@@ -1,16 +1,11 @@
 {
  "band": "sco2",
  "n_members": 20,
- "selection": {
+ "final": {
   "reduced": 0.07959888229072785,
   "radiance": 0.00043202416420424475
  },
- "final": {
-  "reduced": 0.07951468639091891,
-  "radiance": 0.0004300159907188641
- },
- "blend_coords": 13,
- "conformal_coverage_90": 0.9965,
+ "conformal_coverage_90": 0.997,
  "kernel_flow": {
   "reduced": 0.1614478923553191,
   "radiance": 0.001147218153340161

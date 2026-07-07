@@ -1,15 +1,10 @@
 {
  "band": "o2",
  "n_members": 20,
- "selection": {
+ "final": {
   "reduced": 0.038253969084822446,
   "radiance": 0.00026724964998136273
  },
- "final": {
-  "reduced": 0.03797350902416882,
-  "radiance": 0.00026694440139353513
- },
- "blend_coords": 4,
  "conformal_coverage_90": 0.9995,
  "kernel_flow": {
   "reduced": 0.16889087698282942,

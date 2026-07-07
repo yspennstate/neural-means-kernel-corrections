@@ -37,7 +37,7 @@ residual MLP, flat metric & 3.99\% & 0.159\% \\
 residual MLP, radiance metric & 46.3\% & 0.0291\% \\
 Mat\'ern head on the flat network's features & 3.82\% & 0.0758\% \\
 Mat\'ern head on the weighted network's features & 20.0\% & 0.0282\% \\
-per-coordinate combination of the above & \textbf{3.80\%} & \textbf{0.0267\%} \\
+per-coordinate combination of the above & \textbf{3.83\%} & \textbf{0.0267\%} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -90,7 +90,7 @@ and SCO2, so part~(ii) of Proposition~\ref{prop:secmom} puts the
 infinite-seed floors of the flat network at $3.9\%$, $16.2\%$ and $8.0\%$, and
 its seed ensemble sits there. Passing below the floor took a different kind of
 member: the Mat\'ern head on learned features reaches $3.82\%$, $16.1\%$ and
-$7.95\%$, and the final combination $3.80\%$, $16.1\%$ and $7.95\%$. Ensembling
+$7.95\%$, and the final combination $3.83\%$, $16.1\%$ and $7.95\%$. Ensembling
 within an architecture class saturates by the same second-moment law on both
 problems; what moved the OCO-2 numbers an order of magnitude was changing what
 the members are (learned features under the kernel), not how many there are.
@@ -139,7 +139,7 @@ metric is diagonal in the reduced coordinates, the per-coordinate
 combination of Proposition~ef{prop:percoord} is optimal for both metrics
 simultaneously; that per-coordinate combination of the flat and weighted
 models is the final surrogate, and it beats the kernel-flow emulator on both
-metrics at once ($3.80\%$ against $16.89\%$ reduced, $0.0267\%$ against
+metrics at once ($3.83\%$ against $16.89\%$ reduced, $0.0267\%$ against
 $0.0448\%$ radiance). The other bands behave the same way: on WCO2 the deep
 kernel heads reach $16.1\%$ and $0.035\%$ against the emulator's $24.1\%$
 and $0.060\%$, and on SCO2 the per-coordinate combination reaches $8.0\%$

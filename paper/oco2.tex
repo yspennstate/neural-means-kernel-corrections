@@ -42,7 +42,23 @@ per-coordinate combination of the above & \textbf{3.83\%} & \textbf{0.0267\%} \\
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:oco2} carries three findings. First, the representation
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/oco2.pdf}
+\caption{Left: the representation ladder on the O2 band. The same exact
+Mat\'ern machinery moves from $40\%$ on the raw input to $3.8\%$ on the
+trained network's features; the kernel-flow emulator and the network sit in
+between. Right: per-coordinate test RMSE with the reduced coordinates ordered
+by their radiance weight (shaded bars). The per-output-tuned kernel-flow
+emulator is most accurate exactly on the heavily weighted coordinates, the
+flat-metric network on the many light ones, and the radiance-trained network
+closes the gap where the weight lives; the per-coordinate combination takes
+each coordinate from whichever model wins it.}
+\label{fig:oco2}
+\end{figure}
+
+Table~\ref{tab:oco2} carries three findings, and Figure~\ref{fig:oco2} shows
+the two central ones. First, the representation
 ladder: the same exact kernel machinery scores $40\%$ on the raw input,
 $30\%$ after rescaling each input coordinate by its measured sensitivity (the
 metric term of Proposition~\ref{prop:aniso}: the effective rank here is

@@ -93,6 +93,22 @@ architecture class saturates by the same second-moment law on both problems;
 what moved the OCO-2 numbers an order of magnitude was changing what the
 members are (learned features under the kernel), not how many there are.
 
+The floor is a property of the architecture class, not of the problem, and it
+can be probed directly. Different architectures decorrelate: on WCO2 two
+residual MLPs of different activation correlate at $0.84$, a wide shallow
+network against the residual MLP at $0.40$, and a random-Fourier-feature
+network against it at $0.08$ to $0.17$, all far below the $0.96$ of two seeds.
+Yet the floor did not move, because its other input is accuracy: by
+part~(i) of Proposition~\ref{prop:secmom} a member of error $e_2$ helps a
+reference of error $e_1$ only when their correlation falls below $e_1/e_2$,
+and across a bandwidth sweep the Fourier network was either accurate and
+correlated (error $31\%$, correlation $0.54$, just above the $0.53$ threshold)
+or decorrelated and inaccurate (error above $140\%$). No architecture we tried
+was both accurate and decorrelated enough to lower the floor, which is the
+honest statement of why the residual MLP is the member of record: not that
+diversity is impossible, but that on this map no more accurate diverse member
+was found.
+
 Fourth, the regimes of Section~\ref{sec:theory-secmom} are decided by these
 numbers before any stack is fit. Against the flat network the raw-input
 kernel has $\varrho=0.14$ and $e_n/e_k=0.12$: the condition of

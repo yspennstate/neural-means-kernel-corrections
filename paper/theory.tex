@@ -286,6 +286,25 @@ representational reading is that the same kernel machinery applied to the
 network's learned features recovers the network's accuracy and slightly
 exceeds it.
 
+The representational term has a precise reading through the same
+optimal-recovery bound that Section~\ref{sec:theory-or} makes exact. That
+bound factors the error as $\|G-m\|_{\mathcal H}\cdot P_\lambda$, a product of
+the target's norm in the kernel's native space and a design factor set by the
+Gram spectrum. Changing the features changes both in principle, but on the
+O2 band only one moves. The effective dimension of the Mat\'ern Gram, the
+quantity Lemma~\ref{lem:deff} controls, is nearly identical on the raw input
+and on the learned features (at $n=4000$ and a matched median length scale,
+$3995$ against $3994$ at a $10^{-8}$ nugget, with equal leading eigenvalue
+mass), so the design factor is essentially fixed. The native-space norm of
+the target is not: interpolating the same outputs through the two kernels,
+the raw-input kernel carries the target at squared norm $1.6\times10^{6}$ and
+the feature kernel at $3.9\times10^{4}$, a factor of $42$. The network does
+not condition the kernel better; it moves the target to a low-norm corner of
+a native space of the same size, where the exact solve reaches it. This is
+the representational advantage, measured in the units of the bound, and it is
+why an anisotropic metric --- which can only rescale the input, not
+re-express the map --- recovers just the factor $1.4$ and leaves the rest.
+
 \subsection{An error bound for the residual kernel correction}
 \label{sec:theory-or}
 

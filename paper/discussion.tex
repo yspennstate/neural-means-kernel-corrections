@@ -70,6 +70,22 @@ ambiguity of which 1250 samples are used; we use the first 1250 of the
 training block and report the same 20000-sample test set, and we release
 splits and code so the comparison can be audited.
 
+\paragraph{What the second problem settles.}
+The OCO-2 study keeps every component and inverts the balance, and the pair
+of problems brackets the design space. When the network and the kernel tie
+(structural mechanics), the coupling pays: stack them, correct the residual,
+and the certified and conformal machinery rides along. When the kernel
+trails by an order of magnitude (OCO-2), the coupling is not the point; the
+kernel's value moves inside the network, as an exact head on its learned
+features, and the pipeline's job becomes metric management, training each
+member in the metric it will be scored in and combining per coordinate. In
+both regimes the same two measurements decide everything in advance: the
+pairwise residual correlations, which set the ensembling floor of
+Corollary~\ref{cor:floor} at whatever level the members share their errors,
+and the member error ratio, which the second-moment identity turns into a
+keep-or-drop verdict for each candidate. Nothing in that protocol is
+specific to these two datasets.
+
 \paragraph{Outlook.}
 Three directions seem worth pursuing. First, the benchmark itself:
 regenerating the dataset with refined meshes at the corner singularities,

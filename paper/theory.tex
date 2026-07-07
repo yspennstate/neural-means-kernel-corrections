@@ -184,6 +184,32 @@ correlations moves the ensemble's root-mean-square relative error below
 $\bar e\sqrt{\bar\varrho}$.
 \end{corollary}
 
+A second consequence of the same decomposition explains the final OCO-2
+surrogate. Evaluation metrics there are diagonal in the output coordinates
+(the radiance metric is the weighting $s_z$), and diagonal metrics decouple.
+
+\begin{proposition}[per-coordinate combination under diagonal metrics]
+\label{prop:percoord}
+For weights $v=(v_{mj})$ that may depend on the output coordinate, let
+$f_v(u)_j=\sum_m v_{mj}f_m(u)_j$. For any diagonal metric with positive
+weights $w$,
+\[
+\mathbb E\big\|\mathrm{diag}(w)\big(f_v(u)-G(u)\big)\big\|_2^2
+=\sum_j w_j^2\;\mathbb E\big(f_v(u)_j-G(u)_j\big)^2 ,
+\]
+so the minimizing weights solve $q$ separate problems, one per output
+coordinate, none of which involves $w$. The per-coordinate optimum is the
+same for every diagonal metric, and it weakly dominates every combination
+whose weights are shared across coordinates, for all such metrics
+simultaneously.
+\end{proposition}
+
+The practical content: when a problem is scored in several diagonal metrics
+at once, the combination stage does not need to know which one matters. Fit
+the best combination coordinate by coordinate on validation and the result
+serves all of them; only the members need metric-aware training, which is
+where the weighted mean of Section~\ref{sec:oco2} enters.
+
 The corollary is the quantity this paper keeps measuring, at two different
 levels. Across architecture families on the structural-mechanics benchmark
 the pairwise correlations exceed $0.86$ at member errors near $4.7\%$, a

@@ -120,6 +120,17 @@ using $\sum_{m\neq k}w_mw_k=(\sum_m w_m)^2-\|w\|_2^2=1-\|w\|_2^2$. The bracket
 is a convex combination of $1$ and $\bar\varrho$, hence at least
 $\bar\varrho$. \qed
 
+\subsection{Proof of Proposition~\ref{prop:percoord}}
+
+The metric is diagonal, so the squared norm splits over coordinates and the
+$j$-th summand $w_j^2\,\mathbb E\big(\sum_m v_{mj}f_m(u)_j-G(u)_j\big)^2$
+depends on the weights only through the column $v_{\cdot j}$. Minimizing the
+sum is therefore $q$ independent minimizations, and the positive factor
+$w_j^2$ does not move any of the $q$ argmins, so the optimizer is the same
+for every positive $w$. A combination with shared weights is the special
+case $v_{mj}=v_m$ for all $j$, a subset of the feasible set of each
+coordinate problem, which gives the domination. \qed
+
 \subsection{Proof of Proposition~\ref{prop:aniso}}
 
 Both displays are the native-space estimate for kernel ridge regression: for a

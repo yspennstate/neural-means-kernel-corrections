@@ -1,0 +1,16 @@
+{
+ "kind": "perpixel",
+ "members": [
+  "mlp_s0_w1024_d4_n19000_mir",
+  "mlpMSE_s0_w1024_d4_n19000_mir",
+  "mlpR_s0_w1024_d4",
+  "fnoPre_s0_w64_m14_L4_mir",
+  "unetG_s0_w48_mir",
+  "krr"
+ ],
+ "holdout_pix": 0.045979780288886156,
+ "holdout_glob": 0.04630874640367663,
+ "used": true,
+ "ridge": 0.001,
+ "test": 0.045771100598132726
+}

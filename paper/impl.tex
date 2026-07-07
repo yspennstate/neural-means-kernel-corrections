@@ -1,0 +1,91 @@
+All experiments ran on a single laptop (one NVIDIA RTX~PRO~2000, 8~GB; 16 CPU
+cores, 64~GB RAM), in single precision for network training and double
+precision for all kernel solves and error computations. The dataset is the
+distributed \texttt{StructuralMechanics} file pair (40000 samples); inputs are
+reduced to $\mathbb R^{41}$ after verifying the broadcast structure exactly.
+Splits: the training block is samples 1--20000, the test set is samples
+20001--40000. High-data protocol: a fixed permutation of the training block
+reserves 1000 samples for validation, 19000 for fitting. Low-data protocol:
+the first 1250 samples of the training block, of which the last 250 form the
+validation split. The test set is never touched during development; each
+configuration is evaluated on it once, after selection on validation.
+
+\paragraph{FNO.} Width 64, 14 modes per dimension, 4 spectral layers with
+pointwise linear skips and GELU, lift from 3 channels (broadcast load, two
+coordinates), projection $64\to128\to1$. AdamW, learning rate
+$1.5\times10^{-3}$ ($2\times10^{-3}$ with batch 256), weight decay $10^{-6}$,
+cosine schedule to $10^{-6}$, 300 epochs, batch 256. 6.45M parameters.
+
+\paragraph{Transformer (implemented, not in the reported ensemble).} Encoder:
+41 tokens (load value and 10 sine/cosine pairs of the coordinate), 5 pre-norm
+blocks, dimension 192, 4 heads, MLP ratio 4. Decoder: grid queries from
+Fourier features of both coordinates, two cross-attention blocks, pointwise
+head $192\to192\to1$; 3.16M parameters. The cross-attention over 1681 grid
+queries is the most compute-intensive of our means, and the hardware available
+for this study (a single laptop GPU that proved unstable under sustained load)
+did not let us train it to the level of the other members; we therefore
+exclude it from the reported ensemble and note it as the natural fourth
+architecture family for a follow-up on stable hardware.
+
+\paragraph{UNet.} Three convolutional scales ($41\to21\to11$ by average
+pooling, ceil mode) and a bottleneck at $6\times6$; two $3\times3$
+convolutions with GroupNorm(8) and SiLU per block; widths $48/96/192/384$;
+bilinear upsampling with skip concatenation; $1\times1$ output head. Input
+channels as for the FNO. AdamW, learning rate $1.5\times10^{-3}$, weight
+decay $10^{-5}$, cosine schedule, 200 epochs, batch 256. 4.38M parameters.
+
+\paragraph{MSE variant.} The residual MLP trained with mean squared error on
+standardized targets in place of the metric loss, otherwise identical recipe;
+it enters the ensemble as a loss-diversity member and is also the strongest
+plain MLP we obtain.
+
+\paragraph{MLP.} Input layer $41\to1024$, three residual SiLU blocks of width
+1024, output $1024\to1681$. AdamW, learning rate $10^{-3}$, weight decay
+$10^{-5}$, cosine schedule, 400 epochs, batch 256. 4.91M parameters. A wider
+variant (width 1536, five residual blocks, 14.5M parameters) is trained under
+the same recipe.
+
+\paragraph{Refiner.} The same residual trunk with input layer
+$(41+1681)\to1024$: the load is concatenated with the kernel method's stress
+prediction for that load. Training uses four-fold out-of-fold kernel
+predictions for the input channel and full-data kernel predictions at
+evaluation; otherwise identical to the MLP. 6.64M parameters. Reflection
+augmentation flips the load and permutes both the kernel channel and the target
+by the row-reversal index.
+
+\paragraph{Common training details.} Loss: mean over the batch of
+$\|\hat v-v\|_2/\|v\|_2$ in original units (predictions denormalized inside
+the loss; targets standardized by the per-pixel training mean and global
+standard deviation), except for the MSE variant above. Reflection
+augmentation with probability $1/2$; reflection averaging at evaluation.
+Model selection: validation error computed every 10 epochs, best checkpoint
+kept. A single seed is trained per architecture; the ensemble's diversity
+comes from the architectures and losses rather than from reseeding, and the
+correlation analysis of Section~\ref{sec:diversity} indicates same-architecture
+reseeds would be more correlated still.
+
+\paragraph{Stacking.} Global weights: convex, initialized at the simplex
+minimizer of the measured second-moment matrix $S$
+(Proposition~\ref{prop:secmom}) and polished by a short random search on the
+validation metric. Per-pixel weights: affine in the members at each grid
+point, ridge parameter $10^{-3}$, fitted on half the validation split and
+accepted only if they beat the global weights on the held-out half, then
+refitted on the full split.
+
+\paragraph{Kernel stages.} Mat\'ern-$5/2$ on standardized inputs. Scale grid
+$\{0.5,1,2,4\}\times$ the median pairwise distance (estimated on 2000
+points), nugget grid $\{10^{-7},10^{-5},10^{-3}\}$ (scaled by $n$), tuned on
+validation using an 8000-sample subsample of the training set, refit at the
+chosen pair on the full training set in double precision. The pure kernel
+baseline (Table~\ref{tab:main}) uses the grid
+$\{0.5,0.75,1,1.5,2\}\times$median and nuggets $\{10^{-8},10^{-6},10^{-4}\}$
+directly at $n=19000$. Feature stage: penultimate activations of the ensemble
+members (FNO: spatially averaged pre-projection channels, 128; transformer:
+mean-pooled encoder tokens, 192; MLP: trunk output, 1024), concatenated,
+standardized, same kernel family and tuning.
+
+\paragraph{Uncertainty.} Posterior standard deviation \eqref{eq:power}
+computed from the Cholesky factor of $K+n\lambda I$ by triangular solves.
+Conformal scaling: the 0.9-quantile of $\|e\|_2/P_\lambda$ on the validation
+split multiplies $P_\lambda$ on test; coverage is the fraction of test
+samples whose absolute error norm falls below the scaled band.

@@ -1,0 +1,245 @@
+\subsection{Proof of Proposition~\ref{prop:sym}}
+
+By convexity of $\ell(\cdot,v)$,
+\[
+\ell\big(\widehat G_S(u),G(u)\big)\;\le\;\tfrac12\,\ell\big(\widehat
+G(u),G(u)\big)+\tfrac12\,\ell\big(T\widehat G(Su),G(u)\big).
+\]
+Since $T$ is an involution, the equivariance $G(Su)=TG(u)$ applied at $u$
+gives $TG(Su)=T^2G(u)=G(u)$, hence
+\[
+\ell\big(T\widehat G(Su),G(u)\big)=\ell\big(T\widehat G(Su),TG(Su)\big)
+=\ell\big(\widehat G(Su),G(Su)\big),
+\]
+using the $T$-invariance of the loss. Taking expectations and using the
+$S$-invariance of $\mu$ (so that $Su\sim\mu$ when $u\sim\mu$),
+\[
+\mathbb E\,\ell\big(\widehat G_S(u),G(u)\big)\le\tfrac12\,\mathbb
+E\,\ell\big(\widehat G(u),G(u)\big)+\tfrac12\,\mathbb E\,\ell\big(\widehat
+G(Su),G(Su)\big)=\mathbb E\,\ell\big(\widehat G(u),G(u)\big). \qed
+\]
+
+\subsection{Proof of Proposition~\ref{prop:kf}}
+
+Strict positive definiteness of the restricted kernel matrix makes $I_C$ the
+(unique) interpolant of the pairs indexed by $C$, so $I_C(z_j)=v_j$ for $j\in
+C$ and the terms of \eqref{eq:kf} indexed by $C$ vanish, which is the first
+claim. For the second, write
+\[
+e_2(\theta;C)\;=\;\sum_{i\in B\setminus C} g(C,i),\qquad
+g(C,i):=\|v_i-I_C(z_i)\|_2^2 .
+\]
+Conditionally on $C$, the sum has exactly $b/2$ terms, so
+$e_2(\theta;C)=\tfrac b2\,\mathbb E_{i\sim\mathrm{Unif}(B\setminus C)}[g(C,i)]$,
+and taking the expectation over $C$ proves the identity. The gradient claim
+is immediate: for fixed $(B,C)$ the map $\theta\mapsto e_2(\theta;C)$ is
+differentiable wherever the Cholesky factorization in $I_C$ is (the kernel
+matrix stays positive definite in a neighborhood), and under a local
+integrable Lipschitz bound the derivative passes under the expectation, so
+$\mathbb E_{B,C}[\nabla_\theta e_2]=\nabla_\theta\,\mathbb E_{B,C}[e_2]$. \qed
+
+\subsection{Proof of Proposition~\ref{prop:stack}}
+
+(i) Since $\sum_m w_m=1$,
+$F_w(u)-G(u)=\sum_m w_m\,(f_m(u)-G(u))$, and the triangle inequality gives
+$\|F_w(u)-G(u)\|_2\le\sum_m w_m\|f_m(u)-G(u)\|_2$. Dividing by $\|G(u)\|_2$
+yields the pointwise claim; taking expectations gives the risk inequality, and
+bounding each $\ell(f_m(u),G(u))$ by $B$ gives $\ell(F_w(u),G(u))\le B$.
+
+(ii) Write $\ell_u(w)=\ell(F_w(u),G(u))$. First, $\ell_u$ is Lipschitz on
+$\Delta$ for the $\ell^1$ norm: for $w,w'\in\Delta$, the reverse triangle
+inequality and the argument of (i) give
+\[
+|\ell_u(w)-\ell_u(w')|\;\le\;\frac{\big\|\sum_m (w_m-w'_m)(f_m(u)-G(u))\big\|_2}
+{\|G(u)\|_2}\;\le\;B\,\|w-w'\|_1 .
+\]
+Next, discretize the simplex. For $k\in\mathbb N$ let
+$\mathcal G_k=\{w\in\Delta:\,kw\in\mathbb Z^M\}$; its cardinality is the number
+of compositions of $k$ into $M$ nonnegative parts,
+$\binom{k+M-1}{M-1}\le (k+1)^{M-1}$. Given $w\in\Delta$, set
+$w'_i=\lfloor kw_i\rfloor/k$ for $i<M$ and $w'_M=1-\sum_{i<M}w'_i$; then
+$w'\in\mathcal G_k$ (the last coordinate is a multiple of $1/k$ and is
+$\ge w_M\ge0$ because the first $M-1$ coordinates only decreased), and
+\[
+\|w-w'\|_1=\sum_{i<M}(w_i-w'_i)+\big(w'_M-w_M\big)
+=2\sum_{i<M}(w_i-w'_i)\;\le\;\frac{2(M-1)}{k}.
+\]
+By (i) the per-sample loss lies in $[0,B]$, so for each fixed $w'$ Hoeffding's
+inequality gives
+$\mathbb P\big(|\widehat R(w')-R(w')|>t\big)\le2e^{-2mt^2/B^2}$, and a union
+bound over $\mathcal G_k$ shows that with probability at least $1-\delta$,
+\[
+\sup_{w'\in\mathcal G_k}\big|\widehat R(w')-R(w')\big|\;\le\;
+B\sqrt{\frac{\log\!\big(2|\mathcal G_k|/\delta\big)}{2m}} .
+\]
+On this event, for every $w\in\Delta$, approximating by its grid point and
+using the Lipschitz property for both $R$ and $\widehat R$,
+\[
+\big|\widehat R(w)-R(w)\big|\;\le\;
+B\sqrt{\frac{\log(2|\mathcal G_k|/\delta)}{2m}}+\frac{4B(M-1)}{k}.
+\]
+If $w^\star$ minimizes $R$ over $\Delta$, the empirical minimizer satisfies
+$R(F_{\widehat w})\le\widehat R(\widehat w)+\sup_\Delta|\widehat R-R|
+\le\widehat R(w^\star)+\sup_\Delta|\widehat R-R|
+\le R(F_{w^\star})+2\sup_\Delta|\widehat R-R|$. Choosing $k=m(M-1)$ and using
+$|\mathcal G_k|\le(m(M-1)+1)^{M-1}$ gives
+\[
+R(F_{\widehat w})\;\le\;\min_{w\in\Delta}R(F_w)+\frac{8B}{m}
++B\sqrt{\frac{2\big((M-1)\log(m(M-1)+1)+\log(2/\delta)\big)}{m}} ,
+\]
+which is the claim. \qed
+
+\subsection{Proof of Proposition~\ref{prop:secmom}}
+
+Since $\sum_m w_m=1$, the stack's normalized residual is
+$\rho_{f_w}(u)=\sum_m w_m\rho_{f_m}(u)$, hence
+\[
+\mathbb E\,\ell\big(f_w(u),G(u)\big)^2
+=\mathbb E\Big\|\sum_m w_m\rho_{f_m}(u)\Big\|_2^2
+=\sum_{m,k}w_mw_k\,\mathbb E\,\langle\rho_{f_m}(u),\rho_{f_k}(u)\rangle
+=w^\top Sw .
+\]
+For (i), parameterize $w=(1-t,t)$; $q(t)=w^\top Sw$ is a quadratic in $t$ with
+$q'(0)=2(\varrho e_1e_2-e_1^2)$, negative precisely when $\varrho<e_1/e_2$,
+and minimizing the quadratic over $t\in[0,1]$ gives the stated value. For
+(ii), $S=e^2\big((1-\varrho)I+\varrho\,\mathbf1\mathbf1^\top\big)$, so
+$w^\top Sw=e^2\big((1-\varrho)\|w\|_2^2+\varrho\big)$ on the simplex, minimized
+by the uniform weights, where $\|w\|_2^2=1/M$. \qed
+
+\subsection{Proof of Proposition~\ref{prop:aniso}}
+
+Both displays are the native-space estimate for kernel ridge regression: for a
+Mat\'ern kernel of smoothness $s$ on a bounded domain, with the nugget chosen
+as in the pipeline, an estimator $\widehat G_n$ of a target $F$ in the native
+space obeys $\mathbb E\|F-\widehat G_n\|\le C\,h_X^{\,s}\,\|F\|_{\mathcal N}$,
+with $h_X$ the fill distance of the design in the kernel's metric
+\citep{wendland2004scattered}, and for $n$ samples from a density bounded
+above and below on a set of effective dimension $d'$, quasi-uniformity gives
+$h_X\asymp n^{-1/d'}$ with high probability.
+
+For the isotropic kernel the metric is Euclidean on the full $d$-dimensional
+domain, so $h_X\asymp n^{-1/d}$; the target is $F=g(A\,\cdot)$, whose Mat\'ern
+native norm is equivalent to its $H^{s}$ norm, and each derivative of order up
+to $s$ brings down at most a factor $\sigma_1$, so
+$\|g(A\cdot)\|_{H^{s}}\asymp\sigma_1^{\,s}$. For the adapted kernel
+$k_A(u,u')=k(Au,Au')$ the estimator is the isotropic estimator of $g$ on the
+design $\{Au_i\}$: in the rescaled coordinates the target has unit norm and
+its variation is confined to the $r$ directions above the truncation level,
+so the fill distance that enters the estimate is the one in those $r$
+directions, $h_X\asymp n^{-1/r}$. Dividing the two bounds gives the ratio.
+\qed
+
+\subsection{Proof of Theorem~\ref{thm:or}}
+
+Fix $u$ and write $\kappa=k(X,u)\in\mathbb R^n$, $A=K+n\lambda I$,
+$w=A^{-1}\kappa$. For each component $j$, membership $r_j\in\mathcal H_k$ and
+the reproducing property give
+\[
+r_j(u)-\widehat r_{\lambda,j}(u)
+= \Big\langle r_j,\; k(u,\cdot)-\sum_{i=1}^n w_i\,k(u_i,\cdot)\Big\rangle_{\mathcal H_k},
+\]
+because $\widehat r_{\lambda,j}(u)=\kappa^\top A^{-1}r_j(X)=\sum_i w_i\,r_j(u_i)$
+and $r_j(u_i)=\langle r_j,k(u_i,\cdot)\rangle$. Cauchy--Schwarz yields
+\[
+\big|r_j(u)-\widehat r_{\lambda,j}(u)\big|\;\le\;\|r_j\|_{\mathcal H_k}\,
+\Big\| k(u,\cdot)-\sum_i w_i k(u_i,\cdot)\Big\|_{\mathcal H_k},
+\]
+and the second factor is independent of $j$; call it $\rho(u)$. Expanding,
+\[
+\rho(u)^2 = k(u,u) - 2\,w^\top\kappa + w^\top K w
+= k(u,u) - \kappa^\top A^{-1}\big(2A-K\big)A^{-1}\kappa .
+\]
+Since $2A-K=A+n\lambda I$,
+\[
+\rho(u)^2 = k(u,u)-\kappa^\top A^{-1}\kappa - n\lambda\,\|A^{-1}\kappa\|_2^2
+=\widetilde P_\lambda(u)^2\;\le\;P_\lambda(u)^2 .
+\]
+Summing the squared componentwise bounds,
+\[
+\big\|r(u)-\widehat r_\lambda(u)\big\|_2^2=\sum_j\big(r_j(u)-\widehat
+r_{\lambda,j}(u)\big)^2\le\rho(u)^2\sum_j\|r_j\|^2_{\mathcal H_k}
+=\widetilde P_\lambda(u)^2\,\|r\|_K^2 . \qed
+\]
+
+Note that the argument does not use interpolation: it holds for every
+$\lambda\ge0$, with the (slightly sharper) factor $\widetilde P_\lambda$
+showing that smoothing can only tighten this particular bound relative to the
+posterior standard deviation $P_\lambda$ that we report.
+
+\subsection{Proof of Proposition~\ref{prop:conf}}
+
+Write $s_i=\|e(\tilde u_i)\|_2/P_\lambda(\tilde u_i)$ for the validation scores
+and $s^\star=\|e(u^\star)\|_2/P_\lambda(u^\star)$ for the test score. Because
+$m$, $\widehat r_\lambda$, $X$ and $P_\lambda$ are fixed and the inputs
+$\tilde u_1,\dots,\tilde u_m,u^\star$ are exchangeable and independent of them,
+the scores $s_1,\dots,s_m,s^\star$ are exchangeable. The event
+$G(u^\star)\in C(u^\star)$ is exactly $\{s^\star\le q\}$, where
+$q=s_{(\lceil(1-\alpha)(m+1)\rceil)}$ is the
+$k:=\lceil(1-\alpha)(m+1)\rceil$-th order statistic of the validation scores.
+
+Consider the augmented sample $s_1,\dots,s_m,s^\star$ of size $m+1$ and let
+$\mathrm{rank}(s^\star)$ be its rank (ties broken uniformly at random, which
+only helps). By exchangeability the rank is uniform on $\{1,\dots,m+1\}$, so
+$\mathbb P(\mathrm{rank}(s^\star)\le k)=k/(m+1)$. If $s^\star$ is among the $k$
+smallest of the $m+1$ values then at most $k-1$ of the $s_i$ are below it, so
+$s^\star\le s_{(k)}=q$; conversely $s^\star\le q$ forces
+$\mathrm{rank}(s^\star)\le k$ except possibly through ties. Hence
+\[
+\mathbb P(s^\star\le q)\;\ge\;\mathbb P(\mathrm{rank}(s^\star)\le k)
+=\frac{k}{m+1}=\frac{\lceil(1-\alpha)(m+1)\rceil}{m+1}\;\ge\;1-\alpha,
+\]
+which is the lower bound. When the scores are almost surely distinct there are
+no ties, $\{s^\star\le q\}=\{\mathrm{rank}(s^\star)\le k\}$ exactly, and
+$k/(m+1)<((1-\alpha)(m+1)+1)/(m+1)=1-\alpha+1/(m+1)$, giving the upper bound.
+\qed
+
+\subsection{Proof of Corollary~\ref{cor:mp}}
+
+The nonzero eigenvalues of $K/n=XX^\top\!/n$ coincide with those of the
+sample covariance matrix $S=X^\top X/n\in\mathbb R^{p\times p}$, and zero
+eigenvalues contribute nothing to
+$d_{\mathrm{eff}}(\lambda)=\sum_i\lambda_i(K)/(\lambda_i(K)+n\lambda)$, so
+\[
+\frac{d_{\mathrm{eff}}(\lambda)}{n}
+=\frac{p}{n}\cdot\frac1p\sum_{j=1}^{p}\frac{\lambda_j(S)}{\lambda_j(S)+\lambda}
+=\frac{p}{n}\Big(1-\lambda\,\widehat m_S(-\lambda)\Big),
+\]
+by the computation of Lemma~\ref{lem:deff} applied to $S$, with
+$\widehat m_S$ the Stieltjes transform of the empirical spectral distribution
+of $S$. By the Mar\v{c}enko--Pastur theorem
+\citep{marchenko1967distribution}, this distribution converges weakly, almost
+surely, to the law with ratio $\gamma$ and scale $\sigma^2$, and since
+$x\mapsto(x+\lambda)^{-1}$ is bounded and continuous on $[0,\infty)$,
+$\widehat m_S(-\lambda)\to m(-\lambda)$. It remains to evaluate
+$m(-\lambda)$. The Stieltjes transform of the Mar\v{c}enko--Pastur law
+satisfies the self-consistent equation
+\[
+m(z)=\frac{1}{\sigma^2\big(1-\gamma-\gamma z\,m(z)\big)-z},
+\]
+i.e.\ $\gamma\sigma^2 z\,m^2+\big(z-\sigma^2(1-\gamma)\big)m+1=0$. At
+$z=-\lambda$ the discriminant is
+$\big(\lambda+\sigma^2(1-\gamma)\big)^2+4\gamma\sigma^2\lambda>0$, and of the
+two real roots
+\[
+m(-\lambda)=\frac{\sigma^2(1-\gamma)+\lambda\pm
+\sqrt{\big(\lambda+\sigma^2(1-\gamma)\big)^2+4\gamma\sigma^2\lambda}}
+{-2\gamma\sigma^2\lambda}
+\]
+only the one with the minus sign in the numerator is positive, as
+$m(-\lambda)=\int(x+\lambda)^{-1}dF(x)>0$ requires; rearranging gives the
+stated expression. \qed
+
+\subsection{Proof of Lemma~\ref{lem:deff}}
+
+Diagonalize $K$ with eigenvalues $\lambda_i$. Then
+\[
+\operatorname{tr}\big(K(K+n\lambda I)^{-1}\big)
+=\sum_{i=1}^n\frac{\lambda_i}{\lambda_i+n\lambda}
+=\sum_{i=1}^n\Big(1-\frac{n\lambda}{\lambda_i+n\lambda}\Big)
+= n-\lambda\sum_{i=1}^n\frac{1}{\lambda_i/n+\lambda}
+= n\big(1-\lambda\,\widehat m(-\lambda)\big),
+\]
+using $\widehat m(-\lambda)=\tfrac1n\sum_i(\lambda_i/n+\lambda)^{-1}$. The
+limit statement follows from the weak convergence of the empirical spectral
+distribution together with the boundedness and continuity of
+$x\mapsto(x+\lambda)^{-1}$ on $[0,\infty)$ for fixed $\lambda>0$. \qed

@@ -1,0 +1,81 @@
+The structural-mechanics benchmark put the neural mean and the kernel in the
+balanced regime. To see the other regime we apply the same components to the
+radiative-transfer emulation problem of \citet{susiluoto2025radiative}: per
+spectral band of the OCO-2 instrument, learn the map from a reduced
+atmospheric state ($20$--$24$ dimensions after the dimension reduction of
+that paper) to the reduced radiance ($40$ PCA coefficients of the
+monochromatic spectrum), from $20000$ training pairs. The data, and the
+kernel-flow emulator's own predictions on the $2000$ test states, are public
+(OSF project \texttt{u2t8a}), so the comparison below is computed on
+identical test points against the published emulator itself rather than
+against our reimplementation of it.
+
+Two error metrics matter, and they disagree in an instructive way. The
+\emph{reduced} metric is the relative $L^2$ error on the $40$ standardized
+coefficients. The \emph{radiance} metric maps predictions back to the
+monochromatic spectrum through the stored PCA projection and norms before
+comparing; because the projection is orthogonal, on the reduced side it is
+exactly the diagonal weighting $s_z$, and its energy concentrates almost
+entirely on the first few coefficients.
+
+\begin{table}[t]
+\centering
+\caption{OCO-2 O2 band, $2000$ held-out states, identical test points. The
+kernel-flow row is the emulator of \citet{susiluoto2025radiative}, scored
+from its own stored predictions. ``Features'' means the penultimate
+activations of the trained network; the kernel head is the same exact
+Mat\'ern solve as everywhere else in this paper.}
+\label{tab:oco2}
+\begin{tabular}{lcc}
+\toprule
+model & reduced & radiance \\
+\midrule
+Mat\'ern kernel, raw input, one length scale & 40.47\% & 0.240\% \\
+Mat\'ern kernel, raw input, sensitivity-scaled (ARD) & 30.01\% & --- \\
+kernel-flow emulator \citep{susiluoto2025radiative} & 16.89\% & 0.0448\% \\
+residual MLP, flat metric & 3.99\% & 0.159\% \\
+residual MLP, radiance metric & 46.3\% & 0.0291\% \\
+Mat\'ern head on the flat network's features & \textbf{3.82\%} & 0.0758\% \\
+Mat\'ern head on the weighted network's features & 20.0\% & \textbf{0.0282\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:oco2} carries three findings. First, the representation
+ladder: the same exact kernel machinery scores $40\%$ on the raw input,
+$30\%$ after rescaling each input coordinate by its measured sensitivity (the
+metric term of Proposition~\ref{prop:aniso}: the effective rank here is
+$17$ of $20$, so the proposition predicts a constant-factor gain and no
+change of rate, which is what the scaling experiment shows), and
+$3.82\%$ on the trained network's features, past the network's own head. The
+raw-input kernel was limited by its features, not by anything kernel-shaped,
+and the deep kernel head, an exact solve on learned features, is the
+strongest single model on the reduced metric.
+
+Second, the training metric behaves as a budget. The flat-trained and
+radiance-trained rows are one architecture and two losses, and each wins the
+metric it was trained in by a factor of five or more while losing the other.
+The mechanism is visible per coordinate: the radiance metric concentrates on
+the leading coefficient, the kernel-flow emulator (whose lengthscales are
+tuned per output) predicts that coefficient to $0.0012$ root mean square
+against the flat network's $0.0054$, while the flat network is three to four
+times more accurate on the trailing thirty coordinates that the radiance
+barely sees. Training the network in the radiance metric closes exactly that
+gap. A constant-elasticity model of this reallocation is too crude --- the
+per-coordinate exponents scatter widely, and coordinate errors do not
+decouple because the network shares capacity --- but the direction is robust,
+and the practical rule is plain: train in the metric you report.
+
+Third, the regimes of Section~\ref{sec:theory-secmom} are decided by these
+numbers before any stack is fit. Against the flat network the raw-input
+kernel has $\varrho=0.14$ and $e_n/e_k=0.12$: the condition of
+Proposition~\ref{prop:secmom} fails and the kernel is dropped, in contrast to
+structural mechanics where the same test keeps it. Because the radiance
+metric is diagonal in the reduced coordinates, selecting the best model per
+coordinate on the validation split is optimal for both metrics
+simultaneously; that per-coordinate combination of the flat and weighted
+models is the final surrogate, and it beats the kernel-flow emulator on both
+metrics at once ($3.82\%$ against $16.89\%$ reduced, $0.028\%$ against
+$0.045\%$ radiance). The second band behaves the same way (the weighted mean
+reaches $0.037\%$ radiance against the emulator's $0.060\%$ on WCO2), and
+the code releases the per-band numbers alongside this paper.

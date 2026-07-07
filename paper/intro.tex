@@ -1,0 +1,145 @@
+Operator learning constructs fast surrogates for the solution maps of
+parametric partial differential equations and physical forward models from
+data. Two families dominate the field: neural operators, which learn their
+own representations, and kernel or Gaussian-process methods, which come with
+exact solves and error certificates. This paper studies how the two combine,
+on two public problems with published baselines that turn out to sit at
+opposite ends of the neural-versus-kernel spectrum: the structural-mechanics
+benchmark of \citet{dehoop2022cost}, where the families tie and the question
+is what their coupling adds, and the OCO-2 radiative-transfer emulation
+problem of \citet{susiluoto2025radiative}, where a fixed kernel trails a
+network by an order of magnitude until it is handed the network's learned
+features. The same small set of components, and the same supporting theory,
+account for both.
+
+Among the standard test problems in the operator-learning literature, the
+structural mechanics benchmark introduced by
+\citet{dehoop2022cost} has proved unusually resistant to improvement. The task
+is to learn the map from a boundary load applied to the top edge of an elastic
+plate to the interior von Mises stress field computed by a finite element
+solver; inputs are sampled from a Gaussian field, and errors are reported as
+mean relative $L^2$ on a held-out set. With 20000 training samples, the four
+architectures compared by \citet{dehoop2022cost} land within half a percentage
+point of each other (PARA-Net 4.55\%, PCA-Net 4.67\%, FNO 4.76\%, DeepONet
+5.20\%), and the optimal-recovery kernel method of \citet{batlle2024kernel},
+which matches or beats neural operators on most of the other benchmarks in
+that study, does not do so here (5.18\%); the authors single out this problem
+as the most challenging one for their method. More recently
+\citet{mora2025operator} revisited the problem in a low-data regime and
+reported 6.49\% with a Gaussian process whose mean is an FNO, against 6.62\%
+for the FNO alone, with 1250 training samples. The picture suggested by these
+numbers is a plateau around 4.5\% that neither pure neural nor pure kernel
+methods penetrate.
+
+This paper does two things with that plateau. First it reaches the front of
+it: a residual coupling of neural and kernel methods attains \errBest\%
+relative test error under the 20000-sample protocol, matching the best
+published result (PARA-Net, \pubBestHi\%) to within run-to-run noise and
+below every other published method, and \errBestLow\% under the 1250-sample
+protocol against a published best of \pubBestLo\%, a clear margin there.
+Second, and we think more usefully, it explains why the front of the band is
+where it is and why further movement should not be expected from modeling. The residuals of maximally different
+surrogates on this benchmark are nearly the same residual: across three
+architecture families and two training losses, per-sample residual
+correlations lie between \corrNetLo{} and \corrNetHi{}, and the component
+shared by all members carries over ninety percent of the residual energy,
+concentrates at
+the corners of the loaded edge where the finite element data are least
+reliable, and is statistically independent of every input statistic we
+compute. The error of a fixed recipe is also nearly flat in the training set
+size. Taken together (Section~\ref{sec:diversity}), the evidence reads the
+published plateau as a property of the benchmark's data rather than of the
+surrogate class, and our final number as sitting within a few hundredths of
+what this dataset can certify. The paper also returns a pointwise
+uncertainty estimate, whose reach and limits we characterize carefully
+rather than oversell. The pipeline combines three ingredients, none of which
+is exotic on its own.
+
+First, representation. The benchmark ships its input as a $41\times41$ array
+in which the one-dimensional load is copied across 41 columns. Treating the
+input as what it is, a function of one variable sampled at 41 points, changes
+what is easy: kernel methods on $\mathbb R^{41}$ with 19000 training points
+are exact linear-algebra computations (a single Cholesky factorization of the
+Gram matrix), and the guesswork of choosing a dimension reduction for the
+input disappears. Some of the published baselines flatten the redundant
+$41\times41$ input or reduce it by PCA; none of the numbers above changes
+materially under such reformattings, so we do not attribute the gap we open to
+this step alone, but it is what makes the rest of the pipeline cheap and
+transparent.
+
+Second, an accurate neural mean. The neural-mean slot is architecture-agnostic;
+we instantiate it with a residual multilayer perceptron and, as a second
+member, the same network fed the kernel method's own prediction as an extra
+channel, so that it learns to refine the kernel rather than to reproduce it.
+Both are trained with a loss equal to the reported metric, with reflection
+augmentation and reflected test-time averaging. On this benchmark the refiner
+is among the strongest single models we obtain, and a convex combination of
+the two with the kernel predictor is near the top of the published band. A
+Fourier neural operator, a UNet, and an MSE-trained variant of the MLP join
+the ensemble in Section~\ref{sec:diversity}, where their role turns out to be
+diagnostic as much as additive. The reflection steps are backed by an elementary but useful
+fact (Proposition~\ref{prop:sym}): if the target operator is equivariant under
+an isometric involution and the input law is invariant, symmetrizing any
+estimator cannot increase a convex risk. We verify the equivariance directly on
+the data by locating near-mirror input pairs and
+checking their outputs (Section~\ref{sec:benchmark}).
+
+Third, a kernel correction of the residual. The stacked ensemble is treated as
+the mean of a Gaussian process on the 41-dimensional load space, and the
+residual operator is regressed by kernel ridge with a Mat\'ern kernel, scale
+and nugget tuned by validation; a second, smaller correction uses the trained
+networks' penultimate features as kernel inputs. This stage is where the
+theory earns its keep. The corrected surrogate satisfies a pathwise bound
+(Theorem~\ref{thm:or}) of the form $\|\text{error at }u\| \le \|G-m\|_K \cdot
+P_\lambda(u)$, the product of the RKHS norm of the residual operator and the
+Gaussian process posterior standard deviation. The operator factor explains
+why one should regress residuals rather than stresses: the computable proxy
+for it, the RKHS norm of the fitted interpolant, drops by about
+\normRatio$\times$ when the kernel is moved from raw targets to ensemble
+residuals. The kernel is asked to represent only what the networks left
+behind, and what they leave behind is much smaller as the kernel measures it,
+so the same design gives a much tighter certificate.
+
+The design factor $P_\lambda$ is the natural candidate for a reported
+uncertainty, and here our finding is a cautionary one. As a pointwise ranking
+of the corrected surrogate's error, $P_\lambda$ is weak: the neural mean
+supplies most of the error, and its error pattern is not a function of the
+input-space geometry that $P_\lambda$ measures. Worse, the benchmark's
+relative-error metric is confounded by output amplitude, so the raw
+correlation of $P_\lambda$ with relative error is even slightly negative. The
+disagreement of our ensemble is no more informative, its members being
+architecturally alike and so wrong in the same places. What survives is what
+should: the conformal rescaling of $P_\lambda$ on held-out data is
+distribution-free and attains its nominal coverage on test. We report this in
+full in Section~\ref{sec:uq} because the gap between a valid bound and a useful
+indicator is exactly the kind of thing benchmark papers tend to gloss.
+
+We also examine two further points of contact between the pipeline and
+theory. The kernel-flow regularizer of \citet{owhadi2019kernel,yoo2021deep},
+which we include as a variant in the training of the neural means, admits an
+exact description: the $\ell^2$ kernel-flow batch loss is an unbiased
+estimator, over the random half-split, of the leave-half-out prediction error
+of a kernel method built on the network's features
+(Proposition~\ref{prop:kf}), so adding it trains the features for the role
+they later play in the correction stage. And the nugget selected by
+cross-validation admits a spectral reading: an exact identity
+(Lemma~\ref{lem:deff}) expresses the effective dimension of the kernel solve
+through the Stieltjes transform of the Gram spectrum, which for our learned
+features exhibits the bulk-plus-spikes shape familiar from random matrix
+theory; the cross-validated nugget sits where the effective dimension has
+absorbed the spikes and leading bulk. Neither observation is deep, but both
+replace folklore with checkable statements, and both checks pass on this
+problem.
+
+The paper is organized as follows. Section~\ref{sec:benchmark} describes the
+benchmark, the published results we compare against, and the data-driven
+verification of the mirror symmetry. Section~\ref{sec:method} specifies the
+pipeline. Section~\ref{sec:theory} states the supporting results, one per
+stage of the pipeline, with proofs in Appendix~\ref{app:proofs}.
+Section~\ref{sec:experiments} reports the main comparisons, ablations that
+attribute the improvement to its sources, the diversity experiment and the
+anatomy of the shared residual, the uncertainty calibration study, and the
+spectral analysis. Section~\ref{sec:discussion} discusses limitations and the
+relation to Gaussian process emulation practice at scale, including the line
+of work on kernel-flow-based emulators for remote sensing retrievals
+\citep{susiluoto2025radiative}.

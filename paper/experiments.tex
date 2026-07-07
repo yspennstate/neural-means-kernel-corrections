@@ -1,0 +1,395 @@
+% Numbers inserted from runs/*.json at freeze; macros in main.tex hold the
+% reported values.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/fields.pdf}
+\caption{Example predictions of the full pipeline. Top: a median-error test
+case; bottom: a case at the 98th error percentile. Columns: input load, true
+von Mises stress, prediction, and pointwise absolute error (note the smaller
+scale). Errors concentrate in the high-traction corner, as also reported by
+\citet{mora2025operator}.}
+\label{fig:fields}
+\end{figure}
+
+\subsection{Main comparison}
+\label{sec:main-results}
+
+Table~\ref{tab:main} reports the high-data protocol. The published numbers
+are quoted from \citet{dehoop2022cost} (as tabulated by
+\citealt{batlle2024kernel}) and from \citet{batlle2024kernel}; our rows are
+computed under the split of Section~\ref{sec:benchmark}, which gives our
+methods strictly no more training information than the baselines had. The
+kernel ridge row reproduces the published kernel result almost exactly
+(\errKRRload\% against 5.18\%), which we take as evidence that the protocols
+are aligned; the gap opened by the rest of the pipeline is therefore not an
+artifact of evaluation choices. The full pipeline reaches \errBest\%. This is
+below every published method other than PARA-Net (4.55\%), which it matches at
+the reported two-decimal precision; since our own stacking configurations vary
+by a hundredth or two among themselves (the ablation below moves between
+4.65\% and 4.67\% under changes that should not matter), we read the two as
+tied and do not claim to separate them. The margin over the FNO (4.76\%), PCA-Net
+(4.67\%), DeepONet (5.20\%) and the optimal-recovery kernel (5.18\%) is
+several times that spread. Section~\ref{sec:diversity} argues the tie is not a
+coincidence of tuning but a floor the data impose on every method here.
+
+\begin{table}[t]
+\centering
+\caption{Structural mechanics, high-data protocol (20000 training samples,
+20000 test). Mean relative $L^2$ test error. Rows above the rule are
+published results on the same data; rows below are ours (mean over the fixed
+split; TTA denotes reflection averaging at test time).}
+\label{tab:main}
+\begin{tabular}{lcc}
+\toprule
+Method & Error (\%) & Parameters \\
+\midrule
+DeepONet \citep{dehoop2022cost} & 5.20 & -- \\
+FNO \citep{dehoop2022cost} & 4.76 & -- \\
+PCA-Net \citep{dehoop2022cost} & 4.67 & -- \\
+PARA-Net \citep{dehoop2022cost} & 4.55 & -- \\
+Optimal-recovery kernel \citep{batlle2024kernel} & 5.18 & -- \\
+\midrule
+Kernel ridge on loads (ours) & \errKRRload & -- \\
+Residual MLP + reflection TTA & \errMLP & 4.9M \\
+\ \ + residual kernel correction (full pipeline) & \errBest & 4.9M \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Low-data protocol (1250 training samples, 20000 test). Published
+rows from \citet{mora2025operator}. Our pipeline sees only the 1250 labels
+(250 of them used as the validation split).}
+\label{tab:lowdata}
+\begin{tabular}{lc}
+\toprule
+Method & Error (\%) \\
+\midrule
+DeepONet & 8.70 \\
+GP, optimal recovery \citep{batlle2024kernel} & 6.95 \\
+Zero-mean GP \citep{mora2025operator} & 6.74 \\
+FNO & 6.62 \\
+FNO-mean GP \citep{mora2025operator} & 6.49 \\
+\midrule
+Kernel ridge on loads (ours, multiscale) & \errKRRloadLow \\
+Full pipeline (ours) & \errBestLow \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Ablation}
+\label{sec:ablation}
+Table~\ref{tab:ablation} builds the pipeline up one component at a time under
+the high-data protocol. The kernel ridge on loads and the reflection-averaged
+neural mean start at \errKRRload\% and \errMLP\% respectively. Stacking is
+trivial with a single high-data mean and leaves it unchanged; the value of the
+combination appears in the correction stage, where regressing the neural
+mean's residual with the validated Mat\'ern kernel lowers the error to
+\errBest\%. The feature-space and second input-space corrections did not
+improve validation error beyond the first correction with a single mean and so
+were not selected; we expect them to contribute more with a larger and more
+diverse ensemble, and we report the stages that the validation split actually
+chose. Two smaller effects are worth isolating. Reflection test-time averaging
+lowers the MLP test error by \ttaGainMLP{} points, consistent with
+Proposition~\ref{prop:sym}, which guarantees the direction of the change.
+Adding the kernel-flow regularizer (Section~\ref{sec:theory-kf}) to the
+low-data MLP did not help here (it moved test error from 5.64\% to 5.87\%);
+Proposition~\ref{prop:kf} says what the term estimates, not that estimating it
+is useful on every problem, and on this smooth-output benchmark the plain
+metric loss was already a good proxy. Nor does a richer correction kernel help:
+replacing the single tuned Mat\'ern with a sum of Mat\'ern kernels at several
+bandwidths leaves the validation error unchanged to two decimals, which is
+consistent with the residual being close to kernel-irreducible in the input
+geometry, and is why the boosted correction stages of
+Section~\ref{sec:method-kernel} were not selected. One positive lesson does
+emerge from the refiner variants. Conditioning the refiner on the kernel
+method's prediction (test error 4.73\%) beats conditioning it on another
+network's prediction (4.84\%), even though the two conditioning fields have
+almost the same accuracy; the kernel field carries information complementary to
+the network's inductive bias, whereas a second network's field is largely
+redundant. Enlarging the ensemble beyond the residual family is the subject of
+the next subsection, where the returns of each addition turn out to be
+predictable in advance from the correlation structure of the members' errors.
+
+\begin{table}[t]
+\centering
+\caption{Building the high-data pipeline. Mean relative $L^2$ test error under
+the 20000-sample protocol; ``+'' rows are cumulative.}
+\label{tab:ablation}
+\begin{tabular}{lc}
+\toprule
+Stage & Test error (\%) \\
+\midrule
+Kernel ridge on loads & \errKRRload \\
+Reflection-averaged neural mean & \errMLP \\
+\ \ + kernel-conditioned refiner, stack & \errStackFam \\
+\ \ + diverse members (Section~\ref{sec:diversity}), per-pixel stack & \errStack \\
+\ \ + residual kernel correction & \errBest \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Architectural diversity and the shared residual}
+\label{sec:diversity}
+
+The natural reading of Table~\ref{tab:main} is that the remaining error is a
+modeling problem: different architectures make different mistakes, so a more
+diverse ensemble should stack to a lower number. We tested this directly. To
+the residual family of Section~\ref{sec:method} we added a Fourier neural
+operator, a UNet, and a variant of the MLP trained on normalized mean squared
+error instead of the metric, each trained to the published single-model level
+or better (Table~\ref{tab:members}). The test refutes the reading.
+Figure~\ref{fig:corr} shows the correlation of per-sample normalized residuals
+between members: every pair of trained networks, across three architecture
+families and two losses, correlates between \corrNetLo{} and \corrNetHi{}, and
+the kernel predictor, the most alien member by construction, still correlates
+\corrKerLo{}--\corrKerHi{} with all of them. The members are not making
+different mistakes. They are making the same mistake with
+small private variations.
+
+The second-moment identity of Proposition~\ref{prop:secmom} makes the
+consequence quantitative before any weights are fitted. The matrix $S$
+measured on the validation split predicts both the optimal convex weights and
+the achievable stack risk: for the six-member ensemble the predicted
+root-mean-square relative error of the best mixture is $4.97\%$, the fitted
+stack realizes a mean of $4.61\%$, and their ratio is the dispersion factor
+$\approx0.93$ that is stable across every pipeline we ran. The weights the
+prediction assigns from $S$ alone, without ever evaluating the metric,
+concentrated on the refiner and the FNO with a few tenths each on the UNet and
+the MSE-trained network, a few percent on the kernel, and zero on the plain
+MLP whose error is already spanned by the better members of its family, match
+the weights the direct metric search finds, as part~(i) of the proposition
+predicts from the measured $(e_1,e_2,\varrho)$. Stacking does exactly what the
+correlations permit, and members like these permit little: part (ii) puts the
+infinite-ensemble floor of an equicorrelated family at $e\sqrt\varrho$, which
+at $e\approx4.7\%$ and a mean pairwise $\varrho\approx0.9$ is about $4.5\%$.
+Allowing the
+weights to vary over the grid (an affine per-pixel stack, fitted by ridge
+regression on half the validation split and accepted only because it beat the
+global weights on the other half) recovers a little of what global weights
+cannot see, and the kernel correction adds a few hundredths on top; that is
+the \errBest\% of Table~\ref{tab:main}, and it is consistent with the floor
+just computed.
+
+Where does the common mistake live? Write $r_m$ for member $m$'s residual
+field on a validation case and $c=\frac1M\sum_m r_m$ for the across-member
+mean, the component that no amount of uniform averaging removes. Measured
+over the validation split and three families (refiner, FNO, kernel), the
+shared component carries $90\%$ of the average residual energy
+(Figure~\ref{fig:shared}). Three of its properties matter. Spatially, its
+energy concentrates at the two corners of the loaded edge, where the traction
+boundary condition meets the lateral supports; relative to the local field
+scale it is three to four times larger there than the grid average, and these
+are precisely the locations where the finite element solution is least
+accurate and where interpolation to the $41\times41$ grid is most strained.
+Spectrally, it is enriched in high radial frequencies relative to the stress
+fields themselves: the fields put $97.5\%$ of their energy below radial
+wavenumber 4, the shared residual only $69\%$. And its magnitude is
+statistically independent of everything we can compute from the input: the
+correlation of $\|c\|$ with the output norm is $0.01$, with the load norm
+$0.02$, with the load's total variation $0.02$. A component that no
+architecture avoids, that no input statistic predicts, that lives at the
+stress concentrations, and that fixed-scale additive noise would reproduce is
+most economically read as noise of the data-generating process itself, finite
+element and grid-interpolation error at the singular corners, not as
+approximation error of the surrogates.
+
+Two independent measurements corroborate this reading. First, the residual
+kernel correction, which regresses the stack's residual on the load, improves
+the stack by only a few hundredths of a point at $n=19000$ whatever the
+kernel scale: at this sample size the shared residual is not a function of
+the load in any way a Mat\'ern RKHS on $\mathbb R^{41}$ can see. Second, the
+error stops responding to data. Under identical recipes, the MLP's test error
+is $4.95\%$ with $3500$ training samples, $4.86\%$ with $8500$, and $4.86\%$
+with $19000$ (Figure~\ref{fig:scaling}); the kernel ridge curve still falls,
+at roughly $n^{-0.11}$, but toward the same region. A modeling limitation
+should yield to capacity, diversity, or data. This error yields to none of
+them.
+
+We draw two conclusions. First, the published plateau of
+Table~\ref{tab:main}, five methods within two thirds of a point of each other
+after years of architectural progress, is not evidence that some sixth
+architecture is missing; it is the signature of a benchmark whose achievable
+error is set by its data. On the evidence above, numbers near $4.5\%$ are
+within a few hundredths of that limit, which is where our pipeline lands
+(\errBest\%), and material further progress on this benchmark means
+regenerating the data (finer meshes near the corners, higher-order elements,
+output grids that resolve the concentrations), not new surrogates. Second,
+the practical recipe survives the reinterpretation with its economics
+clarified: symmetrized accurate means capture what is learnable, stacking
+buys exactly the decorrelation the members possess (little, here), and the
+kernel correction certifies and mops up the load-visible remainder. The
+components are worth their cost in that order.
+
+\begin{table}[t]
+\centering
+\caption{Ensemble members, high-data protocol. Mean relative $L^2$ test error
+with reflection averaging; every member is selected on the validation split.}
+\label{tab:members}
+\begin{tabular}{llc}
+\toprule
+Member & Family / loss & Error (\%) \\
+\midrule
+Residual MLP & MLP, metric loss & \errMLP \\
+Residual MLP & MLP, normalized MSE & \errMSE \\
+Kernel-conditioned refiner & MLP on $(u,\mathrm{KRR}(u))$ & \errRef \\
+FNO & spectral, metric loss & \errFNOG \\
+UNet & convolutional, metric loss & \errUNetG \\
+Kernel ridge on loads & Mat\'ern-$5/2$ & \errKRRload \\
+\midrule
+Per-pixel stack (validation-fitted) & -- & \errStack \\
+\ \ + residual kernel correction & -- & \errBest \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\linewidth]{figs/corr.pdf}
+\caption{Correlation of per-sample normalized residuals between ensemble
+members on the validation split (test-set values agree to two decimals).
+Every pair of trained networks correlates between \corrNetLo{} and
+\corrNetHi{}, the convolutional UNet being the least like the rest; the kernel
+predictor, the most alien member by construction, still correlates
+\corrKerLo{}--\corrKerHi{} with all of them.}
+\label{fig:corr}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/shared.pdf}
+\caption{Anatomy of the shared residual $c$ (across-member mean of the
+residual fields; refiner, FNO and kernel members). Left to right: rms of $c$
+over the grid; rms of the member-specific remainders; radial DCT band
+energies of the stress fields, of $c$, and of the specific parts; and the
+norm of $c$ against the output norm, whose correlation is $0.01$.}
+\label{fig:shared}
+\end{figure}
+
+\subsection{Uncertainty quantification}
+\label{sec:uq}
+Theorem~\ref{thm:or} certifies the corrected surrogate's error by
+$\|G-m\|_K\,P_\lambda(u)$, and it is tempting to read the design factor
+$P_\lambda$ as a pointwise error bar. On this benchmark that reading fails, in
+an instructive way. Table~\ref{tab:norms} confirms the operator factor behaves
+as the theory predicts: the computable RKHS norm of the fitted correction is
+about \normRatio$\times$ smaller when the kernel regresses ensemble residuals
+than when it regresses raw stress fields, so an accurate mean genuinely leaves
+a smoother remainder and a tighter certificate. But the design factor
+$P_\lambda$ correlates only weakly with the corrected surrogate's absolute
+error (Pearson \uqCorrAbs), and \emph{negatively} with the benchmark's
+relative error. The cause is measurable: $P_\lambda$ is large for loads far
+from the training set, those loads tend to have large amplitude, large-amplitude
+loads produce large-norm stress fields, and dividing by the output norm makes
+their relative error small. Indeed $P_\lambda$ correlates \uqCorrNorm{} with
+the output norm (Figure~\ref{fig:uq}). The error is dominated by the neural
+mean, whose mistakes are not a function of the input-space geometry that
+$P_\lambda$ sees, so a purely input-space power function cannot rank them.
+
+The obvious alternative fares no better, and with the ensemble of
+Section~\ref{sec:diversity} the question can be answered rather than left
+open. Ensemble disagreement, the spread of the members' predictions, is the
+standard deep-ensemble error signal; on the full cross-architecture ensemble
+its correlation with the corrected surrogate's absolute error is
+\uqDisAbsDiv, no better than the \uqDisAbs{} of the like-architecture
+ensemble. Section~\ref{sec:diversity} says why it cannot do better here:
+disagreement measures the member-specific components of the error, which
+carry under a tenth of the residual energy, while the ranking signal for the
+shared component is invisible to any within-ensemble statistic, because the
+members agree precisely where they are jointly wrong.
+
+What does hold is coverage, for free. A distribution-free conformal rescaling,
+taking the 0.9-quantile of $\|e\|_2/P_\lambda$ on the validation split and
+scaling $P_\lambda$ by it, yields a band with \uqCover\% empirical coverage on
+the test set at the nominal \uqCoverNom\% level. Conformal validity needs no
+correlation between the score and the error, only exchangeability, so it
+survives the confound that defeats the ranking. The lesson is narrow but real:
+a valid pointwise bound (Theorem~\ref{thm:or}) is not automatically a useful
+pointwise indicator, the standard uncertainty signals can both fail on the
+same problem, and a relative-error metric has to have its normalization
+accounted for before a posterior standard deviation means what it appears to.
+
+\begin{table}[t]
+\centering
+\caption{Squared RKHS norm of the fitted kernel interpolant,
+$\operatorname{tr}(\alpha^\top K\alpha)$, when the same validated kernel and
+design regress raw stress fields versus ensemble residuals.}
+\label{tab:norms}
+\begin{tabular}{lc}
+\toprule
+Kernel regresses & $\|\widehat r\|_K^2$ \\
+\midrule
+Raw stress fields ($m=0$) & $1.39\times10^{10}$ \\
+Ensemble residuals & $5.14\times10^{7}$ \\
+\midrule
+Ratio & \normRatio$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/uq.pdf}
+\caption{Left: the Gaussian process posterior standard deviation $P_\lambda$
+against the corrected surrogate's relative error on the test set; the
+association is weak and, because of the output-amplitude confound, slightly
+negative. Right: decile calibration of $P_\lambda$ against absolute error, the
+theory-consistent quantity. A distribution-free conformal rescaling of
+$P_\lambda$ attains \uqCover\% coverage at the nominal \uqCoverNom\% level.}
+\label{fig:uq}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/scaling.pdf}
+\caption{Relative test error against training set size for the kernel ridge on
+loads (log-log), with the full pipeline and the best published results marked
+in both regimes.}
+\label{fig:scaling}
+\end{figure}
+
+\subsection{Spectra and effective dimension}
+\label{sec:spectra}
+Figure~\ref{fig:spectra} shows the spectrum of the Mat\'ern Gram matrix on the
+loads and the effective dimension $d_{\mathrm{eff}}(\lambda)$ computed from it
+by the exact identity of Lemma~\ref{lem:deff}. The spectrum decays quickly: a
+few hundred eigenvalues carry essentially all the mass, the tail falling many
+orders of magnitude below the leading modes. At the cross-validated nugget the
+effective dimension is a few hundred out of $n=19000$, which is why the exact
+Cholesky solve is affordable and why the correction generalizes despite
+interpolating nineteen thousand points; the problem the kernel actually solves
+has the dimension of the retained spectrum, not of the sample. The
+cross-validated $\lambda$ sits at the shoulder of the $d_{\mathrm{eff}}$ curve,
+past the leading modes and into the rapidly decaying tail, matching the reading
+of Lemma~\ref{lem:deff}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/spectra.pdf}
+\caption{Left: eigenvalues of the Mat\'ern Gram matrix $K/n$ on the loads
+(log scale); the spectrum decays by many orders of magnitude within a few
+hundred modes. Right: the effective dimension $d_{\mathrm{eff}}(\lambda)$ from
+the exact identity of Lemma~\ref{lem:deff}, with the cross-validated nugget
+marked.}
+\label{fig:spectra}
+\end{figure}
+
+\subsection{Cost and reproducibility}
+\label{sec:cost}
+The pipeline was built and run on a single laptop. The kernel stages are exact:
+one Cholesky factorization of the $19000\times19000$ Mat\'ern Gram matrix in
+double precision takes about a minute on a desktop CPU, and prediction is two
+matrix products; there are no inducing points, stochastic solvers, or
+preconditioners, and no GPU is needed for the correction. The neural means are
+small by the standards of the literature (a few million parameters) and train
+in the metric itself. The exactness is affordable precisely because, as
+Section~\ref{sec:spectra} shows, the effective dimension of the solve is a few
+hundred: the Gram matrix is numerically low rank at the working nugget, so the
+factorization does far less work than its nominal $O(n^3)$ suggests. All splits
+are fixed by a published permutation seed, the input is consumed as the
+41-dimensional load after the exact broadcast check of
+Section~\ref{sec:benchmark}, and every model is selected on the validation
+split and evaluated once on the test set; we release the splits, the trained
+means, and the code so the table can be regenerated end to end.

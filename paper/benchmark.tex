@@ -1,0 +1,111 @@
+\subsection{Problem and data}
+The dataset originates in the cost-accuracy study of \citet{dehoop2022cost}
+and is the one distributed with \citet{batlle2024kernel} and
+\citet{mora2025operator}. An isotropic elastic plate occupies
+$D=(0,1)^2$; the displacement field $w$ satisfies
+$\nabla\cdot\sigma=0$ with a fixed constitutive law, displacement conditions
+on the bottom and lateral parts of the boundary, and a prescribed normal
+traction $\bar t$ on the top edge $\Gamma_t=[0,1]\times\{1\}$. The quantity of
+interest is the von Mises stress field $\sigma_v$ on $D$. The learning task is
+the map $G:\bar t\mapsto\sigma_v$. Loads are drawn from the Gaussian field
+$\mathcal{GP}\big(100,\,400^2(-\Delta+3^2 I)^{-1}\big)$ with homogeneous
+Neumann boundary conditions for the Laplacian; outputs are finite element
+solutions interpolated to a regular $41\times41$ grid, and the load is sampled
+at $41$ points. The distributed file contains 40000 input/output pairs; the
+input array stores the load broadcast along the second grid coordinate, which
+we verified is an exact copy (maximal deviation $0$ across all 40000
+samples), so all our methods consume the load as a vector in $\mathbb R^{41}$.
+
+Errors are mean relative $L^2$ errors over the test set,
+\[
+\frac1{N_{\mathrm{test}}}\sum_{n}\frac{\|\widehat
+G(u_n)-G(u_n)\|_2}{\|G(u_n)\|_2},
+\]
+computed on grid values in double precision. Quadrature weighting
+(trapezoidal instead of plain vector norms) changes our reported numbers by
+less than 0.02 percentage points, and we report the plain-norm convention of
+the prior work.
+
+\subsection{Protocols and published results}
+Two regimes appear in the literature, and we follow both. In the
+\emph{high-data} protocol the first 20000 samples are available for training
+and the last 20000 form the test set; \citet{dehoop2022cost} report, at 20000
+training samples, 4.55\% (PARA-Net), 4.67\% (PCA-Net), 4.76\% (FNO) and 5.20\%
+(DeepONet), and \citet{batlle2024kernel} report 5.18\% for their
+optimal-recovery kernel method (Mat\'ern/rational quadratic; 27.11\% for the
+linear kernel) on the same task. Within the 20000-sample budget we hold out
+the last 1000 samples (of a fixed permutation) for model selection and
+stacking, and train on the remaining 19000, so no method of ours sees more
+than the 20000 training samples used by the baselines. In the \emph{low-data}
+protocol of \citet{mora2025operator}, 1250 samples are available and the same
+20000-sample test set is used; their table gives 8.70\% (DeepONet), 6.62\%
+(FNO), 6.95\% (the kernel method of \citealt{batlle2024kernel}), 6.74\% (their
+zero-mean GP), 7.12\% (DeepONet-mean GP) and 6.49\% (FNO-mean GP). In this
+regime we carve the validation split (250 samples) out of the 1250, so
+training uses 1000 samples and every choice made by the pipeline is informed
+by the 1250 available labels only.
+
+\subsection{A data-driven check of the mirror symmetry}
+\label{sec:symcheck}
+The continuous problem is invariant under $x_1\mapsto1-x_1$: the domain and
+boundary partition are symmetric, and the input law has a symmetric
+covariance. On the grid, reflecting the load ($S$) should reflect the stress
+field along the first grid coordinate ($T$), i.e.\ $G(Su)=TG(u)$. Rather than
+assume this, we test it on the data. For each of the first 200 samples we
+searched all 40000 loads for the nearest neighbor of the reflected load $Su_i$
+and compared the corresponding outputs. For the five best-matching pairs, the
+input mismatch $\|Su_i-u_j\|/\|u_j\|$ ranges over $0.27$--$0.32$, while the
+output mismatch $\|Tv_i-v_j\|/\|v_j\|$ ranges over $0.085$--$0.14$; reflecting
+along the second coordinate instead gives output mismatches of order one.
+Outputs of near-mirror inputs are far closer than the inputs themselves,
+which is what equivariance plus a Lipschitz solution map predicts, and the
+effect singles out the correct output reflection axis. A complementary check
+on the input law: the empirical mean and covariance of the training loads are
+invariant under reflection to within 1.1\% and 1.5\% respectively, as required
+for Proposition~\ref{prop:sym}. Consistently with all of this, reflection
+averaging at test time improves every model we trained
+(Section~\ref{sec:experiments}), as Proposition~\ref{prop:sym} says it must on
+average when the symmetry holds.
+
+\subsection{Related work}
+\label{sec:related}
+The benchmark sits at the meeting point of three lines of work. \emph{Neural
+operators} learn maps between function spaces: DeepONet \citep{lu2021deeponet}
+with its branch/trunk factorization, the Fourier neural operator
+\citep{li2021fourier} and the broader neural-operator framework
+\citep{kovachki2023neural}, and the reduced-basis PCA-Net and PARA-Net
+architectures assembled for the cost--accuracy study of
+\citet{dehoop2022cost}. These methods are fast and mesh-flexible but do not by
+themselves come with error control, and it is their numbers on this problem
+that define the plateau we start from. \emph{Kernel and Gaussian process
+methods} for operator learning approach the same maps through reproducing
+kernels: the optimal-recovery framework of \citet{batlle2024kernel}, with its
+convergence theory and a-priori bounds, is the most direct comparison, and it
+is competitive with neural operators on most of the benchmarks it considers.
+Random-feature variants \citep{darcy2023one} and the vector-valued kernel
+formulations reviewed there extend the reach of this family. \emph{Hybrids}
+that place a neural network and a kernel in the same estimator are the closest
+relatives of our pipeline: \citet{mora2025operator} use a neural operator as
+the mean of a Gaussian process and fit the two together, and this is the work
+we most directly build on, differing in that we fit the mean first and the
+kernel after, tune by cross-validation rather than marginal likelihood, and
+solve the correction exactly at nineteen thousand points.
+
+Two further threads inform the design. The kernel-flow method
+\citep{owhadi2019kernel} learns a kernel from data by minimizing a
+half-sample cross-validation loss, and its use as a regularizer for the inner
+layers of a network \citep{yoo2021deep} is exactly the term we analyze in
+Proposition~\ref{prop:kf}; kernel flows have since been used at scale as
+emulators for physical forward models, for instance in atmospheric radiative
+transfer retrievals \citep{susiluoto2025radiative} and in the inference of
+convective-storm structure from satellite observations
+\citep{prasanth2021kernel}, where presenting the input in its physical
+parametrization and adapting the kernel to data are what make the emulator
+accurate. Our pipeline follows the same instinct, with the smoothing of the
+target performed by a neural ensemble rather than by a hand-chosen reduction.
+Finally, the effective-dimension reading of the kernel solve
+(Lemma~\ref{lem:deff}) draws on the random-matrix description of kernel Gram
+spectra \citep{koltchinskii2000random} and on the classical
+Mar\v{c}enko--Pastur \citep{marchenko1967distribution} and spiked-covariance
+\citep{baik2005phase} laws; the same effective dimension governs the
+generalization of kernel ridge regression \citep{caponnetto2007optimal}.

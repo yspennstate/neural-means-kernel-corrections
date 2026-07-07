@@ -1,0 +1,12 @@
+{
+ "kind": "unet",
+ "args": {
+  "seed": 0,
+  "width": 48,
+  "mirror": 1,
+  "ntrain": 0
+ },
+ "val": 0.0523,
+ "note": "best-val checkpoint promoted to member (trainer stopped early; diversity member)",
+ "test_mirror_tta": 0.0499
+}

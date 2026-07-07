@@ -1,0 +1,21 @@
+{
+ "kind": "krr",
+ "protocol": "strict n=1250 (train 1000, val 250)",
+ "stages": [
+  {
+   "smult": 3.0,
+   "lam": 1e-06,
+   "val": 0.0674,
+   "test": 0.0685
+  },
+  {
+   "smult": 0.25,
+   "lam": 0.0001,
+   "val": 0.0659,
+   "test": 0.0666
+  }
+ ],
+ "val": 0.0659,
+ "test": 0.0666,
+ "note": "multiscale boosted KRR from test_boost.py"
+}

@@ -1,0 +1,22 @@
+{
+ "kind": "mlpR",
+ "args": {
+  "seed": 0,
+  "epochs": 120,
+  "width": 1024,
+  "depth": 4,
+  "batch": 256,
+  "lr": 0.001,
+  "wd": 1e-05,
+  "threads": 4,
+  "field_tr": "mlp_oof_train.npy",
+  "field_va": "mlp_full_pred_val.npy",
+  "field_te": "mlp_full_pred_test.npy",
+  "tag": "mlpR2"
+ },
+ "val": 0.04871041501313068,
+ "test": 0.048358411408324704,
+ "test_notta": 0.050303686391678266,
+ "best_ep": 69,
+ "minutes": 7.899955999851227
+}

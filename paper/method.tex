@@ -1,0 +1,99 @@
+The pipeline has three stages: neural means, stacking, and kernel
+corrections. All components operate on the load vector $u\in\mathbb R^{41}$
+(standardized by training statistics) and produce stress fields in
+$\mathbb R^{41\times41}$; all networks are trained with the reported metric as
+the loss, i.e.\ the per-sample relative $L^2$ error in original units, which
+we found mildly but consistently better than mean squared error on
+normalized targets.
+
+\subsection{Neural means}
+\emph{Residual MLP.} The primary mean is a residual multilayer perceptron:
+three or five residual SiLU blocks of width 1024--1536 mapping
+$\mathbb R^{41}\to\mathbb R^{1681}$ directly. This is essentially PARA-Net
+\citep{dehoop2022cost} with a modern training recipe, and it also supplies the
+penultimate features used by the feature-space kernel stage.
+
+\emph{Kernel-conditioned refiner.} The second mean is the same residual network
+given an extra input channel: the kernel method's predicted stress field for
+the same load, concatenated with the load. It therefore learns to correct the
+kernel predictor rather than to reproduce the map from scratch, and it is the
+strongest single model in our study. During training the refiner reads
+\emph{out-of-fold} kernel predictions (four-fold, so the kernel channel is
+never fit on the target sample), and at test time the full-data kernel
+prediction; this keeps the channel honest.
+
+\emph{Other instances.} The mean slot is not tied to a particular
+architecture. We also use a Fourier neural operator \citep{li2021fourier}
+that consumes the broadcast load as a field, a UNet on the same field
+representation, and an MSE-trained variant of the MLP; all are drop-in means,
+all enter the ensemble of Section~\ref{sec:diversity}, and their pairwise
+error correlations are one of the measurements of this paper. We additionally
+implement an encoder--decoder transformer
+\citep{vaswani2017attention,dosovitskiy2021image} that tokenizes the 41 load
+samples and decodes the field by cross-attention at the grid points; it is a
+natural fourth architecture family, but we were unable to train it to the
+level of the others on the hardware available for this study and report the
+ensemble without it (Section~\ref{sec:diversity} returns to this).
+
+All means are trained with AdamW and a cosine schedule, batches of 128--256,
+for up to a few hundred epochs (Appendix~\ref{app:impl} lists every
+hyperparameter).
+During training each batch is reflected with probability $1/2$ (load reversed,
+target field reflected along the first grid coordinate); at test time each
+model is evaluated as $\frac12(f(u)+T f(Su))$. Proposition~\ref{prop:sym}
+guarantees the test-time step cannot hurt on average, and the ablation
+confirms small consistent gains from both steps. Optionally, the training
+loss carries a kernel-flow term $\beta\,e_2$ computed from the batch
+(Section~\ref{sec:theory-kf}) with a Gaussian kernel on pooled penultimate
+features whose log-bandwidth is trained jointly; this variant appears in the
+ablation.
+
+\subsection{Stacking}
+With $M$ trained models $f_1,\dots,f_M$ we form the convex combination
+$m(u)=\sum_m w_m f_m(u)$, $w\in\Delta^{M-1}$, minimizing the validation
+relative error; the weights are initialized at the simplex minimizer of the
+measured second-moment matrix of Proposition~\ref{prop:secmom} and polished
+by a short search on the 1000 held-out samples (250 in the low-data
+protocol). A per-pixel variant allows the weights (plus an intercept) to
+vary over the grid, ridge-fitted on half the validation split and accepted
+only when it beats the global weights on the other half; it is the variant
+the final pipeline uses. Stacking on a held-out split rather than uniform
+averaging costs nothing, guards against a weak member
+\citep{wolpert1992stacked}, and is statistically almost free at this size
+(Proposition~\ref{prop:stack}).
+
+\subsection{Kernel corrections}
+\label{sec:method-kernel}
+The stacked mean is then corrected by kernel ridge regression of its
+residuals. Let $X=(u_1,\dots,u_n)$ be the training loads (standardized
+coordinatewise), $R\in\mathbb R^{n\times1681}$ the matrix of training
+residuals $v_i-m(u_i)$, and $k$ a Mat\'ern-$5/2$ kernel
+$k(u,u')=\kappa\big(\|u-u'\|/s\big)$. The correction is
+\[
+\widehat r(u)=k(u,X)\,\alpha,\qquad \alpha=(K+n\lambda I)^{-1}R ,
+\]
+with $(s,\lambda)$ chosen on the validation split from a small grid ($s$ as a
+multiple of the median pairwise distance, $\lambda\in\{10^{-7},10^{-5},10^{-3}\}$;
+the grid is searched on an 8000-sample subsample and the chosen pair is refit
+on all of $X$). The corrected surrogate is $m+\widehat r$. A second corrective
+stage repeats the construction with the kernel evaluated on deep features,
+the concatenated penultimate activations of the ensemble members
+(reflection-averaged, standardized), fitted to the residuals of $m+\widehat
+r$; it contributes a smaller improvement and is included when it helps on
+validation. At $n=19000$ the exact solve is a single Cholesky factorization
+of a $19000\times19000$ matrix, about a minute in double precision on a
+laptop CPU, and prediction is two matrix products; no inducing points,
+preconditioners, or stochastic solvers are involved. The Gaussian process
+reading of the same formulas supplies the posterior standard deviation
+$P_\lambda(u)$ of \eqref{eq:power} at negligible extra cost (one triangular
+solve per evaluation batch), which is the uncertainty estimate studied in
+Section~\ref{sec:experiments} and certified by Theorem~\ref{thm:or}.
+
+Two remarks on scope. Nothing in the construction uses properties of this
+particular PDE beyond the verified reflection symmetry, so the recipe
+(native input parametrization, symmetrized accurate means, validated kernel
+correction of the residual, posterior standard deviation as certificate)
+transfers to other operator learning problems with low-dimensional input
+parametrizations. And the pipeline degrades gracefully: dropping the feature
+stage, the stacking, or the corrections recovers progressively simpler
+methods whose individual numbers appear in the ablation table.

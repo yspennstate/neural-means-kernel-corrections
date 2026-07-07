@@ -1,0 +1,14 @@
+{
+ "member_0": 12.085,
+ "member_1": 12.226,
+ "member_2": 11.359,
+ "stack": 11.359,
+ "stack_per_pixel": false,
+ "plus_kernel_correction": 11.355,
+ "plus_feature_correction": 11.349,
+ "final": 11.349,
+ "published_best_pct": 11.28,
+ "minutes": 17.3,
+ "input_intrinsic_dim": 0.1,
+ "d_eff_at_1e-6": 1039
+}

@@ -1,0 +1,124 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1.1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[dvipsnames,table]{xcolor}
+\usepackage{microtype}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black,urlcolor=blue!60!black]{hyperref}
+\usepackage{subcaption}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{assumption}[theorem]{Assumption}
+
+% ---- result macros: single source of truth for all reported numbers ----
+% Filled from runs/*.json by freeze.py at results freeze (final).
+\newcommand{\errBest}{4.55}          % best high-data pipeline test error (%)
+\newcommand{\errBestLow}{5.38}       % best low-data pipeline test error, N=1250 (%)
+\newcommand{\errMLP}{4.86}           % MLP + TTA, high data
+\newcommand{\errRef}{4.73}           % kernel-conditioned refiner + TTA
+\newcommand{\errMSE}{4.71}           % MSE-trained MLP + TTA
+\newcommand{\errFNOG}{4.70}          % FNO member + TTA
+\newcommand{\errUNetG}{4.99}         % UNet member + TTA
+\newcommand{\errStackFam}{4.67}      % MLP-family stack (before diverse members)
+\newcommand{\errStack}{4.58}          % diverse per-pixel stack before correction
+\newcommand{\uqDisAbsDiv}{0.08}      % corr(disagreement, abs err), diverse ensemble
+\newcommand{\corrNetLo}{0.86}        % min network-network residual corr
+\newcommand{\corrNetHi}{0.96}        % max network-network residual corr
+\newcommand{\corrKerLo}{0.79}        % min network-kernel residual corr
+\newcommand{\corrKerHi}{0.89}        % max network-kernel residual corr
+\newcommand{\errKRRload}{5.19}       % kernel ridge on loads, high data
+\newcommand{\errKRRloadLow}{6.66}    % multiscale kernel ridge on loads, N=1250
+\newcommand{\normRatio}{271}         % RKHS norm ratio direct/residual
+\newcommand{\uqCoverNom}{90}         % nominal conformal level (%)
+\newcommand{\uqCover}{91.6}          % empirical conformal coverage (%)
+\newcommand{\uqCorrAbs}{0.08}        % corr(power fn, absolute error) -- weak
+\newcommand{\uqCorrNorm}{0.65}       % corr(power fn, output norm) -- the confound
+\newcommand{\uqDisAbs}{0.10}         % corr(ensemble disagreement, absolute error) -- also weak
+\newcommand{\pubBestHi}{4.55}        % best published high-data (PARA-Net)
+\newcommand{\pubBestLo}{6.49}        % best published low-data (FNO-mean GP)
+\newcommand{\pubKernelHi}{5.18}      % published kernel method, high data
+\newcommand{\ttaGainMLP}{0.11}       % MLP test-time reflection-averaging gain (points)
+
+\title{Neural means and kernel corrections for operator learning}
+\author{%
+Yitzchak Shmalo%
+\thanks{Department of Mathematics, Pennsylvania State University. \texttt{yms5281@psu.edu}}}
+\date{July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We study how neural networks and exact kernel methods combine in operator
+learning: an accurate neural mean, trained in the metric the application
+reports, with an exact Mat\'ern solve applied to its residual or to its
+learned features. Two public benchmarks with published baselines sit in
+opposite regimes and the same components explain both. On the
+structural-mechanics problem of de Hoop et al.\ the pipeline reaches
+\errBest\% relative test error, matching the best published result, and the
+reason no method moves much further is measurable: the residuals of every
+architecture we train correlate above 0.86, and their shared component
+concentrates where the finite element data are least accurate and responds
+neither to capacity, diversity, nor sample size. On the OCO-2
+radiative-transfer emulation problem of Lamminp\"a\"a et al.\ the same kernel
+that trails the network tenfold on the raw input overtakes it on the
+network's learned features, and the resulting surrogate beats the published
+kernel-flow emulator on its own test points on both of that problem's
+metrics (3.8\% against 16.9\% on reduced radiances, 0.028\% against 0.045\%
+on the reconstructed spectrum). Each stage of the pipeline carries a
+supporting result, from a second-moment identity that predicts the stacking
+outcome from measured residual correlations, through an optimal-recovery
+bound and rates separating the metric from the representational part of a
+network's advantage over a fixed kernel, to a distribution-free coverage
+guarantee for the reported uncertainty, which is the only uncertainty signal
+that survives our tests.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+% written after results freeze -- see draft in intro.tex include
+\input{intro}
+
+\section{Benchmark, protocol, and related work}
+\label{sec:benchmark}
+\input{benchmark}
+
+\section{Method}
+\label{sec:method}
+\input{method}
+
+\section{Theory}
+\label{sec:theory}
+\input{theory}
+
+\section{Results on the structural-mechanics benchmark}
+\label{sec:experiments}
+\input{experiments}
+
+\section{The OCO-2 radiative-transfer emulator}
+\label{sec:oco2}
+\input{oco2}
+
+\section{Discussion}
+\label{sec:discussion}
+\input{discussion}
+
+\bibliographystyle{abbrvnat}
+\bibliography{refs}
+
+\appendix
+\section{Proofs}
+\label{app:proofs}
+\input{proofs}
+
+\section{Implementation details}
+\label{app:impl}
+\input{impl}
+
+\end{document}

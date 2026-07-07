@@ -1,0 +1,16 @@
+{
+ "kernel_flow_reduced": 24.0604,
+ "kernel_flow_radiance": 0.0599,
+ "mean_flat_reduced": 16.2123,
+ "mean_flat_radiance": 0.1794,
+ "mean_weighted_reduced": 62.8898,
+ "mean_weighted_radiance": 0.0371,
+ "kernel_blocks_reduced": 62.6193,
+ "kernel_blocks_radiance": 0.422,
+ "dkr_flat_reduced": 16.1193,
+ "dkr_flat_radiance": 0.101,
+ "dkr_weighted_reduced": 48.2722,
+ "dkr_weighted_radiance": 0.035,
+ "stack_reduced": 16.1273,
+ "stack_radiance": 0.1041
+}

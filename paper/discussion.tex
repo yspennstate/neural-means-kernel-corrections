@@ -1,0 +1,89 @@
+\paragraph{What moved the number, and what stopped it.}
+The improvement over the published band decomposes unevenly. Accurate neural
+means trained on the reported metric and averaged over the reflection
+symmetry do most of the work; stacking members from different architecture
+families adds exactly what their measured residual correlations permit, about
+a tenth of a point here; the kernel corrections contribute a few hundredths
+more and, with them, the certificate of Theorem~\ref{thm:or} and the
+calibrated band of Proposition~\ref{prop:conf}. We did not find evidence that
+any published architecture was mis-tuned by its authors; the components
+compose, and the composition had not been tried on this benchmark. What stops
+further movement is not a missing architecture. Section~\ref{sec:diversity}
+locates the remaining error in a component that all families share, that
+concentrates where the finite element data are least reliable, that no input
+statistic predicts, and that neither capacity, nor diversity, nor more data
+reduces. The margin over the published methods other than PARA-Net is real,
+and the match with PARA-Net is exact to within run-to-run noise, but both
+should be read for what they are: the last few learnable hundredths above a
+floor set by the data, not a step on the way to zero.
+
+\paragraph{Relation to neural-mean Gaussian processes.}
+Our correction stage is closest in spirit to \citet{mora2025operator}, who
+place a neural operator inside the mean of a Gaussian process and fit both
+jointly. The differences are operational but they matter at this scale: we
+fit the mean first and the kernel after (so the expensive stage is ordinary
+network training), we tune the kernel by validation rather than by marginal
+likelihood, we correct with an exact solve at $n=19000$ rather than train
+through the kernel, and we add the feature-space second stage. The theory in
+Section~\ref{sec:theory} applies verbatim to their setting as well; the
+measured drop in the fitted RKHS norm (Table~\ref{tab:norms}) is the
+quantitative reason residual corrections of accurate means are the right
+place to spend kernel capacity.
+
+\paragraph{Relation to kernel emulation practice.}
+The pipeline is consistent with the experience of the kernel-flow line of
+work in emulation at scale. The closest instance is the forward-model
+emulator of \citet{susiluoto2025radiative} for the OCO-2 CO$_2$ retrievals,
+in which a Gaussian process with a cross-validation-learned kernel replaces
+the full-physics radiative transfer code within measurement-error precision;
+kernel flows have likewise been used to infer convective-storm structure
+from passive microwave observations \citep{prasanth2021kernel}. The lesson of
+that work matches ours: kernels with data-adapted hyperparameters are
+extremely effective once the input is presented in its physical
+parametrization and the target has been reduced to something smooth. Here the
+reduction is performed by the neural ensemble rather than by physics, and the
+kernel-flow loss itself admits the leave-half-out reading of
+Proposition~\ref{prop:kf}. The OCO-2 setting is also the natural next test
+bed for the residual coupling studied here. Its training pairs are
+simulator-generated state-to-radiance maps of exactly the shape this paper
+exploits, a low-dimensional physical state mapped to a smooth
+high-dimensional output, the mission's Level 1 and Level 2 products are
+publicly distributed through NASA's Earthdata archive, and the emulation
+setup of \citet{susiluoto2025radiative} specifies the state parametrization
+and sampling design, so a neural mean with a validated kernel correction and
+a conformal wrapper can be evaluated there against the pure-kernel emulator
+without new data collection.
+
+\paragraph{Limitations.}
+The benchmark has a one-dimensional input function and a fixed geometry; the
+exact kernel solve exploits both, and problems with high-dimensional input
+fields would require the usual approximations (inducing points, random
+features) at some cost to the certificates. The certified bound of
+Theorem~\ref{thm:or} controls the error relative to the RKHS norm of the
+residual operator, a quantity we can only lower-bound empirically; the
+conformal calibration we report is the honest, assumption-light complement.
+Training the means on the metric, the reflection steps, and the stacking are
+benchmark-agnostic, but the specific error levels reported here should be
+read as properties of this dataset and protocol. Finally, our low-data
+protocol reproduces that of \citet{mora2025operator} up to the unavoidable
+ambiguity of which 1250 samples are used; we use the first 1250 of the
+training block and report the same 20000-sample test set, and we release
+splits and code so the comparison can be audited.
+
+\paragraph{Outlook.}
+Three directions seem worth pursuing. First, the benchmark itself:
+regenerating the dataset with refined meshes at the corner singularities,
+higher-order elements, or output grids that resolve the concentrations would
+move the floor that Section~\ref{sec:diversity} measures, and would return
+the problem to being a test of surrogates rather than of its own data. The
+diagnostic protocol used there, cross-family residual correlation, the
+second-moment prediction of Proposition~\ref{prop:secmom}, and the
+scaling-in-$n$ check, is cheap to run on any benchmark suspected of the same
+condition. Second, the same recipe on the remaining benchmarks of
+\citet{dehoop2022cost} and \citet{batlle2024kernel}, where the input
+functions are genuinely high-dimensional and the interplay between neural
+means and kernel corrections should look different. Third, the uncertainty
+side: $P_\lambda$ is a design quantity, so it can be optimized, and the
+connection of Lemma~\ref{lem:deff} between the nugget, the spectrum, and the
+effective dimension suggests principled ways to spend a fixed computational
+budget on the correction stage.

@@ -1,0 +1,8 @@
+{
+ "kind": "ensemble_uq",
+ "M": 3,
+ "dis_abs_pearson": 0.10040013511243152,
+ "dis_abs_spearman": 0.06717026037142564,
+ "dis_rel_pearson": -0.18230599664395306,
+ "dis_rel_spearman": -0.19745702729564255
+}

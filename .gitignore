@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+data/
+runs/*.npy
+runs/*.pt
+runs/*.npz
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.bbl
+paper/*.blg

@@ -1,0 +1,25 @@
+{
+ "kind": "mlp",
+ "args": {
+  "seed": 0,
+  "epochs": 120,
+  "width": 1024,
+  "depth": 4,
+  "batch": 256,
+  "lr": 0.001,
+  "wd": 1e-05,
+  "mirror": 1,
+  "ntrain": 0,
+  "lowval": 0,
+  "final": 0,
+  "kf": 0.0,
+  "mse": 1,
+  "threads": 6,
+  "tag": "mlpMSE"
+ },
+ "val": 0.04757395748275777,
+ "test": 0.04727689949994896,
+ "test_tta": 0.047052615512338615,
+ "best_ep": 119,
+ "minutes": 1.914067840576172
+}

@@ -1,0 +1,438 @@
+Throughout this section $\mathcal U=\mathbb R^p$ denotes the (discretized) input
+space and $\mathcal V=\mathbb R^q$ the output space, $G:\mathcal U\to\mathcal V$
+the target operator, $\mu$ the input distribution, and
+$(u_1,v_1),\dots,(u_N,v_N)$ i.i.d.\ draws with $v_n=G(u_n)$; the data carry no
+sampling noise in the usual sense, coming from a deterministic solver, though
+Section~\ref{sec:diversity} has something to say about solver error. We write
+$\ell(w,v)=\|w-v\|_2/\|v\|_2$ for the relative error and
+$R(\widehat G)=\mathbb E_{u\sim\mu}\,\ell(\widehat G(u),G(u))$ for the risk, which is
+the quantity reported in Section~\ref{sec:experiments}. The results below are
+largely elementary, but each one licenses a specific design decision in the
+pipeline of Section~\ref{sec:method}, and each has a measurable footprint in
+the experiments: one statement per stage, from the symmetry handling and the
+kernel-flow term through stacking, the residual correction, its coverage
+guarantee, and the choice of nugget. Proofs are collected in
+Appendix~\ref{app:proofs}.
+
+\subsection{Symmetry averaging does not increase the risk}
+\label{sec:theory-sym}
+
+The elasticity problem behind the benchmark is invariant under the reflection
+$x_1\mapsto 1-x_1$: the domain, the boundary partition, and the constitutive
+model are all symmetric, the input distribution has a reflection-invariant
+covariance, and reflecting the load reflects the stress field. On the discrete
+grid this is expressed by two permutation matrices: $S\in\mathbb R^{p\times p}$
+reverses the load samples and $T\in\mathbb R^{q\times q}$ reverses the rows of
+the stress field. Both are orthogonal involutions. Section~\ref{sec:benchmark}
+describes a direct data-driven check of the equivariance
+$G(Su)=T\,G(u)$; we treat it as an assumption here.
+
+\begin{proposition}[symmetrization]\label{prop:sym}
+Assume $G(Su)=TG(u)$ for $\mu$-a.e.\ $u$, that $\mu$ is invariant under $S$,
+and that $T$ is orthogonal. For a measurable $\widehat G:\mathcal U\to\mathcal V$ define
+its symmetrization
+\[
+\widehat G_S(u)\;=\;\tfrac12\left(\widehat G(u)+T\,\widehat G(Su)\right).
+\]
+Then, for every loss $\ell(\cdot,v)$ that is convex in its first argument and
+satisfies $\ell(Tw,Tv)=\ell(w,v)$,
+\[
+\mathbb E_{u\sim\mu}\,\ell\big(\widehat G_S(u),G(u)\big)\;\le\;
+\mathbb E_{u\sim\mu}\,\ell\big(\widehat G(u),G(u)\big).
+\]
+\end{proposition}
+
+The relative error satisfies both hypotheses ($T$ orthogonal gives
+$\ell(Tw,Tv)=\ell(w,v)$). Proposition~\ref{prop:sym} justifies the two uses of
+the symmetry in the pipeline: averaging each trained model with its reflected
+evaluation at test time can only help on average, and training on
+reflection-augmented data is ordinary empirical risk minimization for the
+symmetrized class. The measured effect is small but strictly positive for
+every model we trained (Table~\ref{tab:ablation}).
+
+\subsection{What the kernel-flow regularizer estimates}
+\label{sec:theory-kf}
+
+The kernel-flow (KF) loss of Owhadi and Yoo \citep{owhadi2019kernel}, in the
+$\ell^2$ variant used by \citet{yoo2021deep} to regularize deep networks,
+enters our ablation study as an optional term in the training of the neural
+means. Its motivation is often stated informally (``a kernel is good if
+half the data predicts the rest''). The following observation makes the
+statement exact. Let $z_i=\phi_\theta(u_i)$ be the features of a batch
+$B=\{1,\dots,b\}$ ($b$ even), let $k$ be a positive definite kernel on feature
+space, and for $C\subset B$, $|C|=b/2$, let $I_C$ denote the $k$-interpolant
+of $\{(z_j,v_j):j\in C\}$. The batch KF loss is
+\begin{equation}\label{eq:kf}
+e_2(\theta;C)\;=\;\sum_{i\in B}\big\|v_i-I_C(z_i)\big\|_2^2 .
+\end{equation}
+
+\begin{proposition}[KF loss is a leave-half-out estimate]\label{prop:kf}
+Let $C$ be drawn uniformly among the subsets of $B$ of size $b/2$ and assume
+$k$ restricted to $\{z_i\}_{i\in B}$ is strictly positive definite. Then
+$e_2(\theta;C)=\sum_{i\in B\setminus C}\|v_i-I_C(z_i)\|_2^2$, and
+\[
+\mathbb E_C\big[e_2(\theta;C)\big]\;=\;\frac b2\;
+\mathbb E_{C,\,i\,\sim\,\mathrm{Unif}(B\setminus C)}
+\big[\big\|v_i-I_C(z_i)\big\|_2^2\big],
+\]
+i.e.\ $\tfrac2b\,e_2$ is an unbiased estimator, over the split randomness, of
+the expected squared error committed on a held-out point by the kernel
+predictor trained on a random half of the batch. When $(B,C)$ are
+resampled at every step, the stochastic gradient
+$\nabla_\theta e_2(\theta;C)$ is unbiased for
+$\nabla_\theta\,\mathbb E_{B,C}[e_2(\theta;C)]$ whenever the expectation and
+derivative commute (e.g.\ under local Lipschitz domination).
+\end{proposition}
+
+The training loss we minimize for a neural mean is a sum of an empirical risk
+term and, optionally, $\beta\,e_2$: the first term is a linear functional of
+the empirical measure of the batch and measures fit, while
+Proposition~\ref{prop:kf} shows the second measures the \emph{generalization
+of a kernel method built on the learned features}. This is the sense in which
+a KF-regularized network is trained to be a good feature map for the kernel
+correction that follows.
+
+\subsection{Stacking on a held-out split is safe}
+\label{sec:theory-stack}
+
+Between the means and the correction sits one more fitted object: the convex
+weights of the stacked ensemble, chosen to minimize the empirical risk on the
+validation split. Two elementary facts justify this step. First, by convexity,
+a convex combination of predictors is never worse than the corresponding
+weighted average of their risks, so stacking cannot be hurt by a weak member
+beyond its weight. Second, the weights live on a low-dimensional simplex and
+are fitted on hundreds of samples, so the selection cannot meaningfully
+overfit; the following proposition quantifies this with explicit constants.
+
+\begin{proposition}[validation stacking]\label{prop:stack}
+Let $f_1,\dots,f_M:\mathcal U\to\mathcal V$ be fixed maps, let
+$\Delta=\{w\in\mathbb R^M:w_m\ge0,\sum_m w_m=1\}$, and for $w\in\Delta$ write
+$F_w=\sum_m w_m f_m$. Assume the members' per-sample relative errors are
+bounded: $\ell(f_m(u),G(u))\le B$ for $\mu$-a.e.\ $u$ and every $m$.
+\begin{enumerate}
+\item[(i)] For every $w\in\Delta$,
+$\ell(F_w(u),G(u))\le\sum_m w_m\,\ell(f_m(u),G(u))$ pointwise; in particular
+$R(F_w)\le\sum_m w_m R(f_m)\le\max_m R(f_m)$, and $\ell(F_w(u),G(u))\le B$.
+\item[(ii)] Let $\widehat w$ minimize the empirical risk
+$\widehat R(w)=\tfrac1m\sum_{i=1}^m\ell(F_w(\tilde u_i),G(\tilde u_i))$ over
+$\Delta$, computed on a validation sample
+$\tilde u_1,\dots,\tilde u_m\sim\mu$ independent of $f_1,\dots,f_M$. Then for
+every $\delta\in(0,1)$, with probability at least $1-\delta$,
+\[
+R(F_{\widehat w})\;\le\;\min_{w\in\Delta}R(F_w)\;+\;\frac{8B}{m}\;+\;
+B\sqrt{\frac{2\big((M-1)\log\!\big(m(M-1)+1\big)+\log(2/\delta)\big)}{m}} .
+\]
+\end{enumerate}
+\end{proposition}
+
+With $M=4$ members, $m=1000$ validation samples and $\delta=0.05$ the right-hand
+excess evaluates to about $0.24\,B$; at $B=0.25$, the largest per-sample member
+error we observe, this caps the selection cost at roughly six percentage
+points. The bound is conservative, as such bounds are: the realized
+validation-to-test gap of the stack in Section~\ref{sec:experiments} is two
+orders of magnitude smaller. Its role is the scaling $\sqrt{M\log m/m}$, which
+says that fitting a handful of convex weights on a thousand held-out samples
+is statistically almost free; this is why the pipeline spends its validation
+data there and on the kernel hyperparameters and nowhere else.
+
+\subsection{What the stack can achieve}
+\label{sec:theory-secmom}
+
+Proposition~\ref{prop:stack} says fitting the weights is safe; it does not say
+mixing is worth anything. That is decided by a single measurable matrix. For a
+map $f$ write the \emph{normalized residual} at $u$ as
+$\rho_f(u)=\big(f(u)-G(u)\big)/\|G(u)\|_2$, so that
+$\ell(f(u),G(u))=\|\rho_f(u)\|_2$.
+
+\begin{proposition}[second-moment identity for convex stacks]\label{prop:secmom}
+Let $f_1,\dots,f_M$ be fixed maps and define
+$S\in\mathbb R^{M\times M}$ by
+$S_{mk}=\mathbb E_{u\sim\mu}\,\langle\rho_{f_m}(u),\rho_{f_k}(u)\rangle$.
+For $w$ in the simplex $\Delta^{M-1}$ let $f_w=\sum_m w_mf_m$. Then
+\[
+\mathbb E_{u\sim\mu}\,\ell\big(f_w(u),G(u)\big)^2\;=\;w^\top S\,w ,
+\]
+so the squared-metric risk of every convex stack is determined by $S$, and
+the best achievable is $\min_{w\in\Delta^{M-1}}w^\top Sw$. In particular:
+\begin{enumerate}
+\item[(i)] (two members) if $S$ has diagonal $(e_1^2,e_2^2)$ with $e_1\le e_2$
+and correlation $\varrho=S_{12}/(e_1e_2)$, mixing in the weaker member
+strictly helps if and only if $\varrho<e_1/e_2$, in which case the optimum is
+interior with value $e_1^2e_2^2(1-\varrho^2)/(e_1^2+e_2^2-2\varrho e_1e_2)$;
+\item[(ii)] (equicorrelated family) if $S_{mm}=e^2$ and $S_{mk}=\varrho\,e^2$
+for all $m\neq k$ with $\varrho\ge0$, then
+$\min_{w}w^\top Sw=e^2\big(\varrho+(1-\varrho)/M\big)$, attained at uniform
+weights and decreasing to $e^2\varrho$ as $M\to\infty$.
+\end{enumerate}
+\end{proposition}
+
+Part (ii) is a floor: no number of additional members from an equicorrelated
+family moves the stack's root-mean-square relative error below
+$e\sqrt{\varrho}$. The reported metric is the mean rather than the root mean
+square of $\|\rho_f\|_2$, and the two differ by the dispersion of the
+per-sample error; across every pipeline in this paper their ratio stays within
+a few percent of $0.93$, so predictions made through $S$ transfer to the
+reported metric essentially unchanged. The proposition frames the diversity
+experiment of Section~\ref{sec:diversity}: what a new member is worth is
+legible in the row it adds to $S$, before any weights are fitted. On this
+benchmark the rows all look alike, pairwise correlations of
+\corrNetLo{}--\corrNetHi{} among trained networks of three architecture
+families and two losses, \corrKerLo{}--\corrKerHi{} against the kernel
+predictor, so the floor sits just below the best single member, and the
+measured stack lands on it. Part (i) is the same
+computation specialized to two members; it correctly predicts, from measured
+$(e_1,e_2,\varrho)$ alone, which members receive weight in the fitted stack
+and which are dropped. Section~\ref{sec:oco2} applies the same test on a
+problem where the answer comes out the other way: there the kernel's error is
+inflated by a factor the next subsection quantifies, the threshold $e_1/e_2$
+collapses, and the kernel is dropped even at a residual correlation of $0.14$.
+
+\subsection{Metric and representation: when a fixed kernel loses to a network}
+\label{sec:theory-aniso}
+
+The structural-mechanics benchmark has the neural mean and the isotropic
+kernel within half a point of each other. On the OCO-2 emulation problem of
+Section~\ref{sec:oco2} the same fixed kernel is an order of magnitude behind
+the same network. Two mechanisms can produce such a gap, and they separate
+cleanly.
+
+Suppose the operator factors as $G(u)=g(Au)$ with $A\in\mathbb R^{d\times d}$
+nonsingular and $g$ of unit $H^{s}$ norm, and that $\mu$ has a density bounded
+above and below on a compact domain. The singular values
+$\sigma_1\ge\dots\ge\sigma_d$ of $A$ are the rates at which $G$ varies along
+the input directions; write $r$ for the number carrying a fixed fraction of
+$\sum_i\sigma_i^2$.
+
+\begin{proposition}[isotropic and adapted kernel rates]\label{prop:aniso}
+Let $\widehat G^{\mathrm{iso}}_n$ be kernel ridge regression with a Mat\'ern
+kernel of smoothness $s$ and a validation-optimal single length scale, and
+$\widehat G^{\mathrm{ard}}_n$ the same construction in the metric
+$u\mapsto Au$. With high probability over $n$ i.i.d.\ samples,
+\[
+\mathbb E\big\|G-\widehat G^{\mathrm{iso}}_n\big\|\;\le\;C\,\sigma_1^{\,s}\,n^{-s/d},
+\qquad
+\mathbb E\big\|G-\widehat G^{\mathrm{ard}}_n\big\|\;\le\;C\,n^{-s/r},
+\]
+with $C$ depending only on $g$, $s$ and the density bounds; the ratio of the
+two bounds is $\sigma_1^{\,s}\,n^{\,s(1/r-1/d)}$.
+\end{proposition}
+
+The proof (Appendix~\ref{app:proofs}) is the scattered-data estimate
+$\|G-\widehat G_n\|\lesssim h_X^{\,s}\|G\|_{H^s}$ applied to the two designs:
+one length scale must fill all $d$ directions, so $h_X\asymp n^{-1/d}$ and the
+norm carries $\sigma_1^{\,s}$; the adapted metric confines the variation to
+$r$ directions and removes the anisotropy from the norm. The proposition
+bounds the \emph{metric} part of a network's advantage, the part an
+anisotropic kernel would recover. The rest is \emph{representational}: a
+stationary kernel of fixed smoothness reaches only its native space, at any
+metric, while the network adapts its features to the map. The two parts are
+separated experimentally by handing the kernel the anisotropic metric and
+seeing how much of the gap closes; on the OCO-2 band of
+Section~\ref{sec:oco2} the metric accounts for a factor of about $1.4$ of a
+tenfold gap and representation for the rest, and the direct proof of the
+representational reading is that the same kernel machinery applied to the
+network's learned features recovers the network's accuracy and slightly
+exceeds it.
+
+\subsection{An error bound for the residual kernel correction}
+\label{sec:theory-or}
+
+The final stage of the pipeline is kernel ridge regression of the ensemble
+residual. The bound below is a vector-valued, residual form of the classical
+power-function estimate for kernel interpolation
+\citep{wendland2004scattered} and of the optimal-recovery viewpoint of
+\citet{owhadi2019operator}; we include the short argument in
+Appendix~\ref{app:proofs} to keep the two factors explicit. Fix the mean
+$m:\mathcal U\to\mathcal V$ (in the pipeline, the stacked ensemble; in the
+statement below $m$ is any fixed map independent of the correction sample) and
+write $r=G-m$ for the residual operator with components $r_j$, $j=1,\dots,q$. Let $k$ be a positive definite kernel on $\mathcal U$ with
+RKHS $\mathcal H_k$, and assume $r_j\in\mathcal H_k$ for all $j$ with
+\[
+\|r\|_K^2:=\sum_{j=1}^q\|r_j\|_{\mathcal H_k}^2<\infty .
+\]
+Given inputs $X=(u_1,\dots,u_n)$, Gram matrix $K=k(X,X)$ and nugget
+$\lambda\ge 0$, the correction is
+$\widehat r_\lambda(u)=k(u,X)\,(K+n\lambda I)^{-1}R$, $R_{nj}=r_j(u_n)$, and the
+corrected predictor is $m+\widehat r_\lambda$. Let
+\begin{equation}\label{eq:power}
+P_\lambda(u)^2\;=\;k(u,u)-k(u,X)\,(K+n\lambda I)^{-1}k(X,u)
+\end{equation}
+denote the Gaussian process posterior variance with the same nugget (for
+$\lambda=0$ this is the classical power function of the point set $X$).
+
+\begin{theorem}[certified pointwise bound]\label{thm:or}
+For every $u\in\mathcal U$ and every $\lambda\ge0$,
+\[
+\big\|G(u)-m(u)-\widehat r_\lambda(u)\big\|_2\;\le\;\|G-m\|_K\;
+\widetilde P_\lambda(u)\;\le\;\|G-m\|_K\;P_\lambda(u),
+\]
+where
+$\widetilde P_\lambda(u)^2=P_\lambda(u)^2-n\lambda\,\|(K+n\lambda
+I)^{-1}k(X,u)\|_2^2$.
+\end{theorem}
+
+Three comments. First, the inequality is algebraic: it holds pathwise for
+every fixed $m$, every dataset, and every $u$, with no probabilistic
+assumptions. In the pipeline $m$ is itself fit on the same training set; this
+does not affect the validity of the bound, only the reading of
+$\|G-m\|_K$ as a random (realized) quantity rather than an a priori one.
+Second, the bound factorizes into a quantity that depends only on
+the residual operator ($\|G-m\|_K$) and a quantity that depends only on the
+kernel and the design ($P_\lambda$), and the second factor is exactly the
+posterior standard deviation that a Gaussian process interpretation of the
+correction would report. This is the sense in which the bound is certified:
+whatever error the corrected surrogate commits at $u$ is controlled by the
+reported $P_\lambda(u)$ times a constant that does not depend on $u$. We stress
+that this is a statement about a valid upper bound, not about the usefulness of
+$P_\lambda$ as a pointwise error \emph{ranking}. Section~\ref{sec:uq} finds
+that on this benchmark $P_\lambda$ ranks the error poorly, because the neural
+mean supplies most of the error and the relative metric is confounded by output
+amplitude; a distribution-free conformal rescaling of $P_\lambda$ nonetheless
+attains its nominal coverage on the test set.
+Third, the theorem quantifies why one should regress residuals rather than
+raw targets: the design factor $P_\lambda$ is the same in both cases, so the
+gain of the neural mean is the drop from $\|G-\bar v\|_K$ (kernel-only, mean
+$\bar v$) to $\|G-m\|_K$. These norms are not directly observable, but the
+RKHS norms of the \emph{fitted} interpolants,
+$\smash{\|\widehat r_\lambda\|_K^2=\operatorname{tr}(\alpha^\top K\alpha)}$ with
+$\alpha=(K+n\lambda I)^{-1}R$, are computable lower-bound proxies, and they
+drop by a factor of about \normRatio{} when the kernel is moved from raw
+targets to ensemble residuals (Table~\ref{tab:norms}). The neural mean does
+not merely reduce the size of the residual in $L^2$; it leaves behind a
+residual operator that is genuinely smoother as seen by the kernel.
+
+\subsection{Distribution-free coverage for the reported band}
+\label{sec:theory-conf}
+
+Theorem~\ref{thm:or} controls the error by $\|G-m\|_K\,P_\lambda(u)$, but the
+constant $\|G-m\|_K$ is not known a priori, and Section~\ref{sec:uq} shows that
+$P_\lambda$ alone ranks the error weakly. What the surrogate reports as
+uncertainty is therefore not $P_\lambda$ itself but a rescaling of it,
+$q\,P_\lambda(u)$, whose multiplier $q$ is calibrated on the held-out split by
+the split-conformal rule
+\begin{equation}\label{eq:conf}
+q=Q_{1-\alpha}\Big(\big\{s_i:=\|e(\tilde u_i)\|_2/P_\lambda(\tilde u_i)\big\}_{i=1}^m\Big),
+\qquad e(u)=G(u)-m(u)-\widehat r_\lambda(u),
+\end{equation}
+where $Q_{1-\alpha}$ is the $\lceil(1-\alpha)(m+1)\rceil$-th smallest value of
+the $m$ validation scores. The point of this construction is that its coverage
+needs neither the bound to be tight nor $P_\lambda$ to be a good error ranking;
+it needs only exchangeability, which the fixed splits provide.
+
+\begin{proposition}[finite-sample coverage]\label{prop:conf}
+Fix the mean $m$, the correction $\widehat r_\lambda$ and the design $X$, and
+let $P_\lambda(\cdot)>0$. Suppose the validation and test inputs
+$\tilde u_1,\dots,\tilde u_m,u^\star$ are exchangeable (in particular
+i.i.d.\ from $\mu$) and drawn independently of $m,\widehat r_\lambda,X$. Let
+$q$ be the conformal multiplier \eqref{eq:conf} and define the band
+$C(u)=\{v:\|v-m(u)-\widehat r_\lambda(u)\|_2\le q\,P_\lambda(u)\}$. Then
+\[
+1-\alpha\;\le\;\mathbb P\big(G(u^\star)\in C(u^\star)\big)\;\le\;
+1-\alpha+\frac{1}{m+1},
+\]
+the upper bound holding when the scores are almost surely distinct.
+\end{proposition}
+
+The two-sided statement is the standard guarantee of split conformal
+prediction \citep{vovk2005algorithmic,lei2018distribution}, transported to the
+functional-output setting by taking the nonconformity score to be the relative
+residual norm $s=\|e(u)\|_2/P_\lambda(u)$; the proof, a rank argument on the
+exchangeable scores, is in Appendix~\ref{app:proofs}. Three points make it the
+right closing statement for the uncertainty analysis. It is exactly the
+quantity we compute: the reported coverage of \uqCover\% at the nominal
+$1-\alpha=\uqCoverNom\%$ in Section~\ref{sec:uq} realizes this proposition with
+$m=1000$ and $\alpha=0.1$, and the slack $1/(m+1)\approx0.001$ explains why the
+empirical coverage sits just above nominal rather than exactly on it. It is
+agnostic to everything the earlier results leave uncertain: the neural mean may
+be biased, $P_\lambda$ may correlate with the error weakly or with the wrong
+sign, and the bound of Theorem~\ref{thm:or} may be loose, yet the band still
+covers at the stated rate. And it is where the uncertainty analysis ends: among
+the candidate uncertainty signals we examine, the conformally rescaled
+$P_\lambda$ is the only one that carries a guarantee, so it is the one the
+surrogate reports.
+
+\subsection{Effective dimension from the Gram spectrum}
+\label{sec:theory-rmt}
+
+The remaining design choice is the nugget $\lambda$, selected by
+cross-validation in the pipeline. The following exact identity connects that
+choice to the spectrum of the Gram matrix and, through it, to random matrix
+descriptions of the design.
+
+\begin{lemma}[effective dimension and the empirical Stieltjes transform]
+\label{lem:deff}
+Let $K$ be a symmetric positive semidefinite $n\times n$ matrix with
+eigenvalues $\lambda_1,\dots,\lambda_n\ge0$, let
+$\widehat m(z)=\tfrac1n\sum_{i=1}^n(\lambda_i/n-z)^{-1}$ be the Stieltjes
+transform of the empirical spectral distribution of $K/n$. Then for every
+$\lambda>0$ the effective dimension of ridge regression with nugget $\lambda$
+satisfies
+\[
+d_{\mathrm{eff}}(\lambda)\;:=\;\operatorname{tr}\!\big(K(K+n\lambda I)^{-1}\big)
+\;=\;n\big(1-\lambda\,\widehat m(-\lambda)\big).
+\]
+In particular, if the empirical spectral distribution of $K/n$ converges
+weakly to a limit law $F$ as $n\to\infty$, then
+$d_{\mathrm{eff}}(\lambda)/n\to 1-\lambda\,m_F(-\lambda)$ with $m_F$ the
+Stieltjes transform of $F$.
+\end{lemma}
+
+The identity is unconditional; the random-matrix content enters through the
+choice of $F$. For the benchmark's simplest reference model, isotropic linear
+features, the limit can be evaluated in closed form.
+
+\begin{corollary}[effective dimension under a Mar\v{c}enko--Pastur limit]
+\label{cor:mp}
+Let $K=XX^\top$ with $X\in\mathbb R^{n\times p}$ having i.i.d.\ entries of
+mean zero and variance $\sigma^2$, and let $p/n\to\gamma\in(0,1]$. Then
+\[
+\frac{d_{\mathrm{eff}}(\lambda)}{n}\;\longrightarrow\;
+\gamma\big(1-\lambda\,m(-\lambda)\big),\qquad
+m(-\lambda)=\frac{\sqrt{\big(\lambda+\sigma^2(1-\gamma)\big)^2+4\gamma\sigma^2\lambda}
+-\big(\lambda+\sigma^2(1-\gamma)\big)}{2\gamma\sigma^2\lambda},
+\]
+almost surely, where $m$ is the Stieltjes transform of the
+Mar\v{c}enko--Pastur law with ratio $\gamma$ and scale $\sigma^2$. In a
+simulation with $n=6000$, $p=1800$, $\sigma^2=1.7$, the formula agrees with
+the empirical $d_{\mathrm{eff}}(\lambda)/n$ to four decimal places across
+$\lambda\in[10^{-3},10]$.
+\end{corollary}
+
+Two uses. Quantitatively, the formula makes the nugget--capacity trade-off
+explicit for the bulk of a feature Gram matrix: eigenvalue mass of
+Mar\v{c}enko--Pastur type is absorbed or discarded by $\lambda$ according to a
+single closed-form curve, and outlying (spiked) eigenvalues $x_s$ simply add
+their terms $x_s/(x_s+n\lambda)$ on top. Qualitatively, it separates the two
+regimes visible in Figure~\ref{fig:spectra}: the Mat\'ern Gram matrix on the
+loads is nothing like a Mar\v{c}enko--Pastur bulk (its spectrum decays
+exponentially, which is why $d_{\mathrm{eff}}$ is a few hundred out of
+19000), whereas the Gram matrices of learned penultimate features do show a
+bulk-plus-spikes shape, and for them the corollary describes how much of the
+bulk the cross-validated nugget retains. For the feature Gram matrices of the trained networks we
+observe the familiar picture of a bulk that is well fitted by a
+Mar\v{c}enko--Pastur law \citep{marchenko1967distribution} together with a
+small number of outlying eigenvalues carrying the regression signal, as in
+spiked covariance models \citep{baik2005phase}; for the Mat\'ern Gram matrix
+on the 41-dimensional loads the spectrum decays rapidly and
+$d_{\mathrm{eff}}$ is small ($\approx$ a few hundred at the cross-validated
+$\lambda$, out of $n=19000$; Figure~\ref{fig:spectra}). This gives a
+post-hoc reading of the cross-validated nugget: $\lambda$ lands where
+$d_{\mathrm{eff}}(\lambda)$ has absorbed the outlying eigenvalues and the
+leading bulk, and further decreasing $\lambda$ buys capacity precisely where
+the spectrum carries little signal. It also explains why the exact solve is
+affordable: the correction is numerically a problem of dimension
+$d_{\mathrm{eff}}$, not $n$.
+
+The effective dimension is moreover exactly the total budget of the design
+factor from Theorem~\ref{thm:or}. Writing $A=K+n\lambda I$, the posterior
+variances at the training inputs sum to
+\[
+\sum_{i=1}^{n}P_\lambda(u_i)^2
+=\operatorname{tr}(K)-\operatorname{tr}(K A^{-1}K)
+=\operatorname{tr}\!\big(n\lambda\,KA^{-1}\big)
+=n\lambda\,d_{\mathrm{eff}}(\lambda),
+\]
+using $KA^{-1}K=K-n\lambda\,KA^{-1}$. So the same $d_{\mathrm{eff}}$ that reads
+the nugget off the spectrum also fixes, up to the factor $n\lambda$, the total
+posterior-variance mass the correction distributes over the design; the two
+halves of this section are one quantity seen from two sides.

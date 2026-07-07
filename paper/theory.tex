@@ -300,10 +300,33 @@ the target is not: interpolating the same outputs through the two kernels,
 the raw-input kernel carries the target at squared norm $1.6\times10^{6}$ and
 the feature kernel at $3.9\times10^{4}$, a factor of $42$. The network does
 not condition the kernel better; it moves the target to a low-norm corner of
-a native space of the same size, where the exact solve reaches it. This is
-the representational advantage, measured in the units of the bound, and it is
-why an anisotropic metric --- which can only rescale the input, not
-re-express the map --- recovers just the factor $1.4$ and leaves the rest.
+a native space of the same size, where the exact solve reaches it.
+
+This is not an accident of the O2 band; it is what a pulled-back kernel does.
+Writing $\varphi$ for the feature map and $k$ for the base kernel, the deep
+kernel head uses $k_\varphi(x,x')=k(\varphi(x),\varphi(x'))$.
+
+\begin{proposition}[feature pullback]\label{prop:pullback}
+The native space of $k_\varphi$ is $\mathcal H_{k_\varphi}=\{f\circ\varphi:
+f\in\mathcal H_k\}$ with
+$\|g\|_{\mathcal H_{k_\varphi}}=\min\{\|f\|_{\mathcal H_k}: f\circ\varphi=g
+\text{ on }\mathcal X\}$. In particular, if the target factors through the
+features as $G=h\circ\varphi$ with $h\in\mathcal H_k$, then
+$\|G\|_{\mathcal H_{k_\varphi}}\le\|h\|_{\mathcal H_k}$, and the
+optimal-recovery bound of Theorem~\ref{thm:or} for the feature-kernel
+regression is governed by $\|h\|_{\mathcal H_k}$ rather than by the norm of
+$G$ in the raw-input space.
+\end{proposition}
+
+The proof (Appendix~\ref{app:proofs}) is the standard pullback identity for
+reproducing kernels. Its content here is the reading: a fixed kernel on the
+raw input must carry the whole warped map $G$, whose native-space norm is
+large when $G$ has fine structure; the same kernel on the features carries
+only the unwarped $h$, and training drives $\varphi$ toward exactly the
+factorization that makes $h$ simple. The measured factor of $42$ is that norm
+gap, and it is the representational advantage that an anisotropic metric,
+which rescales the input but cannot re-express the map, leaves untouched
+(recovering only the factor $1.4$).
 
 \subsection{An error bound for the residual kernel correction}
 \label{sec:theory-or}

@@ -131,6 +131,23 @@ for every positive $w$. A combination with shared weights is the special
 case $v_{mj}=v_m$ for all $j$, a subset of the feasible set of each
 coordinate problem, which gives the domination. \qed
 
+\subsection{Proof of Proposition~\ref{prop:pullback}}
+
+Let $T:\mathcal H_k\to\mathbb R^{\mathcal X}$ be the composition map
+$Tf=f\circ\varphi$. For $x\in\mathcal X$ the reproducing property gives
+$(Tf)(x)=f(\varphi(x))=\langle f,k(\cdot,\varphi(x))\rangle_{\mathcal H_k}$,
+so evaluation of $Tf$ at $x$ is a bounded functional, and the image
+$\mathcal H_{k_\varphi}:=T(\mathcal H_k)$ carries the quotient norm
+$\|g\|_{\mathcal H_{k_\varphi}}=\min\{\|f\|_{\mathcal H_k}:Tf=g\}$, the minimum
+over the affine subspace $T^{-1}(g)$ (nonempty exactly when $g$ is a pullback).
+This normed space is an RKHS: its reproducing kernel is
+$k_\varphi(x,x')=\langle k(\cdot,\varphi(x)),k(\cdot,\varphi(x'))\rangle_{\mathcal H_k}
+=k(\varphi(x),\varphi(x'))$, since the minimum-norm representer of evaluation
+at $x$ is $k(\cdot,\varphi(x))$. Taking $f=h$ in the minimum gives
+$\|h\circ\varphi\|_{\mathcal H_{k_\varphi}}\le\|h\|_{\mathcal H_k}$, and
+substituting this bound into Theorem~\ref{thm:or} applied with the kernel
+$k_\varphi$ replaces $\|G\|$ by $\|h\|_{\mathcal H_k}$. \qed
+
 \subsection{Proof of Proposition~\ref{prop:aniso}}
 
 Both displays are the native-space estimate for kernel ridge regression: for a

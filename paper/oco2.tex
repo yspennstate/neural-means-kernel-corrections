@@ -57,7 +57,7 @@ each coordinate from whichever model wins it.}
 \label{fig:oco2}
 \end{figure}
 
-Table~\ref{tab:oco2} carries three findings, and Figure~\ref{fig:oco2} shows
+Table~\ref{tab:oco2} carries four findings, and Figure~\ref{fig:oco2} shows
 the two central ones. First, the representation
 ladder: the same exact kernel machinery scores $40\%$ on the raw input,
 $30\%$ after rescaling each input coordinate by its measured sensitivity (the
@@ -83,7 +83,17 @@ per-coordinate exponents scatter widely, and coordinate errors do not
 decouple because the network shares capacity --- but the direction is robust,
 and the practical rule is plain: train in the metric you report.
 
-Third, the regimes of Section~\ref{sec:theory-secmom} are decided by these
+Third, the same-class floor of the structural-mechanics study reappears here,
+one level down. The residuals of independently seeded copies of the flat
+network correlate at $0.78$ on the O2 band and at $0.97$ and $0.96$ on WCO2
+and SCO2, so part~(ii) of Proposition~\ref{prop:secmom} puts the
+infinite-seed floors at $3.9\%$, $16.2\%$ and $8.0\%$ --- and the measured
+combinations sit on them ($3.82\%$, $16.1\%$, $8.0\%$). Ensembling within an
+architecture class saturates by the same second-moment law on both problems;
+what moved the OCO-2 numbers an order of magnitude was changing what the
+members are (learned features under the kernel), not how many there are.
+
+Fourth, the regimes of Section~\ref{sec:theory-secmom} are decided by these
 numbers before any stack is fit. Against the flat network the raw-input
 kernel has $\varrho=0.14$ and $e_n/e_k=0.12$: the condition of
 Proposition~\ref{prop:secmom} fails and the kernel is dropped, in contrast to

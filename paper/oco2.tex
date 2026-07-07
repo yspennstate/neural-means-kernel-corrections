@@ -35,8 +35,9 @@ Mat\'ern kernel, raw input, sensitivity-scaled (ARD) & 30.01\% & --- \\
 kernel-flow emulator \citep{susiluoto2025radiative} & 16.89\% & 0.0448\% \\
 residual MLP, flat metric & 3.99\% & 0.159\% \\
 residual MLP, radiance metric & 46.3\% & 0.0291\% \\
-Mat\'ern head on the flat network's features & \textbf{3.82\%} & 0.0758\% \\
-Mat\'ern head on the weighted network's features & 20.0\% & \textbf{0.0282\%} \\
+Mat\'ern head on the flat network's features & 3.82\% & 0.0758\% \\
+Mat\'ern head on the weighted network's features & 20.0\% & 0.0282\% \\
+per-coordinate combination of the above & \textbf{3.83\%} & \textbf{0.0267\%} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -75,7 +76,9 @@ metric is diagonal in the reduced coordinates, selecting the best model per
 coordinate on the validation split is optimal for both metrics
 simultaneously; that per-coordinate combination of the flat and weighted
 models is the final surrogate, and it beats the kernel-flow emulator on both
-metrics at once ($3.82\%$ against $16.89\%$ reduced, $0.028\%$ against
-$0.045\%$ radiance). The second band behaves the same way (the weighted mean
-reaches $0.037\%$ radiance against the emulator's $0.060\%$ on WCO2), and
-the code releases the per-band numbers alongside this paper.
+metrics at once ($3.83\%$ against $16.89\%$ reduced, $0.0267\%$ against
+$0.0448\%$ radiance). The other bands behave the same way: on WCO2 the deep
+kernel heads reach $16.1\%$ and $0.035\%$ against the emulator's $24.1\%$
+and $0.060\%$, and on SCO2 the per-coordinate combination reaches $8.0\%$
+and $0.043\%$ against $16.1\%$ and $0.115\%$. The code releases the per-band
+numbers alongside this paper.

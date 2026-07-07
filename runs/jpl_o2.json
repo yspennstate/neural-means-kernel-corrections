@@ -11,6 +11,8 @@
  "dkr_flat_radiance": 0.0758,
  "dkr_weighted_reduced": 19.9922,
  "dkr_weighted_radiance": 0.0282,
+ "combined_reduced": 3.8274,
+ "combined_radiance": 0.0267,
  "stack_reduced": 3.8246,
  "stack_radiance": 0.0753
 }

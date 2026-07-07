@@ -37,7 +37,7 @@ residual MLP, flat metric & 3.99\% & 0.159\% \\
 residual MLP, radiance metric & 46.3\% & 0.0291\% \\
 Mat\'ern head on the flat network's features & 3.82\% & 0.0758\% \\
 Mat\'ern head on the weighted network's features & 20.0\% & 0.0282\% \\
-per-coordinate combination of the above & \textbf{3.83\%} & \textbf{0.0267\%} \\
+per-coordinate combination of the above & \textbf{3.80\%} & \textbf{0.0267\%} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -107,7 +107,26 @@ or decorrelated and inaccurate (error above $140\%$). No architecture we tried
 was both accurate and decorrelated enough to lower the floor, which is the
 honest statement of why the residual MLP is the member of record: not that
 diversity is impossible, but that on this map no more accurate diverse member
-was found.
+was found. Figure~\ref{fig:floor} shows both halves of this: the correlations
+that make the floor class-specific, and the accuracy-decorrelation trade-off
+that keeps it in place. Adding the Fourier members to the per-coordinate
+combination changes the reported error by less than a hundredth of a point,
+in either direction, on all three bands: the honesty-split blend gives them no
+weight.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/floor.pdf}
+\caption{The ensembling floor on WCO2. Left: residual correlations. Two seeds
+of one architecture correlate near the value that sets the floor (dashed);
+different architectures correlate far less, so the floor is a property of the
+architecture class. Right: the Fourier-feature member across bandwidths. A
+member helps the ensemble only in the shaded region, below the
+$e_{\mathrm{ref}}/\varrho$ curve of Proposition~\ref{prop:secmom}(i); the
+accurate settings are too correlated and the decorrelated settings too
+inaccurate, so none lands there with room to spare.}
+\label{fig:floor}
+\end{figure}
 
 Fourth, the regimes of Section~\ref{sec:theory-secmom} are decided by these
 numbers before any stack is fit. Against the flat network the raw-input

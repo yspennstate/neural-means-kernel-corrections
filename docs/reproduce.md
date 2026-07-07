@@ -61,14 +61,14 @@ feature distance (6000-point estimate), nugget grid {1e-8, 1e-6, 1e-4}, tuned
 against validation on a 6000-sample subsample and refit on all 18000. The
 per-coordinate combination picks, for each of the 40 coefficients, the member
 with the lowest validation root mean square error; it is the reported model
-(on O2 it reaches 3.83% reduced and 0.0267% radiance at once).
+(on O2 it reaches 3.80% reduced and 0.0267% radiance at once).
 
 Results (`runs/jpl_<band>.json`; the kernel-flow rows are computed from the
 emulator's own stored predictions):
 
 | band | kernel flow, reduced | ours | kernel flow, radiance | ours |
 |------|---------------------:|-----:|----------------------:|-----:|
-| O2 | 16.89% | 3.83% | 0.0448% | 0.0267% |
+| O2 | 16.89% | 3.80% | 0.0448% | 0.0267% |
 | WCO2 | 24.06% | 16.12% | 0.0599% | 0.0350% |
 | SCO2 | 16.14% | 7.96% | 0.1147% | 0.0432% |
 

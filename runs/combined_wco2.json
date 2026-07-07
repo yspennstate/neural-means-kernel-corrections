@@ -1,0 +1,18 @@
+{
+ "band": "wco2",
+ "n_members": 16,
+ "selection": {
+  "reduced": 0.16324787797105228,
+  "radiance": 0.00044016960655695377
+ },
+ "final": {
+  "reduced": 0.16179661252879476,
+  "radiance": 0.0004329961620506026
+ },
+ "blend_coords": 32,
+ "conformal_coverage_90": 0.9965,
+ "kernel_flow": {
+  "reduced": 0.24060354632197423,
+  "radiance": 0.0005986683396744897
+ }
+}

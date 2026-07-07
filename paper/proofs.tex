@@ -106,6 +106,20 @@ and minimizing the quadratic over $t\in[0,1]$ gives the stated value. For
 $w^\top Sw=e^2\big((1-\varrho)\|w\|_2^2+\varrho\big)$ on the simplex, minimized
 by the uniform weights, where $\|w\|_2^2=1/M$. \qed
 
+\subsection{Proof of Corollary~\ref{cor:floor}}
+
+Convex weights are nonnegative, so each term of
+$w^\top Sw=\sum_{m}w_m^2S_{mm}+\sum_{m\neq k}w_mw_kS_{mk}$ can be bounded
+below entrywise:
+\[
+w^\top Sw\;\ge\;\bar e^{\,2}\sum_m w_m^2+\bar\varrho\,\bar
+e^{\,2}\sum_{m\neq k}w_mw_k
+=\bar e^{\,2}\Big(\|w\|_2^2+\bar\varrho\,(1-\|w\|_2^2)\Big),
+\]
+using $\sum_{m\neq k}w_mw_k=(\sum_m w_m)^2-\|w\|_2^2=1-\|w\|_2^2$. The bracket
+is a convex combination of $1$ and $\bar\varrho$, hence at least
+$\bar\varrho$. \qed
+
 \subsection{Proof of Proposition~\ref{prop:aniso}}
 
 Both displays are the native-space estimate for kernel ridge regression: for a

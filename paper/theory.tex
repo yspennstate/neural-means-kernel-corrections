@@ -166,9 +166,35 @@ weights and decreasing to $e^2\varrho$ as $M\to\infty$.
 \end{enumerate}
 \end{proposition}
 
-Part (ii) is a floor: no number of additional members from an equicorrelated
-family moves the stack's root-mean-square relative error below
-$e\sqrt{\varrho}$. The reported metric is the mean rather than the root mean
+Exact equicorrelation never holds in practice, but for convex weights the
+floor survives one-sided bounds on the entries of $S$, which are what one
+actually measures.
+
+\begin{corollary}[ensembling floor]\label{cor:floor}
+If every member satisfies $S_{mm}\ge\bar e^{\,2}$ and every pair satisfies
+$S_{mk}\ge\bar\varrho\,\bar e^{\,2}$ with $\bar\varrho\ge0$, then every convex
+combination $f_w$ obeys
+\[
+\mathbb E\,\ell\big(f_w(u),G(u)\big)^2\;=\;w^\top Sw\;\ge\;
+\bar e^{\,2}\big(\bar\varrho+(1-\bar\varrho)\,\|w\|_2^2\big)\;\ge\;
+\bar e^{\,2}\,\bar\varrho .
+\]
+No number of additional members with the same error level and mutual
+correlations moves the ensemble's root-mean-square relative error below
+$\bar e\sqrt{\bar\varrho}$.
+\end{corollary}
+
+The corollary is the quantity this paper keeps measuring, at two different
+levels. Across architecture families on the structural-mechanics benchmark
+the pairwise correlations exceed $0.86$ at member errors near $4.7\%$, a
+floor of about $4.4\%$, and the corrected stack lands within a tenth of it.
+Across random seeds of one architecture on the OCO-2 bands the correlations
+are $0.78$, $0.97$ and $0.96$ at member errors of $4.4\%$, $16.4\%$ and
+$8.2\%$, floors of $3.9\%$, $16.2\%$ and $8.0\%$, and the measured
+combinations sit on all three. When an ensemble is at its floor the
+corollary says where improvement cannot come from; on OCO-2 it came from
+changing the members (the kernel head on learned features) rather than
+adding more of them. The reported metric is the mean rather than the root mean
 square of $\|\rho_f\|_2$, and the two differ by the dispersion of the
 per-sample error; across every pipeline in this paper their ratio stays within
 a few percent of $0.93$, so predictions made through $S$ transfer to the

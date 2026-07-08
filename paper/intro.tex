@@ -12,8 +12,39 @@ network by an order of magnitude until it is handed the network's learned
 features. The same small set of components, and the same supporting theory,
 account for both.
 
-Among the standard test problems in the operator-learning literature, the
-structural mechanics benchmark introduced by
+The structural-mechanics problem is one of seven in the operator-learning
+suite assembled by \citet{batlle2024kernel} from the benchmarks of
+\citet{dehoop2022cost} and \citet{lu2022comprehensive}, distributed through the
+Caltech data record that accompanies that study. Table~\ref{tab:suite} lists
+all seven with the best published error on each; we single out structural
+mechanics because it is the one where the two method families tie, and use
+advection~II, a linear discontinuous problem, as the contrasting linear regime.
+
+\begin{table}[t]
+\centering
+\caption{The Batlle--Owhadi operator-learning suite (all seven Caltech
+benchmarks) with the best published mean relative $L^2$ test error and its
+source, and this work where we run it. Low-data problems use 1000 training
+pairs; high-data problems use the larger de Hoop/Huang sets. The kernel column
+is the best Mat\'ern or rational-quadratic kernel of \citet{batlle2024kernel}.}
+\label{tab:suite}
+\begin{tabular}{llcc}
+\toprule
+Problem & Map & Best published & This work \\
+\midrule
+Burgers & initial condition $\to$ solution & 1.93\% (FNO) & --- \\
+Darcy flow & permeability $\to$ pressure & 2.41\% (FNO) & --- \\
+Advection~I & smooth pulse $\to$ solution & $\approx0\%$ (kernel) & --- \\
+Advection~II & discontinuous pulse $\to$ solution & 11.28\% (linear kernel) & 11.29\% \\
+Helmholtz & wavespeed $\to$ field & 1.00\% (kernel) & --- \\
+Structural mechanics & boundary load $\to$ stress & 4.55\% (PARA-Net) & \textbf{4.55\%} \\
+Navier--Stokes & vorticity $\to$ vorticity & 0.12\% (kernel) & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Among these seven, the structural
+mechanics benchmark introduced by
 \citet{dehoop2022cost} has proved unusually resistant to improvement. The task
 is to learn the map from a boundary load applied to the top edge of an elastic
 plate to the interior von Mises stress field computed by a finite element

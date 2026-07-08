@@ -62,9 +62,12 @@ We study how neural networks and exact kernel methods combine in operator
 learning: an accurate neural mean, trained in the metric the application
 reports, with an exact Mat\'ern solve applied to its residual or to its
 learned features. Two public benchmarks with published baselines sit in
-opposite regimes and the same components explain both. On the
-structural-mechanics problem of de Hoop et al.\ the pipeline reaches
-\errBest\% relative test error, matching the best published result, and the
+opposite regimes and the same components explain both. The first is the
+structural-mechanics problem of de Hoop et al., one of the seven Caltech
+operator-learning benchmarks collected by Batlle et al.\ (Burgers, Darcy,
+advection, Helmholtz, structural mechanics, Navier--Stokes); on it the pipeline
+reaches \errBest\% relative test error, matching the best published result, and
+the
 reason no method moves much further is measurable: the residuals of every
 architecture we train correlate above 0.86, and their shared component
 concentrates where the finite element data are least accurate and responds

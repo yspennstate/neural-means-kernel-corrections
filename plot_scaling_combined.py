@@ -21,16 +21,16 @@ C = ["#3b5bdb", "#e8590c", "#2b8a3e", "#862e9c"]
 
 fig, (axo, axc) = plt.subplots(1, 2, figsize=(8.2, 3.3))
 
-# --- OCO-2 panel: error vs n, power law, reaching the emulator ---
+# --- OCO-2 panel: corrected-surrogate error vs n, power law toward full-data result ---
 R = json.load(open(HERE / "runs" / "scaling_reduced.json"))["results"]
-n = np.array([r["n"] for r in R], float); mean = np.array([r["mean"] for r in R])
-b, a = np.polyfit(np.log(n), np.log(mean), 1)
+n = np.array([r["n"] for r in R], float); best = np.array([r["best"] for r in R])
+b, a = np.polyfit(np.log(n), np.log(best), 1)
 ne = np.array([n[0], 2.2e4]); axo.loglog(ne, np.exp(a) * ne ** b, "--", color=C[0], lw=1.0, alpha=.6,
                                           label=f"slope {b:.2f}")
-axo.loglog(n, mean, "o-", color=C[0], lw=1.3, ms=4, label="neural mean")
-axo.axhline(3.8, ls=":", color="#868e96", lw=.8); axo.text(n[0], 4.0, "emulator 3.8%", fontsize=7, color="#868e96")
+axo.loglog(n, best, "o-", color=C[0], lw=1.3, ms=4, label="neural mean + kernel")
+axo.axhline(3.83, ls=":", color="#868e96", lw=.8); axo.text(2.5e3, 3.95, "full pipeline 3.8%", fontsize=7, color="#868e96")
 axo.set_xlabel("training pairs $n$"); axo.set_ylabel("reduced-radiance error (%)")
-axo.set_title("OCO-2 O2 emulator"); axo.legend(frameon=False, loc="lower left")
+axo.set_title("OCO-2 O2 emulator"); axo.legend(frameon=False, loc="upper right")
 axo.grid(True, which="both", alpha=.15)
 
 # --- ClimSim panel: R^2 vs n, neural mean crossing the kernel, toward baseline ---

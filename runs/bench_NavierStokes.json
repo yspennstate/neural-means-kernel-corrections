@@ -1,0 +1,6 @@
+{
+ "kernel": 0.511,
+ "mean": 2.056,
+ "mean_plus_kernel": 0.898,
+ "val_selected": "kernel"
+}

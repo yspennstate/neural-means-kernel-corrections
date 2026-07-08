@@ -439,11 +439,19 @@ prediction \citep{vovk2005algorithmic,lei2018distribution}, transported to the
 functional-output setting by taking the nonconformity score to be the relative
 residual norm $s=\|e(u)\|_2/P_\lambda(u)$; the proof, a rank argument on the
 exchangeable scores, is in Appendix~\ref{app:proofs}. Three points make it the
-right closing statement for the uncertainty analysis. It is exactly the
+right closing statement for the uncertainty analysis. It is close to the
 quantity we compute: the reported coverage of \uqCover\% at the nominal
 $1-\alpha=\uqCoverNom\%$ in Section~\ref{sec:uq} realizes this proposition with
-$m=1000$ and $\alpha=0.1$, and the slack $1/(m+1)\approx0.001$ explains why the
-empirical coverage sits just above nominal rather than exactly on it. It is
+$m=1000$ and $\alpha=0.1$. The $1.6$-point excess over nominal is not the
+$1/(m+1)$ slack, which is only a tenth of a point; it is the finite-sample
+fluctuation of coverage on a single test set, whose standard deviation
+$\sqrt{\alpha(1-\alpha)/m}\approx0.95$ point places \uqCover\% about $1.7$
+standard deviations above nominal, well inside the guarantee. One caveat on
+the hypotheses: our calibration scores are computed on the same held-out split
+used to select the neural-mean checkpoints and tune the correction, so the
+exchangeability the proposition assumes is only approximate here; the selection
+is low-complexity and the band over-covers, but a calibration split disjoint
+from model selection would make the guarantee exact. It is
 agnostic to everything the earlier results leave uncertain: the neural mean may
 be biased, $P_\lambda$ may correlate with the error weakly or with the wrong
 sign, and the bound of Theorem~\ref{thm:or} may be loose, yet the band still

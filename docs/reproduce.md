@@ -78,10 +78,12 @@ seed-0 runs, matching the configuration above.
 
 ## Advection (discontinuous inputs)
 
-Data: `Advection_inputs.npy` / `Advection_outputs.npy` from the same Caltech
-record (200-point binary initial condition to the solution at a later time;
-18000 / 2000 / 20000 split, seed 0). Because the operator is linear, a
-ridge-regularized linear member (ridge 1e-2) reaches **11.29%** against the
-published best of 11.28% (a linear kernel) and 13.49% for the FNO; neural
-means (two seeds, width 512, 200-250 epochs, configuration as above) and the
-kernel add nothing, which the paper discusses. See `runs/` for the summary.
+This is a supplementary check kept in the repository; it is not part of the
+paper. Data: `Advection_inputs.npy` / `Advection_outputs.npy` from the same
+Caltech record (200-point binary initial condition to the solution at a later
+time; 18000 / 2000 / 20000 split, seed 0). Because the operator is linear, a
+ridge-regularized linear member (ridge 1e-2) reaches **11.29%**
+(`runs/advection_linear.json`) against the published best of 11.28% (a linear
+kernel) and 13.49% for the FNO. Neither the neural means (two seeds, width 512,
+200-250 epochs) nor the Matern kernel improves on the linear member: the full
+MLP-plus-kernel pipeline reaches **11.35%** (`runs/advection.json`).

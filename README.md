@@ -24,10 +24,15 @@ stored predictions on the same test states.
 | WCO2 | 24.1% / **16.1%** | 0.060% / **0.035%** |
 | SCO2 | 16.1% / **8.0%** | 0.115% / **0.043%** |
 
-The winner on the reduced metric is an exact kernel head on the flat-trained
-network's features; on the radiance metric, the same head on a
-radiance-trained network's features. The same kernel scores 40% on the raw
-input: its limitation was the features, not the solve.
+On O2 and SCO2 both entries in the "ours" columns are one model: a
+per-coordinate combination that is best on both metrics at once. On WCO2 they
+are two separate deep-kernel heads (the flat-feature head for the reduced
+metric, the weighted-feature head for the radiance metric); a single combined
+WCO2 model was not produced, so its two numbers are the best single head per
+metric rather than one model. The winner on the reduced metric is an exact
+kernel head on the flat-trained network's features; on the radiance metric,
+the same head on a radiance-trained network's features. The same kernel scores
+40% on the raw input: its limitation was the features, not the solve.
 
 **Structural mechanics** (de Hoop, Huang, Qian and Stuart; boundary load to
 von Mises stress field). The pipeline reaches **4.55%** relative test error
@@ -39,10 +44,13 @@ residual correlations, the spatial structure of the shared error, and
 flat scaling in the sample size that the published plateau near 4.5% is a
 property of this benchmark's data rather than of any architecture.
 
-**Advection with discontinuous inputs** (same source). A linear member
-reaches **11.29%** against the published best of 11.28% — the operator is
-linear, and the paper uses the problem as the degenerate case of its
-regime analysis.
+**Advection with discontinuous inputs** (same source; a supplementary check
+in this repository, not in the paper). A ridge-linear member reaches
+**11.29%** (`runs/advection_linear.json`), matching the published
+linear-kernel baseline of 11.28%; the operator is linear, so neither the
+neural mean nor the Matern kernel improves on it — the full MLP-plus-kernel
+pipeline reaches 11.35% (`runs/advection.json`). It is the degenerate,
+linear end of the same regime picture.
 
 ## Layout
 

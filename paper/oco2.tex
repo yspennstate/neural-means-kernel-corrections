@@ -14,9 +14,12 @@ Two error metrics matter, and they disagree in an instructive way. The
 \emph{reduced} metric is the relative $L^2$ error on the $40$ standardized
 coefficients. The \emph{radiance} metric maps predictions back to the
 monochromatic spectrum through the stored PCA projection and norms before
-comparing; because the projection is orthogonal, on the reduced side it is
-exactly the diagonal weighting $s_z$, and its energy concentrates almost
-entirely on the first few coefficients.
+comparing; because the projection is orthogonal, the error \emph{numerator} on
+the reduced side is exactly the diagonally weighted norm
+$\|s_z\odot(\hat z-z)\|$, whose weights concentrate almost entirely on the
+first few coefficients (the denominator is the full reconstructed-radiance
+norm, which adds the reconstruction offsets). It is this diagonal weighting of
+the residual that the per-coordinate combination exploits.
 
 \begin{table}[t]
 \centering
@@ -24,7 +27,12 @@ entirely on the first few coefficients.
 kernel-flow row is the emulator of \citet{susiluoto2025radiative}, scored
 from its own stored predictions. ``Features'' means the penultimate
 activations of the trained network; the kernel head is the same exact
-Mat\'ern solve as everywhere else in this paper.}
+Mat\'ern solve as everywhere else in this paper. The two raw-input rows are the
+diagnostic-script fit (a $6000$-point solve at a single median length scale),
+lighter than the feature head's full-grid fit; the anisotropy experiment of
+Section~\ref{sec:theory-aniso}, which tunes the raw kernel fully, confirms it
+stays an order of magnitude above the feature head, so the gap is not an
+artifact of this.}
 \label{tab:oco2}
 \begin{tabular}{lcc}
 \toprule

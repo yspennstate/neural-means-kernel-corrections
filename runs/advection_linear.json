@@ -1,0 +1,7 @@
+{
+ "method": "ridge_linear (ridge=1e-2)",
+ "test_rel_l2_pct": 11.288,
+ "split": "18000/2000/20000 seed 0",
+ "published_linear_kernel": 11.28,
+ "note": "advection is a linear operator; neither neural mean nor Matern kernel improves on this (see advection.json, pipeline 11.35)"
+}

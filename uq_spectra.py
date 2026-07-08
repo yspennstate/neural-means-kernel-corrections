@@ -110,7 +110,11 @@ Wv = solve_triangular(L, Kqv, lower=True, check_finite=False)
 Pv = np.sqrt(np.maximum(kuu - (Wv * Wv).sum(0), 0.0))
 pred_va = E_va + Kqv.T @ alpha_res
 err_va_abs = np.linalg.norm(pred_va - Yva, axis=1)
-scale90 = float(np.quantile(err_va_abs / np.maximum(Pv, 1e-12), 0.9))
+# exact split-conformal quantile: the ceil((1-alpha)(m+1))-th smallest score,
+# the order statistic that carries the finite-sample coverage guarantee
+scores = np.sort(err_va_abs / np.maximum(Pv, 1e-12))
+m = len(scores)
+scale90 = float(scores[int(np.ceil(0.9 * (m + 1))) - 1])
 cover90 = float(np.mean(np.linalg.norm(pred_corr - Yte, axis=1) <= scale90 * P))
 print(f"conformal 90% scaling: empirical coverage on test = {cover90:.3f}", flush=True)
 

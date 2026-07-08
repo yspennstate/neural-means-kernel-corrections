@@ -274,10 +274,11 @@ Theorem~\ref{thm:or} certifies the corrected surrogate's error by
 $\|G-m\|_K\,P_\lambda(u)$, and it is tempting to read the design factor
 $P_\lambda$ as a pointwise error bar. On this benchmark that reading fails, in
 an instructive way. Table~\ref{tab:norms} confirms the operator factor behaves
-as the theory predicts: the computable RKHS norm of the fitted correction is
-about \normRatio$\times$ smaller when the kernel regresses ensemble residuals
-than when it regresses raw stress fields, so an accurate mean genuinely leaves
-a smoother remainder and a tighter certificate. But the design factor
+as the theory predicts: the computable squared RKHS norm of the fitted
+correction is about \normRatio$\times$ smaller when the kernel regresses
+ensemble residuals than when it regresses raw stress fields, so an accurate
+mean genuinely leaves a smoother remainder and a tighter certificate (the
+bound, linear in the norm, by the square root of that). But the design factor
 $P_\lambda$ correlates only weakly with the corrected surrogate's absolute
 error (Pearson \uqCorrAbs), and \emph{negatively} with the benchmark's
 relative error. The cause is measurable: $P_\lambda$ is large for loads far

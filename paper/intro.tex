@@ -10,11 +10,13 @@ is competitive with or better than the leading neural operators while keeping
 the exact solve and its certificate. We develop this as a residual coupling ---
 an accurate neural mean, trained in the metric the application reports, plus an
 exact Mat\'ern regression of its residual and of its features --- and it
-performs strongly across the board: it reaches the front of the
-structural-mechanics band (\errBest\%, matching the best of five published
-architectures), it beats the published Gaussian-process emulator of a real
-OCO-2 CO$_2$ retrieval problem on that problem's own test set, and it extends
-across the operator-learning benchmark suite (Table~\ref{tab:suite}).
+performs strongly on the two problems we study in depth: it reaches the front
+of the structural-mechanics band (\errBest\%, matching the best published
+architecture), and it beats the published Gaussian-process emulator of a real
+OCO-2 CO$_2$ retrieval problem on that problem's own test set (outright on two
+of the three spectral bands and on every band--metric pair).
+Table~\ref{tab:suite} situates both problems within the seven-benchmark
+operator-learning suite they belong to.
 
 The two problems we study in depth sit at opposite ends of the
 neural-versus-kernel spectrum, and that is the point: the
@@ -138,9 +140,10 @@ theory earns its keep. The corrected surrogate satisfies a pathwise bound
 P_\lambda(u)$, the product of the RKHS norm of the residual operator and the
 Gaussian process posterior standard deviation. The operator factor explains
 why one should regress residuals rather than stresses: the computable proxy
-for it, the RKHS norm of the fitted interpolant, drops by about
+for it, the squared RKHS norm of the fitted interpolant, drops by about
 \normRatio$\times$ when the kernel is moved from raw targets to ensemble
-residuals. The kernel is asked to represent only what the networks left
+residuals (so the certificate, linear in the norm, tightens by its square
+root). The kernel is asked to represent only what the networks left
 behind, and what they leave behind is much smaller as the kernel measures it,
 so the same design gives a much tighter certificate.
 
@@ -170,10 +173,11 @@ comparable models but to move the kernel's exactness onto the network's terms.
 An exact Mat\'ern head on the trained network's features reaches $3.8\%$
 relative error where the same kernel on the raw input reaches $40\%$, and the
 reason is one we can state precisely: the effective dimension of the two Gram
-matrices is the same, but the target's norm in the feature kernel's space is
-smaller, by a factor whose mechanism we prove --- when the target factors
-through the features, the feature-kernel norm is controlled by the unwarped
-map, not by the target's raw-space norm --- and whose size we measure at about
+matrices is the same, but the target's squared norm in the feature kernel's
+space is smaller, by a factor whose mechanism we prove --- when the target
+factors through the features, the feature-kernel norm is controlled by the
+unwarped map, not by the target's raw-space norm --- and whose size we measure
+at about
 forty. Training each member in the metric
 the application reports, and combining members per output coordinate, then
 beats the published emulator: on two of the three bands a single combined

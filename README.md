@@ -4,7 +4,8 @@ Code and paper for a study of how neural networks and exact kernel methods
 combine when learning solution operators and physical forward models. The
 same small set of components runs on problems that sit at opposite ends of
 the neural-versus-kernel spectrum, and the paper's theory says which end a
-given problem is on before anything is fit.
+given problem is on from the members' measured residual correlations, before
+any stack is fit.
 
 The components: a residual network trained directly on the error metric the
 application reports; an exact Matern kernel solve, applied either to the raw

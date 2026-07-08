@@ -65,27 +65,28 @@ trained in the metric the application reports, with an exact Mat\'ern kernel
 regression of its residual and of its features, and find the combination
 competitive with or better than the best published methods. On the
 structural-mechanics benchmark of de Hoop et al.\ it reaches the front of the
-band (\errBest\%, matching the best of five architectures); on the OCO-2
+band (\errBest\%, matching the best published architecture); on the OCO-2
 radiative-transfer emulator of Lamminp\"a\"a et al.\ it beats a published
 Gaussian-process emulator of a real NASA CO$_2$ retrieval problem on that
-problem's own test set; and it extends across the operator-learning benchmark
-suite (Table~\ref{tab:suite}). The gains come
+problem's own test set, outright on two of the three spectral bands and on
+every band--metric pair; and Table~\ref{tab:suite} situates both problems
+within the seven-benchmark suite. The gains come
 from a specific, measurable place: on OCO-2 the same kernel that trails the
 network tenfold on the raw input overtakes it on the learned features, because
-the target's norm in the feature kernel's space is smaller by a factor of about
-forty at unchanged effective dimension, a factor whose mechanism we prove.
-Structural mechanics sits in the opposite regime, where neural and kernel
-methods tie, and there the paper's contribution is a diagnosis: the residuals
-of every architecture we train correlate above 0.86, and their shared component
-concentrates where the finite element data are least accurate and is flat in
-capacity, diversity, and sample size, so the published plateau near 4.5\% is a
-property of the data, not of the surrogate class. Two public problems thus
-bracket what the neural--kernel coupling buys, and each stage of the method
+the target's squared norm in the feature kernel's space is smaller by a factor
+of about forty at unchanged effective dimension, a factor whose mechanism we
+prove. Structural mechanics sits in the opposite regime, where neural and
+kernel methods tie, and there the paper's contribution is a diagnosis: the
+residuals of every architecture we train correlate above 0.86, and their shared
+component concentrates where the finite element data are least accurate and is
+flat in diversity and sample size, so the evidence reads the plateau near 4.5\%
+as a property of the data rather than the surrogate class. Two public problems
+thus bracket what the neural--kernel coupling buys, and each stage of the method
 carries a supporting result: a second-moment identity that predicts the
-stacking outcome from measured residual correlations, an optimal-recovery bound
-with a feature-pullback rate that separates the metric from the representational
-part of the advantage, and a distribution-free coverage band that is the only
-uncertainty signal to survive our tests.
+stacking outcome from measured residual correlations, an optimal-recovery bound,
+a feature-pullback identity and a rate that separate the metric from the
+representational part of the advantage, and a distribution-free coverage band
+that is the only uncertainty signal to survive our tests.
 \end{abstract}
 
 \section{Introduction}

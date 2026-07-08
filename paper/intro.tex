@@ -1,16 +1,29 @@
 Operator learning constructs fast surrogates for the solution maps of
 parametric partial differential equations and physical forward models from
-data. Two families dominate the field: neural operators, which learn their
-own representations, and kernel or Gaussian-process methods, which come with
-exact solves and error certificates. This paper studies how the two combine,
-on two public problems with published baselines that turn out to sit at
-opposite ends of the neural-versus-kernel spectrum: the structural-mechanics
-benchmark of \citet{dehoop2022cost}, where the families tie and the question
-is what their coupling adds, and the OCO-2 radiative-transfer emulation
-problem of \citet{susiluoto2025radiative}, where a fixed kernel trails a
-network by an order of magnitude until it is handed the network's learned
-features. The same small set of components, and the same supporting theory,
-account for both.
+data. Two families dominate: neural operators, which learn their own
+representations, and kernel or Gaussian-process methods, which come with exact
+solves and error certificates but are usually cast as the classical, less
+accurate foil on hard high-dimensional maps. This paper makes the opposite
+case when kernels are used in a modern way. An exact kernel regression placed
+on a neural network's \emph{learned features}, rather than on the raw input,
+is competitive with or better than the leading neural operators while keeping
+the exact solve and its certificate. We develop this as a residual coupling ---
+an accurate neural mean, trained in the metric the application reports, plus an
+exact Mat\'ern regression of its residual and of its features --- and it
+performs strongly across the board: it reaches the front of the
+structural-mechanics band (\errBest\%, matching the best of five published
+architectures), it beats the published Gaussian-process emulator of a real
+OCO-2 CO$_2$ retrieval problem on that problem's own test set, and on the
+smoother PDE benchmarks it is competitive with the Fourier neural operator.
+
+The two problems we study in depth sit at opposite ends of the
+neural-versus-kernel spectrum, and that is the point: the
+structural-mechanics benchmark of \citet{dehoop2022cost}, where the families
+tie and the question is what their coupling adds and why nothing moves the
+number, and the OCO-2 radiative-transfer emulation problem of
+\citet{susiluoto2025radiative}, where a fixed kernel trails a network by an
+order of magnitude until it is handed the network's learned features. The same
+small set of components, and the same supporting theory, account for both.
 
 The structural-mechanics problem is one of seven in the operator-learning
 suite assembled by \citet{batlle2024kernel} from the benchmarks of

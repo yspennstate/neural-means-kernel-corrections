@@ -27,8 +27,10 @@ Members (mean relative L2 on the 20000-sample test set, reflection-averaged):
 | UNet | 4.99% | `train_unet.py --mirror 1`; widths 48/96/192/384 over three scales, batch 256, lr 1.5e-3, weight decay 1e-5; best-validation checkpoint (epoch 50 of a 200-epoch schedule) |
 
 Pipeline: `gen_preds.py --run <member>` writes train/val/test predictions with
-reflection averaging; `stack_correct.py --members <list> --krr 1` fits the
-stack and the residual kernel correction. The final surrogate uses
+reflection averaging; `stack_correct.py --members <list> --krr 1` fits a global
+convex stack and the residual kernel correction (reaching about 4.65%), and
+`stack_perpixel.py --members <list> --krr 1 --tag hpix` fits the final
+per-pixel affine stack that reaches the headline number. The final surrogate uses
 per-coordinate affine stacking (ridge 1e-3, fit on half the validation split
 and accepted only because it beat global convex weights on the other half)
 followed by the Matern correction of the stacked residual (scale grid

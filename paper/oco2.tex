@@ -4,10 +4,14 @@ radiative-transfer emulation problem of \citet{susiluoto2025radiative}: per
 spectral band of the OCO-2 instrument, learn the map from a reduced
 atmospheric state ($20$--$24$ dimensions after the dimension reduction of
 that paper) to the reduced radiance ($40$ PCA coefficients of the
-monochromatic spectrum), from a pool of $20000$ pairs (we train on $18000$ and
-hold $2000$ for validation). The data, and the
-kernel-flow emulator's own predictions on the $2000$ test states, are public
-(OSF project \texttt{u2t8a}), so the comparison below is computed on
+monochromatic spectrum). The OSF project (\texttt{u2t8a}) publishes a training
+pool of $20000$ pairs and, separately, $2000$ test states together with the
+kernel-flow emulator's own predictions on them; we verified the two sets share
+no point. We split the pool $18000/2000$ into training and validation, and
+every choice in our pipeline --- the network checkpoints, the kernel head's
+length scale and nugget, and the per-coordinate winners of the combination
+below --- is made on that validation split; the $2000$ public test states are
+used once, for the final numbers. The comparison is therefore computed on
 identical test points against the published emulator itself rather than
 against our reimplementation of it.
 
@@ -24,7 +28,9 @@ the residual that the per-coordinate combination exploits.
 
 \begin{table}[t]
 \centering
-\caption{OCO-2 O2 band, $2000$ held-out states, identical test points. The
+\caption{OCO-2 O2 band, scored on the $2000$ public test states, which are
+disjoint from the training pool; all model selection happened on a validation
+split of the pool. The
 kernel-flow row is the emulator of \citet{susiluoto2025radiative}, scored
 from its own stored predictions. ``Features'' means the penultimate
 activations of the trained network; the kernel head is the same exact
@@ -76,7 +82,9 @@ change of rate, the $40\%\!\to\!30\%$ the ARD row records), and
 $3.82\%$ on the trained network's features, past the network's own head. The
 raw-input kernel was limited by its features, not by anything kernel-shaped,
 and the deep kernel head, an exact solve on learned features, is the
-strongest single model on the reduced metric. Learning the metric rather than
+strongest single model on the reduced metric --- though its margin over the
+network it feeds on ($3.82\%$ against $3.99\%$, one seed each) is small, and
+we lean on the ladder's order of magnitude, not on that gap. Learning the metric rather than
 setting it by hand does not change this reading. A per-dimension metric fit by
 the kernel-flows cross-validation loss of \citet{owhadi2019kernel} reaches the
 same $30\%$ on the raw state, and a low-rank Mahalanobis metric with a thousand

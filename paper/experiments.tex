@@ -30,8 +30,8 @@ by a hundredth or two among themselves (the ablation below moves between
 4.65\% and 4.67\% under changes that should not matter), we read the two as
 tied and do not claim to separate them. The margin over the FNO (4.76\%), PCA-Net
 (4.67\%), DeepONet (5.20\%) and the optimal-recovery kernel (5.18\%) is
-several times that spread. Section~\ref{sec:diversity} argues the tie is not a
-coincidence of tuning but a floor the data impose on every method here.
+several times that spread. Section~\ref{sec:diversity} argues the tie is better read as a floor the
+data impose than as a coincidence of tuning.
 
 \begin{table}[t]
 \centering
@@ -211,12 +211,15 @@ them.
 We draw two conclusions. First, the published plateau of
 Table~\ref{tab:main}, five methods within two thirds of a point of each other
 after years of architectural progress, is not evidence that some sixth
-architecture is missing; it is the signature of a benchmark whose achievable
-error is set by its data. On the evidence above, numbers near $4.5\%$ are
-within a few hundredths of that limit, which is where our pipeline lands
-(\errBest\%), and material further progress on this benchmark means
-regenerating the data (finer meshes near the corners, higher-order elements,
-output grids that resolve the concentrations), not new surrogates. Second,
+architecture is missing; every measurement above is what a benchmark whose
+achievable error is set by its data would produce. This is an inference from
+surrogate-side measurements --- certifying it would take regenerated data,
+mesh-refinement checks, or repeated solver evaluations, which we did not
+perform --- but on this reading, numbers near $4.5\%$ sit within a few
+hundredths of the limit, which is where our pipeline lands (\errBest\%), and
+material further progress on this benchmark would come from regenerating the
+data (finer meshes near the corners, higher-order elements, output grids that
+resolve the concentrations) rather than from new surrogates. Second,
 the practical recipe survives the reinterpretation with its economics
 clarified: symmetrized accurate means capture what is learnable, stacking
 buys exactly the decorrelation the members possess (little, here), and the
@@ -306,7 +309,11 @@ taking the 0.9-quantile of $\|e\|_2/P_\lambda$ on the validation split and
 scaling $P_\lambda$ by it, yields a band with \uqCover\% empirical coverage on
 the test set at the nominal \uqCoverNom\% level. Conformal validity needs no
 correlation between the score and the error, only exchangeability, so it
-survives the confound that defeats the ranking. The lesson is narrow but real:
+survives the confound that defeats the ranking. One honesty note, expanded in
+Section~\ref{sec:theory-conf}: the same validation split served model
+selection, so the exchangeability behind the exact guarantee is approximate
+here, and the observed coverage should be read as empirical; a calibration
+split untouched by selection would make the guarantee exact. The lesson is narrow but real:
 a valid pointwise bound (Theorem~\ref{thm:or}) is not automatically a useful
 pointwise indicator, the standard uncertainty signals can both fail on the
 same problem, and a relative-error metric has to have its normalization
@@ -382,14 +389,19 @@ marked.}
 \label{sec:cost}
 The pipeline was built and run on a single laptop. The kernel stages are exact:
 one Cholesky factorization of the $19000\times19000$ Mat\'ern Gram matrix in
-double precision takes about a minute on a desktop CPU, and prediction is two
-matrix products; there are no inducing points, stochastic solvers, or
-preconditioners, and no GPU is needed for the correction. The neural means are
-small by the standards of the literature (a few million parameters) and train
-in the metric itself. The exactness is affordable precisely because, as
-Section~\ref{sec:spectra} shows, the effective dimension of the solve is a few
-hundred: the Gram matrix is numerically low rank at the working nugget, so the
-factorization does far less work than its nominal $O(n^3)$ suggests. All splits
+double precision takes $24$ seconds on the laptop's CPU ($16$ threads,
+OpenBLAS; the matrix itself is $2.9$\,GB), and prediction is two matrix
+products; there are no inducing points, stochastic solvers, or
+preconditioners, and no GPU is needed for the correction. The factorization
+performs the full $n^3/3\approx2.3\times10^{12}$ floating-point operations ---
+numerical low rank does not reduce the work of a dense Cholesky --- and the
+measured rate, about $100$ gigaflops per second, is simply what a current
+multicore CPU delivers; exactness at this $n$ costs half a minute, not a
+cluster. What the low effective dimension of Section~\ref{sec:spectra} buys is
+statistical rather than computational: it describes where the solve's
+information concentrates at the working nugget, not its flop count. The neural
+means are small by the standards of the literature (a few million parameters)
+and train in the metric itself. All splits
 are fixed by a published permutation seed, the input is consumed as the
 41-dimensional load after the exact broadcast check of
 Section~\ref{sec:benchmark}, and every model is selected on the validation

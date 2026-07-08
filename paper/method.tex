@@ -81,9 +81,10 @@ the concatenated penultimate activations of the ensemble members
 (reflection-averaged, standardized), fitted to the residuals of $m+\widehat
 r$; it contributes a smaller improvement and is included when it helps on
 validation. At $n=19000$ the exact solve is a single Cholesky factorization
-of a $19000\times19000$ matrix, about a minute in double precision on a
-laptop CPU, and prediction is two matrix products; no inducing points,
-preconditioners, or stochastic solvers are involved. The Gaussian process
+of a $19000\times19000$ matrix, under half a minute in double precision on a
+laptop CPU (measured in Section~\ref{sec:cost}), and prediction is two matrix
+products; no inducing points, preconditioners, or stochastic solvers are
+involved. The Gaussian process
 reading of the same formulas supplies the posterior standard deviation
 $P_\lambda(u)$ of \eqref{eq:power} at negligible extra cost (one triangular
 solve per evaluation batch), which is the uncertainty estimate studied in

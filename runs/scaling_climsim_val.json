@@ -1,0 +1,26 @@
+{
+ "dataset": "ClimSim",
+ "din": 124,
+ "dout": 128,
+ "ntest": 20000,
+ "results": [
+  {
+   "n": 1000,
+   "mean_r2": -8.6104,
+   "mean_rel": 38.144,
+   "kernel_r2": 0.339
+  },
+  {
+   "n": 3000,
+   "mean_r2": -3.6299,
+   "mean_rel": 34.035,
+   "kernel_r2": 0.3814
+  },
+  {
+   "n": 10000,
+   "mean_r2": -1.2113,
+   "mean_rel": 30.462,
+   "kernel_r2": 0.3971
+  }
+ ]
+}

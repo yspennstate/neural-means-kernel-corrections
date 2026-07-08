@@ -172,39 +172,51 @@ alongside this paper.
 \label{sec:scaling}
 The structural-mechanics error was flat in the sample size because it is set
 by the noise of the finite element data; the emulator error is not, and the
-contrast is the sharpest practical difference between the two problems.
-Figure~\ref{fig:ocoscaling} fixes the O2 task and varies only the number of
-training pairs, from a few hundred to several thousand, scoring each on a
-disjoint held-out set. The neural mean's reduced-radiance error falls as a
-clean power law in $n$, with fitted slope $-0.70$ over the range we can afford,
-and the kernel correction tracks it; the exact kernel on the raw state improves
-far more slowly, so at these sample sizes the network is the component that
-converts data into accuracy. Extending the fitted line one step past the
-measured points---an extrapolation, and one that would break if the curve
-eventually floors the way structural mechanics does---projects to about $3.4\%$
-at the $20000$ pairs the published emulator used, which independently reports
-$3.8\%$; that near agreement is the check on the fit. A projection further out,
-to near one percent at $10^5$ pairs, we state only as what the fitted slope
-implies, not as a number we have reached. Two things follow. Over the range we
-can measure the emulator's residual is sample-limited rather than
-noise-limited: unlike the structural-mechanics floor, it recedes as training
-pairs are added, so the largest lever on this problem is simply more of them,
-and pairs are cheap to generate because the forward model is a program. The complementary case is the
+contrast is the sharpest practical difference between the two problems. The
+left panel of Figure~\ref{fig:ocoscaling} fixes the O2 task and varies only the
+number of training pairs, scoring each on a disjoint held-out set. The neural
+mean's reduced-radiance error falls as a clean power law in $n$, fitted slope
+$-0.66$, from $74\%$ at a few hundred pairs to $4.6\%$ at $n=15700$; the exact
+kernel on the raw state improves far more slowly, so at these sample sizes the
+network is the component that turns data into accuracy. The measured curve
+reaches the published emulator on its own budget: $4.6\%$ at $15700$ pairs,
+with the fit meeting the emulator's reported $3.8\%$ near the $20000$ pairs it
+used. Over this range the emulator's residual is sample-limited rather than
+noise-limited: unlike the structural-mechanics floor it recedes as pairs are
+added, so the largest lever on this problem is simply more of them, and pairs
+are cheap because the forward model is a program. The complementary case is the
 full-resolution $58\to3048$ map, where the error is instead flat in $n$ across
 the few hundred retrievals we hold: that task is limited by its representation,
 not its sample count, and the reduction the emulator applies is what moves it.
-The two regimes of Section~\ref{sec:theory-secmom} thus have a data axis as
-well: a problem is worth more samples exactly when its accurate mean is still
-descending the power law.
+
+The same reading holds well beyond OCO-2, on a benchmark large enough to watch
+the two regimes trade places. ClimSim \citep{yu2023climsim} is a climate
+emulation dataset of about ten million samples that maps a $124$-dimensional
+atmospheric state to $128$ physics tendencies, with published neural baselines.
+The right panel of Figure~\ref{fig:ocoscaling} sweeps the training size across
+more than three orders of magnitude at a fixed test set, in the coefficient of
+determination the benchmark reports (over the outputs with non-negligible
+variance). The exact kernel on the state is data-efficient: its $R^2$ is
+already about $0.4$ at ten thousand samples and holds there. The neural mean is
+data-hungry: badly underfit at a thousand samples, with $R^2$ well below zero,
+it crosses the kernel near a few hundred thousand samples and keeps rising,
+reaching $R^2=0.56$ at two million, close to the published
+multilayer-perceptron baseline near $0.6$. Which member is the stronger one is
+therefore a matter of the sample size alone---the kernel below the crossover,
+the network above it---and the two regimes of
+Section~\ref{sec:theory-secmom} gain a data axis: the accurate mean is worth
+building precisely once there is enough data to train it past the kernel it
+would otherwise defer to.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.72\linewidth]{figs/scaling.pdf}
-\caption{Reduced-radiance test error on the OCO-2 O2 emulation task against the
-number of training pairs, at fixed test set. The neural mean and the corrected
-surrogate fall as a power law (fitted slope $-0.70$); the exact kernel on the
-raw state improves slowly. The dashed line is the fit to the mean and the stars
-are its extrapolation to $2\times10^4$ and $10^5$ pairs; the dotted line marks
-the published emulator's $3.8\%$ at $2\times10^4$.}
+\includegraphics[width=\linewidth]{figs/scaling_combined.pdf}
+\caption{Test error against training-set size, at fixed test set. Left: the
+OCO-2 O2 emulator, reduced-radiance error; the neural mean falls as a power law
+(fitted slope $-0.66$) to $4.6\%$ at $n=15700$, and the dotted line marks the
+published emulator's $3.8\%$. Right: ClimSim, test $R^2$ over the outputs with
+non-negligible variance; the exact kernel is flat and data-efficient while the
+neural mean, underfit at small $n$, overtakes it near a few hundred thousand
+samples and approaches the published baseline (dotted) by two million.}
 \label{fig:ocoscaling}
 \end{figure}

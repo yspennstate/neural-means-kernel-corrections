@@ -11,7 +11,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 HERE = pathlib.Path(__file__).resolve().parent
-FIGS = pathlib.Path(r"C:\Users\owner\nmkc-public\paper\figs")
+FIGS = HERE / "paper" / "figs"
 
 plt.rcParams.update({"font.size": 9, "axes.titlesize": 9, "axes.labelsize": 9,
                      "xtick.labelsize": 8, "ytick.labelsize": 8, "legend.fontsize": 8,
@@ -19,7 +19,7 @@ plt.rcParams.update({"font.size": 9, "axes.titlesize": 9, "axes.labelsize": 9,
                      "figure.dpi": 150, "savefig.bbox": "tight"})
 C = ["#3b5bdb", "#e8590c", "#2b8a3e", "#862e9c"]
 
-red = json.load(open(HERE / "scaling_reduced.json"))
+red = json.load(open(HERE / "runs" / "scaling_reduced.json"))
 R = red["results"]
 n = np.array([r["n"] for r in R], float)
 mean = np.array([r["mean"] for r in R])

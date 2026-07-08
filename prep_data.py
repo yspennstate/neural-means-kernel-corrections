@@ -5,10 +5,15 @@ Verifies the input fields are constant along axis 1 (i.e. the true input is the
 canonical split: first 20000 samples = train pool, last 20000 = test,
 matching the high-data protocol of de Hoop et al. / Batlle et al.
 """
-import numpy as np, pathlib, json
+import numpy as np, pathlib, json, os
 
-SRC = pathlib.Path(r"C:\Users\owner\Downloads")
-DST = pathlib.Path(r"C:\Users\owner\structmech_sprint\data")
+# Point SRC at the directory holding the two distributed .npy files
+# (StructuralMechanics_inputs.npy / _outputs.npy from the Caltech record).
+# Override with the STRUCTMECH_SRC environment variable; default is ./data.
+HERE = pathlib.Path(__file__).resolve().parent
+SRC = pathlib.Path(os.environ.get("STRUCTMECH_SRC", HERE / "data"))
+DST = HERE / "data"
+DST.mkdir(exist_ok=True)
 
 X = np.load(SRC / "StructuralMechanics_inputs.npy", mmap_mode="r")   # (41,41,40000)
 Y = np.load(SRC / "StructuralMechanics_outputs.npy", mmap_mode="r")

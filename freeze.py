@@ -3,7 +3,7 @@ paper/main.tex. Run at results freeze; prints what it wrote."""
 import json, pathlib, re, sys
 
 RUNS = pathlib.Path(__file__).resolve().parent / "runs"
-MAIN = pathlib.Path(r"C:\Users\owner\structmech_sprint\paper\main.tex")
+MAIN = pathlib.Path(__file__).resolve().parent / "paper" / "main.tex"
 
 def get(name, *keys, default=None):
     f = RUNS / f"{name}.json"

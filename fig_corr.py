@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 
 TAG = sys.argv[1] if len(sys.argv) > 1 else "div"
 RUNS = pathlib.Path(__file__).resolve().parent / "runs"
-FIGS = pathlib.Path(r"C:\Users\owner\structmech_sprint\paper\figs")
+FIGS = pathlib.Path(__file__).resolve().parent / "paper" / "figs"
+FIGS.mkdir(parents=True, exist_ok=True)
 
 plt.rcParams.update({
     "font.size": 9, "axes.titlesize": 9, "axes.labelsize": 9,

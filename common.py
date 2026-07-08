@@ -1,5 +1,5 @@
 """Shared data loading, splits, and the benchmark metric."""
-import numpy as np, torch, pathlib, json, time
+import numpy as np, pathlib, json, time
 
 DATA = pathlib.Path(__file__).resolve().parent / "data"
 RUNS = pathlib.Path(__file__).resolve().parent / "runs"
@@ -22,8 +22,8 @@ def canonical_split(n_val=1000, seed=0):
     return tr, val, ite
 
 def rel_l2(yhat, ytrue):
-    """Mean relative L2 error over samples; plain grid norm (the convention of
-    de Hoop et al. / user's scripts). Cast to float64 for the metric."""
+    """Mean relative L2 error over samples; plain grid norm, the convention of
+    de Hoop et al. Computed in float64."""
     yhat = np.asarray(yhat, dtype=np.float64).reshape(len(yhat), -1)
     ytrue = np.asarray(ytrue, dtype=np.float64).reshape(len(ytrue), -1)
     num = np.linalg.norm(yhat - ytrue, axis=1)

@@ -10,8 +10,8 @@ sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent))
 from common import load_arrays, canonical_split, rel_l2, RUNS
 
 TAG = sys.argv[1] if len(sys.argv) > 1 else "hyb"
-FIGS = pathlib.Path(r"C:\Users\owner\structmech_sprint\paper\figs")
-FIGS.mkdir(exist_ok=True)
+FIGS = pathlib.Path(__file__).resolve().parent / "paper" / "figs"
+FIGS.mkdir(parents=True, exist_ok=True)
 
 plt.rcParams.update({
     "font.size": 9, "axes.titlesize": 9, "axes.labelsize": 9,

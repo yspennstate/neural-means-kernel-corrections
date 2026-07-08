@@ -72,7 +72,7 @@ ladder: the same exact kernel machinery scores $40\%$ on the raw input,
 $30\%$ after rescaling each input coordinate by its measured sensitivity (the
 metric term of Proposition~\ref{prop:aniso}: the effective rank here is
 $17$ of $20$, so the proposition predicts a constant-factor gain and no
-change of rate, which is what the scaling experiment shows), and
+change of rate, the $40\%\!\to\!30\%$ the ARD row records), and
 $3.82\%$ on the trained network's features, past the network's own head. The
 raw-input kernel was limited by its features, not by anything kernel-shaped,
 and the deep kernel head, an exact solve on learned features, is the
@@ -159,3 +159,44 @@ head reaches $0.035\%$ radiance but at $48\%$ reduced. On WCO2, then, each
 metric is won by a different head, and unlike the other two bands no single
 model beats the emulator on both. The code releases the per-band numbers
 alongside this paper.
+
+\subsection{The error is limited by data, and yields to more of it}
+\label{sec:scaling}
+The structural-mechanics error was flat in the sample size because it is set
+by the noise of the finite element data; the emulator error is not, and the
+contrast is the sharpest practical difference between the two problems.
+Figure~\ref{fig:ocoscaling} fixes the O2 task and varies only the number of
+training pairs, from a few hundred to several thousand, scoring each on a
+disjoint held-out set. The neural mean's reduced-radiance error falls as a
+clean power law in $n$, with fitted slope $-0.70$ over the range we can afford,
+and the kernel correction tracks it; the exact kernel on the raw state improves
+far more slowly, so at these sample sizes the network is the component that
+converts data into accuracy. Extending the fitted line one step past the
+measured points---an extrapolation, and one that would break if the curve
+eventually floors the way structural mechanics does---projects to about $3.4\%$
+at the $20000$ pairs the published emulator used, which independently reports
+$3.8\%$; that near agreement is the check on the fit. A projection further out,
+to near one percent at $10^5$ pairs, we state only as what the fitted slope
+implies, not as a number we have reached. Two things follow. Over the range we
+can measure the emulator's residual is sample-limited rather than
+noise-limited: unlike the structural-mechanics floor, it recedes as training
+pairs are added, so the largest lever on this problem is simply more of them,
+and pairs are cheap to generate because the forward model is a program. The complementary case is the
+full-resolution $58\to3048$ map, where the error is instead flat in $n$ across
+the few hundred retrievals we hold: that task is limited by its representation,
+not its sample count, and the reduction the emulator applies is what moves it.
+The two regimes of Section~\ref{sec:theory-secmom} thus have a data axis as
+well: a problem is worth more samples exactly when its accurate mean is still
+descending the power law.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.72\linewidth]{figs/scaling.pdf}
+\caption{Reduced-radiance test error on the OCO-2 O2 emulation task against the
+number of training pairs, at fixed test set. The neural mean and the corrected
+surrogate fall as a power law (fitted slope $-0.70$); the exact kernel on the
+raw state improves slowly. The dashed line is the fit to the mean and the stars
+are its extrapolation to $2\times10^4$ and $10^5$ pairs; the dotted line marks
+the published emulator's $3.8\%$ at $2\times10^4$.}
+\label{fig:ocoscaling}
+\end{figure}

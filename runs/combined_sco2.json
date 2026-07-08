@@ -2,10 +2,10 @@
  "band": "sco2",
  "n_members": 20,
  "final": {
-  "reduced": 0.07959888229072785,
-  "radiance": 0.00043202416420424475
+  "reduced": 0.0795984916152942,
+  "radiance": 0.0004328386564680293
  },
- "conformal_coverage_90": 0.997,
+ "conformal_coverage_90": 0.998,
  "kernel_flow": {
   "reduced": 0.1614478923553191,
   "radiance": 0.001147218153340161

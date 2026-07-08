@@ -132,10 +132,21 @@ The author declares no competing interests.
 
 \section*{Declaration of generative AI and AI-assisted technologies in the
 manuscript preparation process}
-During the preparation of this work the author used generative AI tools to
-accelerate drafting and revision. All mathematical claims, proofs, numerical
-interpretations, and bibliographic information were subsequently reviewed and
-edited by the author, who takes full responsibility for the content of the
+During the preparation of this work the author made substantial use of
+generative AI tools, and describes their role here. A large part of the
+software was written with Fable~5 (Anthropic): the implementation of the
+experiments and diagnostics, the downloading, assembly and preparation of the
+benchmark and OCO-2 datasets, and the adaptation of the publicly released
+emulator code of Lamminp\"a\"a et al.\ --- originally split between Julia and a
+ReFRACtor-driving Python layer --- into a single Python pipeline for sampling
+states and reducing radiances. The main contributions are the author's: the
+residual coupling of neural means and exact kernel corrections, the
+two-regime framing that organizes the paper, and the supporting theory, all
+developed with AI assistance in calculation, drafting, and exposition. Each
+theorem and its proof was checked independently and more than once --- by
+Fable~5, by ChatGPT Pro (OpenAI), and by the author --- and the reported
+numbers were verified against the released per-run data. The author reviewed
+all of the above and takes full responsibility for the content of the
 manuscript.
 
 \section*{Data and code availability}

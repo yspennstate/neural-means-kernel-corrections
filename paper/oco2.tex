@@ -76,7 +76,15 @@ change of rate, the $40\%\!\to\!30\%$ the ARD row records), and
 $3.82\%$ on the trained network's features, past the network's own head. The
 raw-input kernel was limited by its features, not by anything kernel-shaped,
 and the deep kernel head, an exact solve on learned features, is the
-strongest single model on the reduced metric.
+strongest single model on the reduced metric. Learning the metric rather than
+setting it by hand does not change this reading. A per-dimension metric fit by
+the kernel-flows cross-validation loss of \citet{owhadi2019kernel} reaches the
+same $30\%$ on the raw state, and a low-rank Mahalanobis metric with a thousand
+more parameters does not improve on it; on the features, where the network has
+already conditioned the representation, a learned metric gives no gain over the
+isotropic kernel. This is what Proposition~\ref{prop:aniso} anticipates: the
+metric is a constant-factor lever, and the representation is the
+order-of-magnitude one.
 
 Second, the training metric behaves as a budget. The flat-trained and
 radiance-trained rows are one architecture and two losses, and each wins the

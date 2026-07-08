@@ -29,8 +29,8 @@ $G(Su)=T\,G(u)$; we treat it as an assumption here.
 
 \begin{proposition}[symmetrization]\label{prop:sym}
 Assume $G(Su)=TG(u)$ for $\mu$-a.e.\ $u$, that $\mu$ is invariant under $S$,
-and that $T$ is orthogonal. For a measurable $\widehat G:\mathcal U\to\mathcal V$ define
-its symmetrization
+and that $T$ is an orthogonal involution ($T^2=I$). For a measurable
+$\widehat G:\mathcal U\to\mathcal V$ define its symmetrization
 \[
 \widehat G_S(u)\;=\;\tfrac12\left(\widehat G(u)+T\,\widehat G(Su)\right).
 \]
@@ -172,8 +172,8 @@ actually measures.
 
 \begin{corollary}[ensembling floor]\label{cor:floor}
 If every member satisfies $S_{mm}\ge\bar e^{\,2}$ and every pair satisfies
-$S_{mk}\ge\bar\varrho\,\bar e^{\,2}$ with $\bar\varrho\ge0$, then every convex
-combination $f_w$ obeys
+$S_{mk}\ge\bar\varrho\,\bar e^{\,2}$ with $\bar\varrho\in[0,1]$, then every
+convex combination $f_w$ obeys
 \[
 \mathbb E\,\ell\big(f_w(u),G(u)\big)^2\;=\;w^\top Sw\;\ge\;
 \bar e^{\,2}\big(\bar\varrho+(1-\bar\varrho)\,\|w\|_2^2\big)\;\ge\;
@@ -250,41 +250,48 @@ cleanly.
 
 Suppose the operator factors as $G(u)=g(Au)$ with $A\in\mathbb R^{d\times d}$
 nonsingular and $g$ of unit $H^{s}$ norm, and that $\mu$ has a density bounded
-above and below on a compact domain. The singular values
-$\sigma_1\ge\dots\ge\sigma_d$ of $A$ are the rates at which $G$ varies along
-the input directions; write $r$ for the number carrying a fixed fraction of
-$\sum_i\sigma_i^2$.
+above and below on a compact domain. Order the singular values
+$\sigma_1\ge\dots\ge\sigma_d$ of $A$; they are the rates at which $G$ varies
+along the input directions. Suppose $A$ has \emph{approximate rank} $r$ at the
+sample size, meaning the trailing singular values fall below the achievable
+resolution, $\sigma_{r+1}\lesssim n^{-1/r}$, so the image $A\,\mathcal U$ is
+effectively $r$-dimensional at scale $n^{-1/r}$.
 
 \begin{proposition}[isotropic and adapted kernel rates]\label{prop:aniso}
 Let $\widehat G^{\mathrm{iso}}_n$ be kernel ridge regression with a Mat\'ern
 kernel of smoothness $s$ and a validation-optimal single length scale, and
 $\widehat G^{\mathrm{ard}}_n$ the same construction in the metric
-$u\mapsto Au$. With high probability over $n$ i.i.d.\ samples,
+$u\mapsto Au$. Up to constants depending on $(\sigma_i)$, $g$, $s$ and the
+density bounds, and up to logarithmic factors in $n$, with high probability
+over $n$ i.i.d.\ samples,
 \[
-\mathbb E\big\|G-\widehat G^{\mathrm{iso}}_n\big\|\;\le\;C\,\sigma_1^{\,s}\,n^{-s/d},
+\mathbb E\big\|G-\widehat G^{\mathrm{iso}}_n\big\|\;\lesssim\;\sigma_1^{\,s}\,n^{-s/d},
 \qquad
-\mathbb E\big\|G-\widehat G^{\mathrm{ard}}_n\big\|\;\le\;C\,n^{-s/r},
+\mathbb E\big\|G-\widehat G^{\mathrm{ard}}_n\big\|\;\lesssim\;n^{-s/r},
 \]
-with $C$ depending only on $g$, $s$ and the density bounds; the ratio of the
-two bounds is $\sigma_1^{\,s}\,n^{\,s(1/r-1/d)}$.
+so the ratio of the two bounds is of order $\sigma_1^{\,s}\,n^{\,s(1/r-1/d)}$.
+When $A$ is close to full rank ($r\approx d$) the two rates coincide and only
+the constant $\sigma_1^{\,s}$ separates them.
 \end{proposition}
 
 The proof (Appendix~\ref{app:proofs}) is the scattered-data estimate
 $\|G-\widehat G_n\|\lesssim h_X^{\,s}\|G\|_{H^s}$ applied to the two designs:
 one length scale must fill all $d$ directions, so $h_X\asymp n^{-1/d}$ and the
-norm carries $\sigma_1^{\,s}$; the adapted metric confines the variation to
-$r$ directions and removes the anisotropy from the norm. The proposition
-bounds the \emph{metric} part of a network's advantage, the part an
-anisotropic kernel would recover. The rest is \emph{representational}: a
-stationary kernel of fixed smoothness reaches only its native space, at any
-metric, while the network adapts its features to the map. The two parts are
-separated experimentally by handing the kernel the anisotropic metric and
-seeing how much of the gap closes; on the OCO-2 band of
-Section~\ref{sec:oco2} the metric accounts for a factor of about $1.4$ of a
-tenfold gap and representation for the rest, and the direct proof of the
-representational reading is that the same kernel machinery applied to the
-network's learned features recovers the network's accuracy and slightly
-exceeds it.
+norm carries $\sigma_1^{\,s}$; the adapted metric, when $A$ has a spectral gap,
+confines the design to $r$ resolved directions and improves the fill distance.
+The proposition bounds the \emph{metric} part of a network's advantage, the
+part an anisotropic kernel would recover, and it says this part is a rate gain
+only under an approximate-rank gap; without one it is the constant
+$\sigma_1^{\,s}$ alone. The rest is \emph{representational}: a stationary
+kernel of fixed smoothness reaches only its native space, at any metric, while
+the network adapts its features to the map. The two parts are separated
+experimentally by handing the kernel the anisotropic metric and seeing how
+much of the gap closes. On the OCO-2 band of Section~\ref{sec:oco2} the input
+has effective rank $17$ of $20$, close to full: the proposition predicts the
+metric can supply only a constant, not a rate, and the measurement agrees,
+$1.4$ of a tenfold gap. The remaining factor is representational, and its
+direct proof is that the same kernel machinery applied to the network's
+learned features recovers the network's accuracy and slightly exceeds it.
 
 The representational term has a precise reading through the same
 optimal-recovery bound that Section~\ref{sec:theory-or} makes exact. That

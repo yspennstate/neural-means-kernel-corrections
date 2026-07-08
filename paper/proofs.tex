@@ -99,9 +99,11 @@ $\rho_{f_w}(u)=\sum_m w_m\rho_{f_m}(u)$, hence
 =\sum_{m,k}w_mw_k\,\mathbb E\,\langle\rho_{f_m}(u),\rho_{f_k}(u)\rangle
 =w^\top Sw .
 \]
-For (i), parameterize $w=(1-t,t)$; $q(t)=w^\top Sw$ is a quadratic in $t$ with
-$q'(0)=2(\varrho e_1e_2-e_1^2)$, negative precisely when $\varrho<e_1/e_2$,
-and minimizing the quadratic over $t\in[0,1]$ gives the stated value. For
+For (i), parameterize $w=(1-t,t)$; $q(t)=w^\top Sw$ is a convex quadratic in
+$t$ with $q'(0)=2(\varrho e_1e_2-e_1^2)$, negative precisely when
+$\varrho<e_1/e_2$. In that case the unconstrained minimizer lies in $(0,1)$ and
+gives the stated interior value; otherwise $q'(0)\ge0$, the minimum over
+$[0,1]$ is at $t=0$ with value $e_1^2$, and the second member is dropped. For
 (ii), $S=e^2\big((1-\varrho)I+\varrho\,\mathbf1\mathbf1^\top\big)$, so
 $w^\top Sw=e^2\big((1-\varrho)\|w\|_2^2+\varrho\big)$ on the simplex, minimized
 by the uniform weights, where $\|w\|_2^2=1/M$. \qed
@@ -157,19 +159,28 @@ space obeys $\mathbb E\|F-\widehat G_n\|\le C\,h_X^{\,s}\,\|F\|_{\mathcal N}$,
 with $h_X$ the fill distance of the design in the kernel's metric
 \citep{wendland2004scattered}, and for $n$ samples from a density bounded
 above and below on a set of effective dimension $d'$, quasi-uniformity gives
-$h_X\asymp n^{-1/d'}$ with high probability.
+$h_X\asymp(\log n/n)^{1/d'}$ with high probability, which we write as
+$n^{-1/d'}$ up to the logarithmic factor absorbed into the statement.
 
 For the isotropic kernel the metric is Euclidean on the full $d$-dimensional
 domain, so $h_X\asymp n^{-1/d}$; the target is $F=g(A\,\cdot)$, whose Mat\'ern
-native norm is equivalent to its $H^{s}$ norm, and each derivative of order up
-to $s$ brings down at most a factor $\sigma_1$, so
-$\|g(A\cdot)\|_{H^{s}}\asymp\sigma_1^{\,s}$. For the adapted kernel
-$k_A(u,u')=k(Au,Au')$ the estimator is the isotropic estimator of $g$ on the
-design $\{Au_i\}$: in the rescaled coordinates the target has unit norm and
-its variation is confined to the $r$ directions above the truncation level,
-so the fill distance that enters the estimate is the one in those $r$
-directions, $h_X\asymp n^{-1/r}$. Dividing the two bounds gives the ratio.
-\qed
+native norm is equivalent to its $H^{s}$ norm. Changing variables $y=Au$ gives
+$\|g(A\cdot)\|_{H^{s}}\asymp|\det A|^{-1/2}\,\sigma_1^{\,s}$, since each
+derivative of order up to $s$ brings down at most a factor $\sigma_1$ and the
+Jacobian contributes $|\det A|^{-1/2}$ in $L^2$; the $|\det A|^{-1/2}$ is one
+of the singular-value constants absorbed into the statement, leaving the
+displayed $\sigma_1^{\,s}$. For the adapted kernel $k_A(u,u')=k(Au,Au')$ the
+estimator is the isotropic estimator of the unit-norm $g$ on the design
+$\{Au_i\}$. Here the approximate-rank hypothesis enters: the design
+$A\,\mathcal U$ has extent $\sigma_{r+1}\lesssim n^{-1/r}$ in each of the
+trailing $d-r$ directions, below the fill distance those directions would
+otherwise demand, so at resolution $n^{-1/r}$ the design is $r$-dimensional and
+its fill distance is $h_X\asymp n^{-1/r}$ (a further $(\prod_{i\le r}\sigma_i)$
+constant, again absorbed). Substituting the two fill distances into the
+native-space estimate and dividing gives the ratio. If instead $A$ is close to
+full rank, $\sigma_{r+1}$ is not below $n^{-1/r}$, the trailing directions are
+resolved, and the adapted fill distance is $n^{-1/d}$ like the isotropic one:
+the rates coincide and only $\sigma_1^{\,s}$ separates the bounds. \qed
 
 \subsection{Proof of Theorem~\ref{thm:or}}
 

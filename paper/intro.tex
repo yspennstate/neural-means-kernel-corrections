@@ -114,6 +114,27 @@ distribution-free and attains its nominal coverage on test. We report this in
 full in Section~\ref{sec:uq} because the gap between a valid bound and a useful
 indicator is exactly the kind of thing benchmark papers tend to gloss.
 
+The second problem puts the same pipeline in the opposite regime and is where
+its parts separate most cleanly. The OCO-2 emulation problem of
+\citet{susiluoto2025radiative} asks, per spectral band of a carbon-observing
+satellite, for the map from a reduced atmospheric state to the reduced
+radiance spectrum, and it comes with a strong published baseline: the
+kernel-flow emulator of that paper, whose own predictions we score on the same
+test states. Here the fixed kernel and the network are an order of magnitude
+apart rather than tied, and the pipeline's job is no longer to couple two
+comparable models but to move the kernel's exactness onto the network's terms.
+An exact Mat\'ern head on the trained network's features reaches $3.8\%$
+relative error where the same kernel on the raw input reaches $40\%$, and the
+reason is one we can state precisely: the effective dimension of the two Gram
+matrices is the same, but the target's norm in the feature kernel's space is
+smaller by a factor we both prove must occur, when the target factors through
+the features, and measure at about forty. Training each member in the metric
+the application reports, and combining members per output coordinate, then
+beats the published emulator on both of its error metrics at once. The two
+problems together bracket what the coupling of neural means and kernels buys:
+almost nothing when the two are already tied and near a data floor, an order of
+magnitude when they are not.
+
 We also examine two further points of contact between the pipeline and
 theory. The kernel-flow regularizer of \citet{owhadi2019kernel,yoo2021deep},
 which we include as a variant in the training of the neural means, admits an
@@ -139,7 +160,8 @@ stage of the pipeline, with proofs in Appendix~\ref{app:proofs}.
 Section~\ref{sec:experiments} reports the main comparisons, ablations that
 attribute the improvement to its sources, the diversity experiment and the
 anatomy of the shared residual, the uncertainty calibration study, and the
-spectral analysis. Section~\ref{sec:discussion} discusses limitations and the
-relation to Gaussian process emulation practice at scale, including the line
-of work on kernel-flow-based emulators for remote sensing retrievals
-\citep{susiluoto2025radiative}.
+spectral analysis. Section~\ref{sec:oco2} carries the OCO-2 study: the
+representation ladder, the metric-matched training, the measurement of the
+norm gap, and the head-to-head with the kernel-flow emulator on all three
+bands. Section~\ref{sec:discussion} discusses limitations and the relation to
+Gaussian process emulation practice at scale.

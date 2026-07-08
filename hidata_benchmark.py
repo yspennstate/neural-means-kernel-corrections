@@ -16,7 +16,7 @@ import torch, torch.nn as nn, torch.nn.functional as F
 from scipy.linalg import cho_factor, cho_solve
 
 HERE = pathlib.Path(__file__).resolve().parent
-DATA = pathlib.Path(r"C:\Users\owner\owhadi_transfer_2026_07_07\batlle\data")
+DATA = HERE / "data"   # <Name>_inputs.npy / <Name>_outputs.npy from the Caltech record
 DEV = "cuda" if torch.cuda.is_available() else "cpu"
 torch.set_num_threads(2)
 

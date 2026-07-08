@@ -12,7 +12,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 HERE = pathlib.Path(__file__).resolve().parent
-FIGS = pathlib.Path(r"C:\Users\owner\nmkc-public\paper\figs")
+FIGS = HERE / "paper" / "figs"
 plt.rcParams.update({"font.size": 9, "axes.titlesize": 9, "axes.labelsize": 9,
                      "xtick.labelsize": 8, "ytick.labelsize": 8, "legend.fontsize": 7.5,
                      "axes.spines.top": False, "axes.spines.right": False,
@@ -22,7 +22,7 @@ C = ["#3b5bdb", "#e8590c", "#2b8a3e", "#862e9c"]
 fig, (axo, axc) = plt.subplots(1, 2, figsize=(8.2, 3.3))
 
 # --- OCO-2 panel: error vs n, power law, reaching the emulator ---
-R = json.load(open(HERE / "scaling_reduced.json"))["results"]
+R = json.load(open(HERE / "runs" / "scaling_reduced.json"))["results"]
 n = np.array([r["n"] for r in R], float); mean = np.array([r["mean"] for r in R])
 b, a = np.polyfit(np.log(n), np.log(mean), 1)
 ne = np.array([n[0], 2.2e4]); axo.loglog(ne, np.exp(a) * ne ** b, "--", color=C[0], lw=1.0, alpha=.6,
@@ -34,8 +34,8 @@ axo.set_title("OCO-2 O2 emulator"); axo.legend(frameon=False, loc="lower left")
 axo.grid(True, which="both", alpha=.15)
 
 # --- ClimSim panel: R^2 vs n, neural mean crossing the kernel, toward baseline ---
-tf = HERE / "scaling_climsim_train.json"
-T = json.load(open(tf))["results"] if tf.exists() else json.load(open(HERE / "scaling_climsim.json"))["results"]
+tf = HERE / "runs" / "scaling_climsim_train.json"
+T = json.load(open(tf))["results"]
 nc = np.array([r["n"] for r in T], float)
 mr2 = np.array([r.get("mean_r2", np.nan) for r in T])
 kr2 = np.array([r.get("kernel_r2", np.nan) for r in T])

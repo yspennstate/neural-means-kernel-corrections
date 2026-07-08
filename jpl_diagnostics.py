@@ -125,20 +125,38 @@ def kernel_head(Ftr, Ytr, Fval, Yval, Fte):
     return matern52(sqdist(Fte, Ftr), s * med) @ a
 
 
+def _kernel_reduced(Xtr, Ytr, Xte, Yte, n_fit=6000):
+    """Isotropic Matern kernel ridge on the raw (or rescaled) input, reduced
+    metric; a single median length scale, a light 6000-point fit, matching the
+    diagnostic-script setting reported for the raw-input rows of the ladder."""
+    med = median_ls(Xtr)
+    K = matern52(sqdist(Xtr[:n_fit], Xtr[:n_fit]), med); K.flat[::n_fit + 1] += 1e-6 * n_fit
+    a = cho_solve(cho_factor(K, lower=True, check_finite=False), Ytr[:n_fit], check_finite=False)
+    return rel(matern52(sqdist(Xte, Xtr[:n_fit]), med) @ a, Yte)
+
+
 def experiment_ladder(sp):
     feat = train(lambda: ResidualMLP(sp["Xtr"].shape[1], sp["Ytr"].shape[1]), sp)
     f32 = lambda a: torch.tensor(np.asarray(a, np.float32))
     with torch.no_grad():
         net_te = feat(f32(sp["Xte"]))[0].numpy()
         F = [feat(f32(sp[k]), feats=True)[1].numpy() for k in ("Xtr", "Xval", "Xte")]
-    # raw isotropic
-    med = median_ls(sp["Xtr"])
-    K = matern52(sqdist(sp["Xtr"][:6000], sp["Xtr"][:6000]), med); K.flat[::6001] += 1e-6 * 6000
-    a = cho_solve(cho_factor(K, lower=True, check_finite=False), sp["Ytr"][:6000], check_finite=False)
-    raw = matern52(sqdist(sp["Xte"], sp["Xtr"][:6000]), med) @ a
-    print(f"raw-input kernel     {100*rel(raw, sp['Yte']):.2f}%")
-    print(f"neural mean          {100*rel(net_te, sp['Yte']):.2f}%")
-    print(f"kernel on features   {100*rel(kernel_head(F[0], sp['Ytr'], F[1], sp['Yval'], F[2]), sp['Yte']):.2f}%")
+
+    # anisotropy of the input->output map, from its linear part: rescale each
+    # input coordinate by its relevance (row norm of the least-squares map), and
+    # report the effective rank (singular values holding 99% of the energy).
+    A, *_ = np.linalg.lstsq(sp["Xtr"], sp["Ytr"], rcond=None)
+    relevance = np.linalg.norm(A, axis=1)
+    s = np.linalg.svd(A, compute_uv=False)
+    eff_rank = int(np.searchsorted(np.cumsum(s ** 2) / (s ** 2).sum(), 0.99) + 1)
+    scale = relevance / relevance.mean()
+
+    print(f"raw-input kernel (iso) {100*_kernel_reduced(sp['Xtr'], sp['Ytr'], sp['Xte'], sp['Yte']):.2f}%")
+    print(f"ARD kernel (relevance) {100*_kernel_reduced(sp['Xtr']*scale, sp['Ytr'], sp['Xte']*scale, sp['Yte']):.2f}%")
+    print(f"neural mean            {100*rel(net_te, sp['Yte']):.2f}%")
+    print(f"kernel on features     {100*rel(kernel_head(F[0], sp['Ytr'], F[1], sp['Yval'], F[2]), sp['Yte']):.2f}%")
+    print(f"input anisotropy: {len(scale)} dims, relevance range {relevance.min():.3g}-{relevance.max():.3g}, "
+          f"effective rank {eff_rank} of {len(scale)}")
 
 
 def experiment_alignment(sp):
@@ -155,7 +173,7 @@ def experiment_alignment(sp):
         ls = median_ls(np.asarray(Z))
         K = matern52(D2, ls)
         ev = np.maximum(np.linalg.eigvalsh(K), 0)
-        deff = float((ev / (ev + len(Z) * 1e-6)).sum())
+        deff = float((ev / (ev + len(Z) * 1e-8)).sum())   # nugget matches the norm below
         Kr = K.copy(); Kr.flat[::len(Z) + 1] += 1e-8 * len(Z)
         a = cho_solve(cho_factor(Kr, lower=True, check_finite=False), Y, check_finite=False)
         return deff, float(np.einsum("nd,nd->", a, Y))

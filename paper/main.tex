@@ -68,22 +68,24 @@ operator-learning benchmarks collected by Batlle et al.\ (Burgers, Darcy,
 advection, Helmholtz, structural mechanics, Navier--Stokes); on it the pipeline
 reaches \errBest\% relative test error, matching the best published result, and
 the
-reason no method moves much further is measurable: the residuals of every
-architecture we train correlate above 0.86, and their shared component
-concentrates where the finite element data are least accurate and responds
-neither to capacity, diversity, nor sample size. On the OCO-2
+reason no method moves much further is measurable: the residuals of the
+architectures we train correlate above 0.86, and their shared component
+concentrates where the finite element data are least accurate and is nearly
+flat in capacity, diversity, and sample size. On the OCO-2
 radiative-transfer emulation problem of Lamminp\"a\"a et al.\ the same kernel
 that trails the network tenfold on the raw input overtakes it on the
-network's learned features, and the resulting surrogate beats the published
-kernel-flow emulator on its own test points on both of that problem's
-metrics (3.8\% against 16.9\% on reduced radiances, 0.027\% against 0.045\%
-on the reconstructed spectrum). Each stage of the pipeline carries a
-supporting result, from a second-moment identity that predicts the stacking
-outcome from measured residual correlations, through an optimal-recovery
-bound and rates separating the metric from the representational part of a
-network's advantage over a fixed kernel, to a distribution-free coverage
-guarantee for the reported uncertainty, which is the only uncertainty signal
-that survives our tests.
+network's learned features, and on two of the three spectral bands a single
+resulting surrogate beats the published kernel-flow emulator on its own test
+points on both error metrics at once (on O2, 3.8\% against 16.9\% on reduced
+radiances and 0.027\% against 0.045\% on the reconstructed spectrum; the
+third band wins each metric with a separate head). Each stage of the pipeline
+carries a supporting result, from a second-moment identity that predicts the
+stacking outcome from measured residual correlations, through an
+optimal-recovery bound and a rate separating the metric from the
+representational part of a network's advantage over a fixed kernel, to a
+distribution-free coverage band for the reported uncertainty (exact when the
+calibration split is disjoint from model selection, approximate as we apply
+it), which is the only uncertainty signal that survives our tests.
 \end{abstract}
 
 \section{Introduction}

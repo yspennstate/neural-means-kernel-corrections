@@ -4,7 +4,8 @@ radiative-transfer emulation problem of \citet{susiluoto2025radiative}: per
 spectral band of the OCO-2 instrument, learn the map from a reduced
 atmospheric state ($20$--$24$ dimensions after the dimension reduction of
 that paper) to the reduced radiance ($40$ PCA coefficients of the
-monochromatic spectrum), from $20000$ training pairs. The data, and the
+monochromatic spectrum), from a pool of $20000$ pairs (we train on $18000$ and
+hold $2000$ for validation). The data, and the
 kernel-flow emulator's own predictions on the $2000$ test states, are public
 (OSF project \texttt{u2t8a}), so the comparison below is computed on
 identical test points against the published emulator itself rather than
@@ -98,7 +99,7 @@ and SCO2, so part~(ii) of Proposition~\ref{prop:secmom} puts the
 infinite-seed floors of the flat network at $3.9\%$, $16.2\%$ and $8.0\%$, and
 its seed ensemble sits there. Passing below the floor took a different kind of
 member: the Mat\'ern head on learned features reaches $3.82\%$, $16.1\%$ and
-$7.95\%$, and the final combination $3.83\%$, $16.1\%$ and $7.95\%$. Ensembling
+$7.96\%$, and the final combination $3.83\%$, $16.1\%$ and $7.96\%$. Ensembling
 within an architecture class saturates by the same second-moment law on both
 problems; what moved the OCO-2 numbers an order of magnitude was changing what
 the members are (learned features under the kernel), not how many there are.
@@ -144,12 +145,16 @@ kernel has $\varrho=0.14$ and $e_n/e_k=0.12$: the condition of
 Proposition~\ref{prop:secmom} fails and the kernel is dropped, in contrast to
 structural mechanics where the same test keeps it. Because the radiance
 metric is diagonal in the reduced coordinates, the per-coordinate
-combination of Proposition~ef{prop:percoord} is optimal for both metrics
-simultaneously; that per-coordinate combination of the flat and weighted
-models is the final surrogate, and it beats the kernel-flow emulator on both
-metrics at once ($3.83\%$ against $16.89\%$ reduced, $0.0267\%$ against
-$0.0448\%$ radiance). The other bands behave the same way: on WCO2 the deep
-kernel heads reach $16.1\%$ and $0.035\%$ against the emulator's $24.1\%$
-and $0.060\%$, and on SCO2 the per-coordinate combination reaches $8.0\%$
-and $0.043\%$ against $16.1\%$ and $0.115\%$. The code releases the per-band
-numbers alongside this paper.
+combination of Proposition~\ref{prop:percoord} is optimal for both metrics
+simultaneously. On O2 and SCO2 this yields a single surrogate that beats the
+kernel-flow emulator on both metrics at once: O2 reaches $3.83\%$ against
+$16.89\%$ reduced and $0.0267\%$ against $0.0448\%$ radiance, and SCO2 reaches
+$7.96\%$ against $16.14\%$ reduced and $0.043\%$ against $0.115\%$ radiance.
+WCO2 is a partial exception, stated plainly. We did not produce a single
+combined WCO2 surrogate, and its two best heads split the metrics: the
+flat-feature head reaches $16.1\%$ reduced, below the emulator's $24.1\%$, but
+$0.101\%$ radiance, \emph{above} the emulator's $0.060\%$; the radiance-trained
+head reaches $0.035\%$ radiance but at $48\%$ reduced. On WCO2, then, each
+metric is won by a different head, and unlike the other two bands no single
+model beats the emulator on both. The code releases the per-band numbers
+alongside this paper.

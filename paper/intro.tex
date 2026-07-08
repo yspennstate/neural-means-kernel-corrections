@@ -158,10 +158,15 @@ An exact Mat\'ern head on the trained network's features reaches $3.8\%$
 relative error where the same kernel on the raw input reaches $40\%$, and the
 reason is one we can state precisely: the effective dimension of the two Gram
 matrices is the same, but the target's norm in the feature kernel's space is
-smaller by a factor we both prove must occur, when the target factors through
-the features, and measure at about forty. Training each member in the metric
+smaller, by a factor whose mechanism we prove --- when the target factors
+through the features, the feature-kernel norm is controlled by the unwarped
+map, not by the target's raw-space norm --- and whose size we measure at about
+forty. Training each member in the metric
 the application reports, and combining members per output coordinate, then
-beats the published emulator on both of its error metrics at once. The two
+beats the published emulator: on two of the three bands a single combined
+surrogate is better on both of that problem's error metrics at once, and on
+the third each metric is won by a separate head (Section~\ref{sec:oco2} is
+precise about which). The two
 problems together bracket what the coupling of neural means and kernels buys:
 almost nothing when the two are already tied and near a data floor, an order of
 magnitude when they are not.

@@ -1,231 +1,107 @@
 Operator learning constructs fast surrogates for the solution maps of
-parametric partial differential equations and physical forward models from
-data. Two families dominate: neural operators, which learn their own
-representations, and kernel or Gaussian-process methods, which come with exact
-solves and error certificates but are usually cast as the classical, less
-accurate foil on hard high-dimensional maps. This paper makes the opposite
-case when kernels are used in a modern way. An exact kernel regression placed
-on a neural network's \emph{learned features}, rather than on the raw input,
-is competitive with or better than the leading neural operators while keeping
-the exact solve and its certificate. We develop this as a residual coupling ---
-an accurate neural mean, trained in the metric the application reports, plus an
-exact Mat\'ern regression of its residual and of its features --- and it
-performs strongly on the two problems we study in depth: it reaches the front
-of the structural-mechanics band (\errBest\%, matching the best published
-architecture), and it beats the published Gaussian-process emulator of a real
-OCO-2 CO$_2$ retrieval problem on that problem's own test set (outright on two
-of the three spectral bands and on every band--metric pair).
-Table~\ref{tab:suite} situates both problems within the seven-benchmark
-operator-learning suite they belong to.
-
-The two problems we study in depth sit at opposite ends of the
-neural-versus-kernel spectrum, and that is the point: the
-structural-mechanics benchmark of \citet{dehoop2022cost}, where the families
-tie and the question is what their coupling adds and why nothing moves the
-number, and the OCO-2 radiative-transfer emulation problem of
-\citet{susiluoto2025radiative}, where a fixed kernel trails a network by an
-order of magnitude until it is handed the network's learned features. The same
-small set of components, and the same supporting theory, account for both.
-
-The structural-mechanics problem is one of seven in the operator-learning
-suite assembled by \citet{batlle2024kernel} from the benchmarks of
-\citet{dehoop2022cost} and \citet{lu2022comprehensive}, distributed through the
-Caltech data record that accompanies that study. Table~\ref{tab:suite} lists
-all seven with the best published error on each, together with what one
-unchanged run of our recipe reaches. The new rows sort cleanly by regime: on
-the smooth high-data problems (Helmholtz, Navier--Stokes, Darcy) the kernel
-stage wins the pipeline's internal selection and lands within a factor of two
-of the tuned per-problem kernels of \citet{batlle2024kernel}, on Burgers the
-corrected mean sits near the Fourier neural operator, and structural mechanics
-is the tie we study in depth. We single out structural mechanics because it is
-the one where the two method families tie, and use advection~II, a linear
-discontinuous problem, as the contrasting linear regime.
+parametric partial differential equations and physical forward models.
+Neural operators \citep{kovachki2023neural,lu2021deeponet,li2021fourier}
+learn their own representations; kernel and Gaussian-process methods
+\citep{batlle2024kernel,mora2025operator,owhadi2019operator} come with exact
+solves and error certificates and a strong record on the same benchmarks.
+This paper combines the two: a neural network mean, trained in the metric the
+application reports, with an exact Mat\'ern kernel regression of its residual
+and of its learned features. We evaluate the combination in depth on two
+public problems with published baselines --- the structural-mechanics
+benchmark of \citet{dehoop2022cost} and the OCO-2 radiative-transfer
+emulation problem of \citet{susiluoto2025radiative} --- and, with one
+unchanged recipe, across the seven-benchmark operator-learning suite
+assembled by \citet{batlle2024kernel} from the problems of
+\citet{dehoop2022cost} and \citet{lu2022comprehensive}.
+Table~\ref{tab:suite} collects the published numbers and ours.
 
 \begin{table}[t]
 \centering
-\caption{The Batlle--Owhadi operator-learning suite (all seven Caltech
-benchmarks) with the best published mean relative $L^2$ test error and its
-source, and this work. The published numbers are per-problem methods, tuned by
-their authors; ours outside the two problems studied in depth come from one
-recipe run unchanged on every problem (a Mat\'ern kernel at the median length
-scale with the exact fit capped at 6000 training points, a residual MLP mean,
-outputs reduced by PCA, the stage selected on validation), so they are
-conservative. Burgers and Darcy use slightly smaller training splits than
-their published baselines (800 and 824 pairs) and Darcy a different grid, from
-the copies we could obtain; the other rows follow the published protocols.}
+\caption{The two problems studied in depth (OCO-2, structural mechanics) and
+the rest of the operator-learning suite, with the best published mean
+relative $L^2$ test error and ours. OCO-2 rows compare against the
+Gaussian-process emulator of \citet{susiluoto2025radiative} on its own test
+points, in that paper's reduced-coefficient metric; Section~\ref{sec:oco2}
+reports both of its metrics, on which our O2 and strong-CO$_2$ surrogates win
+both while the weak-CO$_2$ metrics are won by two different heads. The
+published suite numbers are per-problem methods tuned by their authors; ours
+outside the two problems studied in depth come from one recipe run unchanged
+(a Mat\'ern kernel at the median length scale, fit capped at 6000 points, a
+residual MLP mean, outputs reduced by PCA, the stage selected on validation).
+Burgers and Darcy use slightly smaller training splits than their baselines
+(800 and 824 pairs) and Darcy a different grid, from the copies we could
+obtain.}
 \label{tab:suite}
 \begin{tabular}{llcc}
 \toprule
 Problem & Map & Best published & This work \\
+\midrule
+OCO-2, O2 band & atmospheric state $\to$ radiance & 16.89\% & 3.83\% \\
+OCO-2, weak CO$_2$ & atmospheric state $\to$ radiance & 24.1\% & 16.1\% \\
+OCO-2, strong CO$_2$ & atmospheric state $\to$ radiance & 16.14\% & 7.96\% \\
+Structural mechanics & boundary load $\to$ stress & 4.55\% (PARA-Net) & 4.55\% \\
 \midrule
 Burgers & initial condition $\to$ solution & 1.93\% (FNO) & 2.38\% \\
 Darcy flow & permeability $\to$ pressure & 2.32\% (POD-DeepONet) & 2.01\% \\
 Advection~I & smooth pulse $\to$ solution & $\approx0\%$ (kernel) & --- \\
 Advection~II & discontinuous pulse $\to$ solution & 11.28\% (linear kernel) & 11.29\% \\
 Helmholtz & wavespeed $\to$ field & 1.00\% (kernel) & 1.75\% \\
-Structural mechanics & boundary load $\to$ stress & 4.55\% (PARA-Net) & \textbf{4.55\%} \\
 Navier--Stokes & vorticity $\to$ vorticity & 0.12\% (kernel) & 0.51\% \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Among these seven, the structural
-mechanics benchmark introduced by
-\citet{dehoop2022cost} has proved unusually resistant to improvement. The task
-is to learn the map from a boundary load applied to the top edge of an elastic
-plate to the interior von Mises stress field computed by a finite element
-solver; inputs are sampled from a Gaussian field, and errors are reported as
-mean relative $L^2$ on a held-out set. With 20000 training samples, the four
-architectures compared by \citet{dehoop2022cost} land within half a percentage
-point of each other (PARA-Net 4.55\%, PCA-Net 4.67\%, FNO 4.76\%, DeepONet
-5.20\%), and the optimal-recovery kernel method of \citet{batlle2024kernel},
-which matches or beats neural operators on most of the other benchmarks in
-that study, does not do so here (5.18\%); the authors single out this problem
-as the most challenging one for their method. More recently
-\citet{mora2025operator} revisited the problem in a low-data regime and
-reported 6.49\% with a Gaussian process whose mean is an FNO, against 6.62\%
-for the FNO alone, with 1250 training samples. The picture suggested by these
-numbers is a plateau around 4.5\% that neither pure neural nor pure kernel
-methods penetrate.
+The two problems studied in depth sit at opposite ends of the
+neural-versus-kernel spectrum, and the pair is the point. On structural
+mechanics the families tie: the pipeline reaches \errBest\% under the
+20000-sample protocol, matching the best published architecture (PARA-Net,
+\pubBestHi\%) within run-to-run noise, and \errBestLow\% under the
+1250-sample protocol against a published best of \pubBestLo\%. What the
+coupling adds there is mostly understanding. The residuals of every
+architecture we train correlate between \corrNetLo{} and \corrNetHi{}, their
+shared component concentrates where the finite element data are least
+reliable and is flat in ensemble diversity and training-set size, and so the
+evidence reads the published plateau near 4.5\% as a property of the
+benchmark's data rather than of any surrogate class
+(Section~\ref{sec:diversity}). Absent regenerated finite-element data this
+remains an inference, but it is the reading every measurement we made
+supports. On the rest of the suite the same recipe sorts the problems by the
+same logic: where the map is smooth and data are plentiful (Helmholtz,
+Navier--Stokes, Darcy) the kernel stage wins the pipeline's internal
+selection and lands within a factor of two of the tuned per-problem kernels
+of \citet{batlle2024kernel}, and on Burgers the corrected mean sits near the
+Fourier neural operator.
 
-This paper does two things with that plateau. First it reaches the front of
-it: a residual coupling of neural and kernel methods attains \errBest\%
-relative test error under the 20000-sample protocol, matching the best
-published result (PARA-Net, \pubBestHi\%) to within run-to-run noise and
-below every other published method, and \errBestLow\% under the 1250-sample
-protocol against a published best of \pubBestLo\%, a clear margin there.
-Second, and we think more usefully, it explains why the front of the band is
-where it is and why further movement should not be expected from modeling. The residuals of maximally different
-surrogates on this benchmark are nearly the same residual: across three
-architecture families and two training losses, per-sample residual
-correlations lie between \corrNetLo{} and \corrNetHi{}, and the component
-shared by all members carries over ninety percent of the residual energy,
-concentrates at
-the corners of the loaded edge where the finite element data are least
-reliable, and is statistically independent of every input statistic we
-compute. The error of a fixed recipe is also nearly flat in the training set
-size. Taken together (Section~\ref{sec:diversity}), the evidence reads the
-published plateau as a property of the benchmark's data rather than of the
-surrogate class, and our final number as sitting within a few hundredths of
-what this dataset can certify. The paper also returns a pointwise
-uncertainty estimate, whose reach and limits we characterize carefully
-rather than oversell. The pipeline combines three ingredients, none of which
-is exotic on its own.
+On OCO-2 the same components separate by an order of magnitude, and the
+pipeline's job changes: not to couple two comparable models but to move the
+kernel's exactness onto the network's representation. Per spectral band of
+the satellite, the task maps a reduced atmospheric state to a reduced
+radiance spectrum, and the baseline is the kernel-flow emulator of
+\citet{susiluoto2025radiative}, whose stored predictions we score on the same
+test points. An exact Mat\'ern head on the trained network's features reaches
+$3.8\%$ where the same kernel on the raw state reaches $40\%$; the effective
+dimension of the two Gram matrices is unchanged, the target's squared
+native-space norm falls by a factor of about forty, and
+Proposition~\ref{prop:pullback} gives the mechanism. Trained in the reported
+metric and combined per output coordinate, the result improves on the
+emulator on both of that problem's error metrics at once on two of the three
+bands; on the third each metric is won by a separate head
+(Section~\ref{sec:oco2} is precise about which).
 
-First, representation. The benchmark ships its input as a $41\times41$ array
-in which the one-dimensional load is copied across 41 columns. Treating the
-input as what it is, a function of one variable sampled at 41 points, changes
-what is easy: kernel methods on $\mathbb R^{41}$ with 19000 training points
-are exact linear-algebra computations (a single Cholesky factorization of the
-Gram matrix), and the guesswork of choosing a dimension reduction for the
-input disappears. Some of the published baselines flatten the redundant
-$41\times41$ input or reduce it by PCA; none of the numbers above changes
-materially under such reformattings, so we do not attribute the gap we open to
-this step alone, but it is what makes the rest of the pipeline cheap and
-transparent.
+Each stage of the pipeline carries one supporting result: a symmetrization
+lemma behind the reflection averaging, a second-moment identity that predicts
+stacking outcomes from measured residual correlations, an optimal-recovery
+bound $\|G-m\|_K\,P_\lambda(u)$ for the corrected surrogate, a pullback
+identity and a rate for the feature kernel, and a distribution-free coverage
+statement for the reported uncertainty. The last one matters because the
+design factor $P_\lambda$, though a valid bound, turns out to be a poor
+pointwise ranking of the actual error, and its split-conformal rescaling is
+the only uncertainty signal that survives our tests (Section~\ref{sec:uq}).
 
-Second, an accurate neural mean. The neural-mean slot is architecture-agnostic;
-we instantiate it with a residual multilayer perceptron and, as a second
-member, the same network fed the kernel method's own prediction as an extra
-channel, so that it learns to refine the kernel rather than to reproduce it.
-Both are trained with a loss equal to the reported metric, with reflection
-augmentation and reflected test-time averaging. On this benchmark the refiner
-is among the strongest single models we obtain, and a convex combination of
-the two with the kernel predictor is near the top of the published band. A
-Fourier neural operator, a UNet, and an MSE-trained variant of the MLP join
-the ensemble in Section~\ref{sec:diversity}, where their role turns out to be
-diagnostic as much as additive. The reflection steps are backed by an elementary but useful
-fact (Proposition~\ref{prop:sym}): if the target operator is equivariant under
-an isometric involution and the input law is invariant, symmetrizing any
-estimator cannot increase a convex risk. We verify the equivariance directly on
-the data by locating near-mirror input pairs and
-checking their outputs (Section~\ref{sec:benchmark}).
-
-Third, a kernel correction of the residual. The stacked ensemble is treated as
-the mean of a Gaussian process on the 41-dimensional load space, and the
-residual operator is regressed by kernel ridge with a Mat\'ern kernel, scale
-and nugget tuned by validation; a second, smaller correction uses the trained
-networks' penultimate features as kernel inputs. This stage is where the
-theory earns its keep. The corrected surrogate satisfies a pathwise bound
-(Theorem~\ref{thm:or}) of the form $\|\text{error at }u\| \le \|G-m\|_K \cdot
-P_\lambda(u)$, the product of the RKHS norm of the residual operator and the
-Gaussian process posterior standard deviation. The operator factor explains
-why one should regress residuals rather than stresses: the computable proxy
-for it, the squared RKHS norm of the fitted interpolant, drops by about
-\normRatio$\times$ when the kernel is moved from raw targets to ensemble
-residuals (so the certificate, linear in the norm, tightens by its square
-root). The kernel is asked to represent only what the networks left
-behind, and what they leave behind is much smaller as the kernel measures it,
-so the same design gives a much tighter certificate.
-
-The design factor $P_\lambda$ is the natural candidate for a reported
-uncertainty, and here our finding is a cautionary one. As a pointwise ranking
-of the corrected surrogate's error, $P_\lambda$ is weak: the neural mean
-supplies most of the error, and its error pattern is not a function of the
-input-space geometry that $P_\lambda$ measures. Worse, the benchmark's
-relative-error metric is confounded by output amplitude, so the raw
-correlation of $P_\lambda$ with relative error is even slightly negative. The
-disagreement of our ensemble is no more informative, its members being
-architecturally alike and so wrong in the same places. What survives is what
-should: the conformal rescaling of $P_\lambda$ on held-out data is
-distribution-free and attains its nominal coverage on test. We report this in
-full in Section~\ref{sec:uq} because the gap between a valid bound and a useful
-indicator is exactly the kind of thing benchmark papers tend to gloss.
-
-The second problem puts the same pipeline in the opposite regime and is where
-its parts separate most cleanly. The OCO-2 emulation problem of
-\citet{susiluoto2025radiative} asks, per spectral band of a carbon-observing
-satellite, for the map from a reduced atmospheric state to the reduced
-radiance spectrum, and it comes with a strong published baseline: the
-kernel-flow emulator of that paper, whose own predictions we score on the same
-test states. Here the fixed kernel and the network are an order of magnitude
-apart rather than tied, and the pipeline's job is no longer to couple two
-comparable models but to move the kernel's exactness onto the network's terms.
-An exact Mat\'ern head on the trained network's features reaches $3.8\%$
-relative error where the same kernel on the raw input reaches $40\%$, and the
-reason is one we can state precisely: the effective dimension of the two Gram
-matrices is the same, but the target's squared norm in the feature kernel's
-space is smaller, by a factor whose mechanism we prove --- when the target
-factors through the features, the feature-kernel norm is controlled by the
-unwarped map, not by the target's raw-space norm --- and whose size we measure
-at about
-forty. Training each member in the metric
-the application reports, and combining members per output coordinate, then
-beats the published emulator: on two of the three bands a single combined
-surrogate is better on both of that problem's error metrics at once, and on
-the third each metric is won by a separate head (Section~\ref{sec:oco2} is
-precise about which). The two
-problems together bracket what the coupling of neural means and kernels buys:
-almost nothing when the two are already tied and near a data floor, an order of
-magnitude when they are not.
-
-We also examine two further points of contact between the pipeline and
-theory. The kernel-flow regularizer of \citet{owhadi2019kernel,yoo2021deep},
-which we include as a variant in the training of the neural means, admits an
-exact description: the $\ell^2$ kernel-flow batch loss is an unbiased
-estimator, over the random half-split, of the leave-half-out prediction error
-of a kernel method built on the network's features
-(Proposition~\ref{prop:kf}), so adding it trains the features for the role
-they later play in the correction stage. And the nugget selected by
-cross-validation admits a spectral reading: an exact identity
-(Lemma~\ref{lem:deff}) expresses the effective dimension of the kernel solve
-through the Stieltjes transform of the Gram spectrum, which for our learned
-features exhibits the bulk-plus-spikes shape familiar from random matrix
-theory; the cross-validated nugget sits where the effective dimension has
-absorbed the spikes and leading bulk. Neither observation is deep, but both
-replace folklore with checkable statements, and both checks pass on this
-problem.
-
-The paper is organized as follows. Section~\ref{sec:benchmark} describes the
-benchmark, the published results we compare against, and the data-driven
-verification of the mirror symmetry. Section~\ref{sec:method} specifies the
-pipeline. Section~\ref{sec:theory} states the supporting results, one per
-stage of the pipeline, with proofs in Appendix~\ref{app:proofs}.
-Section~\ref{sec:experiments} reports the main comparisons, ablations that
-attribute the improvement to its sources, the diversity experiment and the
-anatomy of the shared residual, the uncertainty calibration study, and the
-spectral analysis. Section~\ref{sec:oco2} carries the OCO-2 study: the
-representation ladder, the metric-matched training, the measurement of the
-norm gap, and the head-to-head with the kernel-flow emulator on all three
-bands. Section~\ref{sec:discussion} discusses limitations and the relation to
-Gaussian process emulation practice at scale.
+Section~\ref{sec:benchmark} describes the problems, protocols, and published
+results. Section~\ref{sec:method} specifies the pipeline.
+Sections~\ref{sec:experiments} and~\ref{sec:oco2} report the two studies,
+including the data-scaling experiments. Section~\ref{sec:theory} states the
+supporting theory, one result per stage, with proofs in
+Appendix~\ref{app:proofs}, and Section~\ref{sec:discussion} discusses
+limitations.

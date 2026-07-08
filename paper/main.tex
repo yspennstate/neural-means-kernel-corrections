@@ -58,35 +58,25 @@ Code, data pointers, and the per-run summaries behind every number reported here
 \maketitle
 
 \begin{abstract}
-Used in a modern way, with the exact solve applied to a neural network's
-learned features rather than to the raw input, kernel methods are a strong and
-interpretable tool for operator learning. We pair an accurate neural mean,
-trained in the metric the application reports, with an exact Mat\'ern kernel
-regression of its residual and of its features, and find the combination
-competitive with or better than the best published methods. On the
-structural-mechanics benchmark of de Hoop et al.\ it reaches the front of the
-band (\errBest\%, matching the best published architecture); on the OCO-2
-radiative-transfer emulator of Lamminp\"a\"a et al.\ it beats a published
-Gaussian-process emulator of a real NASA CO$_2$ retrieval problem on that
-problem's own test set, outright on two of the three spectral bands and on
-every band--metric pair; and Table~\ref{tab:suite} situates both problems
-within the seven-benchmark suite. The gains come
-from a specific, measurable place: on OCO-2 the same kernel that trails the
-network tenfold on the raw input overtakes it on the learned features, because
-the target's squared norm in the feature kernel's space is smaller by a factor
-of about forty at unchanged effective dimension, a factor whose mechanism we
-prove. Structural mechanics sits in the opposite regime, where neural and
-kernel methods tie, and there the paper's contribution is a diagnosis: the
-residuals of every architecture we train correlate above 0.86, and their shared
-component concentrates where the finite element data are least accurate and is
-flat in diversity and sample size, so the evidence reads the plateau near 4.5\%
-as a property of the data rather than the surrogate class. Two public problems
-thus bracket what the neural--kernel coupling buys, and each stage of the method
-carries a supporting result: a second-moment identity that predicts the
-stacking outcome from measured residual correlations, an optimal-recovery bound,
-a feature-pullback identity and a rate that separate the metric from the
-representational part of the advantage, and a distribution-free coverage band
-that is the only uncertainty signal to survive our tests.
+We combine neural network means with exact Mat\'ern kernel regressions of
+their residuals and of their learned features, and evaluate the pairing on two
+public emulation problems with published baselines: the structural-mechanics
+benchmark of de Hoop et al.\ and the OCO-2 radiative-transfer emulator of
+Lamminp\"a\"a et al. On structural mechanics the combination reaches
+\errBest\% test error, matching the best published architecture, and
+\errBestLow\% against a published \pubBestLo\% in the low-data regime. On
+OCO-2 it improves on the published Gaussian-process emulator on that problem's
+own test points, outright on two of the three spectral bands; the same kernel
+that trails the network tenfold on the raw state overtakes it on the network's
+features, and we measure why (the target's squared native-space norm drops
+about fortyfold at fixed effective dimension) and prove the mechanism. Where
+the two families tie instead, the residuals of every architecture we train
+correlate above 0.86 and their shared component is flat in diversity and
+sample size, which reads the published plateau as a property of the data.
+Supporting results include a second-moment identity that predicts stacking
+outcomes from measured correlations, an optimal-recovery certificate, and a
+distribution-free coverage band, the only uncertainty signal that survives our
+tests.
 \end{abstract}
 
 \section{Introduction}
@@ -102,10 +92,6 @@ that is the only uncertainty signal to survive our tests.
 \label{sec:method}
 \input{method}
 
-\section{Theory}
-\label{sec:theory}
-\input{theory}
-
 \section{Results on the structural-mechanics benchmark}
 \label{sec:experiments}
 \input{experiments}
@@ -113,6 +99,10 @@ that is the only uncertainty signal to survive our tests.
 \section{The OCO-2 radiative-transfer emulator}
 \label{sec:oco2}
 \input{oco2}
+
+\section{Theory}
+\label{sec:theory}
+\input{theory}
 
 \section{Discussion}
 \label{sec:discussion}
@@ -154,8 +144,9 @@ The code, the per-run summaries behind every reported number, and the exact
 configuration of each experiment are available at
 \url{https://github.com/yspennstate/neural-means-kernel-corrections}. The
 structural-mechanics, Helmholtz, Navier--Stokes and advection data are
-distributed through the Caltech data record \texttt{20091}; the OCO-2 emulation
-data and the kernel-flow emulator's predictions through the OSF project
+distributed through the data record accompanying \citet{dehoop2022cost}
+(\texttt{data.caltech.edu}, record \texttt{20091}); the OCO-2 emulation data
+and the kernel-flow emulator's predictions through the OSF project
 \texttt{u2t8a}; and the ClimSim data through the LEAP repository
 \texttt{subsampled\_low\_res}.
 

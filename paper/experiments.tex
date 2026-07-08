@@ -358,10 +358,11 @@ loads and the effective dimension $d_{\mathrm{eff}}(\lambda)$ computed from it
 by the exact identity of Lemma~\ref{lem:deff}. The spectrum decays quickly: a
 few hundred eigenvalues carry essentially all the mass, the tail falling many
 orders of magnitude below the leading modes. At the cross-validated nugget the
-effective dimension is a few hundred out of $n=19000$, which is why the exact
-Cholesky solve is affordable and why the correction generalizes despite
-interpolating nineteen thousand points; the problem the kernel actually solves
-has the dimension of the retained spectrum, not of the sample. The
+effective dimension is a few hundred out of $n=19000$. This is a statistical
+statement, not a computational one --- the dense factorization costs its full
+$n^3$ operations regardless --- but it is why the correction generalizes
+despite interpolating nineteen thousand points: the problem the kernel solves
+has the statistical dimension of the retained spectrum, not of the sample. The
 cross-validated $\lambda$ sits at the shoulder of the $d_{\mathrm{eff}}$ curve,
 past the leading modes and into the rapidly decaying tail, matching the reading
 of Lemma~\ref{lem:deff}.

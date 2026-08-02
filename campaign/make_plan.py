@@ -50,6 +50,8 @@ OCO = dict(box1=[], box2=["o2"], box3=["wco2", "sco2"])[args.host]
 for s in SM_SEEDS:
     emit(f"a1_sm_s{s}", [PYBIN, f"{CODE}/campaign/seed_pipeline.py"],
          dict(NMKC_SEED=str(s)), threads=6, timeout_hours=36)
+    emit(f"a5_kappa_s{s}", [PYBIN, f"{CODE}/campaign/eval_kappa.py"],
+         dict(NMKC_SEED=str(s)), threads=6, timeout_hours=4)
 
 for band in OCO:
     for s in range(10):

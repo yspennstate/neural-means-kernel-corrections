@@ -181,6 +181,41 @@ if name.startswith("oco_"):
     strat.sort(key=lambda r: -r["spread"])
     out["stratified_top"] = strat[:6]
 
+    # prop:selectcoord evaluated on this band-seed: the deployed per-coordinate
+    # selection (M=6, q=40, m_v=2000) against the test oracle, in both the
+    # unweighted and the exact squared-relative-error metrics, next to the
+    # bound with the measured range proxy L. Isolated: this block has not yet
+    # run against a finished band-seed, and a failure here must not cost the
+    # established sections above.
+    try:
+      import math as _math
+      Pv_o = np.stack([mp["val_" + m].astype(np.float64) for m in deployed])
+      Pt_o = np.stack([mp["te_" + m].astype(np.float64) for m in deployed])
+      M_o, m_v, q_o = len(deployed), Yval.shape[0], Yval.shape[1]
+      delta_o = 0.05
+      a_val = 1.0 / (np.linalg.norm(Yval, axis=1) ** 2 + 1e-30)
+      a_te = 1.0 / (np.linalg.norm(Yte, axis=1) ** 2 + 1e-30)
+      sc = {}
+      for tag, av, at in (("unweighted", np.ones(m_v), np.ones(len(Yte))),
+                          ("weighted", a_val, a_te)):
+          Rv = np.einsum("n,mnj->mj", av, (Pv_o - Yval) ** 2) / m_v
+          Rt = np.einsum("n,mnj->mj", at, (Pt_o - Yte) ** 2) / len(Yte)
+          win = Rv.argmin(0)
+          realized = float(np.mean(Rt[win, np.arange(q_o)] - Rt.min(0)))
+          L_meas = float(max((av[None, :, None] * (Pv_o - Yval) ** 2).max(),
+                             (at[None, :, None] * (Pt_o - Yte) ** 2).max()))
+          sc[tag] = dict(
+              realized_excess=realized, L_meas=L_meas,
+              bound=2 * L_meas * _math.sqrt(_math.log(2 * M_o * q_o / delta_o)
+                                            / (2 * m_v)),
+              oracle_risk=float(Rt.min(0).mean()),
+              deployed_risk=float(Rt[win, np.arange(q_o)].mean()))
+      out["bounds"] = dict(M=M_o, q=q_o, m_v=m_v, delta=delta_o,
+                           members=deployed, selectcoord=sc)
+    except Exception as exc:                                   # noqa: BLE001
+      out["bounds"] = dict(error=f"{type(exc).__name__}: {exc}")
+      print(f"BOUNDS BLOCK FAILED on {name}: {exc}", flush=True)
+
 elif name.startswith("sm_"):
     per = np.load(SD / "per_sample_errors.npz")
     out["tails"] = dict(stack=quantiles(per["stack"]), corr=quantiles(per["corr"]),
@@ -250,12 +285,96 @@ elif name.startswith("sm_"):
         W_max=float(wn.max()), W_median=float(np.median(wn)),
         b=float(max(np.abs(Yva).max(), max(float(np.abs(p).max()) for p in Pv))),
         note="kappa (correction weight l1 norm) computed in the collection wave")
+
+    # finite-sample bounds next to realized excesses (verification appendix).
+    # The oracle of prop:affine is estimated by an unregularized per-coordinate
+    # refit on the test arrays (M+1 parameters on 19000 samples; its optimism
+    # is O((M+1)/n) and it can only make the reported ratios conservative).
+    # Member test predictions are streamed in row chunks; loading all six at
+    # once is the 19 GB mistake the stack stages already fixed.
+    import math as _math
+    hstk_w = hstk["report"].get("weights", {})
+    w_glob = np.array([hstk_w.get(m, 0.0) for m in members])
+    have_glob = float(w_glob.sum()) > 0
+    files_te = [runs / (f"{m}_predte.npy" if m != "krr" else
+                        "krr_full_matern52_n19000_pred_test.npy") for m in members]
+    mm = [np.load(f, mmap_mode="r") for f in files_te]
+    S_dep = np.load(runs / "hpix_stack_te.npy", mmap_mode="r")
+    C_dep = np.load(runs / "hpix_corr_pred_test.npy", mmap_mode="r")
+    n_te, Dq = Yte_s.shape
+    M_ = len(members)
+    Gm_te = np.zeros((Dq, M_ + 1, M_ + 1))
+    bv_te = np.zeros((Dq, M_ + 1))
+    y2_c = np.zeros(Dq); r2_stack_c = np.zeros(Dq); r2_corr_c = np.zeros(Dq)
+    e_glob = np.empty(n_te) if have_glob else None
+    b_meas = float(np.abs(Yva).max())
+    for k0 in range(0, n_te, 1000):
+        sl = slice(k0, min(k0 + 1000, n_te))
+        P = np.stack([np.asarray(m_[sl], dtype=np.float64) for m_ in mm])
+        b_meas = max(b_meas, float(np.abs(P).max()))
+        Pa = np.concatenate([P, np.ones((1,) + P.shape[1:])], 0)
+        Gm_te += np.einsum("mnd,knd->dmk", Pa, Pa)
+        Y = Yte_s[sl]
+        b_meas = max(b_meas, float(np.abs(Y).max()))
+        bv_te += np.einsum("mnd,nd->dm", Pa, Y)
+        y2_c += (Y ** 2).sum(0)
+        r2_stack_c += ((np.asarray(S_dep[sl], np.float64) - Y) ** 2).sum(0)
+        r2_corr_c += ((np.asarray(C_dep[sl], np.float64) - Y) ** 2).sum(0)
+        if have_glob:
+            Rg = np.einsum("m,mnd->nd", w_glob, P) - Y
+            e_glob[sl] = np.linalg.norm(Rg, axis=1) / np.linalg.norm(Y, axis=1)
+    Gm_te /= n_te; bv_te /= n_te; y2_c /= n_te
+    Gm_te += 1e-9 * np.eye(M_ + 1)[None]
+    W_star = np.linalg.solve(Gm_te, bv_te[..., None])[..., 0]
+    R_oracle = float(np.mean(y2_c - np.einsum("dm,dm->d", W_star, bv_te)))
+    R_stack = float(np.mean(r2_stack_c / n_te))
+    R_corr = float(np.mean(r2_corr_c / n_te))
+
+    delta_ = 0.05
+    W_b, D_b, m_b, q_b, lam_b = float(wn.max()), _math.sqrt(M_ + 1), len(Yva), Dq, 1e-3
+    aff_bound = ((8 * W_b * b_meas ** 2 * D_b * (1 + W_b * D_b)
+                  + 2 * b_meas ** 2 * (1 + W_b * D_b) ** 2
+                  * _math.sqrt(0.5 * _math.log(2 * q_b / delta_)))
+                 / _math.sqrt(m_b)) + lam_b * W_b ** 2
+    # lem:select on the honesty comparison (K=2 on half the validation split)
+    sel = dict(K=2, m_half=len(Yva) // 2,
+               holdout_pix=hj.get("holdout_pix"), holdout_glob=hj.get("holdout_glob"),
+               used_perpixel=bool(hj.get("used", True)))
+    e_pix_mean = float(per["stack"].mean())
+    if have_glob:
+        e_glob_mean = float(e_glob.mean())
+        chosen = e_pix_mean if sel["used_perpixel"] else e_glob_mean
+        B_hat = float(max(per["stack"].max(), e_glob.max()))
+        sel.update(test_perpixel=e_pix_mean, test_global=e_glob_mean,
+                   realized_regret=chosen - min(e_pix_mean, e_glob_mean),
+                   B_meas=B_hat,
+                   bound=B_hat * _math.sqrt(2 * _math.log(2 * 2 / delta_)
+                                            / sel["m_half"]))
+    out["bounds"] = dict(
+        delta=delta_, b_meas=b_meas, W=W_b, D=D_b, m=m_b, q=q_b,
+        n_grid=9,
+        select=sel,
+        affine=dict(bound=aff_bound, ridge_term=lam_b * W_b ** 2,
+                    R_deployed_stack=R_stack, R_test_refit_oracle=R_oracle,
+                    realized_excess=R_stack - R_oracle),
+        certificate=dict(R_deployed_corrected=R_corr,
+                         realized_excess_vs_oracle=R_corr - R_oracle,
+                         note="bound assembled at collection once kappa joins"))
 else:
     raise SystemExit(f"unrecognized seed dir kind: {name}")
 
 tmp = SD / "extras.json.tmp"
 json.dump(out, open(tmp, "w"), indent=1)
 os.replace(tmp, SD / "extras.json")
+
+# a copy lands in <root>/results/ under a unique name so the collector's
+# existing results pull picks extras up without a second transport path
+out["kind"] = "extras"
+root_res = SD.parent.parent / "results"
+if root_res.is_dir():
+    tmp2 = root_res / f"extras_{name}.json.tmp"
+    json.dump(out, open(tmp2, "w"), indent=1)
+    os.replace(tmp2, root_res / f"extras_{name}.json")
 sb = out.get("secmom")
 print(f"{name}: extras written" +
       (f"; secmom rule correct {sb['correct']}/{sb['n']}" if sb else ""), flush=True)

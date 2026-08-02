@@ -7,7 +7,7 @@ stage downstream).
 
 Usage: python stack_perpixel.py --members a,b,c --krr 1 --tag hpix
 """
-import argparse, sys, json
+import argparse, sys, json, os
 import numpy as np
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent))
 from common import load_arrays, canonical_split, rel_l2, save_run, RUNS
@@ -53,7 +53,8 @@ def apply_pixel_weights(P, W):
     X = np.concatenate([P, np.ones((1, n, Dd))], 0)
     return np.einsum("dm,mnd->nd", W, X)
 
-rng = np.random.default_rng(1)
+# the half-split is part of the pipeline's randomness; NMKC_PIPE_SEED varies it
+rng = np.random.default_rng(1 + 1000 * int(os.environ.get("NMKC_PIPE_SEED", "0")))
 perm = rng.permutation(nv)
 A, B = perm[:nv // 2], perm[nv // 2:]
 

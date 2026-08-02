@@ -1,8 +1,13 @@
-"""Shared data loading, splits, and the benchmark metric."""
-import numpy as np, pathlib, json, time
+"""Shared data loading, splits, and the benchmark metric.
 
-DATA = pathlib.Path(__file__).resolve().parent / "data"
-RUNS = pathlib.Path(__file__).resolve().parent / "runs"
+The environment variables NMKC_DATA, NMKC_RUNS and NMKC_SPLIT_SEED override the
+data directory, the run directory and the validation-split seed; they exist so
+the multi-seed campaign can run many pipeline copies against one code tree.
+Unset, everything behaves exactly as before (seed 0, ./data, ./runs)."""
+import numpy as np, pathlib, json, time, os
+
+DATA = pathlib.Path(os.environ.get("NMKC_DATA", pathlib.Path(__file__).resolve().parent / "data"))
+RUNS = pathlib.Path(os.environ.get("NMKC_RUNS", pathlib.Path(__file__).resolve().parent / "runs"))
 
 def load_arrays():
     loads = np.load(DATA / "loads.npy")     # (N,41) float32
@@ -12,7 +17,9 @@ def load_arrays():
 def canonical_split(n_val=1000, seed=0):
     """Train pool = samples 0..19999, test = 20000..39999 (de Hoop convention).
     n_val samples for model selection are taken from the train pool with a fixed
-    permutation so every script sees the same split."""
+    permutation so every script sees the same split. NMKC_SPLIT_SEED overrides
+    the permutation seed (the pool/test boundary never moves)."""
+    seed = int(os.environ.get("NMKC_SPLIT_SEED", seed))
     itr = np.load(DATA / "idx_train.npy")
     ite = np.load(DATA / "idx_test.npy")
     rng = np.random.default_rng(seed)

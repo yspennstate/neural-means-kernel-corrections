@@ -115,7 +115,8 @@ for ep in range(args.epochs):
             note = " *"
         print(f"ep {ep+1:4d}  train {loss.item():.4f}  val {e_va:.4f}  [{time.time()-t0:.0f}s]{note}", flush=True)
 
-model.load_state_dict(best_state)
+if best_state is not None:
+    model.load_state_dict(best_state)
 e_va = evaluate(Xva, Kva, Yva); e_te = evaluate(Xte, Kte, Yte)
 e_te_no = evaluate(Xte, Kte, Yte, tta=False)
 print(f"FINAL  val {e_va:.4f}  test(TTA) {e_te:.4f}  test(noTTA) {e_te_no:.4f}", flush=True)

@@ -89,6 +89,80 @@ R(F_{\widehat w})\;\le\;\min_{w\in\Delta}R(F_w)+\frac{8B}{m}
 \]
 which is the claim. \qed
 
+\subsection{Proof of Lemma~\ref{lem:select}}
+
+For each $k$ the validation scores $\ell(g_k(\tilde u_i),G(\tilde u_i))$,
+$i\le m'$, are i.i.d., take values in $[0,B]$, and have mean $R(g_k)$; the
+maps $g_k$ are fixed relative to this sample, which is the only place the
+independence assumption enters. Hoeffding's inequality gives, for each $k$,
+\[
+\Pr\Big(\big|\widehat R(g_k)-R(g_k)\big|\ge t\Big)\;\le\;
+2\exp\!\big(-2m't^2/B^2\big),
+\]
+so with $t=B\sqrt{\log(2K/\delta)/(2m')}$ and a union bound over $k\le K$,
+all $K$ deviations are below $t$ simultaneously with probability at least
+$1-\delta$. On that event, if $k^\ast$ attains $\min_k R(g_k)$,
+\[
+R(g_{\widehat k})\;\le\;\widehat R(g_{\widehat k})+t\;\le\;
+\widehat R(g_{k^\ast})+t\;\le\;R(g_{k^\ast})+2t,
+\]
+and $2t=B\sqrt{2\log(2K/\delta)/m'}$. \qed
+
+\subsection{Proof of Proposition~\ref{prop:affine}}
+
+Fix a coordinate $j$ and abbreviate $\varphi=\varphi_j$, $Y(u)=G(u)_j$,
+$D=\sqrt{M+1}$. Each entry of $\varphi(u)$ is bounded by $b$ in absolute
+value (the members by assumption, the intercept entry by construction), so
+$\|\varphi(u)\|_2\le bD$, and for $\|w\|_2\le W$ Cauchy--Schwarz gives
+$|w^\top\varphi(u)|\le WbD$ and
+$|w^\top\varphi(u)-Y(u)|\le b(1+WD)$. The losses
+$\ell_w(u)=(w^\top\varphi(u)-Y(u))^2$ therefore take values in
+$[0,L_\infty]$ with $L_\infty=b^2(1+WD)^2$.
+
+\emph{Uniform deviation.} Let
+$Z=\sup_{\|w\|_2\le W}|\widehat R_j(w)-R_j(w)|$ over the validation sample of
+size $m$. Changing one sample moves $Z$ by at most $L_\infty/m$, so
+McDiarmid's inequality gives
+$Z\le\mathbb E Z+L_\infty\sqrt{\log(2q/\delta)/(2m)}$ with probability at
+least $1-\delta/q$ (we use the two-sided form for a margin). By
+symmetrization, $\mathbb E Z\le 2\,\mathfrak R_m(\mathcal L)$, the Rademacher
+complexity of the loss class. The loss is the composition of $t\mapsto t^2$,
+restricted to $|t|\le b(1+WD)$ where it is $2b(1+WD)$-Lipschitz, with the
+class $\{u\mapsto w^\top\varphi(u)-Y(u)\}$; translation by the fixed function
+$Y$ leaves the Rademacher average unchanged (the translated term does not
+involve $w$ and has zero mean), and for the linear class over the
+$\ell^2$ ball,
+\[
+\mathfrak R_m\;\le\;\frac{W}{m}\,
+\mathbb E\Big\|\sum_{i=1}^m\sigma_i\varphi(\tilde u_i)\Big\|_2\;\le\;
+\frac{W}{m}\Big(\sum_{i=1}^m\mathbb E\|\varphi(\tilde u_i)\|_2^2\Big)^{1/2}
+\;\le\;\frac{WbD}{\sqrt m},
+\]
+by Jensen's inequality. Talagrand's contraction lemma then gives
+$\mathfrak R_m(\mathcal L)\le 2b(1+WD)\cdot WbD/\sqrt m$, hence
+\[
+Z\;\le\;\frac{4Wb^2D(1+WD)}{\sqrt m}
++L_\infty\sqrt{\frac{\log(2q/\delta)}{2m}}
+\qquad\text{with probability}\ge 1-\delta/q .
+\]
+
+\emph{Empirical risk minimization.} On this event, for any minimizer
+$w^\ast$ of $R_j$ over the ball,
+$R_j(\widehat w_j)\le\widehat R_j(\widehat w_j)+Z
+\le\widehat R_j(w^\ast)+Z\le R_j(w^\ast)+2Z$, and $2Z$ is bounded by the
+displayed excess. A union bound over the $q$ coordinates makes all events
+hold simultaneously with probability at least $1-\delta$, and averaging over
+$j$ preserves the (coordinate-uniform) bound. This proves (i).
+
+For (ii), the ridge minimizer satisfies
+$\widehat R_j(\widehat w_j)+\lambda\|\widehat w_j\|_2^2\le
+\widehat R_j(w^\ast)+\lambda\|w^\ast\|_2^2$, so
+$\widehat R_j(\widehat w_j)\le\widehat R_j(w^\ast)+\lambda\|w^\ast\|_2^2
+\le\widehat R_j(w^\ast)+\lambda W^2$. Since by assumption
+$\|\widehat w_j\|_2\le W$, the uniform event of part (i) applies to
+$\widehat w_j$ and $w^\ast$ alike, and the chain above goes through with the
+extra $\lambda W^2$. \qed
+
 \subsection{Proof of Proposition~\ref{prop:secmom}}
 
 Since $\sum_m w_m=1$, the stack's normalized residual is
@@ -132,6 +206,25 @@ $w_j^2$ does not move any of the $q$ argmins, so the optimizer is the same
 for every positive $w$. A combination with shared weights is the special
 case $v_{mj}=v_m$ for all $j$, a subset of the feasible set of each
 coordinate problem, which gives the domination. \qed
+
+\subsection{Proof of Corollary~\ref{cor:percoordw}}
+
+The integrand is nonnegative, so Tonelli's theorem permits exchanging the
+expectation with the coordinate sum:
+\[
+\mathbb E\Big[a(u)\sum_j w_j^2\big(f_v(u)_j-G(u)_j\big)^2\Big]
+=\sum_j w_j^2\,\mathbb E\Big[a(u)\big(f_v(u)_j-G(u)_j\big)^2\Big].
+\]
+The $j$-th summand depends on $v$ only through its $j$-th column
+$v_{\cdot j}$, exactly as in the proof of
+Proposition~\ref{prop:percoord}, so minimizing over $v$ splits into $q$
+independent problems; the factors $w_j^2$ rescale the summands without
+moving any per-coordinate minimizer, which gives the simultaneous optimality
+over all diagonal $w$. The choice $a(u)=\|G(u)\|_2^{-2}$, $w=\mathbf 1$
+identifies the objective with $\mathbb E\,\|\rho_{f_v}\|_2^2$, the mean
+squared relative error. Finally
+$\mathbb E\|\rho\|_2\le(\mathbb E\|\rho\|_2^2)^{1/2}$ is Jensen's
+inequality. \qed
 
 \subsection{Proof of Proposition~\ref{prop:pullback}}
 

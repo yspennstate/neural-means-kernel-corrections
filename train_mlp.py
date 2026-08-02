@@ -25,6 +25,7 @@ p.add_argument("--ntrain", type=int, default=0)
 p.add_argument("--lowval", type=int, default=0)
 p.add_argument("--final", type=int, default=0)
 p.add_argument("--kf", type=float, default=0.0, help="weight of the Kernel-Flow regularizer on trunk features")
+p.add_argument("--mse", type=int, default=0, help="1 = mean squared error on standardized targets")
 p.add_argument("--threads", type=int, default=0)
 p.add_argument("--tag", type=str, default="mlp")
 args = p.parse_args()
@@ -73,6 +74,8 @@ idx2d = torch.arange(1681, device=dev).reshape(41, 41)
 MIR = idx2d.flip(0).reshape(-1)
 
 def loss_fn(pred_n, ytrue):
+    if args.mse:
+        return F.mse_loss(pred_n, (ytrue - mu_y) / sd_y)
     pred = pred_n * sd_y + mu_y
     return (torch.linalg.vector_norm(pred - ytrue, dim=1) / torch.linalg.vector_norm(ytrue, dim=1)).mean()
 

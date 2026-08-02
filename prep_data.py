@@ -12,8 +12,8 @@ import numpy as np, pathlib, json, os
 # Override with the STRUCTMECH_SRC environment variable; default is ./data.
 HERE = pathlib.Path(__file__).resolve().parent
 SRC = pathlib.Path(os.environ.get("STRUCTMECH_SRC", HERE / "data"))
-DST = HERE / "data"
-DST.mkdir(exist_ok=True)
+DST = pathlib.Path(os.environ.get("NMKC_DATA", HERE / "data"))
+DST.mkdir(parents=True, exist_ok=True)
 
 X = np.load(SRC / "StructuralMechanics_inputs.npy", mmap_mode="r")   # (41,41,40000)
 Y = np.load(SRC / "StructuralMechanics_outputs.npy", mmap_mode="r")

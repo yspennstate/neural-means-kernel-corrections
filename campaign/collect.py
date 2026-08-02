@@ -16,6 +16,7 @@ BOXES = [
     ("box1", ["scp", "-o", "ConnectTimeout=20"], "research-box"),
     ("box2", ["scp", "-o", "ConnectTimeout=20"], "research-box-02"),
     ("box3", ["scp", "-o", "ConnectTimeout=20"], "research-box-03"),
+    ("box4", ["scp", "-o", "ConnectTimeout=20"], "research-box-04"),
 ]
 ROOT = "/srv/aiwork/nmkc10seed"
 

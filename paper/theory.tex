@@ -193,6 +193,53 @@ license to fit $q(M{+}1)$ numbers on a thousand held-out samples without
 fearing selection bias at the reported precision; the honesty comparison of
 Lemma~\ref{lem:select} then guards the one discrete choice that remains.
 
+One stage of the pipeline is still uncovered at this point: the residual
+correction, whose scale and nugget are chosen from a finite grid on the same
+validation split that fitted the stack. The next statement closes the chain.
+Its key observation is structural: for a fixed grid point the correction is
+fit to the training residual of the stack, which is affine in the stack
+weights, so the corrected predictor is again a per-coordinate affine function
+of $w$ with a transformed feature map, and the machinery of
+Proposition~\ref{prop:affine} applies to the composite class at the cost of
+one further measurable constant.
+
+\begin{corollary}[certificate for the deployed corrected surrogate]
+\label{cor:certificate}
+Assume the setting of Proposition~\ref{prop:affine}, and let $\Gamma$ be a
+finite set of correction configurations, each defining weights
+$c_\gamma(u)\in\mathbb R^{n_{\mathrm{tr}}}$ with the corrected predictor
+\[
+h_{w,\gamma}(u)_j\;=\;w_j^\top\varphi_j(u)
++c_\gamma(u)^\top\big(Y_j-\Phi_j w_j\big),
+\]
+where $Y_j\in\mathbb R^{n_{\mathrm{tr}}}$ collects the training targets of
+coordinate $j$ and $\Phi_j$ the members' training predictions; $\gamma=0$
+(no correction, $c_0\equiv0$) is included in $\Gamma$. Suppose the correction
+weights are uniformly bounded, $\sup_{u,\gamma}\|c_\gamma(u)\|_1\le\kappa$.
+If the deployed surrogate uses any validation-measurable choice
+$(\widehat w,\widehat\gamma)$ with $\|\widehat w_j\|_2\le W$ and
+$\widehat\gamma$ minimizing the empirical validation risk, aggregated over
+coordinates, among $\gamma\in\Gamma$ at the fitted $\widehat w$ (the grid
+choice is shared across coordinates, as in the pipeline), then with
+probability at least $1-\delta$,
+\[
+\frac1q\sum_j R_j\big(h_{\widehat w,\widehat\gamma}\big)\;\le\;
+\min_{\gamma\in\Gamma}\;\frac1q\sum_j R_j\big(h_{\widehat w,\gamma}\big)
+\;+\;\frac{2(1+\kappa)^2\,b^2(1+WD)\Big(4WD+(1+WD)
+\sqrt{\tfrac12\log\big(2q|\Gamma|/\delta\big)}\Big)}{\sqrt m}.
+\]
+Since $\gamma=0$ is among the candidates, the oracle on the right is at most
+the fitted stack's own risk, and combining with
+Proposition~\ref{prop:affine}(ii) bounds the deployed risk against the best
+affine stack itself. All three constants $b$, $W$ and $\kappa$ are measured
+and released with the runs.
+\end{corollary}
+
+The reading: the object the pipeline actually ships -- fitted stack, grid-tuned
+correction, validated final choice -- carries a finite-sample certificate
+whose every constant is observable, and the certificate is evaluated
+numerically alongside the seed experiments rather than left as a formula.
+
 \subsection{What the stack can achieve}
 \label{sec:theory-secmom}
 
@@ -241,6 +288,34 @@ No number of additional members with the same error level and mutual
 correlations moves the ensemble's root-mean-square relative error below
 $\bar e\sqrt{\bar\varrho}$.
 \end{corollary}
+
+The floor is a lower bound; a matching upper bound follows from the same
+entrywise information, and together they pin the achievable window from both
+sides by measured quantities alone.
+
+\begin{corollary}[the floor is nearly achieved]\label{cor:floorpinch}
+Suppose, in addition to the hypotheses of Corollary~\ref{cor:floor}, that
+$S_{mm}\le\bar e^{\,2}(1+\delta_e)$ for every $m$ and
+$S_{mk}\le(\bar\varrho+\delta_\varrho)\,\bar e^{\,2}$ for every $m\neq k$.
+Then
+\[
+\bar\varrho\;\le\;\frac{1}{\bar e^{\,2}}\min_{w\in\Delta^{M-1}}w^\top Sw
+\;\le\;\bar\varrho+\delta_\varrho+\frac{1+\delta_e-\bar\varrho-\delta_\varrho}{M}.
+\]
+The width of the bracket is the measured correlation spread
+$\delta_\varrho$ plus a $1/M$ term: when the members' errors and pairwise
+correlations are tight, whatever convex ensemble one builds sits within that
+window of the floor, and conversely no tuning of the weights can be blamed
+for more than the window.
+\end{corollary}
+
+On the structural-mechanics benchmark the measured spreads
+($\varrho\in[0.86,0.96]$ across member pairs at member errors within a few
+percent of one another) put the window at roughly a tenth of the squared
+floor, which is precisely the margin by which the fitted stack sits above
+$\bar e\sqrt{\bar\varrho}$ in Section~\ref{sec:experiments}; the seed
+campaign reports the bracket alongside the realized ensemble risk for every
+seed and both problems.
 
 A second consequence of the same decomposition explains the final OCO-2
 surrogate. Evaluation metrics there are diagonal in the output coordinates

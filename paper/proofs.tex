@@ -163,6 +163,70 @@ $\|\widehat w_j\|_2\le W$, the uniform event of part (i) applies to
 $\widehat w_j$ and $w^\ast$ alike, and the chain above goes through with the
 extra $\lambda W^2$. \qed
 
+\subsection{Proof of Corollary~\ref{cor:floorpinch}}
+
+The lower bound is Corollary~\ref{cor:floor}. For the upper bound, evaluate
+the quadratic form at the uniform weights $w_m=1/M$:
+\[
+\frac{1}{\bar e^{\,2}}\,w^\top Sw
+=\frac{1}{\bar e^{\,2}}\Big(\frac{1}{M^2}\sum_m S_{mm}
++\frac{1}{M^2}\sum_{m\neq k}S_{mk}\Big)
+\;\le\;\frac{1+\delta_e}{M}
++\frac{M-1}{M}\,\big(\bar\varrho+\delta_\varrho\big),
+\]
+using the entrywise upper bounds and the counts $M$ and $M(M-1)$ of the two
+sums. The right side equals
+$\bar\varrho+\delta_\varrho+\big(1+\delta_e-\bar\varrho-\delta_\varrho\big)/M$,
+and the minimum over the simplex is at most the value at any feasible point.
+\qed
+
+\subsection{Proof of Corollary~\ref{cor:certificate}}
+
+Fix a coordinate $j$ and a grid point $\gamma$. Substituting the affine form
+of the correction,
+\[
+h_{w,\gamma}(u)_j=w_j^\top\widetilde\varphi_{j,\gamma}(u)+o_{j,\gamma}(u),
+\qquad
+\widetilde\varphi_{j,\gamma}(u)=\varphi_j(u)-\Phi_j^\top c_\gamma(u),\quad
+o_{j,\gamma}(u)=c_\gamma(u)^\top Y_j ,
+\]
+and neither $\widetilde\varphi_{j,\gamma}$ nor $o_{j,\gamma}$ depends on $w$
+or on the validation sample: $c_\gamma$ is built from the training design
+alone. Each component of $\Phi_j^\top c_\gamma(u)$ is a $c_\gamma$-weighted
+sum of member values bounded by $b$, so its absolute value is at most
+$b\,\|c_\gamma(u)\|_1\le b\kappa$, whence
+$\|\widetilde\varphi_{j,\gamma}(u)\|_2\le bD+bD\kappa=bD(1+\kappa)$ and
+$|o_{j,\gamma}(u)|\le b\kappa$. For $\|w\|_2\le W$ the prediction deviates
+from the target by at most
+$WbD(1+\kappa)+b\kappa+b\le b(1+WD)(1+\kappa)=:\tilde c$, so the squared
+losses lie in $[0,\tilde c^{\,2}]$ and are $2\tilde c$-Lipschitz in the
+prediction.
+
+The argument of Proposition~\ref{prop:affine} now applies verbatim to the
+class indexed by $w$ in the $W$-ball, for this fixed $(j,\gamma)$: the
+Rademacher complexity of the affine part is at most
+$W\,bD(1+\kappa)/\sqrt m$, contraction multiplies it by $2\tilde c$,
+symmetrization doubles it, and McDiarmid at level $\delta/(q|\Gamma|)$ adds
+$\tilde c^{\,2}\sqrt{\log(2q|\Gamma|/\delta)/(2m)}$. A union bound over the
+$q|\Gamma|$ pairs makes, with probability at least $1-\delta$, every
+deviation
+$Z_{j,\gamma}=\sup_{\|w\|\le W}|\widehat R_{j,\gamma}(w)-R_{j,\gamma}(w)|$
+at most
+\[
+\frac{4W b^2D(1+WD)(1+\kappa)^2}{\sqrt m}
++b^2(1+WD)^2(1+\kappa)^2\sqrt{\frac{\log(2q|\Gamma|/\delta)}{2m}} .
+\]
+On that event, write $\bar R(\gamma)=\tfrac1q\sum_jR_j(h_{\widehat w,\gamma})$
+and $\widehat{\bar R}(\gamma)$ for its empirical version; averaging the
+$Z_{j,\gamma}$ over $j$ bounds
+$|\widehat{\bar R}(\gamma)-\bar R(\gamma)|$ by the same quantity for every
+$\gamma$ simultaneously, including at the data-dependent $\widehat w$,
+because the deviations are uniform over the ball. The selection chain
+$\bar R(\widehat\gamma)\le\widehat{\bar R}(\widehat\gamma)+Z\le
+\widehat{\bar R}(\gamma^\ast)+Z\le\bar R(\gamma^\ast)+2Z$ with
+$\gamma^\ast$ the aggregate oracle then gives the display, whose constant is
+$2Z$ in the factored form stated. \qed
+
 \subsection{Proof of Proposition~\ref{prop:secmom}}
 
 Since $\sum_m w_m=1$, the stack's normalized residual is

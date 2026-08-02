@@ -160,9 +160,19 @@ def matern_head(Ztr, Zva, Zte, err_fn, label):
                 best = (e, (scale, nug))
     scale, nug = best[1]
     n = len(Ftr)
-    K = m52(sqd(Ftr, Ftr), scale * med); K.flat[::n + 1] += nug * n
-    c = cho_factor(K, lower=True, check_finite=False, overwrite_a=True)
-    alpha = cho_solve(c, Ytr, check_finite=False)
+    # full-Gram refit under the box-wide lock: two concurrent full solves
+    # OOM-killed a task on the 31 GB box; one Gram factorization per box
+    lk = open(ROOT / ".gram.lock", "w")
+    import fcntl
+    fcntl.flock(lk, fcntl.LOCK_EX)
+    try:
+        K = m52(sqd(Ftr, Ftr), scale * med); K.flat[::n + 1] += nug * n
+        c = cho_factor(K, lower=True, check_finite=False, overwrite_a=True)
+        alpha = cho_solve(c, Ytr, check_finite=False)
+        del K
+    finally:
+        fcntl.flock(lk, fcntl.LOCK_UN)
+        lk.close()
     out = []
     for F_ in (Ftr, Fval, Fte):
         pred = np.empty((len(F_), Ytr.shape[1]))

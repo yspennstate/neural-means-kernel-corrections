@@ -31,21 +31,45 @@ Ytr = stress[tr].reshape(len(tr), -1).astype(np.float64)
 Yva = stress[va].reshape(len(va), -1).astype(np.float64)
 Yte = stress[te].reshape(len(te), -1).astype(np.float64)
 
-Ptr, Pva, Pte, names = [], [], [], []
+# validation predictions eagerly (small); train/test stay on disk and are
+# only read in row blocks -- all members in float64 at once is ~19 GB, which
+# the smaller boxes cannot hold
+names, Pva, tr_files, te_files = [], [], [], []
 for m in args.members.split(","):
     m = m.strip()
-    Ptr.append(np.load(RUNS / f"{m}_predtr.npy").astype(np.float64))
     Pva.append(np.load(RUNS / f"{m}_predva.npy").astype(np.float64))
-    Pte.append(np.load(RUNS / f"{m}_predte.npy").astype(np.float64))
+    tr_files.append(RUNS / f"{m}_predtr.npy")
+    te_files.append(RUNS / f"{m}_predte.npy")
     names.append(m)
 if args.krr and args.ntrain == 0:
-    Ptr.append(np.load(RUNS / "krr_oof_train.npy").astype(np.float64))
     Pva.append(np.load(RUNS / "krr_full_matern52_n19000_pred_val.npy").astype(np.float64))
-    Pte.append(np.load(RUNS / "krr_full_matern52_n19000_pred_test.npy").astype(np.float64))
+    tr_files.append(RUNS / "krr_oof_train.npy")
+    te_files.append(RUNS / "krr_full_matern52_n19000_pred_test.npy")
     names.append("krr")
 
-for m, pt in zip(names, Pte):
-    print(f"  member {m}: test {rel_l2(pt, Yte):.4f}  val {rel_l2(Pva[names.index(m)], Yva):.4f}", flush=True)
+
+def rel_l2_stream(path, Y, block=2000):
+    mp = np.load(path, mmap_mode="r")
+    acc = []
+    for k in range(0, len(Y), block):
+        P = np.asarray(mp[k:k+block], dtype=np.float64)
+        acc.append(np.linalg.norm(P - Y[k:k+block], axis=1)
+                   / np.linalg.norm(Y[k:k+block], axis=1))
+    return float(np.concatenate(acc).mean())
+
+
+def weighted_sum_stream(files, w, n, block=2000):
+    out = np.zeros((n, Yva.shape[1]), dtype=np.float64)
+    maps = [np.load(f, mmap_mode="r") for f in files]
+    for k in range(0, n, block):
+        for wm, mp in zip(w, maps):
+            out[k:k+block] += wm * np.asarray(mp[k:k+block], dtype=np.float64)
+    return out
+
+
+for m, tf in zip(names, te_files):
+    print(f"  member {m}: test {rel_l2_stream(tf, Yte):.4f}  "
+          f"val {rel_l2(Pva[names.index(m)], Yva):.4f}", flush=True)
 
 # convex stacking weights on val (projected gradient on the simplex via softmax)
 Pv = np.stack(Pva); Yv = Yva
@@ -69,10 +93,10 @@ for it in range(2000):
 _, w = stack_err(logit, Pv, Yv)
 print("stack weights:", {n: round(float(x), 3) for n, x in zip(names, w)}, flush=True)
 
-E_tr = np.einsum("m,mnd->nd", w, np.stack(Ptr))
+E_tr = weighted_sum_stream(tr_files, w, len(Ytr))
 E_va = np.einsum("m,mnd->nd", w, np.stack(Pva))
-E_te = np.einsum("m,mnd->nd", w, np.stack(Pte))
-report = dict(members={n: dict(test=rel_l2(pt, Yte)) for n, pt in zip(names, Pte)},
+E_te = weighted_sum_stream(te_files, w, len(Yte))
+report = dict(members={n: dict(test=rel_l2_stream(tf, Yte)) for n, tf in zip(names, te_files)},
               stack=dict(val=rel_l2(E_va, Yva), test=rel_l2(E_te, Yte)), weights=dict(zip(names, w.tolist())))
 print(f"STACK: val {report['stack']['val']:.4f}  test {report['stack']['test']:.4f}", flush=True)
 
@@ -121,7 +145,7 @@ final = "plus_corr" if report["plus_corr"]["val"] < report["stack"]["val"] else 
 report["final_stage"] = final
 report["final_test"] = report[final]["test"]
 np.save(RUNS / f"{args.tag}_pred_test.npy", (E2_te if final == "plus_corr" else E_te).astype(np.float32))
-np.save(RUNS / f"{args.tag}_members_te.npy", np.stack(Pte).astype(np.float32))
+# member test predictions already live in their own files; no stacked copy
 np.save(RUNS / f"{args.tag}_stack_tr.npy", E_tr.astype(np.float32))
 np.save(RUNS / f"{args.tag}_stack_va.npy", E_va.astype(np.float32))
 np.save(RUNS / f"{args.tag}_stack_te.npy", E_te.astype(np.float32))

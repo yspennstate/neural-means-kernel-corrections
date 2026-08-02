@@ -10,6 +10,7 @@ if its outputs already exist, so a killed task resumes where it stopped.
 Environment: NMKC_ROOT (campaign root), NMKC_SEED (int), TASK_ID,
 NMKC_THREADS (default 6). Writes <root>/results/<TASK_ID>.json at the end.
 """
+import contextlib
 import json, os, pathlib, subprocess, sys, time
 import fcntl
 import numpy as np
@@ -43,6 +44,20 @@ NAMES = dict(
     unet=f"unet_s{SEED}_w48_mir",
 )
 MEMBER_LIST = ",".join(NAMES[k] for k in ("mlp", "mlpMSE", "mlpR", "fno", "unet"))
+
+
+@contextlib.contextmanager
+def gram_lock():
+    """At most ONE full-Gram stage per box, ever. Two concurrent 19000^2
+    kernel solves OOM-killed a seed on the 31 GB box (rc=-9, 2026-08-02);
+    every stage that factorizes a full Gram matrix must hold this lock."""
+    lk = open(ROOT / ".gram.lock", "w")
+    fcntl.flock(lk, fcntl.LOCK_EX)
+    try:
+        yield
+    finally:
+        fcntl.flock(lk, fcntl.LOCK_UN)
+        lk.close()
 
 
 def prep_data_once():
@@ -82,10 +97,11 @@ def main():
     prep_data_once()
 
     # 1. exact KRR member (tuned grid, full 19000 solve) + out-of-fold fields
-    step([f"krr_full_matern52_n19000.json", "krr_full_matern52_n19000_pred_val.npy",
-          "krr_full_matern52_n19000_pred_test.npy"],
-         [PY, CODE / "train_krr.py", "--tag", "krr_full"], "krr")
-    step(["krr_oof_train.npy"], [PY, CODE / "krr_oof.py"], "krr_oof")
+    with gram_lock():
+        step([f"krr_full_matern52_n19000.json", "krr_full_matern52_n19000_pred_val.npy",
+              "krr_full_matern52_n19000_pred_test.npy"],
+             [PY, CODE / "train_krr.py", "--tag", "krr_full"], "krr")
+        step(["krr_oof_train.npy"], [PY, CODE / "krr_oof.py"], "krr_oof")
 
     # 2. neural members, configurations of the published table
     step([NAMES["mlp"] + ".json"],
@@ -113,13 +129,15 @@ def main():
     step(["hpix.json", "hpix_stack_te.npy"],
          [PY, CODE / "stack_perpixel.py", "--members", MEMBER_LIST, "--krr", 1,
           "--tag", "hpix"], "hpix")
-    step(["hpix_corr.json", "hpix_corr_pred_test.npy"],
-         [PY, CODE / "campaign" / "correct_stack.py", "--tag", "hpix"], "corr")
+    with gram_lock():
+        step(["hpix_corr.json", "hpix_corr_pred_test.npy"],
+             [PY, CODE / "campaign" / "correct_stack.py", "--tag", "hpix"], "corr")
 
     # 5. global convex stack + its own correction (the simplex-theorem chain)
-    step(["hstk.json"],
-         [PY, CODE / "stack_correct.py", "--members", MEMBER_LIST, "--krr", 1,
-          "--tag", "hstk"], "hstk")
+    with gram_lock():
+        step(["hstk.json"],
+             [PY, CODE / "stack_correct.py", "--members", MEMBER_LIST, "--krr", 1,
+              "--tag", "hstk"], "hstk")
 
     # 6. split-conformal UQ with a calibration set never used for any selection
     step(["hpix_uq.json"],

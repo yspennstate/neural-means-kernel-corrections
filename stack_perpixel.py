@@ -25,18 +25,22 @@ Ytr = stress[tr].reshape(len(tr), -1).astype(np.float64)
 Yva = stress[va].reshape(len(va), -1).astype(np.float64)
 Yte = stress[te].reshape(len(te), -1).astype(np.float64)
 
-names, Ptr, Pva, Pte = [], [], [], []
+# validation predictions are small and loaded eagerly; the train/test arrays
+# are memory-mapped and only ever touched in row blocks (six members in
+# float64 at once would need ~19 GB, more than the smaller boxes have)
+names, Pva = [], []
+tr_files, te_files = [], []
 for m in args.members.split(","):
     m = m.strip(); names.append(m)
-    Ptr.append(np.load(RUNS / f"{m}_predtr.npy").astype(np.float64))
     Pva.append(np.load(RUNS / f"{m}_predva.npy").astype(np.float64))
-    Pte.append(np.load(RUNS / f"{m}_predte.npy").astype(np.float64))
+    tr_files.append(RUNS / f"{m}_predtr.npy")
+    te_files.append(RUNS / f"{m}_predte.npy")
 if args.krr:
-    Ptr.append(np.load(RUNS / "krr_oof_train.npy").astype(np.float64))
     Pva.append(np.load(RUNS / "krr_full_matern52_n19000_pred_val.npy").astype(np.float64))
-    Pte.append(np.load(RUNS / "krr_full_matern52_n19000_pred_test.npy").astype(np.float64))
+    tr_files.append(RUNS / "krr_oof_train.npy")
+    te_files.append(RUNS / "krr_full_matern52_n19000_pred_test.npy")
     names.append("krr")
-Pva = np.stack(Pva); Pte = np.stack(Pte); Ptr = np.stack(Ptr)   # (M,n,D)
+Pva = np.stack(Pva)                                             # (M,n_val,D)
 M, nv, D = Pva.shape
 
 def fit_pixel_weights(P, Y, ridge):
@@ -52,6 +56,16 @@ def apply_pixel_weights(P, W):
     Mm, n, Dd = P.shape
     X = np.concatenate([P, np.ones((1, n, Dd))], 0)
     return np.einsum("dm,mnd->nd", W, X)
+
+def apply_pixel_weights_files(files, W, block=2000):
+    """Streamed apply: member predictions read from disk in row blocks."""
+    maps = [np.load(f, mmap_mode="r") for f in files]
+    n = maps[0].shape[0]
+    out = np.empty((n, D), dtype=np.float64)
+    for k in range(0, n, block):
+        P = np.stack([np.asarray(mp[k:k+block], dtype=np.float64) for mp in maps])
+        out[k:k+block] = apply_pixel_weights(P, W)
+    return out
 
 # the half-split is part of the pipeline's randomness; NMKC_PIPE_SEED varies it
 rng = np.random.default_rng(1 + 1000 * int(os.environ.get("NMKC_PIPE_SEED", "0")))
@@ -80,8 +94,8 @@ out = dict(kind="perpixel", members=names, holdout_pix=err_pix_B,
            holdout_glob=err_glob_B, used=bool(use_pix), ridge=args.ridge)
 if use_pix:
     W = fit_pixel_weights(Pva, Yva, args.ridge)
-    E_te = apply_pixel_weights(Pte, W)
-    E_tr = apply_pixel_weights(Ptr, W)
+    E_te = apply_pixel_weights_files(te_files, W)
+    E_tr = apply_pixel_weights_files(tr_files, W)
     E_va = apply_pixel_weights(Pva, W)
     out["test"] = rel_l2(E_te, Yte)
     print(f"per-pixel stack test: {out['test']:.4f}", flush=True)

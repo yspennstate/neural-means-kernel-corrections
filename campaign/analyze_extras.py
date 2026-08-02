@@ -169,6 +169,30 @@ elif name.startswith("sm_"):
     per = np.load(SD / "per_sample_errors.npz")
     out["tails"] = dict(stack=quantiles(per["stack"]), corr=quantiles(per["corr"]),
                         exceed_corr=exceedance(per["corr"], np.geomspace(0.01, 0.5, 25)))
+
+    def floor_bracket(residuals_test, stack_weights):
+        """cor:floor / cor:floorpinch on the measured S-matrix, in ebar^2
+        units (scale-invariant, so the flattened-residual normalization drops
+        out). The realized point is the fitted convex stack's w'Sw."""
+        names_ = list(residuals_test.keys())
+        M_ = len(names_)
+        S = np.empty((M_, M_))
+        for i, a in enumerate(names_):
+            for j2, b2 in enumerate(names_):
+                S[i, j2] = float((residuals_test[a] * residuals_test[b2]).mean())
+        ebar2 = float(np.diag(S).min())
+        offd = S[~np.eye(M_, dtype=bool)] / ebar2
+        s_off_lo, s_off_hi = float(offd.min()), float(offd.max())
+        s_diag_hi = float(np.diag(S).max() / ebar2)
+        lower = s_off_lo
+        upper = s_off_lo + (s_off_hi - s_off_lo) + (s_diag_hi - s_off_hi) / M_
+        w = np.array([stack_weights.get(n_, 0.0) for n_ in names_])
+        realized = float(w @ S @ w / ebar2) if w.sum() > 0 else None
+        return dict(members=names_, bracket_units="ebar2",
+                    bracket=[round(lower, 5), round(upper, 5)],
+                    realized_convex_stack=None if realized is None else round(realized, 5),
+                    inside=None if realized is None else
+                    bool(lower - 1e-9 <= realized <= upper + 1e-9))
     runs = SD / "runs"
     hj = json.load(open(runs / "hpix.json"))
     members = hj["members"]
@@ -192,6 +216,24 @@ elif name.startswith("sm_"):
         errs["val"][m] = float(np.sqrt((rv ** 2).sum(1)).mean())
         errs["test"][m] = float(np.sqrt((rt ** 2).sum(1)).mean())
     out["secmom"] = secmom_scoreboard(resid, errs)
+    hstk = json.load(open(runs / "hstk.json"))
+    out["floor_bracket"] = floor_bracket(resid["test"],
+                                         hstk["report"].get("weights", {}))
+    # certificate constant W: refit the per-pixel ridge on the validation
+    # members (deterministic given saved arrays) and record the weight norms
+    Pv = np.stack([(np.load(runs / (f"{m}_predva.npy" if m != "krr" else
+                    "krr_full_matern52_n19000_pred_val.npy"))).astype(np.float64)
+                   for m in members])
+    Xa = np.concatenate([Pv, np.ones((1,) + Pv.shape[1:])], 0)
+    Gm = np.einsum("mnd,knd->dmk", Xa, Xa) / Pv.shape[1]
+    bv = np.einsum("mnd,nd->dm", Xa, Yva) / Pv.shape[1]
+    Gm += 1e-3 * np.eye(len(members) + 1)[None]
+    Wd = np.linalg.solve(Gm, bv[..., None])[..., 0]
+    wn = np.linalg.norm(Wd, axis=1)
+    out["certificate_constants"] = dict(
+        W_max=float(wn.max()), W_median=float(np.median(wn)),
+        b=float(max(np.abs(Yva).max(), max(float(np.abs(p).max()) for p in Pv))),
+        note="kappa (correction weight l1 norm) computed in the collection wave")
 else:
     raise SystemExit(f"unrecognized seed dir kind: {name}")
 

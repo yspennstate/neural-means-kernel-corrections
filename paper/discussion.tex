@@ -4,8 +4,9 @@ means trained on the reported metric and averaged over the reflection
 symmetry do most of the work; stacking members from different architecture
 families adds exactly what their measured residual correlations permit, about
 a tenth of a point here; the kernel corrections contribute a few hundredths
-more and, with them, the certificate of Theorem~\ref{thm:or} and the
-calibrated band of Proposition~\ref{prop:conf}. We did not find evidence that
+more and, with them, the certificate of Theorem~\ref{thm:or}, the end-to-end
+guarantee of Corollary~\ref{cor:certificate}, and the calibrated band of
+Proposition~\ref{prop:conf}. We did not find evidence that
 any published architecture was mis-tuned by its authors; the components
 compose, and the composition had not been tried on this benchmark. What stops
 further movement is not a missing architecture. Section~\ref{sec:diversity}
@@ -44,16 +45,14 @@ extremely effective once the input is presented in its physical
 parametrization and the target has been reduced to something smooth. Here the
 reduction is performed by the neural ensemble rather than by physics, and the
 kernel-flow loss itself admits the leave-half-out reading of
-Proposition~\ref{prop:kf}. The OCO-2 setting is also the natural next test
-bed for the residual coupling studied here. Its training pairs are
-simulator-generated state-to-radiance maps of exactly the shape this paper
-exploits, a low-dimensional physical state mapped to a smooth
-high-dimensional output, the mission's Level 1 and Level 2 products are
-publicly distributed through NASA's Earthdata archive, and the emulation
-setup of \citet{susiluoto2025radiative} specifies the state parametrization
-and sampling design, so a neural mean with a validated kernel correction and
-a conformal wrapper can be evaluated there against the pure-kernel emulator
-without new data collection.
+Proposition~\ref{prop:kf}. Section~\ref{sec:oco2} carries out the comparison
+against that emulator on its own test points; the step this paper does not
+take is the retrieval-level one. The mission's Level 1 and Level 2 products
+are publicly distributed through NASA's Earthdata archive, and evaluating how
+the surrogate's certified bands and fallback behavior propagate through an
+actual retrieval, rather than through the emulation metrics alone, is the
+natural continuation and requires the estimation machinery of the retrieval
+pipeline rather than new data collection.
 
 \paragraph{Limitations.}
 The benchmark has a one-dimensional input function and a fixed geometry; the
@@ -82,10 +81,11 @@ features, and the pipeline's job becomes metric management, training each
 member in the metric it will be scored in and combining per coordinate. In
 both regimes the same two measurements decide everything in advance: the
 pairwise residual correlations, which set the ensembling floor of
-Corollary~\ref{cor:floor} at whatever level the members share their errors,
-and the member error ratio, which the second-moment identity turns into a
-keep-or-drop verdict for each candidate. Nothing in that protocol is
-specific to these two datasets.
+Corollary~\ref{cor:floor} at whatever level the members share their errors
+and, through Corollary~\ref{cor:floorpinch}, bracket how close the fitted
+ensemble must come to it, and the member error ratio, which the
+second-moment identity turns into a keep-or-drop verdict for each candidate.
+Nothing in that protocol is specific to these two datasets.
 
 \paragraph{Outlook.}
 Three directions seem worth pursuing. First, the benchmark itself:

@@ -62,9 +62,13 @@ prep_data.py      one-time extraction from the distributed arrays
 train_*.py        the neural means (MLP, MSE variant, refiner, FNO, UNet, transformer)
 train_krr.py      the kernel baseline; krr_oof.py its out-of-fold fields
 gen_preds.py      member predictions with reflection averaging
-stack_correct.py  stacking and the residual kernel correction
+stack_correct.py  global stacking and the residual kernel correction
+stack_perpixel.py the per-pixel affine stack (the reported pipeline)
 jpl_data.py       OCO-2: data, metrics, the kernel-flow reference
 jpl_pipeline.py   OCO-2: the full comparison, one command per band
+climsim_scaling.py  the ClimSim data-scaling sweep
+campaign/         the seed campaign: per-seed pipelines, matched kernel
+                  tuning, conformal calibration, verification suite, analyses
 analyze_corr.py / ensemble_theory.py / ensemble_uq.py / uq_spectra.py
                   the diversity, stacking-identity and uncertainty analyses
 figures.py / fig_corr.py / freeze.py
@@ -77,8 +81,12 @@ docs/reproduce.md every number, with its exact command and hyperparameters
 
 None of the datasets is redistributed here. Structural mechanics and
 advection come from the Caltech record `data.caltech.edu/records/20091`; the
-OCO-2 files come from the OSF project `osf.io/u2t8a` (JLD2 read with h5py).
-`docs/reproduce.md` lists sizes, splits and where each file goes.
+OCO-2 files come from the OSF project `osf.io/u2t8a` (JLD2 read with h5py);
+the ClimSim arrays are the LEAP subsampled low-resolution set
+(`huggingface.co/datasets/LEAP/subsampled_low_res`, the four files
+`{train,val}_{input,target}.npy`; `campaign/get_climsim.sh` downloads and
+shape-checks them). `docs/reproduce.md` lists sizes, splits and where each
+file goes.
 
 ## Requirements
 

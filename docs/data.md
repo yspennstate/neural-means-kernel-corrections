@@ -70,3 +70,14 @@ emulation experiments beyond the OSF extract.
 
 Once the data is in place, `docs/reproduce.md` gives the exact command and
 hyperparameters for every number in the paper.
+
+## ClimSim (data-scaling study)
+
+The scaling experiment of the paper uses the LEAP subsampled low-resolution
+ClimSim arrays: `train_input.npy` (10,091,520 x 124), `train_target.npy`
+(10,091,520 x 128), `val_input.npy` (1,441,920 x 124) and `val_target.npy`
+(1,441,920 x 128), all float32 and pre-normalized, from
+`huggingface.co/datasets/LEAP/subsampled_low_res`.
+`campaign/get_climsim.sh` downloads the four files and verifies their shapes;
+`campaign/climsim_seeded.py` runs one (n, seed) scaling point with kernel
+hyperparameters selected on a held-out block of the training pool.

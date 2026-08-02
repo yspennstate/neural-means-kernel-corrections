@@ -226,6 +226,29 @@ squared relative error. Finally
 $\mathbb E\|\rho\|_2\le(\mathbb E\|\rho\|_2^2)^{1/2}$ is Jensen's
 inequality. \qed
 
+\subsection{Proof of Proposition~\ref{prop:selectcoord}}
+
+Fix a coordinate $j$ and a member $m$. The validation scores
+$a(\tilde u_i)(f_m(\tilde u_i)_j-G(\tilde u_i)_j)^2$, $i\le m_v$, are i.i.d.,
+take values in $[0,L]$ by assumption, and have mean $R_j(m)$; the members and
+the weight are fixed relative to the validation sample. Hoeffding's
+inequality gives
+\[
+\Pr\Big(\big|\widehat R_j(m)-R_j(m)\big|\ge t\Big)\;\le\;
+2\exp\!\big(-2m_v t^2/L^2\big)
+\]
+for each of the $Mq$ pairs $(m,j)$. With
+$t=L\sqrt{\log(2Mq/\delta)/(2m_v)}$ and a union bound, all $Mq$ deviations
+are below $t$ simultaneously with probability at least $1-\delta$. On that
+event, for every $j$, writing $m^\ast(j)$ for a population minimizer,
+\[
+R_j\big(\widehat m(j)\big)\le\widehat R_j\big(\widehat m(j)\big)+t
+\le\widehat R_j\big(m^\ast(j)\big)+t\le R_j\big(m^\ast(j)\big)+2t .
+\]
+The metric statement follows by multiplying the coordinate-wise inequality
+by $w_j^2\ge0$ and summing; the selection $\widehat m(\cdot)$ does not
+depend on $w$, so one event serves every diagonal metric. \qed
+
 \subsection{Proof of Proposition~\ref{prop:pullback}}
 
 Let $T:\mathcal H_k\to\mathbb R^{\mathcal X}$ be the composition map
@@ -245,35 +268,105 @@ $k_\varphi$ replaces $\|G\|$ by $\|h\|_{\mathcal H_k}$. \qed
 
 \subsection{Proof of Proposition~\ref{prop:aniso}}
 
-Both displays are the native-space estimate for kernel ridge regression: for a
-Mat\'ern kernel of smoothness $s$ on a bounded domain, with the nugget chosen
-as in the pipeline, an estimator $\widehat G_n$ of a target $F$ in the native
-space obeys $\mathbb E\|F-\widehat G_n\|\le C\,h_X^{\,s}\,\|F\|_{\mathcal N}$,
-with $h_X$ the fill distance of the design in the kernel's metric
-\citep{wendland2004scattered}, and for $n$ samples from a density bounded
-above and below on a set of effective dimension $d'$, quasi-uniformity gives
-$h_X\asymp(\log n/n)^{1/d'}$ with high probability, which we write as
-$n^{-1/d'}$ up to the logarithmic factor absorbed into the statement.
+The argument has five steps: a pointwise error bound whose design dependence
+is the power function; a fill-distance bound for random designs; an upper
+bound on the warped target's native norm; the two substitutions; and the
+reduction from the validated nugget to the interpolation scale. Throughout,
+$k$ is a Mat\'ern kernel of smoothness $s$ whose native space on a bounded
+Lipschitz domain $\Omega\subset\mathbb R^{d'}$ is norm-equivalent to
+$H^{s+d'/2}(\Omega)$ \citep[Ch.~10]{wendland2004scattered}; we follow the
+convention of the statement and write $s$ for the resulting approximation
+order.
 
-For the isotropic kernel the metric is Euclidean on the full $d$-dimensional
-domain, so $h_X\asymp n^{-1/d}$; the target is $F=g(A\,\cdot)$, whose Mat\'ern
-native norm is equivalent to its $H^{s}$ norm. Changing variables $y=Au$ gives
-$\|g(A\cdot)\|_{H^{s}}\asymp|\det A|^{-1/2}\,\sigma_1^{\,s}$, since each
-derivative of order up to $s$ brings down at most a factor $\sigma_1$ and the
-Jacobian contributes $|\det A|^{-1/2}$ in $L^2$; the $|\det A|^{-1/2}$ is one
-of the singular-value constants absorbed into the statement, leaving the
-displayed $\sigma_1^{\,s}$. For the adapted kernel $k_A(u,u')=k(Au,Au')$ the
-estimator is the isotropic estimator of the unit-norm $g$ on the design
-$\{Au_i\}$. Here the approximate-rank hypothesis enters: the design
-$A\,\mathcal U$ has extent $\sigma_{r+1}\lesssim n^{-1/r}$ in each of the
-trailing $d-r$ directions, below the fill distance those directions would
-otherwise demand, so at resolution $n^{-1/r}$ the design is $r$-dimensional and
-its fill distance is $h_X\asymp n^{-1/r}$ (a further $(\prod_{i\le r}\sigma_i)$
-constant, again absorbed). Substituting the two fill distances into the
-native-space estimate and dividing gives the ratio. If instead $A$ is close to
-full rank, $\sigma_{r+1}$ is not below $n^{-1/r}$, the trailing directions are
-resolved, and the adapted fill distance is $n^{-1/d}$ like the isotropic one:
-the rates coincide and only $\sigma_1^{\,s}$ separates the bounds. \qed
+\emph{Step 1: pointwise bound through the power function.} For any target
+$F$ with components in the native space and the interpolant $\widehat F_0$ on
+the design $X$, the argument that proves Theorem~\ref{thm:or} (with
+$\lambda=0$ and $m=0$) gives, for every $u$,
+\[
+\|F(u)-\widehat F_0(u)\|_2\;\le\;\|F\|_K\,P_0(u),
+\]
+and the classical zeros lemma for functions with many zeros on a dense set
+converts the power function into the fill distance
+$h_X=\sup_{u\in\Omega}\min_i\|u-u_i\|$:
+$\sup_u P_0(u)\le C\,h_X^{\,s}$ for $h_X$ below a domain constant
+\citep[Ch.~11]{wendland2004scattered}. Hence
+$\sup_u\|F(u)-\widehat F_0(u)\|_2\le C\,h_X^{\,s}\,\|F\|_K$.
+
+\emph{Step 2: fill distance of an i.i.d.\ design.} Let $u_1,\dots,u_n$ be
+i.i.d.\ from a density bounded below by $p_->0$ on $\Omega$. Fix
+$\delta>0$ and a $\delta/2$-net of $\Omega$ of cardinality
+$N(\delta)\le C_\Omega\,\delta^{-d'}$. A net ball of radius $\delta/2$ has
+$\mu$-mass at least $c\,p_-\delta^{d'}$, so the probability that some net
+ball receives no sample is at most
+$C_\Omega\,\delta^{-d'}(1-c\,p_-\delta^{d'})^n
+\le C_\Omega\,\delta^{-d'}e^{-c\,p_-\,n\delta^{d'}}$.
+Choosing $\delta^{d'}=(2/(c\,p_-))\,(\log n)/n$ makes this at most
+$C'\,n^{-1}$, and on the complement every point of $\Omega$ lies within
+$\delta$ of a sample: with probability at least $1-C'/n$,
+\[
+h_X\;\le\;C''\,\Big(\frac{\log n}{n}\Big)^{1/d'} .
+\]
+This is the high-probability statement in the proposition; the logarithm is
+absorbed into the logarithmic factors there.
+
+\emph{Step 3: the warped target's norm, from above.} Let $F=g(A\,\cdot)$
+with $\|g\|_{H^{s}}=1$ (native norm of the isotropic kernel in the image
+variables). For integer $m$, the chain rule gives, for any multi-index
+$\alpha$ with $|\alpha|=m$,
+$D^\alpha\{g(Au)\}=\sum_{|\beta|=m}c_{\alpha\beta}(A)\,(D^\beta g)(Au)$ with
+$\sum_\beta|c_{\alpha\beta}(A)|\le\|A\|^m=\sigma_1^m$, so by the change of
+variables $y=Au$ (Jacobian $|\det A|$),
+\[
+\|D^\alpha\{g(A\cdot)\}\|_{L^2(\mathcal U)}\;\le\;\sigma_1^{\,m}\,
+|\det A|^{-1/2}\,\|g\|_{H^m(A\,\mathcal U)} .
+\]
+Summing over $|\alpha|\le m$ bounds $\|g(A\cdot)\|_{H^m}$ by
+$C\,\sigma_1^{\,m}|\det A|^{-1/2}\|g\|_{H^m}$ for integer $m$, and the
+fractional case follows by interpolation between consecutive integers
+\citep[Ch.~7]{adams2003sobolev}. Only this upper bound is used; the
+$|\det A|^{-1/2}$ and the domain constants are among the singular-value
+constants absorbed into the statement, leaving the displayed
+$\sigma_1^{\,s}$.
+
+\emph{Step 4: the two designs.} For the isotropic kernel on the raw input the
+domain has dimension $d'=d$, so Steps 1--3 give the first display:
+$C\,h_X^{\,s}\,\sigma_1^{\,s}\lesssim\sigma_1^{\,s}n^{-s/d}$ up to logarithms.
+For the adapted kernel $k_A(u,u')=k(Au,Au')$, interpolating $F$ at $\{u_i\}$
+is interpolating $g$ at the image design $\{Au_i\}$, and $\|F\|_{K_A}=
+\|g\|_K\le 1$ by the pullback identity (Proposition~\ref{prop:pullback}). The
+image measure has a density bounded above and below on its support by the
+idealization of the statement. Split $A=A_r+A_\perp$ along the leading-$r$
+right singular subspace. The projected points $\Pi_r Au_i$ are i.i.d.\ on an
+$r$-dimensional bounded set, so Step 2 (with $d'=r$) puts every projected
+image point within $C(\log n/n)^{1/r}$ of a projected sample; and for every
+$u$ in the domain, $\|Au-\Pi_rAu\|\le\sigma_{r+1}\,\mathrm{diam}(\mathcal U)$.
+The triangle inequality then bounds the image fill distance by
+$C(\log n/n)^{1/r}+2\sigma_{r+1}\,\mathrm{diam}(\mathcal U)$, and the
+approximate-rank hypothesis $\sigma_{r+1}\lesssim n^{-1/r}$ makes the second
+term of the same order as the first. Steps 1 and 3 with $d'=r$ and
+$\|g\|_K\le1$ give the second display. If instead $\sigma_{r+1}$ is not below
+$n^{-1/r}$, the trailing directions are resolved by the design, the image
+fill distance is that of a $d$-dimensional set, and the two rates coincide;
+only the constant $\sigma_1^{\,s}$ separates the bounds, as claimed.
+
+\emph{Step 5: from the interpolant to the validated ridge estimator.} The
+pipeline fits with a nugget from a grid containing values down to $10^{-8}n$
+and selects on validation. For any fixed $\lambda$ the pathwise bound of
+Theorem~\ref{thm:or} controls the ridge estimator by
+$\|F\|_K\,\sup_uP_\lambda(u)$, and a two-line spectral computation compares
+the regularized power function with the interpolation one: with
+$\kappa=k(X,u)$ and $A_\lambda=K+n\lambda I$,
+\[
+P_\lambda(u)^2-P_0(u)^2=\kappa^\top\big(K^{-1}-A_\lambda^{-1}\big)\kappa
+=n\lambda\,\kappa^\top K^{-1}A_\lambda^{-1}\kappa\;\le\;
+\frac{n\lambda\,\|\kappa\|_2^2}{\lambda_{\min}(K)\,
+\big(\lambda_{\min}(K)+n\lambda\big)},
+\]
+which vanishes as $\lambda\to0$. Validation selection over the grid can only
+improve on its smallest-nugget arm up to the selection cost priced by
+Lemma~\ref{lem:select}, which is of lower order than the rates displayed.
+Both displays are upper bounds under the stated idealization, and no matching
+lower bound is claimed. \qed
 
 \subsection{Proof of Theorem~\ref{thm:or}}
 

@@ -294,6 +294,35 @@ near $0.93$ across the pipelines of this paper.
 The experiments run the combination both ways, unweighted and with the
 per-sample weights of the corollary, and report both.
 
+Proposition~\ref{prop:percoord} and its corollary describe the population
+optimum; the pipeline computes an empirical selection, coordinate by
+coordinate, on the validation split. The finite-sample cost of that step is
+priced by the same argument that priced the stacks.
+
+\begin{proposition}[empirical per-coordinate selection]\label{prop:selectcoord}
+Let $f_1,\dots,f_M$ be fixed maps, $a:\mathcal U\to[0,A]$ a bounded
+per-sample weight, and suppose $a(u)\,(f_m(u)_j-G(u)_j)^2\le L$ for
+$\mu$-a.e.\ $u$, every member $m$ and coordinate $j$. On a validation sample
+of size $m_v$ independent of the members, let $\widehat m(j)$ minimize the
+empirical weighted risk of coordinate $j$ over the $M$ members, and let the
+combination take coordinate $j$ from member $\widehat m(j)$. Then, with
+probability at least $1-\delta$, simultaneously for every coordinate,
+\[
+R_j\big(\widehat m(j)\big)\;\le\;\min_{m\le M}R_j(m)\;+\;
+2L\sqrt{\frac{\log(2Mq/\delta)}{2m_v}},
+\qquad R_j(m)=\mathbb E\big[a(u)\big(f_m(u)_j-G(u)_j\big)^2\big],
+\]
+and consequently, for every diagonal metric $w$ at once,
+$\sum_j w_j^2 R_j(\widehat m(j))\le\sum_j w_j^2\min_m R_j(m)
++2L\big(\sum_j w_j^2\big)\sqrt{\log(2Mq/\delta)/(2m_v)}$.
+\end{proposition}
+
+On the OCO-2 bands the deployed combination is exactly this estimator
+($M=6$ members, $q=40$ coordinates, $m_v=2000$), in the unweighted form and,
+for the squared relative error, with $a(u)=\|G(u)\|_2^{-2}$; the proposition
+prices both at the same rate, and the selection cost it bounds is what the
+seed experiments measure directly.
+
 The corollary is the quantity this paper keeps measuring, at two different
 levels. Across architecture families on the structural-mechanics benchmark
 the pairwise correlations exceed $0.86$ at member errors near $4.7\%$, a

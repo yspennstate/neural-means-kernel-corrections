@@ -1,0 +1,32 @@
+Every result stated in Section~\ref{sec:theory} is checked numerically, and
+the checks are released with the code. They come in two kinds. The first kind
+builds a synthetic object whose ground truth is known exactly and tests the
+stated inequality or identity on it: the certified bound of
+Theorem~\ref{thm:or} is evaluated on a residual constructed inside the native
+space with exactly known norm, at several nuggets, where any pointwise
+violation beyond numerical precision would falsify the statement; the
+leave-half-out identity and unbiasedness of Proposition~\ref{prop:kf} are
+checked by direct enumeration and Monte Carlo; the effective-dimension
+identity of Lemma~\ref{lem:deff} is checked to machine precision and the
+closed form of Corollary~\ref{cor:mp} against the empirical spectrum of an
+i.i.d.-entry Gram matrix; and the rate mechanism of
+Proposition~\ref{prop:aniso} is exercised on a controlled warped target
+$G=g(A\,\cdot)$ with a known singular-value profile, where the adapted metric
+must dominate at every sample size and improve the empirical rate. The second
+kind evaluates the statements whose subject is the pipeline itself on the
+pipeline's own released artifacts, once per seed: the symmetrization
+inequality of Proposition~\ref{prop:sym} on every trained member (reflection
+averaging must not increase test error); the second-moment identity of
+Proposition~\ref{prop:secmom} on the measured residual matrix; the bracket of
+Corollaries~\ref{cor:floor} and~\ref{cor:floorpinch} against the realized
+convex stack; the selection conditions of
+Propositions~\ref{prop:percoord}, \ref{prop:selectcoord}
+and~\ref{prop:affine} against the realized selections, with the measured
+constants $b$, $W$ and $\kappa$ of Corollary~\ref{cor:certificate} and the
+certificate evaluated next to the realized excess; the prospective
+scoreboard of the two-member rule of Proposition~\ref{prop:secmom}(i) across
+all member pairs, seeds and problems; and the coverage of
+Proposition~\ref{prop:conf} across seeds, which must land inside the
+finite-sample band $[1-\alpha,\,1-\alpha+1/(m+1)]$ up to binomial
+fluctuation. The synthetic checks report pass or fail against explicit
+tolerances; the artifact checks report the measured quantities themselves.

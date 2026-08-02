@@ -134,14 +134,20 @@ def m52(D2, ls):
     return (1 + a + (5.0 / 3.0) * (D2 / ls ** 2)) * np.exp(-a)
 
 
-def matern_head(Ztr, Zva, Zte, err_fn, label):
+def matern_head(Ztr, Zva, Zte, err_fn, label, w=None):
     """Exact Matern-5/2 kernel ridge, the single protocol used everywhere:
     inputs standardized by train moments, scale grid {0.5,1,2,4} x median
     pairwise distance (6000-point estimate), nugget grid {1e-8,1e-6,1e-4},
     tuned on validation by err_fn over a 6000-sample training subsample,
-    winner refit on the full training set."""
+    winner refit on the full training set. A diagonal metric w is applied
+    AFTER standardization: standardization divides by the per-dimension std,
+    so any pre-scaling of the inputs cancels exactly and reproduces the
+    isotropic row digit for digit (verified live, 2026-08-02). Never pass a
+    metric by rescaling the inputs of this function."""
     mu, sd = Ztr.mean(0), Ztr.std(0) + 1e-9
     Ftr, Fval, Fte = (Ztr - mu) / sd, (Zva - mu) / sd, (Zte - mu) / sd
+    if w is not None:
+        Ftr, Fval, Fte = Ftr * w, Fval * w, Fte * w
     rng = np.random.default_rng(args.seed)
     sub = rng.choice(len(Ftr), min(6000, len(Ftr)), replace=False)
     med = np.sqrt(np.median(sqd(Ftr[sub], Ftr[sub])[np.triu_indices(len(sub), 1)]))
@@ -195,11 +201,16 @@ raw, h = matern_head(Xtr, Xval, Xte, lambda Pv: rel(Pv, Yval), "kernel_raw")
 results["kernel_raw"] = dict(reduced=rel(raw[2], Yte), radiance=rad(raw[2], Yte))
 hyper["kernel_raw"] = h
 val_preds["kernel_raw"], te_preds["kernel_raw"] = raw[1], raw[2]
-A_ls, *_ = np.linalg.lstsq(Xtr, Ytr, rcond=None)
+# relevance of the standardized coordinates, applied inside the head after
+# its standardization; equals the published ladder's raw-coordinate metric
+# (the ladder's head does not standardize, so it could scale raw inputs)
+Xs = (Xtr - Xtr.mean(0)) / (Xtr.std(0) + 1e-9)
+A_ls, *_ = np.linalg.lstsq(Xs, Ytr, rcond=None)
 relevance = np.linalg.norm(A_ls, axis=1)
-scale_ard = relevance / relevance.mean()
-ard, h = matern_head(Xtr * scale_ard, Xval * scale_ard, Xte * scale_ard,
-                     lambda Pv: rel(Pv, Yval), "kernel_ard")
+w_ard = relevance / relevance.mean()
+ard, h = matern_head(Xtr, Xval, Xte, lambda Pv: rel(Pv, Yval), "kernel_ard",
+                     w=w_ard)
+h["w"] = [round(float(x), 5) for x in w_ard]
 results["kernel_ard"] = dict(reduced=rel(ard[2], Yte), radiance=rad(ard[2], Yte))
 hyper["kernel_ard"] = h
 val_preds["kernel_ard"], te_preds["kernel_ard"] = ard[1], ard[2]

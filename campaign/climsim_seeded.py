@@ -1,6 +1,6 @@
 """ClimSim scaling point, leakage-free and seeded: one (n, seed) per run.
 
-Fixes versus climsim_scaling.py, responding to review: kernel hyperparameters
+Differences from climsim_scaling.py: kernel hyperparameters
 (scale and nugget) are selected on a 2000-sample validation block drawn from
 the training pool immediately after the training slice -- the test set is
 touched exactly once, for the final numbers. The grid is the same one the rest

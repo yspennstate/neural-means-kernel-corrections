@@ -1,6 +1,6 @@
 """OCO-2 pipeline at one campaign seed, with matched kernel tuning throughout.
 
-Differences from jpl_pipeline.py, all responding to review:
+Differences from jpl_pipeline.py:
   - every stochastic choice is seeded by --seed: the train/validation split,
     network initialization and batch order, and the kernel tuning subsample;
   - a third network is trained in the exact radiance-relative metric (the loss
@@ -264,7 +264,7 @@ ci = lambda a: [float(np.percentile(a, 2.5)), float(np.percentile(a, 97.5))]
 boot = {}
 for name, (er, ea) in per.items():
     boot[name] = dict(reduced=ci(er[bidx].mean(1)), radiance=ci(ea[bidx].mean(1)))
-# paired contrasts the review asked about
+# paired contrasts behind the claims in the text
 boot["dkr_flat_minus_mean_flat"] = dict(
     reduced=ci(per["dkr_flat"][0][bidx].mean(1) - per["mean_flat"][0][bidx].mean(1)))
 boot["combined_minus_kernel_flow"] = dict(

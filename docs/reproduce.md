@@ -30,7 +30,7 @@ Pipeline: `gen_preds.py --run <member>` writes train/val/test predictions with
 reflection averaging; `stack_correct.py --members <list> --krr 1` fits a global
 convex stack and the residual kernel correction (reaching about 4.65%), and
 `stack_perpixel.py --members <list> --krr 1 --tag hpix` fits the final
-per-pixel affine stack that reaches the headline number. The final surrogate uses
+per-pixel affine stack that reaches the reported number. The final surrogate uses
 per-coordinate affine stacking (ridge 1e-3, fit on half the validation split
 and accepted only because it beat global convex weights on the other half)
 followed by the Matern correction of the stacked residual (scale grid

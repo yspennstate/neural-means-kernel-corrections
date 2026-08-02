@@ -7,6 +7,8 @@ ROOT="${NMKC_ROOT:-/srv/aiwork/nmkc10seed}"
 TASK_ID="${TASK_ID:-climsim_dl}"
 DST="$ROOT/climsim"
 mkdir -p "$DST"
+# the shape check needs numpy; prefer the campaign interpreter when present
+if [ -s "$ROOT/PYBIN" ]; then PY3=$(cat "$ROOT/PYBIN"); else PY3=python3; fi
 DSID="LEAP/subsampled_low_res"
 API="https://huggingface.co/api/datasets/$DSID"
 
@@ -53,7 +55,7 @@ for f in $need; do
   mv "$DST/$f.part" "$DST/$f"
 done
 
-python3 - "$DST" <<'EOF'
+"$PY3" - "$DST" <<'EOF'
 import sys, numpy as np, pathlib
 d = pathlib.Path(sys.argv[1])
 shapes = {}
@@ -74,7 +76,7 @@ if [ $rc -ne 0 ]; then
 fi
 
 mkdir -p "$ROOT/results"
-python3 - "$ROOT/results/$TASK_ID.json" "$TASK_ID" "$DST" <<'EOF'
+"$PY3" - "$ROOT/results/$TASK_ID.json" "$TASK_ID" "$DST" <<'EOF'
 import json, sys, pathlib, os
 out, task_id, dst = sys.argv[1], sys.argv[2], pathlib.Path(sys.argv[3])
 files = {f.name: f.stat().st_size for f in dst.glob("*.npy")}

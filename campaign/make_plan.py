@@ -58,6 +58,14 @@ for band in OCO:
              dict(NMKC_JPL_DATA=str(ROOT / "data" / "jpl_oco2")),
              threads=5, timeout_hours=8)
 
+if args.host == "box2":
+    emit("a4_krr_multiscale_ld",
+         [PYBIN, f"{CODE}/campaign/krr_multiscale_lowdata.py"], {},
+         threads=5, timeout_hours=4)
+    for s in range(10):
+        emit(f"a4_ld_s{s}", [PYBIN, f"{CODE}/campaign/seed_pipeline_lowdata.py"],
+             dict(NMKC_SEED=str(s)), threads=5, timeout_hours=6)
+
 if args.host == "box3":
     emit("a0_climsim_dl", ["bash", f"{CODE}/campaign/get_climsim.sh"], {},
          threads=1, timeout_hours=6)

@@ -1,6 +1,10 @@
-All experiments ran on a single laptop (one NVIDIA RTX~PRO~2000, 8~GB; 16 CPU
-cores, 64~GB RAM), in single precision for network training and double
-precision for all kernel solves and error computations. The dataset is the
+The pipeline was developed on a single laptop (one NVIDIA RTX~PRO~2000, 8~GB;
+16 CPU cores, 64~GB RAM); every number reported in this paper was then
+recomputed from scratch on CPU-only cloud instances under the seed protocol
+below, in single precision for network training and double precision for all
+kernel solves and error computations. The one exception is stated where it
+occurs: the ClimSim mean of Section~\ref{sec:scaling} trains on a GPU when
+one is present, and the released runs record which device produced them. The dataset is the
 distributed \texttt{StructuralMechanics} file pair (40000 samples); inputs are
 reduced to $\mathbb R^{41}$ after verifying the broadcast structure exactly.
 Splits: the training block is samples 1--20000, the test set is samples
@@ -14,7 +18,7 @@ configuration is evaluated on it once, after selection on validation.
 pointwise linear skips and GELU, lift from 3 channels (broadcast load, two
 coordinates), projection $64\to128\to1$. AdamW, learning rate
 $1.5\times10^{-3}$ ($2\times10^{-3}$ with batch 256), weight decay $10^{-6}$,
-cosine schedule to $10^{-6}$, 300 epochs, batch 256. 6.45M parameters.
+cosine schedule to $10^{-6}$, 200 epochs, batch 256. 6.45M parameters.
 
 \paragraph{Transformer (implemented, not in the reported ensemble).} Encoder:
 41 tokens (load value and 10 sine/cosine pairs of the coordinate), 5 pre-norm
@@ -59,10 +63,21 @@ the loss; targets standardized by the per-pixel training mean and global
 standard deviation), except for the MSE variant above. Reflection
 augmentation with probability $1/2$; reflection averaging at evaluation.
 Model selection: validation error computed every 10 epochs, best checkpoint
-kept. A single seed is trained per architecture; the ensemble's diversity
-comes from the architectures and losses rather than from reseeding, and the
-correlation analysis of Section~\ref{sec:diversity} indicates same-architecture
-reseeds would be more correlated still.
+kept. The ensemble's diversity comes from the architectures and losses rather
+than from reseeding; the correlation analysis of Section~\ref{sec:diversity}
+indicates same-architecture reseeds would be more correlated still.
+
+\paragraph{Seed protocol.} Every pipeline is run at ten seeds. One seed value
+enters every stochastic component at once: the permutation that draws the
+validation split from the training pool, each member's initialization and
+batch order, the half-split of the stacking honesty comparison, and the
+subsamples used to tune the kernel stages; the pool/test boundary itself
+never moves. Tables report the mean and standard deviation across seeds;
+within-seed intervals are basic bootstrap percentiles over test samples
+(2000 resamples), and the correction step is assessed by the paired
+difference, resampling the same test indices for the stacked and the
+corrected predictor. Per-sample errors and member predictions are released
+for every seed, so any of these statistics can be recomputed.
 
 \paragraph{Stacking.} Global weights: convex, initialized at the simplex
 minimizer of the measured second-moment matrix $S$
@@ -74,7 +89,7 @@ refitted on the full split.
 
 \paragraph{Kernel stages.} Mat\'ern-$5/2$ on standardized inputs. Scale grid
 $\{0.5,1,2,4\}\times$ the median pairwise distance (estimated on 2000
-points), nugget grid $\{10^{-7},10^{-5},10^{-3}\}$ (scaled by $n$), tuned on
+points), nugget grid $\{10^{-6},10^{-5},10^{-3}\}$ (scaled by $n$), tuned on
 validation using an 8000-sample subsample of the training set, refit at the
 chosen pair on the full training set in double precision. The pure kernel
 baseline (Table~\ref{tab:main}) uses the grid
@@ -86,6 +101,9 @@ standardized, same kernel family and tuning.
 
 \paragraph{Uncertainty.} Posterior standard deviation \eqref{eq:power}
 computed from the Cholesky factor of $K+n\lambda I$ by triangular solves.
-Conformal scaling: the 0.9-quantile of $\|e\|_2/P_\lambda$ on the validation
-split multiplies $P_\lambda$ on test; coverage is the fraction of test
-samples whose absolute error norm falls below the scaled band.
+Conformal calibration uses a random 1000-sample subset of the test block that
+no training, checkpointing, stacking, or tuning step ever touched; the exact
+split-conformal quantile of the scores on that subset sets the band, and
+coverage is evaluated on the disjoint remainder. The hypotheses of
+Proposition~\ref{prop:conf} therefore hold as stated, with no
+approximate-exchangeability caveat.

@@ -137,6 +137,22 @@ if name.startswith("oco_"):
         errs["test"][m] = float(np.sqrt((rt ** 2).sum(1)).mean())
     out["secmom"] = secmom_scoreboard(resid, errs)
 
+    # floor bracket over the deployed members; the realized point is the
+    # uniform convex mix, the feasible point the pinch bound evaluates
+    S_ = np.empty((len(deployed), len(deployed)))
+    for i2, a2 in enumerate(deployed):
+        for j2, b3 in enumerate(deployed):
+            S_[i2, j2] = float((resid["test"][a2] * resid["test"][b3]).mean())
+    eb2 = float(np.diag(S_).min())
+    offd_ = S_[~np.eye(len(deployed), dtype=bool)] / eb2
+    lo_, hi_ = float(offd_.min()), float(offd_.max())
+    dh_ = float(np.diag(S_).max() / eb2)
+    u_ = np.full(len(deployed), 1.0 / len(deployed))
+    out["floor_bracket"] = dict(
+        members=deployed, bracket_units="ebar2",
+        bracket=[round(lo_, 5), round(hi_ + (dh_ - hi_) / len(deployed), 5)],
+        realized_uniform_mix=round(float(u_ @ S_ @ u_ / eb2), 5))
+
     # 4. stratified by named state coordinates
     sp = load_band(band, seed=seed)
     Xte = sp["Xte"]

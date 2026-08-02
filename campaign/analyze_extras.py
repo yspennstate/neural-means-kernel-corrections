@@ -113,8 +113,9 @@ if name.startswith("oco_"):
         q = np.sort(err[cal] / (disagree[cal] + 1e-30))[min(k, len(cal)) - 1]
         band_w = q * (disagree[ev] + 1e-30)
         cover = float((err[ev] <= band_w).mean())
-        # flag rule: widest-decile predicted bands vs realized worst decile
-        thresh = np.percentile(band_w, 90)
+        # flag rule: cutoff fixed on CALIBRATION band widths (causal), applied
+        # to evaluation; compared against the realized worst decile
+        thresh = np.percentile(q * (disagree[cal] + 1e-30), 90)
         flag = band_w >= thresh
         worst = err[ev] >= np.percentile(err[ev], 90)
         prec = float((flag & worst).sum() / max(flag.sum(), 1))

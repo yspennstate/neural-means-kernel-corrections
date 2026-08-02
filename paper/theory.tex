@@ -635,16 +635,17 @@ exchangeable scores, is in Appendix~\ref{app:proofs}. Three points make it the
 right closing statement for the uncertainty analysis. It is close to the
 quantity we compute: the reported coverage of \uqCover\% at the nominal
 $1-\alpha=\uqCoverNom\%$ in Section~\ref{sec:uq} realizes this proposition with
-$m=1000$ and $\alpha=0.1$. The $1.6$-point excess over nominal is not the
+$m=1000$ and $\alpha=0.1$. Any gap to nominal is not the
 $1/(m+1)$ slack, which is only a tenth of a point; it is the finite-sample
-fluctuation of coverage on a single test set, whose standard deviation
-$\sqrt{\alpha(1-\alpha)/m}\approx0.95$ point places \uqCover\% about $1.7$
-standard deviations above nominal, well inside the guarantee. One caveat on
-the hypotheses: our calibration scores are computed on the same held-out split
-used to select the neural-mean checkpoints and tune the correction, so the
-exchangeability the proposition assumes is only approximate here; the selection
-is low-complexity and the band over-covers, but a calibration split disjoint
-from model selection would make the guarantee exact. It is
+fluctuation of conditional coverage for a single calibration draw, whose
+standard deviation $\sqrt{\alpha(1-\alpha)/m}$ is about a point at these
+sizes, and the seed campaign reports the coverage of every seed against the
+guarantee band. The hypotheses
+hold exactly as stated: calibration uses a random subset of the test block
+that no training, checkpointing, stacking, or tuning step ever touched, and
+coverage is evaluated on the disjoint remainder (Appendix~\ref{app:impl}), so
+the exchangeability the proposition assumes is exact, with no low-complexity
+selection argument needed. It is
 agnostic to everything the earlier results leave uncertain: the neural mean may
 be biased, $P_\lambda$ may correlate with the error weakly or with the wrong
 sign, and the bound of Theorem~\ref{thm:or} may be loose, yet the band still

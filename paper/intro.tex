@@ -88,20 +88,36 @@ emulator on both of that problem's error metrics at once on two of the three
 bands; on the third each metric is won by a separate head
 (Section~\ref{sec:oco2} is precise about which).
 
-Each stage of the pipeline carries one supporting result: a symmetrization
-lemma behind the reflection averaging, a second-moment identity that predicts
-stacking outcomes from measured residual correlations, an optimal-recovery
-bound $\|G-m\|_K\,P_\lambda(u)$ for the corrected surrogate, a pullback
-identity and a rate for the feature kernel, and a distribution-free coverage
-statement for the reported uncertainty. The last one matters because the
-design factor $P_\lambda$, though a valid bound, turns out to be a poor
-pointwise ranking of the actual error, and its split-conformal rescaling is
-the only uncertainty signal that survives our tests (Section~\ref{sec:uq}).
+Each stage of the pipeline carries one supporting result, and the objects the
+results cover are the deployed estimators rather than idealizations of them:
+a symmetrization lemma behind the reflection averaging; a second-moment
+identity that predicts stacking outcomes from measured residual correlations,
+sharpened to a two-sided bracket that certifies, from the same measurements,
+how close any convex ensemble must sit to its floor; finite-sample oracle
+inequalities for the validated simplex stack, for the per-pixel affine stack
+the pipeline actually fits, and for the per-coordinate selection that builds
+the OCO-2 surrogate, chained through the grid-tuned correction into a
+certificate for the shipped object whose every constant is measured and
+released; an optimal-recovery bound $\|G-m\|_K\,P_\lambda(u)$ for the
+corrected surrogate; a pullback identity and a rate for the feature kernel;
+and a distribution-free coverage statement whose hypotheses the experiment
+satisfies exactly, the calibration set being disjoint from every selection.
+The coverage statement matters because the design factor $P_\lambda$, though
+a valid bound, turns out to be a poor pointwise ranking of the actual error,
+and its split-conformal rescaling is the only uncertainty signal that
+survives our tests (Section~\ref{sec:uq}). Every stated result is also
+checked numerically: identities to machine precision, inequalities on
+constructions whose ground truth is known exactly, and the pipeline-level
+statements on the released artifacts of every seed
+(Appendix~\ref{app:verification}). The two-member stacking rule in
+particular is validated prospectively, on every member pair of every seed of
+both problems, rather than on selected examples.
 
 Section~\ref{sec:benchmark} describes the problems, protocols, and published
 results. Section~\ref{sec:method} specifies the pipeline.
 Sections~\ref{sec:experiments} and~\ref{sec:oco2} report the two studies,
 including the data-scaling experiments. Section~\ref{sec:theory} states the
 supporting theory, one result per stage, with proofs in
-Appendix~\ref{app:proofs}, and Section~\ref{sec:discussion} discusses
+Appendix~\ref{app:proofs} and their numerical verification in
+Appendix~\ref{app:verification}, and Section~\ref{sec:discussion} discusses
 limitations.

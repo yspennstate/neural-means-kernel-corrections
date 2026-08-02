@@ -485,6 +485,12 @@ metric can supply only a constant, not a rate, and the measurement agrees,
 $1.4$ of a tenfold gap. The remaining factor is representational, and its
 direct evidence is that the same kernel machinery applied to the network's
 learned features recovers the network's accuracy and slightly exceeds it.
+The seed campaign tests the rate half of this prediction directly: both
+kernel rows are refit at nested training sizes over a sixteenfold range,
+where the proposition requires the two empirical exponents to coincide on
+this near-full-rank input with a roughly constant gap, in contrast to the
+controlled rank-gap target of the verification suite, where the adapted
+metric must improve the exponent itself.
 
 The representational term has a precise reading through the same
 optimal-recovery bound that Section~\ref{sec:theory-or} makes exact. That
@@ -627,6 +633,23 @@ $C(u)=\{v:\|v-m(u)-\widehat r_\lambda(u)\|_2\le q\,P_\lambda(u)\}$. Then
 the upper bound holding when the scores are almost surely distinct.
 \end{proposition}
 
+\begin{remark}[the exact law of realized coverage]\label{rem:covlaw}
+When the calibration and test scores are i.i.d.\ with a continuous
+distribution $F$ --- as in the campaign's protocol, where calibration and
+evaluation sets are a random split of an i.i.d.\ test block --- the coverage
+probability conditional on the calibration sample is $F$ evaluated at the
+$k$-th smallest calibration score, $k=\lceil(1-\alpha)(m+1)\rceil$. Since
+$F(s_i)$ are i.i.d.\ uniform, this is the $k$-th order statistic of $m$
+uniforms, with distribution exactly $\mathrm{Beta}(k,\,m+1-k)$
+\citep{vovk2012conditional}; its mean $k/(m+1)$ recovers
+Proposition~\ref{prop:conf}. Conditional on the calibration sample the
+evaluation indicators are i.i.d.\ Bernoulli, so the coverage observed on $N$
+evaluation points follows the Beta--Binomial law with these parameters. Each
+seed's observed coverage is therefore placed against the central band of an
+exact finite-sample law, whose per-seed width at $m=1000$ is close to
+$\sqrt{\alpha(1-\alpha)/m}$.
+\end{remark}
+
 The two-sided statement is the standard guarantee of split conformal
 prediction \citep{vovk2005algorithmic,lei2018distribution}, transported to the
 functional-output setting by taking the nonconformity score to be the relative
@@ -639,8 +662,8 @@ $m=1000$ and $\alpha=0.1$. Any gap to nominal is not the
 $1/(m+1)$ slack, which is only a tenth of a point; it is the finite-sample
 fluctuation of conditional coverage for a single calibration draw, whose
 standard deviation $\sqrt{\alpha(1-\alpha)/m}$ is about a point at these
-sizes, and the seed campaign reports the coverage of every seed against the
-guarantee band. The hypotheses
+sizes; Remark~\ref{rem:covlaw} gives the exact law of that fluctuation, and
+the seed campaign places every seed's observed coverage against it. The hypotheses
 hold exactly as stated: calibration uses a random subset of the test block
 that no training, checkpointing, stacking, or tuning step ever touched, and
 coverage is evaluated on the disjoint remainder (Appendix~\ref{app:impl}), so

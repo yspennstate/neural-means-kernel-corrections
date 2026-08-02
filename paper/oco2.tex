@@ -78,7 +78,9 @@ ladder: the same exact kernel machinery scores $40\%$ on the raw input,
 $30\%$ after rescaling each input coordinate by its measured sensitivity (the
 metric term of Proposition~\ref{prop:aniso}: the effective rank here is
 $17$ of $20$, so the proposition predicts a constant-factor gain and no
-change of rate, the $40\%\!\to\!30\%$ the ARD row records), and
+change of rate, the $40\%\!\to\!30\%$ the ARD row records --- a prediction
+the seed campaign checks directly by refitting both rows across a
+sixteenfold range of training sizes, Appendix~\ref{app:verification}), and
 $3.82\%$ on the trained network's features, past the network's own head. The
 raw-input kernel was limited by its features, not by anything kernel-shaped,
 and the deep kernel head, an exact solve on learned features, is the

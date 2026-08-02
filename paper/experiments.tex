@@ -304,16 +304,16 @@ carry under a tenth of the residual energy, while the ranking signal for the
 shared component is invisible to any within-ensemble statistic, because the
 members agree precisely where they are jointly wrong.
 
-What does hold is coverage, for free. A distribution-free conformal rescaling,
-taking the 0.9-quantile of $\|e\|_2/P_\lambda$ on the validation split and
-scaling $P_\lambda$ by it, yields a band with \uqCover\% empirical coverage on
-the test set at the nominal \uqCoverNom\% level. Conformal validity needs no
-correlation between the score and the error, only exchangeability, so it
-survives the confound that defeats the ranking. One honesty note, expanded in
-Section~\ref{sec:theory-conf}: the same validation split served model
-selection, so the exchangeability behind the exact guarantee is approximate
-here, and the observed coverage should be read as empirical; a calibration
-split untouched by selection would make the guarantee exact. The lesson is narrow but real:
+What does hold is coverage, for free. A distribution-free conformal
+rescaling, taking the exact split-conformal quantile of $\|e\|_2/P_\lambda$
+on a random calibration subset of the test block that no selection step ever
+touched, and scaling $P_\lambda$ by it, yields \uqCover\% empirical coverage
+on the disjoint remainder at the nominal \uqCoverNom\% level. Conformal
+validity needs no correlation between the score and the error, only
+exchangeability, which this calibration protocol supplies exactly
+(Section~\ref{sec:theory-conf}); the seed campaign repeats the split at
+every seed and reports each coverage against the finite-sample band. The
+lesson is narrow but real:
 a valid pointwise bound (Theorem~\ref{thm:or}) is not automatically a useful
 pointwise indicator, the standard uncertainty signals can both fail on the
 same problem, and a relative-error metric has to have its normalization

@@ -9,3 +9,5 @@ paper/*.log
 paper/*.out
 paper/*.bbl
 paper/*.blg
+campaign/boxes.local.json
+campaign/collected/

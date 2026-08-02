@@ -12,12 +12,12 @@ import argparse, json, math, pathlib, statistics, subprocess, sys
 
 HERE = pathlib.Path(__file__).resolve().parent
 COLL = HERE / "collected"
-BOXES = [
-    ("box1", ["scp", "-o", "ConnectTimeout=20"], "research-box"),
-    ("box2", ["scp", "-o", "ConnectTimeout=20"], "research-box-02"),
-    ("box3", ["scp", "-o", "ConnectTimeout=20"], "research-box-03"),
-    ("box4", ["scp", "-o", "ConnectTimeout=20"], "research-box-04"),
-]
+# The host list is machine-local and not part of the repository:
+# campaign/boxes.local.json holds rows of [name, scp_argv, host], e.g.
+#   [["box1", ["scp", "-o", "ConnectTimeout=20"], "my-box-host"]]
+_BOXES_FILE = HERE / "boxes.local.json"
+BOXES = ([tuple(r) for r in json.load(open(_BOXES_FILE))]
+         if _BOXES_FILE.exists() else [])
 ROOT = "/srv/aiwork/nmkc10seed"
 
 ap = argparse.ArgumentParser()
@@ -25,6 +25,8 @@ ap.add_argument("--no-pull", action="store_true")
 args = ap.parse_args()
 
 if not args.no_pull:
+    if not BOXES:
+        sys.exit("no boxes configured: create campaign/boxes.local.json or run --no-pull")
     for name, scp, host in BOXES:
         dst = COLL / name
         dst.mkdir(parents=True, exist_ok=True)

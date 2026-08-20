@@ -47,8 +47,10 @@ $\ell(Tw,Tv)=\ell(w,v)$). Proposition~\ref{prop:sym} justifies the two uses of
 the symmetry in the pipeline: averaging each trained model with its reflected
 evaluation at test time can only help on average, and training on
 reflection-augmented data is ordinary empirical risk minimization for the
-symmetrized class. The measured effect is small but strictly positive for
-every model we trained (Table~\ref{tab:ablation}).
+symmetrized class. The measured effect is small and, being an expectation, need
+not hold sample by sample: over the thirty reflected members of the seed
+campaign it helps twenty-nine times and hurts once, by a thousandth of a point
+(Appendix~\ref{app:verification}).
 
 \subsection{What the kernel-flow regularizer estimates}
 \label{sec:theory-kf}
@@ -271,6 +273,108 @@ weights and decreasing to $e^2\varrho$ as $M\to\infty$.
 \end{enumerate}
 \end{proposition}
 
+Everything in this subsection is stated for the squared metric, and the tables
+of Sections~\ref{sec:experiments} and~\ref{sec:oco2} report a different one.
+The distinction is small numerically and decisive logically, so we make it
+explicit once and refer back to it wherever the two families of numbers meet.
+
+\begin{remark}[the two error metrics]\label{rem:metric}
+For a map $f$ write
+$\mathcal E_1(f)=\mathbb E\|\rho_f(u)\|_2$ and
+$\mathcal E_2(f)=(\mathbb E\|\rho_f(u)\|_2^2)^{1/2}$, the mean and the root
+mean square of the per-sample relative error. The tables report
+$\mathcal E_1$; Proposition~\ref{prop:secmom} is a statement about
+$\mathcal E_2$, since $\mathcal E_2(f_w)^2=w^\top Sw$ by definition. Writing
+$X=\|\rho_f(u)\|_2$ and $c_f=(\operatorname{Var}X)^{1/2}/\mathbb EX$,
+\[
+\mathcal E_2(f)^2-\mathcal E_1(f)^2=\operatorname{Var}X,
+\qquad
+\mathcal E_1(f)/\mathcal E_2(f)=(1+c_f^2)^{-1/2}\le1 ,
+\]
+with equality only if the per-sample error is almost surely constant. Two
+consequences are used in this paper. The floor belongs in $\mathcal E_2$,
+because only $\mathcal E_2$ is determined by $S$: the map
+$w\mapsto w^\top Sw$ is a quadratic form in second moments, whereas
+$w\mapsto\mathbb E\|\sum_m w_m\rho_{f_m}(u)\|_2$ depends on the full joint law
+of the residuals. And upper bounds transfer downward for free, since
+$\mathcal E_1\le\mathcal E_2$, while lower bounds do not --- so a floor read
+off $S$ says nothing about a table entry without the dispersion of the same
+predictor. Comparing the two directly is biased in favour of the table entry
+by $(1+c_f^2)^{-1/2}$, which is about six percent on the structural-mechanics
+stack and ten to eleven percent on the O2 objects of
+Section~\ref{sec:oco2}; the dispersion is a property of the predictor and not
+a constant of the problem, so a single conversion factor should not be reused
+across objects.
+\end{remark}
+
+Part~(i) is an exact criterion, but it is used as a decision rule, and a
+decision rule is applied to estimates. Both $\varrho$ and $e_1/e_2$ must be
+formed on data the decision does not see, so what governs the rule in
+practice is not the criterion but the gap it has to resolve relative to the
+noise in that estimation. The following makes this quantitative, and is
+stated for any threshold comparison of this shape.
+
+\begin{proposition}[margin law for a threshold rule]\label{prop:margin}
+Let $D=\varrho-e_1/e_2$ be the signed gap of Proposition~\ref{prop:secmom}(i),
+so that mixing the weaker member strictly helps exactly when $D<0$, and
+suppose $D\neq0$. Let $\widehat D$ be an estimate of $D$ formed on a split
+independent of the one on which $D$ is evaluated, and suppose the estimation
+error $\widehat D-D$ is subgaussian with variance proxy $\sigma^2$, that is
+$\mathbb E\exp\!\big(\lambda(\widehat D-D)\big)\le\exp(\lambda^2\sigma^2/2)$
+for all $\lambda\in\mathbb R$, conditionally on $D$. Then, writing
+$\Delta=|D|$ for the margin,
+\begin{enumerate}
+\item[(i)] on $\{D\neq0\}$, the decision taken from $\widehat D$ differs from
+the correct one with probability at most
+$\exp(-\Delta^{2}/2\sigma^{2})$;
+\item[(ii)] for every $\tau\ge0$, and with no condition on $D$,
+\[
+\mathbb P\big(\operatorname{sign}\widehat D\neq\operatorname{sign}D,\ \
+|\widehat D|\ge\tau\big)\;\le\;\exp\!\left(-\frac{\tau^{2}}{2\sigma^{2}}\right).
+\]
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Suppose first $D<0$, so $\Delta=-D$ and the correct decision is to mix. The
+decision taken from $\widehat D$ differs only if $\widehat D\ge0$, which
+forces $\widehat D-D\ge-D=\Delta$. The subgaussian hypothesis and the
+Chernoff bound give, for every $\lambda>0$,
+$\mathbb P(\widehat D-D\ge\Delta)\le\exp(\lambda^2\sigma^2/2-\lambda\Delta)$,
+and optimizing at $\lambda=\Delta/\sigma^2$ yields
+$\exp(-\Delta^2/2\sigma^2)$. If instead $D>0$ then $\Delta=D$, the decision
+differs only if $\widehat D\le0$, which forces $\widehat D-D\le-\Delta$, and
+the same argument applied to $-(\widehat D-D)$, which is subgaussian with the
+same proxy, gives the identical bound. The two cases are exhaustive because
+$D\neq0$, which proves (i).
+
+For (ii), condition on $D$ again. If $D<0$ the error event is
+$\{\widehat D\ge0\}$, so on the error event intersected with
+$\{|\widehat D|\ge\tau\}$ we have $\widehat D\ge\tau$ and therefore
+$\widehat D-D\ge\tau-D\ge\tau$; the one-sided estimate above applies with
+$\Delta$ replaced by $\tau$. If $D\ge0$ the error event is
+$\{\widehat D<0\}$, so on it with $|\widehat D|\ge\tau$ we have
+$\widehat D\le-\tau$ and therefore $D-\widehat D\ge\tau+D\ge\tau$, and the
+one-sided estimate in the other direction applies. In both cases the bound is
+$\exp(-\tau^2/2\sigma^2)$, which is free of $D$, so taking the expectation
+over $D$ removes the conditioning.
+\end{proof}
+
+Three consequences are worth stating because they are what the measurement in
+Section~\ref{sec:secmom-margin} rests on. Part~(ii) is the form the rule is
+actually used in: the quantity available when the decision is taken is
+$|\widehat D|$ and not $\Delta$, so binning verdicts by the observed margin is
+legitimate, and it carries the same constant as (i). The bound is vacuous for
+$\Delta\lesssim\sigma$ and falls off quickly beyond it, so a rule of this
+shape has a band around its own threshold inside which it carries no
+guarantee, and the band is set by $\sigma$ rather than chosen. Second,
+$\sigma$ is estimable without knowing $D$: the differences between $\widehat
+D$ and the value of $D$ realized on the held-out block, taken across many
+pairs, have exactly this scale. Third, and this is what makes the statement
+useful rather than merely cautionary, $\Delta$ is observable at decision
+time, so a practitioner can report the margin next to the verdict and know
+which verdicts the data support.
+
 Exact equicorrelation never holds in practice, but for convex weights the
 floor survives one-sided bounds on the entries of $S$, which are what one
 actually measures.
@@ -310,12 +414,15 @@ for more than the window.
 \end{corollary}
 
 On the structural-mechanics benchmark the measured spreads
-($\varrho\in[0.86,0.96]$ across member pairs at member errors within a few
-percent of one another) put the window at roughly a tenth of the squared
-floor, which is precisely the margin by which the fitted stack sits above
-$\bar e\sqrt{\bar\varrho}$ in Section~\ref{sec:experiments}; the seed
-campaign reports the bracket alongside the realized ensemble risk for every
-seed and both problems.
+($\varrho\in[\corrNetLo,\corrNetHi]$ across member pairs and seeds, at member
+errors within a few percent of one another) put the window at roughly a tenth
+of the squared floor, which is the margin by which the fitted convex stack sits
+above $\bar e\sqrt{\bar\varrho}$ in Section~\ref{sec:experiments}. The bracket
+is evaluated against the realized ensemble risk at every seed, and its
+stability is the point: the predicted risk is $\predRMS\pm\predRMSSd\%$ and the
+realized risk a factor $\dispFac\pm\dispFacSd$ of it, so ten independent
+redraws of the validation split and of every network initialization move the
+prediction by six thousandths of a point and the ratio by three thousandths.
 
 A second consequence of the same decomposition explains the final OCO-2
 surrogate. Evaluation metrics there are diagonal in the output coordinates
@@ -400,19 +507,22 @@ seed experiments measure directly.
 
 The corollary is the quantity this paper keeps measuring, at two different
 levels. Across architecture families on the structural-mechanics benchmark
-the pairwise correlations exceed $0.86$ at member errors near $4.7\%$, a
-floor of about $4.4\%$, and the corrected stack lands within a tenth of it.
+the pairwise correlations exceed $0.86$ at member errors near $4.7\%$, which
+places the floor at $\ensFloor\pm\ensFloorSd\%$ in the root-mean-square
+metric it is stated in; Section~\ref{sec:diversity} makes the comparison
+with the deployed pipeline in that metric rather than across the two.
 Across random seeds of one architecture on the OCO-2 bands the correlations
 are $0.78$, $0.97$ and $0.96$ at member errors of $4.4\%$, $16.4\%$ and
-$8.2\%$, floors of $3.9\%$, $16.2\%$ and $8.0\%$, and the measured
-combinations sit on all three. When an ensemble is at its floor the
-corollary says where improvement cannot come from; on OCO-2 it came from
-changing the members (the kernel head on learned features) rather than
-adding more of them. The reported metric is the mean rather than the root mean
-square of $\|\rho_f\|_2$, and the two differ by the dispersion of the
-per-sample error; across every pipeline in this paper their ratio stays within
-a few percent of $0.93$, so predictions made through $S$ transfer to the
-reported metric essentially unchanged. The proposition frames the diversity
+$8.2\%$; measured in the squared metric of the proposition itself, over all
+$45$ seed pairs per band, the floors are $4.360\%$, $17.970\%$ and $9.248\%$
+and the realized ten-seed ensembles sit at $4.419\%$, $17.997\%$ and
+$9.267\%$ (Section~\ref{sec:oco2}). When an ensemble is at its floor the
+corollary says where improvement cannot come from. The reported tables use
+the mean rather than the root mean square of $\|\rho_f\|_2$, and the two are
+not interchangeable: Remark~\ref{rem:metric} gives the relation, the ratio
+runs from about $0.89$ to $0.94$ across the objects here, and every
+comparison in this paper between a quantity read off $S$ and a table entry is
+made after converting one to the other. The proposition frames the diversity
 experiment of Section~\ref{sec:diversity}: what a new member is worth is
 legible in the row it adds to $S$, before any weights are fitted. On this
 benchmark the rows all look alike, pairwise correlations of
@@ -479,18 +589,28 @@ $\sigma_1^{\,s}$ alone. The rest is \emph{representational}: a stationary
 kernel of fixed smoothness reaches only its native space, at any metric, while
 the network adapts its features to the map. The two parts are separated
 experimentally by handing the kernel the anisotropic metric and seeing how
-much of the gap closes. On the OCO-2 band of Section~\ref{sec:oco2} the input
-has effective rank $17$ of $20$, close to full: the proposition predicts the
-metric can supply only a constant, not a rate, and the measurement agrees,
-$1.4$ of a tenfold gap. The remaining factor is representational, and its
+much of the gap closes. On the OCO-2 bands of Section~\ref{sec:oco2} the metric
+closes a factor of $1.1$ to $1.5$ out of a tenfold gap
+(Section~\ref{sec:aniso-measured}); the remainder is representational, and its
 direct evidence is that the same kernel machinery applied to the network's
 learned features recovers the network's accuracy and slightly exceeds it.
-The seed campaign tests the rate half of this prediction directly: both
-kernel rows are refit at nested training sizes over a sixteenfold range,
-where the proposition requires the two empirical exponents to coincide on
-this near-full-rank input with a roughly constant gap, in contrast to the
-controlled rank-gap target of the verification suite, where the adapted
-metric must improve the exponent itself.
+
+The rate half of the proposition is tested rather than assumed, and the test is
+the more interesting for not going our way. Both kernel rows are refit at
+nested training sizes over a sixteenfold range, at ten seeds per band. The
+sensitivity map's approximate rank is $0.54$ to $0.60$ of the input dimension,
+a gap wide enough that the proposition would permit a rate gain; the measured
+difference between the two empirical exponents is nevertheless small on all
+three bands and consistent with zero on one. The bound is an upper bound with
+no matching lower bound, so this does not contradict it --- the adapted rate is
+free to beat its own bound --- but it does mean that on these problems the
+rank gap is not converted into a rate, and a reader should take from
+Proposition~\ref{prop:aniso} only the part the measurement supports: an
+anisotropic metric is worth a constant. The controlled rank-gap target of the
+verification suite, where the construction is exactly the idealization the
+proposition assumes, does show the adapted exponent improving; the distance
+between that and the OCO-2 bands is the distance between the idealization and
+a real sensitivity map.
 
 The representational term has a precise reading through the same
 optimal-recovery bound that Section~\ref{sec:theory-or} makes exact. That
@@ -656,14 +776,17 @@ functional-output setting by taking the nonconformity score to be the relative
 residual norm $s=\|e(u)\|_2/P_\lambda(u)$; the proof, a rank argument on the
 exchangeable scores, is in Appendix~\ref{app:proofs}. Three points make it the
 right closing statement for the uncertainty analysis. It is close to the
-quantity we compute: the reported coverage of \uqCover\% at the nominal
-$1-\alpha=\uqCoverNom\%$ in Section~\ref{sec:uq} realizes this proposition with
-$m=1000$ and $\alpha=0.1$. Any gap to nominal is not the
+quantity we compute: the reported coverage of $\uqCover\pm\uqCoverSd\%$ at the
+nominal $1-\alpha=\uqCoverNom\%$ in Section~\ref{sec:uq} realizes this
+proposition with $m=1000$ and $\alpha=0.1$. Any gap to nominal is not the
 $1/(m+1)$ slack, which is only a tenth of a point; it is the finite-sample
 fluctuation of conditional coverage for a single calibration draw, whose
-standard deviation $\sqrt{\alpha(1-\alpha)/m}$ is about a point at these
-sizes; Remark~\ref{rem:covlaw} gives the exact law of that fluctuation, and
-the seed campaign places every seed's observed coverage against it. The hypotheses
+standard deviation $\sqrt{\alpha(1-\alpha)/m}$ is about a point at these sizes.
+Remark~\ref{rem:covlaw} gives the exact law of that fluctuation, and the ten
+seeds let it be checked rather than invoked: the observed spread across seeds
+is $\uqCoverSd$ points against the $0.9$ points the law predicts, and every
+seed falls inside the central $95\%$ band of the exact distribution at the
+$90\%$ level and at the $95\%$ level alike. The hypotheses
 hold exactly as stated: calibration uses a random subset of the test block
 that no training, checkpointing, stacking, or tuning step ever touched, and
 coverage is evaluated on the disjoint remainder (Appendix~\ref{app:impl}), so

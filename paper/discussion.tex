@@ -1,23 +1,46 @@
 \paragraph{What moved the number, and what stopped it.}
-The improvement over the published band decomposes unevenly. Accurate neural
-means trained on the reported metric and averaged over the reflection
-symmetry do most of the work; stacking members from different architecture
-families adds exactly what their measured residual correlations permit, about
-a tenth of a point here; the kernel corrections contribute a few hundredths
-more and, with them, the certificate of Theorem~\ref{thm:or}, the end-to-end
-guarantee of Corollary~\ref{cor:certificate}, and the calibrated band of
-Proposition~\ref{prop:conf}. We did not find evidence that
-any published architecture was mis-tuned by its authors; the components
-compose, and the composition had not been tried on this benchmark. What stops
-further movement is not a missing architecture. Section~\ref{sec:diversity}
-locates the remaining error in a component that all families share, that
-concentrates where the finite element data are least reliable, that no input
-statistic predicts, and that neither capacity, nor diversity, nor more data
-reduces. The margin over the published methods other than PARA-Net is real,
-and the match with PARA-Net is exact to within run-to-run noise, but both
-should be read for what they are: the last few learnable hundredths above what
-the evidence of Section~\ref{sec:diversity} reads as a data-set floor, not a
-step on the way to zero.
+The improvement over the published band decomposes unevenly, and with ten
+replicates the pieces can be sized rather than asserted. Accurate neural means
+trained on the reported metric and averaged over the reflection symmetry do
+most of the work: from the kernel's \errKRRload\% to the best single network's
+\errMSE\%. Combining members adds what their measured residual correlations
+permit and no more --- $0.064$ points from equal weighting, $0.021$ from weights
+fitted on validation, $0.032$ from letting those weights vary over the grid ---
+and the kernel correction contributes $\corrGain\pm\corrGainSd$ points, bringing
+with it the certificate of Theorem~\ref{thm:or}, the end-to-end guarantee of
+Corollary~\ref{cor:certificate}, and the calibrated band of
+Proposition~\ref{prop:conf}. Each of those contributions is smaller than the
+difference between two published architectures, and only the seeds make them
+separable from noise at all.
+
+The largest single lever is none of them: it is which members the stack
+contains. Removing one architecture, the spectral one, costs
+$\fnoGain\pm\fnoGainSd$ points --- more than any individual stage above --- even
+though that member ranks only third of five on the metric. This is the
+practical form of the second-moment reading. What a member is worth to a stack
+is set by how its errors covary with the others', not by how small they are,
+and a stack of near-duplicates cannot be repaired by tuning the combination
+harder.
+
+We did not find evidence that any published architecture was mis-tuned by its
+authors; the components compose, and the composition had not been tried on this
+benchmark. What stops further movement is not a missing architecture.
+Section~\ref{sec:diversity} locates the remaining error in a component that all
+families share, that concentrates where the finite element data are least
+reliable, that no input statistic predicts, and that neither capacity, nor
+diversity, nor more data, nor reseeding reduces;
+Section~\ref{sec:errors} adds that the cases where it is worst are the cases
+where every member fails at once. The margin over the published methods other
+than PARA-Net is real and survives both error bars of
+Section~\ref{sec:uncertainty-budget}. Against PARA-Net the five-member pipeline
+is level: $0.022$ points, about one standard error, which we read as a tie and
+not as a win. Without the spectral member the same pipeline loses by $0.061$
+points, about three standard errors, so the tie belongs to the configuration
+that carries that member rather than to the approach in general. An earlier
+version of this work claimed a match, on a single run. All of these should be read for what they are:
+the last few learnable hundredths above what the evidence of
+Section~\ref{sec:diversity} reads as a data-set floor, not a step on the way to
+zero.
 
 \paragraph{Relation to neural-mean Gaussian processes.}
 Our correction stage is closest in spirit to \citet{mora2025operator}, who
@@ -64,11 +87,40 @@ residual operator, a quantity we can only lower-bound empirically; the
 conformal calibration we report is the honest, assumption-light complement.
 Training the means on the metric, the reflection steps, and the stacking are
 benchmark-agnostic, but the specific error levels reported here should be
-read as properties of this dataset and protocol. Finally, our low-data
-protocol reproduces that of \citet{mora2025operator} up to the unavoidable
-ambiguity of which 1250 samples are used; we use the first 1250 of the
-training block and report the same 20000-sample test set, and we release
-splits and code so the comparison can be audited.
+read as properties of this dataset and protocol.
+
+The seed coverage is uneven and it is uneven in the places that matter least
+for the paper's arguments but most for a reader who wants a single number. The
+structural-mechanics members, stack, correction, second-moment measurement and
+conformal calibration are replicated ten times. The six-member configuration
+that produced our lowest error completed at two of the ten seeds, its UNet
+member having been scheduled last; both runs land at $4.539\%$ and $4.537\%$.
+Two seeds are not ten, so we report them and press nothing on them.
+The low-data pipeline now carries ten seeds, and its margin over the best
+published row is $1.06\pm0.09$ points; what remains single-seeded in
+Table~\ref{tab:lowdata} is the kernel-ridge baseline. The OCO-2 tables carry
+ten seeds per band, and the scaling sweep behind
+Section~\ref{sec:aniso-measured} agrees with them at the size where the two
+overlap. Our low-data protocol reproduces that of \citet{mora2025operator} up
+to the unavoidable ambiguity of which 1250 samples are used; we use the first
+1250 of the training block and report the same 20000-sample test set, and we
+release splits and code so the comparison can be audited.
+
+One prediction of the theory did not survive the extra measurement.
+Proposition~\ref{prop:aniso} allows an anisotropic metric a rate gain when the
+sensitivity map has an approximate-rank gap, and the OCO-2 bands have one, at a
+rank ratio between $0.54$ and $0.60$. Refitting both kernel rows across a
+sixteenfold range of training sizes at ten seeds finds no rate gain on one band
+and a small one on the other two, well short of what the rank gap would
+license; what the metric delivers is a constant between $1.1$ and $1.5$
+(Section~\ref{sec:aniso-measured}). Since the proposition is an upper bound
+with no matching lower bound, this is not a contradiction, but it does mean the
+rate half of it earns no experimental support here, and we have restated the
+conclusion to the constant half, which the data do support. An earlier version
+of this work reported the O2 band's effective rank as near-full and read the
+absence of a rate gain as confirmation; the campaign's causal, per-seed
+measurement puts that rank at $12$ of $20$, which makes the same observation a
+failed prediction rather than a confirmed one.
 
 \paragraph{What the second problem settles.}
 The OCO-2 study keeps every component and inverts the balance, and the pair

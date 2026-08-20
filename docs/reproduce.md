@@ -1,13 +1,31 @@
 # Reproducing every reported number
 
-All structural-mechanics and OCO-2 runs are CPU-only; the ClimSim mean uses a
-GPU when one is present and its run records state which device produced them.
-Kernel solves and error computations are double precision, network training
-single precision. Splits are fixed by the seeds below; every model is selected
-on the validation split and evaluated once on the test set. Every experiment
-is replicated over ten pipeline seeds (the campaign section at the end);
-reported values are means with standard deviations across seeds, and
-per-sample errors and member predictions are released for every seed.
+The structural-mechanics and OCO-2 campaign ran on CPU-only cloud instances;
+development was on a laptop with one GPU, and the trainers will use CUDA if it
+is visible, so the device is a property of the machine you run on and not of
+the scripts. No run record carries a device field -- do not expect to recover
+the device from the artifacts. Kernel solves and error computations are double
+precision, network training single precision. Splits are fixed by the seeds
+below; every model is selected on the validation split and evaluated once on
+the test set.
+
+Seed coverage is not uniform, and the table below is not the campaign. Ten
+pipeline seeds back the structural-mechanics members, stack, correction,
+second-moment measurement and conformal calibration, the low-data pipeline,
+and each of the three OCO-2 bands. The six-member configuration completed at
+two seeds, the low-data kernel-ridge row at one, and ClimSim at five/three/
+three by training size. The per-member table immediately below is a single
+seed-0 laptop run kept for its command lines; its numbers differ from the
+ten-seed means the paper reports (for instance FNO 4.70 here against
+4.754 +- 0.031, MLP 4.86 against 4.836 +- 0.018), and the paper's values are
+the campaign ones.
+
+What ships: the per-seed result records (JSON) for every stage of every run,
+under `campaign/collected/` and `campaign/{pix4,pix5,ens5,conf5}/`, plus the
+scripts that turn them into the paper's tables. The prediction arrays and
+network checkpoints are too large to distribute and are NOT included, so
+rescoring a new rule on our stored predictions is not possible without
+retraining.
 
 ## Structural mechanics
 
@@ -42,8 +60,9 @@ followed by the Matern correction of the stacked residual (scale grid
 {1, 2, 4} x median distance estimated on 2000 points, nugget grid
 {1e-6, 1e-5, 1e-3}, tuned on an 8000-sample subsample, refit on all 19000).
 Result: 4.58% after stacking, **4.55%** after correction (`runs/hpix.json`,
-`runs/hpix_corr.json`). The low-data pipeline reaches **5.38%**
-(`runs/hybLD.json`).
+`runs/hpix_corr.json`). The low-data pipeline reaches **5.433% +- 0.093%** over ten seeds
+(`campaign/collected/*/ld_s*.json`; the single run in `runs/hybLD.json` is
+seed 0 at 5.376%).
 
 ## OCO-2 radiative-transfer emulation
 
@@ -68,16 +87,24 @@ feature distance (6000-point estimate), nugget grid {1e-8, 1e-6, 1e-4}, tuned
 against validation on a 6000-sample subsample and refit on all 18000. The
 per-coordinate combination picks, for each of the 40 coefficients, the member
 with the lowest validation root mean square error; it is the reported model
-(on O2 it reaches 3.83% reduced and 0.0267% radiance at once).
+(on O2 it reaches 4.12% +- 0.05% reduced and 0.0294% +- 0.0020% radiance at
+once, over ten seeds at the matched 250-epoch budget).
 
 Results (`runs/jpl_<band>.json`; the kernel-flow rows are computed from the
 emulator's own stored predictions):
 
 | band | kernel flow, reduced | ours | kernel flow, radiance | ours |
 |------|---------------------:|-----:|----------------------:|-----:|
-| O2 | 16.89% | 3.83% | 0.0448% | 0.0267% |
-| WCO2 | 24.06% | 16.12% | 0.0599% | 0.0350% |
-| SCO2 | 16.14% | 7.96% | 0.1147% | 0.0432% |
+| O2 | 16.89% | 4.12% +- 0.05% | 0.0448% | 0.0294% +- 0.0020% |
+| WCO2 | 24.06% | 16.28% +- 0.06% | 0.0599% | 0.0507% +- 0.0052% |
+| SCO2 | 16.14% | 8.08% +- 0.01% | 0.1147% | 0.0584% +- 0.0041% |
+
+Our columns are mean +- standard deviation over ten seeds at a matched
+250-epoch budget, aggregated from `campaign/collected/*/oco_<band>_s*.json`
+by `campaign/gen_oco_table.py`. The earlier single-seed numbers (O2 3.83% /
+0.0267%) came from a longer training budget; a 750-epoch run of the seeded
+code reproduces that level (3.71% reduced, 0.0174% radiance) and is recorded
+in `oco_o2_s900.json`.
 
 The seed campaign below replicates the full band pipeline at ten seeds,
 adds a network trained in the exact radiance-relative metric (loss computed

@@ -1,0 +1,21 @@
+{
+ "task_id": "a3_climsim_train_n1000000_s0",
+ "kind": "climsim_point",
+ "data": "train",
+ "n": 1000000,
+ "seed": 0,
+ "epochs": 60,
+ "ntest": 20000,
+ "active_outputs": 107,
+ "mean_r2": 0.5422,
+ "mean_rel": 22.042,
+ "kernel_r2": 0.3894,
+ "kernel_rel": 28.823,
+ "kernel_hyper": {
+  "scale": 2.0,
+  "nugget": 1e-06,
+  "med": 13.496619419636819,
+  "cap": 6000
+ },
+ "minutes": 27.0
+}

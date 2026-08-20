@@ -22,8 +22,8 @@ the rest of the operator-learning suite, with the best published mean
 relative $L^2$ test error and ours. OCO-2 rows compare against the
 Gaussian-process emulator of \citet{susiluoto2025radiative} on its own test
 points, in that paper's reduced-coefficient metric; Section~\ref{sec:oco2}
-reports both of its metrics, on which our O2 and strong-CO$_2$ surrogates win
-both while the weak-CO$_2$ metrics are won by two different heads. The
+reports both of its metrics, on which one surrogate wins both on each of the
+three bands. The
 published suite numbers are per-problem methods tuned by their authors; ours
 outside the two problems studied in depth come from one recipe run unchanged
 (a Mat\'ern kernel at the median length scale, fit capped at 6000 points, a
@@ -36,10 +36,10 @@ obtain.}
 \toprule
 Problem & Map & Best published & This work \\
 \midrule
-OCO-2, O2 band & atmospheric state $\to$ radiance & 16.89\% & 3.83\% \\
-OCO-2, weak CO$_2$ & atmospheric state $\to$ radiance & 24.1\% & 16.1\% \\
-OCO-2, strong CO$_2$ & atmospheric state $\to$ radiance & 16.14\% & 7.96\% \\
-Structural mechanics & boundary load $\to$ stress & 4.55\% (PARA-Net) & 4.55\% \\
+OCO-2, O2 band & atmospheric state $\to$ radiance & 16.89\% & $4.12\pm0.05\%$ \\
+OCO-2, weak CO$_2$ & atmospheric state $\to$ radiance & 24.06\% & $16.28\pm0.06\%$ \\
+OCO-2, strong CO$_2$ & atmospheric state $\to$ radiance & 16.14\% & $8.08\pm0.01\%$ \\
+Structural mechanics & boundary load $\to$ stress & 4.55\% (PARA-Net) & $\errPipe\pm\errPipeSd\%$ \\
 \midrule
 Burgers & initial condition $\to$ solution & 1.93\% (FNO) & 2.38\% \\
 Darcy flow & permeability $\to$ pressure & 2.32\% (POD-DeepONet) & 2.01\% \\
@@ -53,19 +53,23 @@ Navier--Stokes & vorticity $\to$ vorticity & 0.12\% (kernel) & 0.51\% \\
 
 The two problems studied in depth sit at opposite ends of the
 neural-versus-kernel spectrum, and the pair is the point. On structural
-mechanics the families tie: the pipeline reaches \errBest\% under the
-20000-sample protocol, matching the best published architecture (PARA-Net,
-\pubBestHi\%) within run-to-run noise, and \errBestLow\% under the
-1250-sample protocol against a published best of \pubBestLo\%. What the
-coupling adds there is mostly understanding. The residuals of every
-architecture we train correlate between \corrNetLo{} and \corrNetHi{}, their
-shared component concentrates where the finite element data are least
-reliable and is flat in ensemble diversity and training-set size, and so the
-evidence reads the published plateau near 4.5\% as a property of the
-benchmark's data rather than of any surrogate class
-(Section~\ref{sec:diversity}). Absent regenerated finite-element data this
-remains an inference, but it is the reading every measurement we made
-supports. On the rest of the suite the same recipe sorts the problems by the
+mechanics the families tie: the pipeline reaches $\errPipe\pm\errPipeSd\%$
+under the 20000-sample protocol, replicated at ten independently seeded runs,
+which is below every published method but PARA-Net's \pubBestHi\% and within one
+standard error of that one; and \errBestLow\% under the 1250-sample protocol
+against a published best of \pubBestLo\%. What the coupling adds there is mostly
+understanding, and the replication is what licenses the reading. The residuals
+of every architecture we train correlate between \corrNetLo{} and \corrNetHi{}
+at every seed; their shared component concentrates where the finite element
+data are least reliable and is flat in ensemble diversity and training-set
+size; the hardest cases are hard for all members at once, so averaging does not
+touch them; and the spread of our own pipeline across seeds is $\errPipeSd$
+points, some sixty times smaller than the $0.65$ points that separate the
+published architectures. The plateau near 4.5\% therefore reads as a property
+of the benchmark's data rather than of any surrogate class, and it is not
+run-to-run noise that makes it look flat (Section~\ref{sec:diversity}). Absent
+regenerated finite-element data this remains an inference, but it is the reading
+every measurement we made supports. On the rest of the suite the same recipe sorts the problems by the
 same logic: where the map is smooth and data are plentiful (Helmholtz,
 Navier--Stokes, Darcy) the kernel stage wins the pipeline's internal
 selection and lands within a factor of two of the tuned per-problem kernels
@@ -79,14 +83,14 @@ the satellite, the task maps a reduced atmospheric state to a reduced
 radiance spectrum, and the baseline is the kernel-flow emulator of
 \citet{susiluoto2025radiative}, whose stored predictions we score on the same
 test points. An exact Mat\'ern head on the trained network's features reaches
-$3.8\%$ where the same kernel on the raw state reaches $40\%$; the effective
+$4.1\%$ where the same kernel on the raw state reaches $40\%$; the effective
 dimension of the two Gram matrices is unchanged, the target's squared
 native-space norm falls by a factor of about forty, and
-Proposition~\ref{prop:pullback} gives the mechanism. Trained in the reported
-metric and combined per output coordinate, the result improves on the
-emulator on both of that problem's error metrics at once on two of the three
-bands; on the third each metric is won by a separate head
-(Section~\ref{sec:oco2} is precise about which).
+Proposition~\ref{prop:pullback} gives the mechanism. Trained in a loss
+weighted towards the reported metric and combined per output coordinate, the
+result improves on the emulator on both of that problem's error metrics at
+once on all three bands, at ten of ten seeds on two of them and nine of ten
+on the third (Section~\ref{sec:oco2} is precise about the margins).
 
 Each stage of the pipeline carries one supporting result, and the objects the
 results cover are the deployed estimators rather than idealizations of them:
@@ -110,8 +114,14 @@ checked numerically: identities to machine precision, inequalities on
 constructions whose ground truth is known exactly, and the pipeline-level
 statements on the released artifacts of every seed
 (Appendix~\ref{app:verification}). The two-member stacking rule in
-particular is validated prospectively, on every member pair of every seed of
-both problems, rather than on selected examples.
+particular is scored prospectively, on every member pair of every seed rather
+than on selected examples, and that scoring is reported as it came out: the
+rule is reliable outside a margin band set by its own estimation noise and no
+better than chance inside it, which is a limitation of the measurement we can
+state precisely rather than one we can remove
+(Section~\ref{sec:secmom-margin}). The symmetrization inequality, which is
+a statement about an expectation, is reported with the one finite-sample
+reversal that ten seeds turn up.
 
 Section~\ref{sec:benchmark} describes the problems, protocols, and published
 results. Section~\ref{sec:method} specifies the pipeline.

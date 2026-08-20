@@ -1,0 +1,10 @@
+{
+ "task_id": "a0_climsim_dl",
+ "kind": "climsim_download",
+ "files": {
+  "val_input.npy": 715192448,
+  "train_target.npy": 5166858368,
+  "train_input.npy": 5005394048,
+  "val_target.npy": 738263168
+ }
+}

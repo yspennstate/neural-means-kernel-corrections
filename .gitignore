@@ -10,4 +10,8 @@ paper/*.out
 paper/*.bbl
 paper/*.blg
 campaign/boxes.local.json
-campaign/collected/
+# campaign/collected/ holds the per-seed result records the paper's tables are
+# computed from, and campaign/{pix4,pix5,ens5,conf5}/ the per-seed stage
+# records. They are small JSON and they are the evidence, so they ship. The
+# large arrays they were computed from (member predictions, checkpoints) do
+# not; those are covered by the runs/ rules above.

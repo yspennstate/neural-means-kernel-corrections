@@ -1,0 +1,28 @@
+{
+ "kind": "hybrid4",
+ "seed": 2,
+ "members": [
+  "mlp",
+  "mlpMSE",
+  "mlpR",
+  "fno",
+  "krr"
+ ],
+ "used_perpixel": true,
+ "holdout_pix": 0.046099361725396054,
+ "holdout_glob": 0.04613086118110515,
+ "stack": {
+  "val": 0.045126174190202234,
+  "test": 0.045926478074268424
+ },
+ "plus_corr": {
+  "val": 0.045006020977928905,
+  "test": 0.04572858358356813,
+  "smult": 2.0,
+  "lam": 0.001,
+  "med": 8.139828706722371
+ },
+ "final_stage": "plus_corr",
+ "final_test": 0.04572858358356813,
+ "ntrain": 19000
+}

@@ -1,4 +1,14 @@
-"""Data-scaling on ClimSim (LEAP subsampled low-res): does the neural mean keep
+"""SUPERSEDED -- do not use for reported numbers. See campaign/climsim_seeded.py.
+
+This is the first version of the ClimSim sweep. Its kernel hyperparameters are
+selected against test rows (`kernel_pred` scores candidates on Xte_n[:2000] /
+Yte[:2000]), so its kernel curve is optimistically biased. It is kept because
+an earlier version of the paper reported it and the record should be legible,
+not because it should be run. Every ClimSim number in the current paper comes
+from campaign/climsim_seeded.py, which selects on a validation block drawn from
+the training pool and never touches test rows.
+
+Data-scaling on ClimSim (LEAP subsampled low-res): does the neural mean keep
 getting stronger with data at the 10^3 -> 10^6 scale OCO-2 cannot reach?
 
 State (124 features: T, q profiles + surface) -> tendencies (128: heating,

@@ -1,10 +1,13 @@
 The pipeline was developed on a single laptop (one NVIDIA RTX~PRO~2000, 8~GB;
-16 CPU cores, 64~GB RAM); every number reported in this paper was then
-recomputed from scratch on CPU-only cloud instances under the seed protocol
-below, in single precision for network training and double precision for all
-kernel solves and error computations. The one exception is stated where it
-occurs: the ClimSim mean of Section~\ref{sec:scaling} trains on a GPU when
-one is present, and the released runs record which device produced them. The dataset is the
+16 CPU cores, 64~GB RAM); the structural-mechanics numbers were then recomputed
+from scratch on CPU-only cloud instances under the seed protocol below, in
+single precision for network training and double precision for all kernel
+solves and error computations, and it is those recomputed values that the
+tables report. One exception is stated where it occurs: the six-member
+configuration of Table~\ref{tab:ablation} completed at two campaign seeds and
+is reported from those. The run records do not carry a device field, so the
+device statements here describe the machines the campaign ran on and are not
+recoverable from the artifacts. The dataset is the
 distributed \texttt{StructuralMechanics} file pair (40000 samples); inputs are
 reduced to $\mathbb R^{41}$ after verifying the broadcast structure exactly.
 Splits: the training block is samples 1--20000, the test set is samples
@@ -39,7 +42,8 @@ channels as for the FNO. AdamW, learning rate $1.5\times10^{-3}$, weight
 decay $10^{-5}$, cosine schedule, 200 epochs, batch 256. 4.38M parameters.
 
 \paragraph{MSE variant.} The residual MLP trained with mean squared error on
-standardized targets in place of the metric loss, otherwise identical recipe;
+standardized targets in place of the metric loss, otherwise identical recipe
+but for the schedule: the campaign ran it for 120 epochs;
 it enters the ensemble as a loss-diversity member and is also the strongest
 plain MLP we obtain.
 
@@ -53,7 +57,8 @@ the same recipe.
 $(41+1681)\to1024$: the load is concatenated with the kernel method's stress
 prediction for that load. Training uses four-fold out-of-fold kernel
 predictions for the input channel and full-data kernel predictions at
-evaluation; otherwise identical to the MLP. 6.64M parameters. Reflection
+evaluation; otherwise identical to the MLP but run for 100 epochs (the
+trainer's own default of 300 is not what the campaign used). 6.64M parameters. Reflection
 augmentation flips the load and permutes both the kernel channel and the target
 by the row-reversal index.
 
@@ -67,17 +72,89 @@ kept. The ensemble's diversity comes from the architectures and losses rather
 than from reseeding; the correlation analysis of Section~\ref{sec:diversity}
 indicates same-architecture reseeds would be more correlated still.
 
-\paragraph{Seed protocol.} Every pipeline is run at ten seeds. One seed value
-enters every stochastic component at once: the permutation that draws the
-validation split from the training pool, each member's initialization and
-batch order, the half-split of the stacking honesty comparison, and the
-subsamples used to tune the kernel stages; the pool/test boundary itself
-never moves. Tables report the mean and standard deviation across seeds;
-within-seed intervals are basic bootstrap percentiles over test samples
-(2000 resamples), and the correction step is assessed by the paired
-difference, resampling the same test indices for the stacked and the
-corrected predictor. Per-sample errors and member predictions are released
-for every seed, so any of these statistics can be recomputed.
+\paragraph{Seed protocol.} One seed value enters every stochastic component at
+once: the permutation that draws the validation split from the training pool,
+each member's initialization and batch order, the half-split of the stacking
+comparison, the subsamples used to tune the kernel stages, and the conformal
+calibration draw; the pool/test boundary itself never moves. ClimSim is the one
+exception, and deliberately so: that benchmark fixes no test split of its own,
+so the seed there also draws the $20000$-row test block out of the full set
+(\texttt{campaign/climsim\_seeded.py}). Its seed spreads therefore include
+test-sampling variation, which the structural-mechanics and OCO-2 spreads
+exclude by construction; that makes them the more conservative of the two
+conventions where ClimSim is concerned, and it is why the ClimSim seed scatter
+is quoted as a check on the crossing rather than as a precision claim. Tables report the
+mean and standard deviation across seeds. What the repository carries is the
+per-seed result record for every stage of every run --- the JSON files the
+tables and this appendix are computed from, together with the scripts that
+compute them. The prediction arrays and network checkpoints those records
+were derived from are too large to distribute and are not included, so a
+reader can recheck every reported number against the records and can rerun
+the pipeline from the code, but cannot rescore a new rule on our stored
+predictions without retraining. Where a statement below turns on an array
+rather than on a record, it is marked.
+
+\paragraph{What the campaign completed.} The structural-mechanics chain was
+enqueued at ten seeds on four CPU instances and the members completed at all
+ten: the kernel ridge, the metric-loss MLP, the normalized-MSE MLP, and the
+refiner, forty trained artifacts in total. The campaign's 36-hour per-task wall
+clock then landed inside the FNO stage at every seed, which is why the two
+remaining members of the published configuration are in different states. The
+FNO has a best-validation checkpoint at all ten seeds, written by the trainer
+each time validation improved; those checkpoints are finalized here by running
+the tail of the trainer on them (evaluate, then save the named artifact), so
+the FNO is a ten-seed member and nothing about it is retrained. The UNet was
+scheduled after the FNO, and the wall clock reached it at only two of the ten
+seeds; it is the one member of Table~\ref{tab:ablation}'s six-member row that
+the campaign supplies at two seeds rather than ten, and completing that row
+would require training eight more UNets. The FNO's own training curves are worth recording because they
+bound what the truncation cost: its best validation epoch falls between 10 and
+70 of the scheduled 200, and at every seed validation was already rising again
+by the last epoch reached, in several cases sharply (seed 3, $0.0489$ at its
+best against $0.0550$ at epoch 150; seed 5, $0.0483$ against $0.0557$). The
+member is therefore the early-stopped optimum a full run would also have kept,
+with the caveat that the cosine schedule never annealed and a late anneal might
+have found more. With the FNO finalized, all ten seeds carry the five-member
+stack, the residual correction, the second-moment measurement and the conformal
+calibration; the four-member versions of each are retained and reported so that
+the FNO's contribution is a measurement rather than an assumption. Two
+tasks were lost to conditions worth recording because they shape what a reader
+should expect from a rerun: one instance was killed by the operating system
+while forming the $19000\times19000$ Gram matrix through full-size temporaries
+(the released code fills it in row blocks instead, Section~\ref{sec:cost}), and
+four seeds hit the wall clock during stack stages and were completed on a
+larger instance afterwards. The OCO-2 and ClimSim sweeps of
+Section~\ref{sec:scaling} report their own seed counts, which are ten per band
+and five, three and three by training size respectively. The low-data chain
+completed at ten seeds. The OCO-2 head pipeline is replicated at ten seeds on
+each of the three bands --- thirty band-seeds at a matched $250$-epoch budget,
+with one further run at $750$ epochs to separate budget effects from
+ordering effects. Each band-seed writes its member predictions and
+per-sample errors, which is what makes the combination rules, the floors and
+the scoreboard of Section~\ref{sec:oco2} recomputable without retraining;
+those arrays stay with the run and are not part of the distributed release.
+Seven of the thirty band-seeds were additionally run a second time, on
+different hardware, as a queue was being drained. That accident is a useful
+control, and we report it as measured: six of the ten rows reproduce to the
+printed precision across the two runs, including the kernel rows, the
+flat-metric network, its feature head and the combination that the paper
+reports, while the three weighted-loss members and their heads move by up to
+$0.39$ points. Seeding fixes the initialization and the data order but not
+every reduction the training performs, so a seeded rerun of those members
+should be expected to land nearby rather than exactly; the tables' standard
+deviations, which are over seeds, are larger than this in every case.
+
+\paragraph{Reconciling the stored arrays.} Every member's saved prediction
+arrays are checked against the metric recorded in its own training record
+before any ensemble is formed: the array is rescored under the project's metric
+and the two must agree. The check matters because each seed has its own
+validation partition, and scoring one seed's predictions against another's
+split produces errors near $28\%$ that are otherwise easy to mistake for a
+training failure --- and, worse, produces no discrepancy at all on the one seed
+whose split happens to be the reference. Reconciliation is run at every seed and
+every member. On the test block, which no seed moves, all forty pairs agree with
+their recorded reflection-averaged error to between $10^{-14}$ and $6\times10^{-8}$,
+the precision at which the arrays are stored.
 
 \paragraph{Stacking.} Global weights: convex, initialized at the simplex
 minimizer of the measured second-moment matrix $S$
@@ -87,9 +164,12 @@ point, ridge parameter $10^{-3}$, fitted on half the validation split and
 accepted only if they beat the global weights on the held-out half, then
 refitted on the full split.
 
-\paragraph{Kernel stages.} Mat\'ern-$5/2$ on standardized inputs. Scale grid
-$\{0.5,1,2,4\}\times$ the median pairwise distance (estimated on 2000
-points), nugget grid $\{10^{-6},10^{-5},10^{-3}\}$ (scaled by $n$), tuned on
+\paragraph{Kernel stages.} Mat\'ern-$5/2$ on standardized inputs. The residual
+correction searches the scale grid
+$\{1,2,4\}\times$ the median pairwise distance (estimated on 2000
+points) and the nugget grid $\{10^{-6},10^{-5},10^{-3}\}$ (scaled by $n$); the
+low-data chain of Table~\ref{tab:lowdata} uses $\{0.5,1,2,4\}$ with nuggets
+$\{10^{-7},10^{-5},10^{-3}\}$. Both are tuned on
 validation using an 8000-sample subsample of the training set, refit at the
 chosen pair on the full training set in double precision. The pure kernel
 baseline (Table~\ref{tab:main}) uses the grid

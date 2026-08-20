@@ -12,30 +12,68 @@ closed form of Corollary~\ref{cor:mp} against the empirical spectrum of an
 i.i.d.-entry Gram matrix; and the rate mechanism of
 Proposition~\ref{prop:aniso} is exercised on a controlled warped target
 $G=g(A\,\cdot)$ with a known singular-value profile, where the adapted metric
-must dominate at every sample size and improve the empirical rate. The second
-kind evaluates the statements whose subject is the pipeline itself on the
-pipeline's own released artifacts, once per seed: the symmetrization
-inequality of Proposition~\ref{prop:sym} on every trained member (reflection
-averaging must not increase test error); the second-moment identity of
-Proposition~\ref{prop:secmom} on the measured residual matrix; the bracket of
-Corollaries~\ref{cor:floor} and~\ref{cor:floorpinch} against the realized
-convex stack; the selection conditions of
-Propositions~\ref{prop:percoord}, \ref{prop:selectcoord}
-and~\ref{prop:affine} against the realized selections, with the measured
-constants $b$, $W$ and $\kappa$ of Corollary~\ref{cor:certificate} and the
-certificate evaluated next to the realized excess; the prospective
-scoreboard of the two-member rule of Proposition~\ref{prop:secmom}(i) across
-all member pairs, seeds and problems; the coverage of
-Proposition~\ref{prop:conf} across seeds, where each seed's observed value is
-placed against the exact Beta--Binomial law of Remark~\ref{rem:covlaw} and
-the count inside its central band is reported; and the data-scaling sweep of
-the two raw-input kernel rows, refit at nested training sizes, where
-Proposition~\ref{prop:aniso} requires the empirical exponents to coincide at
-the measured near-full approximate rank, in contrast to the synthetic
-rank-gap target on which the adapted exponent must improve. The bound
-comparisons are reported as measured constants, bound value and realized
-excess side by side; where an oracle risk is needed it is estimated by a
-deterministic refit on the test arrays, which can only make the reported
-ratios conservative. The synthetic checks report pass or fail against
-explicit tolerances; the artifact checks report the measured quantities
-themselves.
+must dominate at every sample size and improve the empirical rate. All four
+pass: the largest relative violation of the optimal-recovery bound is
+$-3.3\times10^{-2}$, that is, the bound holds with margin everywhere it was
+evaluated; the kernel-flow identity closes to $2.8\times10^{-14}$; the
+effective-dimension identity to $3.7\times10^{-15}$ and its Mar\v{c}enko--Pastur
+closed form to $4.4\times10^{-5}$ across five nuggets spanning four orders of
+magnitude; and the adapted metric dominates the isotropic one at every sample
+size of the warped construction.
+
+The second kind evaluates the statements whose subject is the pipeline itself
+on the pipeline's own released artifacts, at every seed the campaign completed.
+The symmetrization inequality of Proposition~\ref{prop:sym} is checked on every
+trained member. It is a statement about the expected loss, so a finite test
+sample may go the other way, and at ten seeds one does: over the thirty members
+that carry a reflection, averaging lowers test error in twenty-nine cases, by
+$0.16$ points on the metric-trained network, $0.07$ on the FNO and $0.02$ on
+the normalized-MSE one, and raises it in the thirtieth by $0.001$ points. That
+single reversal is the sampling noise the proposition permits and a single-seed
+check cannot see. The second-moment identity of
+Proposition~\ref{prop:secmom} is measured on the validation residual matrix at
+each seed and its predicted risk compared with the realized risk of the weights
+it implies; the ratio is $\dispFac\pm\dispFacSd$ over ten seeds. The simplex
+minimization behind that comparison is solved by sequential quadratic
+programming under an explicit sum-to-one constraint. The routine released with
+the earlier version of this work used projected gradient with clipping and
+renormalization, which is not a projection onto the simplex; on the five-member
+matrix it terminated $0.8$--$3.6\%$ above the true minimum, at near-vertex
+points, and the weight vectors it reported were wrong in a way that read as a
+finding rather than as a numerical failure. The check that caught it is the
+cheapest one available and is now part of the suite: evaluate the objective at
+the returned point, at every pure-member vertex, and at a properly solved
+optimum, and require the first to be no worse than the others. The bracket of
+Corollaries~\ref{cor:floor} and~\ref{cor:floorpinch} is evaluated against the
+realized convex stack at each seed, and the two-member rule of
+Proposition~\ref{prop:secmom}(i) is scored prospectively on every member pair
+of every seed rather than on selected examples --- decided on the validation
+split and checked on the test block, $840$ pairs over the thirty OCO-2
+band-seeds. Section~\ref{sec:secmom-margin} reports what that scoring found,
+which is not a uniform verdict: the rule's accuracy is governed by the margin
+between the two quantities it compares. The selection conditions of
+Propositions~\ref{prop:percoord}, \ref{prop:selectcoord} and~\ref{prop:affine}
+are checked against the realized selections, with the measured constants $b$,
+$W$ and $\kappa$ of Corollary~\ref{cor:certificate} and the certificate
+evaluated next to the realized excess; $\kappa$ is a supremum over a test probe
+and therefore a measured lower bound, $31.2\pm0.9$ over the three seeds at
+which it was evaluated at the working configuration ($29.3$ at a
+single-seed probe run outside the campaign) and
+falling to $3.0$ at the largest nugget and length scale of the grid. The
+coverage of Proposition~\ref{prop:conf} is computed at every seed and each
+observed value placed against the exact Beta law of Remark~\ref{rem:covlaw}:
+at the $90\%$ level ten of ten fall inside the central band $[88.1\%,91.8\%]$,
+and at the $95\%$ level ten of ten inside $[93.6\%,96.3\%]$. Finally the
+data-scaling sweep of the two raw-input kernel rows is refit at nested training
+sizes and at ten seeds per band. The approximate rank of the sensitivity map
+is $12$ of $20$ on O2 and $13$--$14$ of $24$ on the two CO$_2$ bands, a rank
+ratio between $0.54$ and $0.60$, so Proposition~\ref{prop:aniso} would permit
+a rate gain here and not merely a constant; the sweep finds the constant and
+not the rate, and Section~\ref{sec:aniso-measured} reports it that way.
+
+The bound comparisons are reported as measured constants, bound value and
+realized excess side by side; where an oracle risk is needed it is estimated by
+a deterministic refit on the test arrays, which can only make the reported
+ratios conservative. The synthetic checks report pass or fail against explicit
+tolerances; the artifact checks report the measured quantities themselves,
+together with the number of seeds behind each.

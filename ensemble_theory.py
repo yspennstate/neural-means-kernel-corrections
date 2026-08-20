@@ -38,13 +38,23 @@ Rva = np.stack([(pv(m, "va") - Yva) / nv for m in names])       # (M, n, d)
 M = len(names)
 S = np.einsum("mnd,knd->mk", Rva, Rva) / Rva.shape[1]
 
-# simplex QP by projected gradient (small M, exact enough)
-w = np.ones(M) / M
-for it in range(20000):
-    g = 2 * S @ w
-    w = w - 0.02 * g
-    w = np.maximum(w, 0); w /= w.sum()
+# Simplex QP. This was a projected-gradient loop with clip-and-renormalise, which is
+# NOT a projection onto the simplex: it walks to near-vertex points and stops there. On
+# the five-member matrix of the seed campaign it terminated 0.8-3.6% above the true
+# minimum and reported all the weight on a single member, which reads as a finding
+# ("the kernel gets zero weight") when it is a numerical failure. Solved properly the
+# optimum is a spread over every member. Kept as a cautionary note rather than deleted,
+# because the earlier reported weight vectors came from the old routine.
+from scipy.optimize import minimize
+_res = minimize(lambda z: z @ S @ z, np.ones(M) / M, jac=lambda z: 2 * S @ z,
+                bounds=[(0.0, 1.0)] * M,
+                constraints={"type": "eq", "fun": lambda z: z.sum() - 1.0},
+                method="SLSQP", options=dict(maxiter=500, ftol=1e-14))
+w = np.maximum(_res.x, 0.0); w /= w.sum()
 pred_err = float(np.sqrt(w @ S @ w))
+# the check that catches a bad solve: no pure vertex may beat the returned mixture
+_vert = float(np.min(np.diag(S)))
+assert w @ S @ w <= _vert + 1e-12, "simplex solve is worse than a single member"
 
 E_te = np.einsum("m,mnd->nd", w, np.stack([pv(m, "te") for m in names]))
 real_te = rel_l2(E_te, Yte)

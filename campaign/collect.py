@@ -64,7 +64,11 @@ def stats(xs):
 summary = {}
 
 # structural mechanics seeds
-sm = [r for r in rows if r.get("kind") == "structmech_seed" and r.get("seed", 99) < 90]
+sm_all = [r for r in rows if r.get("kind") == "structmech_seed" and r.get("seed", 99) < 90]
+sm = [r for r in sm_all if "stack_test" in r]
+for r in sm_all:
+    if r not in sm:
+        print(f"WARNING: skipping incomplete structmech result {r.get('task_id')}")
 if sm:
     s = dict(seeds=sorted(r["seed"] for r in sm))
     s["stack"] = stats([r["stack_test"] for r in sm])
@@ -72,7 +76,7 @@ if sm:
     s["delta"] = stats([r["delta_corr_minus_stack"] for r in sm])
     s["delta_boot_negative"] = sum(1 for r in sm if r["boot_ci_delta"][1] < 0)
     s["hstk_final"] = stats([r["hstk"]["report"]["final_test"] for r in sm
-                             if "hstk" in r])
+                             if "report" in r.get("hstk", {})])
     for m in ("mlp", "mlpMSE", "mlpR", "fno", "unet"):
         s[f"member_{m}"] = stats([r["members"][m] for r in sm])
     s["krr"] = stats([r.get("krr") for r in sm])
@@ -80,10 +84,19 @@ if sm:
     s["uq_cover90_scaled"] = stats(cov)
     summary["structmech"] = s
 
-# OCO-2 seeds
+# OCO-2 seeds. The a2_* queue lane partially re-ran seeds the 08-09 lane had
+# already produced; keep one row per (band, seed), preferring the complete
+# original lane, so the summary is ten seeds and not a mixture of the two.
 for band in ("o2", "wco2", "sco2"):
-    br = [r for r in rows if r.get("kind") == "oco_seed" and r.get("band") == band
-          and r.get("seed", 99) < 90]
+    br_all = [r for r in rows if r.get("kind") == "oco_seed" and r.get("band") == band
+              and r.get("seed", 99) < 90]
+    by_seed = {}
+    for r in sorted(br_all, key=lambda r: r.get("task_id", "").startswith("a2_")):
+        by_seed.setdefault(r["seed"], r)
+    br = list(by_seed.values())
+    dropped = len(br_all) - len(br)
+    if dropped:
+        print(f"NOTE: oco_{band}: {dropped} duplicate a2_* lane rows excluded from stats")
     if not br:
         continue
     s = dict(seeds=sorted(r["seed"] for r in br))
@@ -194,7 +207,7 @@ if sm_ex:
 
 for band in ("o2", "wco2", "sco2"):
     bx = [r for r in ex if r.get("seed_dir", "").startswith(f"oco_{band}_s")
-          and int(r["seed_dir"].split("_s")[1]) < 90]
+          and int(r["seed_dir"].rsplit("_s", 1)[1]) < 90]
     rowsb = [r["bounds"]["selectcoord"] for r in bx
              if isinstance(r.get("bounds"), dict) and "selectcoord" in r["bounds"]]
     if rowsb:

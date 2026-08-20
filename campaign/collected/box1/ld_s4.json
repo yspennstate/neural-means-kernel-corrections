@@ -1,0 +1,9 @@
+{
+ "task_id": "ld_s4",
+ "kind": "lowdata_seed",
+ "seed": 4,
+ "mlpLD_test_tta": 0.05651021993622392,
+ "mlpLD_test": 0.06068627558757288,
+ "final_stage": "plus_input_krr",
+ "final_test": 0.053568744397677434
+}

@@ -1,0 +1,81 @@
+{
+ "task_id": "a7_emit_s107",
+ "kind": "emit_clean",
+ "seed": 107,
+ "smoke": false,
+ "n_train": 18884,
+ "n_val": 2098,
+ "n_test": 2331,
+ "fit_cap": 4000,
+ "families": {
+  "ridge3": {
+   "rel_l2_Y1": 0.01160885120270366,
+   "rel_l2_Y2": 0.021876816742930755,
+   "rel_l2_Y3": 0.010861790117177403,
+   "rel_l2_Y4": 0.029726091244176536,
+   "rel_l2_radiance": 0.007571090244130998,
+   "refl_rmse": 5.111789796706773,
+   "refl_mae_median": 0.004696354218556187,
+   "refl_p95_abs": 0.7069861367309952,
+   "refl_nan_frac": 0.0,
+   "wellposed_frac": 0.9975614712456817,
+   "refl_rmse_wellposed": 5.11791453013171,
+   "refl_p95_abs_wellposed": 0.7067838338216321,
+   "mean_rel_l2_components": 0.01851838732674709
+  },
+  "krr": {
+   "rel_l2_Y1": 0.0017007300885878943,
+   "rel_l2_Y2": 0.0058301881622441105,
+   "rel_l2_Y3": 0.0028043879604472653,
+   "rel_l2_Y4": 0.01901651774698972,
+   "rel_l2_radiance": 0.003098037758740805,
+   "refl_rmse": 10.617791838733728,
+   "refl_mae_median": 0.0015471109593206966,
+   "refl_p95_abs": 0.702837369176968,
+   "refl_nan_frac": 0.0,
+   "wellposed_frac": 0.9975614712456817,
+   "refl_rmse_wellposed": 10.63070310936316,
+   "refl_p95_abs_wellposed": 0.7021119654172067,
+   "mean_rel_l2_components": 0.007337955989567248
+  },
+  "dnn": {
+   "rel_l2_Y1": 0.004919080287740252,
+   "rel_l2_Y2": 0.00968159070978829,
+   "rel_l2_Y3": 0.004072474551138233,
+   "rel_l2_Y4": 0.027454177163083352,
+   "rel_l2_radiance": 0.0038084191150371868,
+   "refl_rmse": 13.831946637207336,
+   "refl_mae_median": 0.0024378145050990563,
+   "refl_p95_abs": 0.6532497992502,
+   "refl_nan_frac": 0.0,
+   "wellposed_frac": 0.9975614712456817,
+   "refl_rmse_wellposed": 13.848785674720334,
+   "refl_p95_abs_wellposed": 0.624244602584765,
+   "mean_rel_l2_components": 0.011531830677937532
+  },
+  "dnn_corr": {
+   "rel_l2_Y1": 0.0017318921093124949,
+   "rel_l2_Y2": 0.004187244132244733,
+   "rel_l2_Y3": 0.001964892703970602,
+   "rel_l2_Y4": 0.018699344132168602,
+   "rel_l2_radiance": 0.0017872166256941858,
+   "refl_rmse": 8.039271264666716,
+   "refl_mae_median": 0.0011731552550818813,
+   "refl_p95_abs": 0.5905604962038912,
+   "refl_nan_frac": 0.0,
+   "wellposed_frac": 0.9975614712456817,
+   "refl_rmse_wellposed": 8.048949401205437,
+   "refl_p95_abs_wellposed": 0.5341538123830138,
+   "mean_rel_l2_components": 0.006645843269424108
+  }
+ },
+ "data_sha": {
+  "X": "3745bd59c5f8782db3021062bd4b18ef2d4efe24d9e029cd5593642619f10a1d",
+  "Y1": "3bc568bd7d7aa5bbda866975e666e5882aa1f58e431bc39b829d424d43a33811",
+  "Y2": "d7536cbce94e9908668333633e3a03bebcabdb28b36fb1d5f22d81eba51f7f15",
+  "Y3": "eb118f3590c3fbaa38dc469a6c0fa2dea7fae771ad7533222c6bf61bd63ad511",
+  "Y4": "43f315155486edd49c5c367b968471972962a10fb0b3f625f573020bb8241ec9"
+ },
+ "split": "numpy RandomState(seed) permutation, 10 percent test; val carve RandomState(seed+10000), 10 percent of train",
+ "minutes": 11.4
+}

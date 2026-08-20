@@ -21,13 +21,18 @@ stored predictions on the same test states.
 
 | band | reduced metric: theirs / ours | radiance metric: theirs / ours |
 |------|------------------------------:|-------------------------------:|
-| O2 | 16.9% / **3.8%** | 0.045% / **0.027%** |
-| WCO2 | 24.1% / **16.1%** | 0.060% / **0.035%** |
-| SCO2 | 16.1% / **8.0%** | 0.115% / **0.043%** |
+| O2 | 16.89% / **4.12% +- 0.05%** | 0.0448% / **0.0294% +- 0.0020%** |
+| WCO2 | 24.06% / **16.28% +- 0.06%** | 0.0599% / **0.0507% +- 0.0052%** |
+| SCO2 | 16.14% / **8.08% +- 0.01%** | 0.1147% / **0.0584% +- 0.0041%** |
 
-On O2 and SCO2 both entries in the "ours" columns are one model: a
-per-coordinate combination that is best on both metrics at once. On WCO2 they
-are two separate deep-kernel heads (the flat-feature head for the reduced
+Our columns are mean +- standard deviation over ten seeds per band at a
+matched 250-epoch budget. On all three bands the "ours" entries are one
+model, a per-coordinate combination that beats the emulator on both metrics
+at once -- at ten of ten seeds on O2 and SCO2 and nine of ten on WCO2.
+Earlier versions of this README reported single-seed numbers from a longer
+training budget (O2 3.8% / 0.027%); see docs/reproduce.md for how the two
+budgets relate. Historically WCO2 was an exception where two separate
+deep-kernel heads split the metrics (the flat-feature head for the reduced
 metric, the weighted-feature head for the radiance metric); a single combined
 WCO2 model was not produced, so its two numbers are the best single head per
 metric rather than one model. The winner on the reduced metric is an exact
@@ -36,11 +41,12 @@ the same head on a radiance-trained network's features. The same kernel scores
 40% on the raw input: its limitation was the features, not the solve.
 
 **Structural mechanics** (de Hoop, Huang, Qian and Stuart; boundary load to
-von Mises stress field). The pipeline reaches **4.55%** relative test error
-at 20000 training samples, matching the best published architecture
-(PARA-Net) and below FNO (4.76%), PCA-Net (4.67%), DeepONet (5.20%) and the
-optimal-recovery kernel (5.18%); in the 1250-sample regime it reaches
-**5.38%** against a published best of 6.49%. The paper argues from measured
+von Mises stress field). The pipeline reaches **4.572% +- 0.010%** relative
+test error over ten seeds, level with the best published architecture
+(PARA-Net, 4.55%) rather than beating it -- the difference is about one
+standard error -- and below FNO (4.76%), PCA-Net (4.67%), DeepONet (5.20%)
+and the optimal-recovery kernel (5.18%); in the 1250-sample regime it reaches
+**5.433% +- 0.093%** over ten seeds against a published best of 6.49%. The paper argues from measured
 residual correlations, the spatial structure of the shared error, and
 flat scaling in the sample size that the published plateau near 4.5% is a
 property of this benchmark's data rather than of any architecture.

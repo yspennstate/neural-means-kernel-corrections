@@ -1,0 +1,9 @@
+{
+ "task_id": "ld_s99_probe",
+ "kind": "lowdata_seed",
+ "seed": 99,
+ "mlpLD_test_tta": 0.11858202268718684,
+ "mlpLD_test": 0.1260319793725141,
+ "final_stage": "plus_feat_krr",
+ "final_test": 0.06638117973354118
+}

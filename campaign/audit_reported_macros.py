@@ -10,7 +10,9 @@ import re
 import statistics as st
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-MAIN = r"C:/Users/owner/nmkc-public/paper/main.tex"
+REPO = os.path.dirname(HERE)
+PAPER = os.path.join(REPO, "paper")
+MAIN = os.path.join(PAPER, "main.tex")
 
 src = open(MAIN, encoding="utf-8").read()
 mac = dict(re.findall(r"\\newcommand\{\\([A-Za-z]+)\}\{([^}]*)\}", src))
@@ -94,7 +96,7 @@ if band_files:
         if r.get("seed", 99) < 90 and not os.path.basename(f).startswith("a2_"):
             per.setdefault(r["band"], {})[r["seed"]] = r
     print("OCO-2 (ten seeds per band, values quoted in Section 6)")
-    oco_src = open(r"C:/Users/owner/nmkc-public/paper/oco2.tex", encoding="utf-8").read()
+    oco_src = open(os.path.join(PAPER, "oco2.tex"), encoding="utf-8").read()
     for band in ("o2", "wco2", "sco2"):
         seeds = per.get(band, {})
         if len(seeds) != 10:

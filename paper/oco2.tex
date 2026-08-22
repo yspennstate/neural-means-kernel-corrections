@@ -114,9 +114,9 @@ representation is the order-of-magnitude one.
 
 \subsection{What the metric buys, measured}
 \label{sec:aniso-measured}
-Proposition~\ref{prop:aniso} splits a metric's advantage into a constant
-$\sigma_1^{\,s}$ and, only under an approximate-rank gap, a rate. The seed
-campaign scores that split directly: both raw-input kernel rows are refit at
+The heuristic rate calculation of Proposition~\ref{prop:aniso} splits a
+metric's advantage into a constant $\sigma_1^{\,s}$ and, only under an
+approximate-rank gap, a rate. The seed campaign scores that split directly: both raw-input kernel rows are refit at
 five nested training sizes over a sixteenfold range, at ten seeds, on each of
 the three bands, with the sensitivity map estimated causally from the first $n$
 rows only so that no row sees data a smaller sample would not have had.
@@ -130,7 +130,7 @@ sitting a third of a unit below the threshold count on the two CO$_2$ bands
 ($13.63$ against $14$, $13.33$ against $13$); the rank ratio is between
 $0.54$ and $0.60$ on either reading, which is what the argument uses. That is a rank ratio between
 $0.54$ and $0.60$, not the near-full rank previously stated for O2, and it is
-the regime in which the proposition would permit a rate gain and not merely a
+the regime in which the calculation would permit a rate gain and not merely a
 constant.
 
 The rate gain does not appear. Table~\ref{tab:aniso} gives the paired
@@ -142,12 +142,12 @@ larger. What is stable instead is the constant: at the largest training size
 the isotropic error exceeds the adapted error by a factor of
 $1.353\pm0.008$, $1.118\pm0.002$ and $1.514\pm0.114$ on the three bands, and
 those ratios are flat in $n$ over the whole sweep. The reading we take is the
-one the proposition is stated to support and no more: a metric is worth a
+one the measurement supports and no more: a metric is worth a
 constant here, the constant is between $1.1$ and $1.5$, and the tenfold gap to
 the feature kernel is not something a metric closes. Both fitted exponents are
-also steeper than the bound's own $s/d$, so the absolute rates are not being
-tested here --- only the difference between them, which is what the split
-concerns.
+also steeper than the heuristic's own $s/d$, so the absolute rates are not
+being tested here --- only the difference between them, which is what the
+split concerns.
 
 \begin{table}[t]
 \centering
@@ -271,15 +271,14 @@ reference of error $e_1$ only when their correlation falls below $e_1/e_2$,
 and across a bandwidth sweep the Fourier network was either accurate and
 correlated (error $31\%$, correlation $0.54$, just above the $0.53$ threshold)
 or decorrelated and inaccurate (error above $140\%$). No architecture we tried
-was both accurate and decorrelated enough to lower the floor, which is the
-honest statement of why the residual MLP is the member of record: not that
-diversity is impossible, but that on this map no more accurate diverse member
-was found. Figure~\ref{fig:floor} shows both halves of this: the correlations
+was both accurate and decorrelated enough to lower the floor, which is why
+the residual MLP is the member of record: not that diversity is impossible,
+but that on this map no more accurate diverse member was found. Figure~\ref{fig:floor} shows both halves of this: the correlations
 that make the floor class-specific, and the accuracy-decorrelation trade-off
 that keeps it in place. Adding the Fourier members to the per-coordinate
 combination changes the reported error by less than a hundredth of a point,
-in either direction, on all three bands: the honesty-split blend gives them no
-weight.
+in either direction, on all three bands: the half-split selection gives them
+no weight.
 
 \begin{figure}[t]
 \centering
@@ -368,18 +367,26 @@ $D=\varrho-e_1/e_2$ moves between validation and test with standard deviation
 $0.099$ across the $840$ pairs, essentially unbiased (mean $-0.0005$). This
 is an order of magnitude larger than the seed-to-seed scatter of $D$ within a
 fixed pair, which is $0.010$: replication across seeds is not what limits the
-rule, and a study that varied only the seed would have missed this. With that
-$\sigma$, Proposition~\ref{prop:margin} bounds the disagreement probability by
-$\exp(-\Delta^2/2\sigma^2)$, which guarantees at least $76\%$ correct at the
-median margin of the $[0.10,0.25)$ bin and essentially no errors above
-$0.25$. The measured rates, $87\%$ and $32$ of $32$, clear that guarantee at
-every bin and meet it at the top one. Because the pairs are binned by the
-margin the decision actually sees, it is part~(ii) of the proposition that
-applies, and it carries the same constant.
+rule, and a study that varied only the seed would have missed this. Because
+the pairs are binned by the margin the decision actually sees, it is
+part~(ii) of Proposition~\ref{prop:margin} that speaks to the scoreboard,
+and it is a joint statement: with this $\sigma$, the probability that a
+decision is both wrong and taken at an observed margin of at least $0.25$ is
+at most $\exp(-0.25^2/2\sigma^2)$, about four percent of all decisions, and
+the corresponding bound at a margin of $0.10$ exceeds one half and says
+nothing. The proposition
+does not bound the error rate within a margin bin, which would require a
+lower bound on how often such margins occur, so the percentages above are an
+empirical calibration of the rule rather than a guarantee it carries. What
+they show is a trend consistent with the proposition: the rule's accuracy
+rises with the observed margin, and at the top of the range, where the joint
+bound leaves room for only a few percent of confident errors among the $840$
+decisions, the scoreboard records none in $32$.
 
-The practical reading: the rule is dependable when the two quantities are
-separated by more than about $0.25$, suggestive between $0.05$ and $0.25$,
-and uninformative below that. This applies to our own use of it. The
+The practical reading, from the scoreboard rather than from the bound: on
+these problems the rule is dependable when the two quantities are separated
+by more than about $0.25$, suggestive between $0.05$ and $0.25$, and
+uninformative below that. This applies to our own use of it. The
 kernel-versus-network decision earlier in this section has $\varrho=0.14$
 against $e_n/e_k=0.109$, a margin of $0.031$, which falls in the band the
 scoreboard says not to trust, and we therefore do not rest the exclusion of
@@ -397,9 +404,12 @@ recommend it wherever this rule is used.
 
 \subsection{The error is limited by data, and yields to more of it}
 \label{sec:scaling}
-The structural-mechanics error was flat in the sample size because it is set
-by the noise of the finite element data; the emulator error is not, and the
-contrast is the sharpest practical difference between the two problems. The
+The structural-mechanics error was flat in the sample size, which
+Section~\ref{sec:diversity} reads as evidence consistent with a floor set by
+the benchmark data themselves, a reading whose decisive test, re-solving the
+benchmark on a refined mesh, has not been run; the emulator error is not
+flat, and the contrast is the sharpest practical difference between the two
+problems. The
 left panel of Figure~\ref{fig:ocoscaling} fixes the O2 task and varies only the
 number of training pairs, scoring each on a disjoint held-out set. The
 corrected surrogate's reduced-radiance error falls as a clean power law in $n$,
@@ -408,8 +418,8 @@ $n=17700$, still descending at the largest sample size we can afford and
 approaching the $3.8\%$ our full pipeline reaches on all $18000$ pairs
 (Table~\ref{tab:oco2}). The exact kernel on the raw state improves far more
 slowly, so at these sizes the network is the component that turns data into
-accuracy. The residual on this task is sample-limited rather than
-noise-limited: unlike the structural-mechanics floor it recedes as pairs are
+accuracy. The residual on this task is sample-limited: unlike the
+structural-mechanics error it recedes as pairs are
 added, so the largest lever on this problem is simply more of them, and pairs
 are cheap because the forward model is a program. The complementary case is the
 full-resolution $58\to3048$ map, where the error is instead flat in $n$ across

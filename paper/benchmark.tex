@@ -45,6 +45,49 @@ regime we carve the validation split (250 samples) out of the 1250, so
 training uses 1000 samples and every choice made by the pipeline is informed
 by the 1250 available labels only.
 
+\subsection{The remaining problems of the suite: an uncontrolled survey}
+\label{sec:suite}
+For orientation we also ran one fixed recipe, unchanged, on the other
+problems of the operator-learning suite that \citet{batlle2024kernel}
+assembled from \citet{dehoop2022cost} and \citet{lu2022comprehensive}: a
+Mat\'ern kernel at the median length scale with the fit capped at 6000
+points, a residual MLP mean, outputs reduced by PCA, and the stage selected on
+validation. Table~\ref{tab:suite} lists the results next to the best
+published number on each problem. The comparison is not controlled, and we
+draw nothing from it beyond orientation: the published numbers are
+per-problem methods tuned by their authors; our rows are single runs without
+seed replication; Burgers and Darcy use slightly smaller training splits than
+their baselines (800 and 824 pairs) and Darcy a different grid, from the
+copies we could obtain; and we report no number for Advection~I. What the
+survey shows is the sorting one would expect: where the map is smooth and
+data are plentiful (Helmholtz, Navier--Stokes, Darcy) the kernel stage wins
+the recipe's internal selection and lands within a factor of two of the tuned
+per-problem kernels, and on Burgers the corrected mean sits near the Fourier
+neural operator. The two problems studied in depth, with replication, are the
+subject of the rest of the paper.
+
+\begin{table}[t]
+\centering
+\caption{The remaining problems of the suite: an uncontrolled survey. Best
+published mean relative $L^2$ test error on each problem (per-problem
+methods tuned by their authors), against one recipe run unchanged and once
+per problem, without seed replication, on training splits and grids that
+differ from the baselines' in the cases noted in the text.}
+\label{tab:suite}
+\begin{tabular}{llcc}
+\toprule
+Problem & Map & Best published & This work (single run) \\
+\midrule
+Burgers & initial condition $\to$ solution & 1.93\% (FNO) & 2.38\% \\
+Darcy flow & permeability $\to$ pressure & 2.32\% (POD-DeepONet) & 2.01\% \\
+Advection~I & smooth pulse $\to$ solution & $\approx0\%$ (kernel) & --- \\
+Advection~II & discontinuous pulse $\to$ solution & 11.28\% (linear kernel) & 11.29\% \\
+Helmholtz & wavespeed $\to$ field & 1.00\% (kernel) & 1.75\% \\
+Navier--Stokes & vorticity $\to$ vorticity & 0.12\% (kernel) & 0.51\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{A data-driven check of the mirror symmetry}
 \label{sec:symcheck}
 The continuous problem is invariant under $x_1\mapsto1-x_1$: the domain and
@@ -90,7 +133,15 @@ relatives of our pipeline: \citet{mora2025operator} use a neural operator as
 the mean of a Gaussian process and fit the two together, and this is the work
 we most directly build on, differing in that we fit the mean first and the
 kernel after, tune by cross-validation rather than marginal likelihood, and
-solve the correction exactly at nineteen thousand points.
+solve the correction exactly at nineteen thousand points. Kernels on learned
+representations are likewise established: deep kernel learning
+\citep{wilson2016deep,calandra2016manifold} places a Gaussian process on the
+features of a network and trains through it. Our feature-space stage is the
+post-hoc form of that construction, with the exact solve and validation
+tuning used everywhere else in the pipeline, and what we add is not the
+construction but the controlled comparison of the same kernel on the raw
+input and on the learned features under one tuning routine and budget
+(Section~\ref{sec:oco2}).
 
 Two further threads inform the design. The kernel-flow method
 \citep{owhadi2019kernel} learns a kernel from data by minimizing a

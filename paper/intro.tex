@@ -6,131 +6,132 @@ number reported here are at
 Neural operators \citep{kovachki2023neural,lu2021deeponet,li2021fourier}
 learn their own representations; kernel and Gaussian-process methods
 \citep{batlle2024kernel,mora2025operator,owhadi2019operator} come with exact
-solves and error certificates and a strong record on the same benchmarks.
-This paper combines the two: a neural network mean, trained in the metric the
-application reports, with an exact Mat\'ern kernel regression of its residual
-and of its learned features. We evaluate the combination in depth on two
-public problems with published baselines --- the structural-mechanics
-benchmark of \citet{dehoop2022cost} and the OCO-2 radiative-transfer
-emulation problem of \citet{susiluoto2025radiative} --- and, with one
-unchanged recipe, across the seven-benchmark operator-learning suite
-assembled by \citet{batlle2024kernel} from the problems of
-\citet{dehoop2022cost} and \citet{lu2022comprehensive}.
-Table~\ref{tab:suite} collects the published numbers and ours.
+solves and error bounds and a strong record on the same benchmarks. Placing
+a neural network in the mean of a kernel or Gaussian-process regression is
+an established way of combining the two \citep{mora2025operator}, and so is
+putting a kernel on a network's learned features
+\citep{wilson2016deep,calandra2016manifold}. This paper takes a plain version
+of that pairing --- a neural mean, trained in the metric the application
+reports, followed by an exact Mat\'ern kernel regression fitted after the
+network --- and asks, on two public problems with published baselines, what
+the kernel stage is for. The answer differs between the two problems, and
+the difference is the subject of the paper. Table~\ref{tab:twoproblems}
+collects the published numbers and ours.
 
 \begin{table}[t]
 \centering
-\caption{The two problems studied in depth (OCO-2, structural mechanics) and
-the rest of the operator-learning suite, with the best published mean
-relative $L^2$ test error and ours. OCO-2 rows compare against the
-Gaussian-process emulator of \citet{susiluoto2025radiative} on its own test
-points, in that paper's reduced-coefficient metric; Section~\ref{sec:oco2}
-reports both of its metrics, on which one surrogate wins both on each of the
-three bands. The
-published suite numbers are per-problem methods tuned by their authors; ours
-outside the two problems studied in depth come from one recipe run unchanged
-(a Mat\'ern kernel at the median length scale, fit capped at 6000 points, a
-residual MLP mean, outputs reduced by PCA, the stage selected on validation).
-Burgers and Darcy use slightly smaller training splits than their baselines
-(800 and 824 pairs) and Darcy a different grid, from the copies we could
-obtain.}
-\label{tab:suite}
+\caption{The two problems studied in depth. OCO-2 rows compare against the
+Gaussian-process emulator of \citet{susiluoto2025radiative}, scored from its
+own stored predictions on the same $2000$ test points, in both of that
+paper's error metrics (Section~\ref{sec:oco2}); ours are mean $\pm$ standard
+deviation over ten seeds per band. Structural-mechanics rows quote the best
+published mean relative $L^2$ test error at each training size
+\citep{dehoop2022cost,mora2025operator}, reported without uncertainties in
+the original work; ours are mean $\pm$ standard deviation over ten seeds,
+and the 20000-sample comparison is a tie within the test block's own
+sampling error (Section~\ref{sec:uncertainty-budget}).}
+\label{tab:twoproblems}
 \begin{tabular}{llcc}
 \toprule
-Problem & Map & Best published & This work \\
+Problem & Metric & Published & This work \\
 \midrule
-OCO-2, O2 band & atmospheric state $\to$ radiance & 16.89\% & $4.12\pm0.05\%$ \\
-OCO-2, weak CO$_2$ & atmospheric state $\to$ radiance & 24.06\% & $16.28\pm0.06\%$ \\
-OCO-2, strong CO$_2$ & atmospheric state $\to$ radiance & 16.14\% & $8.08\pm0.01\%$ \\
-Structural mechanics & boundary load $\to$ stress & 4.55\% (PARA-Net) & $\errPipe\pm\errPipeSd\%$ \\
+OCO-2, O2 band & reduced & 16.89\% & $4.12\pm0.05\%$ \\
+ & radiance & 0.0448\% & $0.0294\pm0.0020\%$ \\
+OCO-2, weak CO$_2$ & reduced & 24.06\% & $16.28\pm0.06\%$ \\
+ & radiance & 0.0599\% & $0.0507\pm0.0052\%$ \\
+OCO-2, strong CO$_2$ & reduced & 16.14\% & $8.08\pm0.01\%$ \\
+ & radiance & 0.1147\% & $0.0584\pm0.0041\%$ \\
 \midrule
-Burgers & initial condition $\to$ solution & 1.93\% (FNO) & 2.38\% \\
-Darcy flow & permeability $\to$ pressure & 2.32\% (POD-DeepONet) & 2.01\% \\
-Advection~I & smooth pulse $\to$ solution & $\approx0\%$ (kernel) & --- \\
-Advection~II & discontinuous pulse $\to$ solution & 11.28\% (linear kernel) & 11.29\% \\
-Helmholtz & wavespeed $\to$ field & 1.00\% (kernel) & 1.75\% \\
-Navier--Stokes & vorticity $\to$ vorticity & 0.12\% (kernel) & 0.51\% \\
+Structural mechanics, 20000 samples & relative $L^2$ & \pubBestHi\% (PARA-Net) & $\errPipe\pm\errPipeSd\%$ \\
+Structural mechanics, 1250 samples & relative $L^2$ & \pubBestLo\% (FNO-mean GP) & $\errBestLow\pm\errBestLowSd\%$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The two problems studied in depth sit at opposite ends of the
-neural-versus-kernel spectrum, and the pair is the point. On structural
-mechanics the families tie: the pipeline reaches $\errPipe\pm\errPipeSd\%$
-under the 20000-sample protocol, replicated at ten independently seeded runs,
-which is below every published method but PARA-Net's \pubBestHi\% and within one
-standard error of that one; and \errBestLow\% under the 1250-sample protocol
-against a published best of \pubBestLo\%. What the coupling adds there is mostly
-understanding, and the replication is what licenses the reading. The residuals
-of every architecture we train correlate between \corrNetLo{} and \corrNetHi{}
-at every seed; their shared component concentrates where the finite element
-data are least reliable and is flat in ensemble diversity and training-set
-size; the hardest cases are hard for all members at once, so averaging does not
-touch them; and the spread of our own pipeline across seeds is $\errPipeSd$
-points, some sixty times smaller than the $0.65$ points that separate the
-published architectures. The plateau near 4.5\% therefore reads as a property
-of the benchmark's data rather than of any surrogate class, and it is not
-run-to-run noise that makes it look flat (Section~\ref{sec:diversity}). Absent
-regenerated finite-element data this remains an inference, but it is the reading
-every measurement we made supports. On the rest of the suite the same recipe sorts the problems by the
-same logic: where the map is smooth and data are plentiful (Helmholtz,
-Navier--Stokes, Darcy) the kernel stage wins the pipeline's internal
-selection and lands within a factor of two of the tuned per-problem kernels
-of \citet{batlle2024kernel}, and on Burgers the corrected mean sits near the
-Fourier neural operator.
+On the structural-mechanics benchmark of \citet{dehoop2022cost} the two
+families are competitive: the published neural operators and the kernel
+method of \citet{batlle2024kernel} sit within $0.65$ points of one another,
+and our own kernel ridge reproduces the published kernel number. There the
+kernel's role is to correct the residual of a stacked neural mean, and the
+corrected pipeline reaches $\errPipe\pm\errPipeSd\%$ under the 20000-sample
+protocol, replicated at ten independently seeded runs: below every published
+method but PARA-Net's \pubBestHi\%, and within one standard error of that
+one once the test block's own sampling error is counted, which we read as a
+tie. Under the 1250-sample protocol of \citet{mora2025operator} it reaches
+$\errBestLow\pm\errBestLowSd\%$ against a published best of \pubBestLo\%.
+The published numbers on this benchmark carry no uncertainties, and
+replication is what lets gains of a few hundredths of a point be resolved at
+all; it also shows why ensembles saturate there. The residuals of every
+architecture we train correlate between \corrNetLo{} and \corrNetHi{} at
+every seed; their shared component concentrates at the corners of the loaded
+edge, where the finite element solution is least reliable, and is flat in
+ensemble diversity and in training-set size; and the spread of our own
+pipeline across seeds, \errPipeSd{} points, is some sixty times smaller than
+the span of the published architectures, so the published cluster near
+$4.5\%$ is not run-to-run noise. That evidence is consistent with a floor
+set by the benchmark's data rather than by any surrogate class, but it is
+circumstantial: the experiment that would decide it --- re-solving a set of
+the hardest cases on a refined mesh or with higher-order elements and
+comparing the solver discrepancy with the shared residual --- has not been
+run, and Section~\ref{sec:diversity} says what each measurement does and
+does not establish.
 
-On OCO-2 the same components separate by an order of magnitude, and the
-pipeline's job changes: not to couple two comparable models but to move the
-kernel's exactness onto the network's representation. Per spectral band of
-the satellite, the task maps a reduced atmospheric state to a reduced
-radiance spectrum, and the baseline is the kernel-flow emulator of
-\citet{susiluoto2025radiative}, whose stored predictions we score on the same
-test points. An exact Mat\'ern head on the trained network's features reaches
-$4.1\%$ where the same kernel on the raw state reaches $40\%$; the effective
-dimension of the two Gram matrices is unchanged, the target's squared
-native-space norm falls by a factor of about forty, and
-Proposition~\ref{prop:pullback} gives the mechanism. Trained in a loss
-weighted towards the reported metric and combined per output coordinate, the
-result improves on the emulator on both of that problem's error metrics at
-once on all three bands, at ten of ten seeds on two of them and nine of ten
-on the third (Section~\ref{sec:oco2} is precise about the margins).
+On the OCO-2 radiative-transfer emulation problem of
+\citet{susiluoto2025radiative} the same components separate by an order of
+magnitude, and the kernel's role changes. Per spectral band of the
+satellite, the task maps a reduced atmospheric state to a reduced radiance
+spectrum, and the baseline is that paper's kernel-flow emulator, whose
+stored predictions we score on the same test points. An exact Mat\'ern
+regression on the raw state reaches $40\%$ on the reduced metric and the
+network $4.4\%$; the same regression on the trained network's features
+reaches $4.1\%$, past the network it feeds on, at ten of ten seeds on each
+band. The comparison is controlled --- the same kernel, tuning routine and
+budget on both inputs --- and it locates the difference: the effective
+dimension of the two Gram matrices is essentially the same, while the
+target's squared native-space norm falls by a factor of about forty, which
+is what the pullback identity of Proposition~\ref{prop:pullback} says a
+learned feature map can do and a rescaling of the input cannot. Combined per
+output coordinate, across networks trained in the flat and in
+metric-weighted losses and the kernel heads on their features, the surrogate
+improves on the emulator on both of that problem's error metrics on all
+three bands, at ten seeds per band; one band's radiance margin is thin, and
+Section~\ref{sec:oco2} gives the per-seed counts.
 
-Each stage of the pipeline carries one supporting result, and the objects the
-results cover are the deployed estimators rather than idealizations of them:
-a symmetrization lemma behind the reflection averaging; a second-moment
-identity that predicts stacking outcomes from measured residual correlations,
-sharpened to a two-sided bracket that certifies, from the same measurements,
-how close any convex ensemble must sit to its floor; finite-sample oracle
-inequalities for the validated simplex stack, for the per-pixel affine stack
-the pipeline actually fits, and for the per-coordinate selection that builds
-the OCO-2 surrogate, chained through the grid-tuned correction into a
-certificate for the shipped object whose every constant is measured and
-released; an optimal-recovery bound $\|G-m\|_K\,P_\lambda(u)$ for the
-corrected surrogate; a pullback identity and a rate for the feature kernel;
-and a distribution-free coverage statement whose hypotheses the experiment
-satisfies exactly, the calibration set being disjoint from every selection.
-The coverage statement matters because the design factor $P_\lambda$, though
-a valid bound, turns out to be a poor pointwise ranking of the actual error,
-and its split-conformal rescaling is the only uncertainty signal that
-survives our tests (Section~\ref{sec:uq}). Every stated result is also
-checked numerically: identities to machine precision, inequalities on
-constructions whose ground truth is known exactly, and the pipeline-level
-statements on the released artifacts of every seed
-(Appendix~\ref{app:verification}). The two-member stacking rule in
-particular is scored prospectively, on every member pair of every seed rather
-than on selected examples, and that scoring is reported as it came out: the
-rule is reliable outside a margin band set by its own estimation noise and no
-better than chance inside it, which is a limitation of the measurement we can
-state precisely rather than one we can remove
-(Section~\ref{sec:secmom-margin}). The symmetrization inequality, which is
-a statement about an expectation, is reported with the one finite-sample
-reversal that ten seeds turn up.
+What this paper adds to the prior constructions is therefore not the pairing
+but what it is used to measure: an exact post-hoc residual correction at
+$n=19000$, one dense Cholesky factorization rather than an approximation;
+the controlled raw-input versus learned-feature comparison above; the
+per-coordinate treatment of OCO-2's two metrics, which trade off coordinate
+by coordinate and had been won by different models; the residual-correlation
+diagnosis of why ensembles saturate on the structural-mechanics benchmark;
+and a replicated audit, at ten seeds, of every stage. The theory of
+Section~\ref{sec:theory} supports the deployed estimators rather than
+idealizations of them, and is kept in proportion: a symmetrization
+inequality behind the reflection averaging; a second-moment identity that
+predicts the stacked risk from measured residual correlations and brackets
+how close any convex ensemble sits to its floor; capacity bounds for the
+fitted stacks and the grid-tuned correction, with constants measured on the
+runs; the residual-norm bound of Theorem~\ref{thm:or}, which is the one
+statement we call a certificate, and the pullback identity; an informal rate
+calculation (Proposition~\ref{prop:aniso}) for what an input metric can buy
+a kernel, whose rate half the OCO-2 sweep does not bear out; and a
+distribution-free coverage statement whose hypotheses the calibration
+protocol satisfies. The last matters because the design factor in
+Theorem~\ref{thm:or}, though a valid bound, ranks the pointwise error poorly
+on the benchmark, and its split-conformal rescaling is the one uncertainty
+signal that survives our tests (Section~\ref{sec:uq}). Each statement is
+checked numerically (Appendix~\ref{app:verification}); the two-member
+stacking rule is scored prospectively on every member pair of every seed and
+reported as it came out, reliable outside a margin band set by its own
+estimation noise and no better than chance inside it
+(Section~\ref{sec:secmom-margin}).
 
-Section~\ref{sec:benchmark} describes the problems, protocols, and published
-results. Section~\ref{sec:method} specifies the pipeline.
-Sections~\ref{sec:experiments} and~\ref{sec:oco2} report the two studies,
-including the data-scaling experiments. Section~\ref{sec:theory} states the
-supporting theory, one result per stage, with proofs in
+Section~\ref{sec:benchmark} describes the problems, protocols, published
+results and related work, and includes a survey of the same recipe on the
+remaining problems of the operator-learning suite, which is uncontrolled and
+reported as such. Section~\ref{sec:method} specifies the pipeline.
+Sections~\ref{sec:experiments} and~\ref{sec:oco2} report the two studies.
+Section~\ref{sec:theory} states the supporting theory, with proofs in
 Appendix~\ref{app:proofs} and their numerical verification in
 Appendix~\ref{app:verification}, and Section~\ref{sec:discussion} discusses
 limitations.

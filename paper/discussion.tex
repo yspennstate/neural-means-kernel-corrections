@@ -1,158 +1,125 @@
-\paragraph{What moved the number, and what stopped it.}
-The improvement over the published band decomposes unevenly, and with ten
-replicates the pieces can be sized rather than asserted. Accurate neural means
-trained on the reported metric and averaged over the reflection symmetry do
-most of the work: from the kernel's \errKRRload\% to the best single network's
+\paragraph{Two regimes, one pairing.}
+The two problems bracket what a kernel stage after a neural mean can do. On
+structural mechanics the families tie, and the kernel corrects the residual
+of a stacked mean; the improvement over the published band decomposes into
+pieces that ten replicates can size. Accurate neural means trained on the
+reported metric and averaged over the reflection symmetry do most of the
+work, from the kernel's \errKRRload\% to the best single network's
 \errMSE\%. Combining members adds what their measured residual correlations
-permit and no more --- $0.064$ points from equal weighting, $0.021$ from weights
-fitted on validation, $0.032$ from letting those weights vary over the grid ---
-and the kernel correction contributes $\corrGain\pm\corrGainSd$ points, bringing
-with it the certificate of Theorem~\ref{thm:or}, the end-to-end guarantee of
-Corollary~\ref{cor:certificate}, and the calibrated band of
-Proposition~\ref{prop:conf}. Each of those contributions is smaller than the
-difference between two published architectures, and only the seeds make them
-separable from noise at all.
+permit and no more --- $0.064$ points from equal weighting, $0.021$ from
+weights fitted on validation, $0.032$ from letting those weights vary over
+the grid --- and the kernel correction contributes $\corrGain\pm\corrGainSd$
+points, bringing with it the residual bound of Theorem~\ref{thm:or} and the
+coverage of Proposition~\ref{prop:conf}. Each contribution is smaller than
+the difference between two published architectures, and only the seeds make
+them separable from noise. The largest single lever is which members the
+stack contains: removing the spectral member costs $\fnoGain\pm\fnoGainSd$
+points, more than any stage above, although it ranks third of five on the
+metric. What a member is worth to a stack is set by how its errors covary
+with the others', not by how small they are, and a stack of near-duplicates
+cannot be repaired by tuning the combination harder.
 
-The largest single lever is none of them: it is which members the stack
-contains. Removing one architecture, the spectral one, costs
-$\fnoGain\pm\fnoGainSd$ points --- more than any individual stage above --- even
-though that member ranks only third of five on the metric. This is the
-practical form of the second-moment reading. What a member is worth to a stack
-is set by how its errors covary with the others', not by how small they are,
-and a stack of near-duplicates cannot be repaired by tuning the combination
-harder.
+On OCO-2 the kernel on the raw state trails the network by an order of
+magnitude, a stack gains nothing measurable from it, and its value moves
+inside the network as an exact head on the learned features; the pipeline's job becomes metric
+management, training each member in a loss that concentrates where the
+reported metric concentrates and combining per coordinate. In both regimes
+the same two measurements decide the design before any stack is fit: the
+pairwise residual correlations, which set the ensembling floor of
+Corollary~\ref{cor:floor} and, through Corollary~\ref{cor:floorpinch},
+bracket how close the fitted ensemble comes to it, and the member error
+ratio, which the second-moment identity turns into a keep-or-drop verdict for
+each candidate.
 
-We did not find evidence that any published architecture was mis-tuned by its
-authors; the components compose, and the composition had not been tried on this
-benchmark. What stops further movement is not a missing architecture.
-Section~\ref{sec:diversity} locates the remaining error in a component that all
-families share, that concentrates where the finite element data are least
-reliable, that no input statistic predicts, and that neither capacity, nor
-diversity, nor more data, nor reseeding reduces;
-Section~\ref{sec:errors} adds that the cases where it is worst are the cases
-where every member fails at once. The margin over the published methods other
-than PARA-Net is real and survives both error bars of
-Section~\ref{sec:uncertainty-budget}. Against PARA-Net the five-member pipeline
-is level: $0.022$ points, about one standard error, which we read as a tie and
-not as a win. Without the spectral member the same pipeline loses by $0.061$
-points, about three standard errors, so the tie belongs to the configuration
-that carries that member rather than to the approach in general. An earlier
-version of this work claimed a match, on a single run. All of these should be read for what they are:
-the last few learnable hundredths above what the evidence of
-Section~\ref{sec:diversity} reads as a data-set floor, not a step on the way to
-zero.
+Against PARA-Net the five-member pipeline is level, $0.022$ points or about
+one standard error, which we read as a tie; without the spectral member the
+same pipeline trails by $0.061$ points, about three standard errors, so the
+tie belongs to the configuration that carries that member. The margin over
+the other published methods survives both error bars of
+Section~\ref{sec:uncertainty-budget}. These are the last few learnable
+hundredths above what Section~\ref{sec:diversity} reads as evidence of a
+floor in the benchmark data, not a step on the way to zero.
 
-\paragraph{Relation to neural-mean Gaussian processes.}
-Our correction stage is closest in spirit to \citet{mora2025operator}, who
-place a neural operator inside the mean of a Gaussian process and fit both
-jointly. The differences are operational but they matter at this scale: we
-fit the mean first and the kernel after (so the expensive stage is ordinary
-network training), we tune the kernel by validation rather than by marginal
-likelihood, we correct with an exact solve at $n=19000$ rather than train
-through the kernel, and we add the feature-space second stage. The theory in
-Section~\ref{sec:theory} applies verbatim to their setting as well; the
-measured drop in the fitted RKHS norm (Table~\ref{tab:norms}) is the
-quantitative reason residual corrections of accurate means are the right
-place to spend kernel capacity.
-
-\paragraph{Relation to kernel emulation practice.}
-The pipeline is consistent with the experience of the kernel-flow line of
-work in emulation at scale. The closest instance is the forward-model
-emulator of \citet{susiluoto2025radiative} for the OCO-2 CO$_2$ retrievals,
-in which a Gaussian process with a cross-validation-learned kernel replaces
-the full-physics radiative transfer code within measurement-error precision;
-kernel flows have likewise been used to infer convective-storm structure
-from passive microwave observations \citep{prasanth2021kernel}. The lesson of
-that work matches ours: kernels with data-adapted hyperparameters are
-extremely effective once the input is presented in its physical
-parametrization and the target has been reduced to something smooth. Here the
-reduction is performed by the neural ensemble rather than by physics, and the
-kernel-flow loss itself admits the leave-half-out reading of
-Proposition~\ref{prop:kf}. Section~\ref{sec:oco2} carries out the comparison
-against that emulator on its own test points; the step this paper does not
-take is the retrieval-level one. The mission's Level 1 and Level 2 products
-are publicly distributed through NASA's Earthdata archive, and evaluating how
-the surrogate's certified bands and fallback behavior propagate through an
+\paragraph{Relation to prior work.}
+Neither component of the pairing is new. \citet{mora2025operator} place a
+neural operator inside the mean of a Gaussian process and fit both jointly;
+deep kernel learning \citep{wilson2016deep,calandra2016manifold} puts a
+kernel on a network's features and trains through it; and the kernel-flow
+line of emulation work, of which the OCO-2 baseline of
+\citet{susiluoto2025radiative} is the closest instance, has shown that
+kernels with data-adapted hyperparameters replace physics codes within
+measurement precision once the input is in its physical parametrization and
+the target has been reduced to something smooth. The differences here are
+operational, but they matter at this scale: the mean is fit first and the
+kernel after, so the expensive stage is ordinary network training; the
+kernel is tuned by validation rather than by marginal likelihood; the
+correction is an exact solve at $n=19000$ rather than a training-time
+approximation; and the feature-space stage is evaluated against the same
+kernel on the raw input under the same budget, which is what lets the
+representation effect be measured (Table~\ref{tab:norms} and
+Section~\ref{sec:oco2}). The theory of Section~\ref{sec:theory} applies
+verbatim to the jointly trained setting; the measured drop in the fitted
+RKHS norm is the quantitative reason residual corrections of accurate means
+are the right place to spend kernel capacity. The step this paper does not
+take is the retrieval-level one. The OCO-2 Level~1 and Level~2 products are
+publicly distributed through NASA's Earthdata archive, and evaluating how
+the surrogate's conformal bands and fallback behavior propagate through an
 actual retrieval, rather than through the emulation metrics alone, is the
-natural continuation and requires the estimation machinery of the retrieval
-pipeline rather than new data collection.
+natural continuation.
 
 \paragraph{Limitations.}
 The benchmark has a one-dimensional input function and a fixed geometry; the
 exact kernel solve exploits both, and problems with high-dimensional input
-fields would require the usual approximations (inducing points, random
-features) at some cost to the certificates. The certified bound of
-Theorem~\ref{thm:or} controls the error relative to the RKHS norm of the
-residual operator, a quantity we can only lower-bound empirically; the
-conformal calibration we report is the honest, assumption-light complement.
-Training the means on the metric, the reflection steps, and the stacking are
-benchmark-agnostic, but the specific error levels reported here should be
-read as properties of this dataset and protocol.
+fields would need the usual approximations (inducing points, random
+features), which give up the exact solve and with it the residual bound of
+Theorem~\ref{thm:or} in the form stated. That bound controls the error
+relative to the RKHS norm of the residual operator, a quantity we can only
+lower-bound empirically; the capacity bounds for the stacks and the
+correction have measured constants but crude ones, and neither they nor the
+bound should be read as a pointwise error bar --- the conformal band is the
+only object here that plays that role. Training the means on the metric, the
+reflection steps and the stacking are benchmark-agnostic, but the error
+levels reported here are properties of these datasets and protocols.
 
-The seed coverage is uneven and it is uneven in the places that matter least
-for the paper's arguments but most for a reader who wants a single number. The
-structural-mechanics members, stack, correction, second-moment measurement and
-conformal calibration are replicated ten times. The six-member configuration
-that produced our lowest error completed at two of the ten seeds, its UNet
-member having been scheduled last; both runs land at $4.539\%$ and $4.537\%$.
-Two seeds are not ten, so we report them and press nothing on them.
-The low-data pipeline now carries ten seeds, and its margin over the best
-published row is $1.06\pm0.09$ points; what remains single-seeded in
-Table~\ref{tab:lowdata} is the kernel-ridge baseline. The OCO-2 tables carry
-ten seeds per band, and the scaling sweep behind
-Section~\ref{sec:aniso-measured} agrees with them at the size where the two
-overlap. Our low-data protocol reproduces that of \citet{mora2025operator} up
-to the unavoidable ambiguity of which 1250 samples are used; we use the first
-1250 of the training block and report the same 20000-sample test set, and we
-release splits and code so the comparison can be audited.
+Three runs are incomplete, and their stopping rules are stated here once. The
+Fourier neural operator was stopped at every seed by the campaign's 36-hour
+per-task wall clock and is finalized from the best-validation checkpoint
+written before the stop, between epochs 10 and 70 of a scheduled 200, with
+its cosine schedule never annealed; nothing was retrained. The UNet member,
+scheduled after it, completed at two of ten seeds, so the six-member
+configuration that included it is not among the reported results. The OCO-2
+networks are trained at a matched 250-epoch budget that is short of
+convergence; a single 750-epoch run reaches lower levels on the O2 band
+without changing the orderings (Section~\ref{sec:aniso-measured}). The
+kernel-ridge baseline of Table~\ref{tab:lowdata} is a single run. Our
+low-data protocol reproduces that of \citet{mora2025operator} up to the
+ambiguity of which 1250 samples are used; we use the first 1250 of the
+training block and the same 20000-sample test set, and release the splits.
 
-One prediction of the theory did not survive the extra measurement.
-Proposition~\ref{prop:aniso} allows an anisotropic metric a rate gain when the
-sensitivity map has an approximate-rank gap, and the OCO-2 bands have one, at a
-rank ratio between $0.54$ and $0.60$. Refitting both kernel rows across a
-sixteenfold range of training sizes at ten seeds finds no rate gain on one band
-and a small one on the other two, well short of what the rank gap would
-license; what the metric delivers is a constant between $1.1$ and $1.5$
-(Section~\ref{sec:aniso-measured}). Since the proposition is an upper bound
-with no matching lower bound, this is not a contradiction, but it does mean the
-rate half of it earns no experimental support here, and we have restated the
-conclusion to the constant half, which the data do support. An earlier version
-of this work reported the O2 band's effective rank as near-full and read the
-absence of a rate gain as confirmation; the campaign's causal, per-seed
-measurement puts that rank at $12$ of $20$, which makes the same observation a
-failed prediction rather than a confirmed one.
-
-\paragraph{What the second problem settles.}
-The OCO-2 study keeps every component and inverts the balance, and the pair
-of problems brackets the design space. When the network and the kernel tie
-(structural mechanics), the coupling pays: stack them, correct the residual,
-and the certified and conformal machinery rides along. When the kernel
-trails by an order of magnitude (OCO-2), the coupling is not the point; the
-kernel's value moves inside the network, as an exact head on its learned
-features, and the pipeline's job becomes metric management, training each
-member in the metric it will be scored in and combining per coordinate. In
-both regimes the same two measurements decide everything in advance: the
-pairwise residual correlations, which set the ensembling floor of
-Corollary~\ref{cor:floor} at whatever level the members share their errors
-and, through Corollary~\ref{cor:floorpinch}, bracket how close the fitted
-ensemble must come to it, and the member error ratio, which the
-second-moment identity turns into a keep-or-drop verdict for each candidate.
-Nothing in that protocol is specific to these two datasets.
+The reading of the structural-mechanics plateau as a data floor is an
+inference from surrogates alone. The experiment that would decide it is to
+re-solve a set of the hardest cases on a refined mesh or with higher-order
+elements and compare the solver discrepancy with the shared residual of
+Section~\ref{sec:diversity}; we have not run it. Proposition~\ref{prop:aniso}
+is an informal rate calculation rather than a theorem with a matching lower
+bound, and the OCO-2 sweep supports only its constant half: at a rank ratio
+between $0.54$ and $0.60$ it would permit a rate gain from an anisotropic
+metric, and across a sixteenfold range of training sizes at ten seeds the
+metric delivers a constant between $1.1$ and $1.5$, with no rate gain on one
+band and small ones on the other two (Section~\ref{sec:aniso-measured}).
 
 \paragraph{Outlook.}
-Three directions seem worth pursuing. First, the benchmark itself:
-regenerating the dataset with refined meshes at the corner singularities,
-higher-order elements, or output grids that resolve the concentrations would
-move the floor that Section~\ref{sec:diversity} measures, and would return
-the problem to being a test of surrogates rather than of its own data. The
-diagnostic protocol used there, cross-family residual correlation, the
-second-moment prediction of Proposition~\ref{prop:secmom}, and the
-scaling-in-$n$ check, is cheap to run on any benchmark suspected of the same
-condition. Second, the same recipe on the remaining benchmarks of
-\citet{dehoop2022cost} and \citet{batlle2024kernel}, where the input
-functions are genuinely high-dimensional and the interplay between neural
-means and kernel corrections should look different. Third, the uncertainty
-side: $P_\lambda$ is a design quantity, so it can be optimized, and the
-connection of Lemma~\ref{lem:deff} between the nugget, the spectrum, and the
-effective dimension suggests principled ways to spend a fixed computational
-budget on the correction stage.
+Three directions seem worth pursuing. First, the benchmark itself: the
+re-solve described above, or regenerated data with refined meshes at the
+corner singularities, would settle whether the plateau is a property of the
+data and, if it is, return the problem to being a test of surrogates. The
+diagnostic used here --- cross-family residual correlation, the second-moment
+prediction of Proposition~\ref{prop:secmom} and the scaling-in-$n$ check ---
+is cheap to run on any benchmark suspected of the same condition. Second, the
+same recipe on problems where the input functions are genuinely
+high-dimensional, where the interplay between neural means and kernel
+corrections should look different and the exact solve will not be available.
+Third, the uncertainty side: $P_\lambda$ is a design quantity, so it can be
+optimized, and the connection of Lemma~\ref{lem:deff} between the nugget, the
+spectrum and the effective dimension suggests principled ways to spend a
+fixed computational budget on the correction stage.

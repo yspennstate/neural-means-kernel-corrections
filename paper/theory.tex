@@ -187,14 +187,21 @@ the same bound holds with an additional $\lambda W^2$ on the right.
 \end{enumerate}
 \end{proposition}
 
-The constants are crude, as in Proposition~\ref{prop:stack}, and the reading
-is the same: with a handful of members the per-coordinate fit is paid for by
-the validation split at rate $\sqrt{(M+1)/m}$ per coordinate, uniformly over
+This is a capacity bound, and it should be read as one. Its content is the
+rate: with a handful of members the per-coordinate fit is paid for by the
+validation split at rate $\sqrt{(M+1)/m}$ per coordinate, uniformly over
 coordinates, and the ridge form the pipeline uses adds only its explicit
-penalty ($\lambda=10^{-3}$ here, so $\lambda W^2$ is negligible at the fitted
-weight norms, which the released runs report). What the bound buys is the
-license to fit $q(M{+}1)$ numbers on a thousand held-out samples without
-fearing selection bias at the reported precision; the honesty comparison of
+penalty ($\lambda=10^{-3}$ here, so $\lambda W^2$ is small against the
+coordinate risks at the fitted weight norms, which the released runs report).
+Its evaluated value is not informative. The bound is stated for the
+coordinatewise mean-squared risk in the units of the stress field, not for
+the relative error of the tables, and the constants $b$ and $W$ enter it
+polynomially; at the measured values ($b$ is the largest stress value in
+original units, about a thousand) the right-hand side exceeds the realized
+excess by many orders of magnitude, as the released evaluation shows. What
+the statement establishes is that fitting $q(M{+}1)$ numbers on a thousand
+held-out samples is a selection problem of the ordinary $m^{-1/2}$ kind, with
+no dependence on $q$ beyond the logarithm; the half-split comparison of
 Lemma~\ref{lem:select} then guards the one discrete choice that remains.
 
 One stage of the pipeline is still uncovered at this point: the residual
@@ -205,9 +212,10 @@ fit to the training residual of the stack, which is affine in the stack
 weights, so the corrected predictor is again a per-coordinate affine function
 of $w$ with a transformed feature map, and the machinery of
 Proposition~\ref{prop:affine} applies to the composite class at the cost of
-one further measurable constant.
+one further constant, a uniform bound on the correction weights, which
+Lemma~\ref{lem:kappa} below supplies in closed form.
 
-\begin{corollary}[certificate for the deployed corrected surrogate]
+\begin{corollary}[capacity bound for the deployed corrected surrogate]
 \label{cor:certificate}
 Assume the setting of Proposition~\ref{prop:affine}, and let $\Gamma$ be a
 finite set of correction configurations, each defining weights
@@ -235,14 +243,57 @@ probability at least $1-\delta$,
 Since $\gamma=0$ is among the candidates, the oracle on the right is at most
 the fitted stack's own risk, and combining with
 Proposition~\ref{prop:affine}(ii) bounds the deployed risk against the best
-affine stack itself. All three constants $b$, $W$ and $\kappa$ are measured
-and released with the runs.
+affine stack itself. The constants $b$ and $W$ are measured and released with
+the runs; for kernel ridge weights, $\kappa$ is supplied by the next lemma.
 \end{corollary}
 
-The reading: the object the pipeline actually ships -- fitted stack, grid-tuned
-correction, validated final choice -- carries a finite-sample certificate
-whose every constant is observable, and the certificate is evaluated
-numerically alongside the seed experiments rather than left as a formula.
+The hypothesis on the correction weights is not an empirical assumption. In
+the pipeline each $\gamma=(s,\lambda)$ is a length scale and a nugget, and
+the weights are those of kernel ridge regression,
+$c_\gamma(u)=(K_\gamma+n\lambda I)^{-1}k_\gamma(X,u)$, so that
+$\widehat r(u)=c_\gamma(u)^\top R$ in the notation of
+Section~\ref{sec:method-kernel}. Their $\ell^1$ norm is bounded uniformly in
+$u$ by the nugget alone.
+
+\begin{lemma}[uniform bound on kernel ridge weights]\label{lem:kappa}
+Let $k$ be a positive definite kernel with $k(u,u)\le k_{\max}$ for all $u$,
+let $X=(u_1,\dots,u_n)$ be any design with Gram matrix $K$, and let
+$\lambda>0$. The kernel ridge weights
+$c_\lambda(u)=(K+n\lambda I)^{-1}k(X,u)$ satisfy, for every $u$,
+\[
+\|c_\lambda(u)\|_1\;\le\;\sqrt n\,\|c_\lambda(u)\|_2\;\le\;
+\frac{P_\lambda(u)}{\sqrt\lambda}\;\le\;\sqrt{\frac{k_{\max}}{\lambda}} ,
+\]
+where $P_\lambda(u)^2=k(u,u)-k(u,X)(K+n\lambda I)^{-1}k(X,u)$ is the
+posterior variance of Section~\ref{sec:theory-or}, equation~\eqref{eq:power}.
+In particular, for the residual correction of Section~\ref{sec:method-kernel}
+--- a Mat\'ern kernel with $k(u,u)=1$ and the nugget grid
+$\lambda\in\{10^{-6},10^{-5},10^{-3}\}$ --- the hypothesis of
+Corollary~\ref{cor:certificate} holds, whatever the length scale, with
+\[
+\kappa_{\mathrm{an}}\;:=\;\max_{\gamma\in\Gamma}\lambda_\gamma^{-1/2}\;=\;10^{3}.
+\]
+\end{lemma}
+
+The proof is two lines in Appendix~\ref{app:proofs}, and the bound is the
+right kind of constant for the corollary: it depends on nothing that is
+estimated. It is also why the corollary is a capacity bound and not a
+certificate. The excess term carries $(1+\kappa)^2$, so at
+$\kappa_{\mathrm{an}}=10^3$ the corollary's right-hand side is, like that of
+Proposition~\ref{prop:affine} before it, vacuous at the shipped constants by
+many orders of magnitude. The realized scale of the weights is far smaller:
+on a test probe of five hundred points the largest $\ell^1$ norm over the
+grid averages $31.2$ across three seeds (Appendix~\ref{app:verification}),
+about a thirtieth of $\kappa_{\mathrm{an}}$, so that evaluating the display
+at the probe value would shrink it by a factor of close to a thousand. But a
+supremum over a finite probe is a lower bound on the constant the corollary
+needs, not the constant, and we do not use it as one. What the corollary
+establishes is structural: the object the pipeline ships --- fitted stack,
+grid-tuned correction, validated final choice --- is covered by an oracle
+inequality of the ordinary $m^{-1/2}$ form, in the coordinatewise
+mean-squared metric, whose every constant is either measured or given in
+closed form. The certificate of this paper, in the sense of a bound whose
+evaluated value is the quantity reported, is Theorem~\ref{thm:or}.
 
 \subsection{What the stack can achieve}
 \label{sec:theory-secmom}
@@ -368,20 +419,29 @@ $\exp(-\tau^2/2\sigma^2)$, which is free of $D$, so taking the expectation
 over $D$ removes the conditioning.
 \end{proof}
 
-Three consequences are worth stating because they are what the measurement in
-Section~\ref{sec:secmom-margin} rests on. Part~(ii) is the form the rule is
-actually used in: the quantity available when the decision is taken is
-$|\widehat D|$ and not $\Delta$, so binning verdicts by the observed margin is
-legitimate, and it carries the same constant as (i). The bound is vacuous for
-$\Delta\lesssim\sigma$ and falls off quickly beyond it, so a rule of this
+Three remarks on how the statement is used in
+Section~\ref{sec:secmom-margin}. Part~(i) is conditional on the true margin
+$\Delta$, which is not available when the decision is taken; what is
+available is $|\widehat D|$, and part~(ii) is the statement about that
+quantity. It is a joint bound: it limits the probability that a decision is
+both wrong and taken at an observed margin of at least $\tau$, and it makes
+that event rare among all decisions once $\tau$ exceeds a few multiples of
+$\sigma$. It is not a bound on the error rate among the decisions whose
+observed margin exceeds $\tau$ --- that conditional probability is the joint
+one divided by $\mathbb P(|\widehat D|\ge\tau)$, on which the proposition
+says nothing --- so the accuracy within a margin bin is an empirical
+calibration of the rule and not a guarantee, and that is how
+Section~\ref{sec:secmom-margin} reports it. Both bounds are vacuous for
+margins of order $\sigma$ and fall off quickly beyond, so a rule of this
 shape has a band around its own threshold inside which it carries no
 guarantee, and the band is set by $\sigma$ rather than chosen. Second,
-$\sigma$ is estimable without knowing $D$: the differences between $\widehat
-D$ and the value of $D$ realized on the held-out block, taken across many
-pairs, have exactly this scale. Third, and this is what makes the statement
-useful rather than merely cautionary, $\Delta$ is observable at decision
-time, so a practitioner can report the margin next to the verdict and know
-which verdicts the data support.
+$\sigma$ is estimable without knowing $D$: the differences between
+$\widehat D$ and the value of $D$ realized on a held-out block, taken across
+many pairs, have exactly this scale. Third, $|\widehat D|$ is observable at
+decision time, so a practitioner can report the observed margin next to the
+verdict; part~(ii) says that verdicts reported at a large margin are seldom
+wrong, and the scoreboard of Section~\ref{sec:secmom-margin} says how the
+realized accuracy varies with that margin.
 
 Exact equicorrelation never holds in practice, but for convex weights the
 floor survives one-sided bounds on the entries of $S$, which are what one
@@ -423,15 +483,19 @@ for more than the window.
 
 On the structural-mechanics benchmark the measured spreads
 ($\varrho\in[\corrNetLo,\corrNetHi]$ across member pairs and seeds, at member
-errors within a few percent of one another) put the window at roughly a tenth
-of the squared floor, and the fitted convex stack of
-Section~\ref{sec:experiments} lands well inside it, within a percent of
-$\bar e\sqrt{\bar\varrho}$ in the squared metric. The bracket
-is evaluated against the realized ensemble risk at every seed, and its
-stability is the point: the predicted risk is $\predRMS\pm\predRMSSd\%$ and the
-realized risk a factor $\dispFac\pm\dispFacSd$ of it, so ten independent
-redraws of the validation split and of every network initialization move the
-prediction by six thousandths of a point and the ratio by three thousandths.
+errors within about ten percent of one another) put the window at roughly a
+fifth of the squared floor: the correlation spread alone is $0.14$, a sixth
+of $\bar\varrho=\corrNetLo$, and the $1/M$ term adds a few hundredths. The
+best convex mixture of the measured $S$ sits at the bottom of that window,
+$\predRMS\pm\predRMSSd\%$ against a floor of $\ensFloor\pm\ensFloorSd\%$,
+both in the root-mean-square metric $\mathcal E_2$ in which the corollary is
+stated. The bracket is evaluated against the realized ensemble risk at every
+seed, and its stability is the point: the realized mean relative error
+$\mathcal E_1$ of the mixture is a factor $\dispFac\pm\dispFacSd$ of the
+predicted root mean square, the dispersion factor of Remark~\ref{rem:metric},
+so ten independent redraws of the validation split and of every network
+initialization move the prediction by six hundredths of a point and the ratio
+by three thousandths.
 
 A second consequence of the same decomposition explains the final OCO-2
 surrogate. Evaluation metrics there are diagonal in the output coordinates
@@ -567,9 +631,11 @@ display also takes the leading-$r$ projection of the image design to keep a
 density bounded above and below, the trailing directions to be exact zeros at
 the working resolution, and the interpolation limit $\lambda\to0$;
 Appendix~\ref{app:proofs} records the argument at that level, as a sketch
-rather than a complete proof.
+rather than a complete proof. The statement is accordingly a heuristic rate
+calculation, and it is labelled informal: nothing else in the paper rests on
+it, and its role is to say what kind of gain a metric can and cannot produce.
 
-\begin{proposition}[isotropic and adapted kernel rates]\label{prop:aniso}
+\begin{proposition}[isotropic and adapted kernel rates, informal]\label{prop:aniso}
 Let $\widehat G^{\mathrm{iso}}_n$ be kernel ridge regression with a Mat\'ern
 kernel of smoothness $s$ and a validation-optimal single length scale, and
 $\widehat G^{\mathrm{ard}}_n$ the same construction in the metric
@@ -586,17 +652,17 @@ When $A$ is close to full rank ($r\approx d$) the two rates coincide and only
 the constant $\sigma_1^{\,s}$ separates them.
 \end{proposition}
 
-The sketch (Appendix~\ref{app:proofs}) is the scattered-data estimate
+The calculation (Appendix~\ref{app:proofs}) is the scattered-data estimate
 $\|G-\widehat G_n\|\lesssim h_X^{\,s}\|G\|_{H^s}$ applied to the two designs:
 one length scale must fill all $d$ directions, so $h_X\asymp n^{-1/d}$ and the
 norm carries $\sigma_1^{\,s}$; the adapted metric, when $A$ has a spectral gap,
 confines the design to $r$ resolved directions and improves the fill distance.
 Both displays are upper bounds under the stated idealization --- the exact
 metric $A$, a fixed $g$, and the length-scale selection folded into the
-logarithmic factors --- and we claim no matching lower bound; the proposition
-is used here to calibrate what a metric can and cannot buy, not as a sharp
-rate theorem.
-The proposition bounds the \emph{metric} part of a network's advantage, the
+logarithmic factors --- and we claim no matching lower bound; the heuristic
+is used here to calibrate what a metric can and cannot buy, not as a rate
+theorem.
+It isolates the \emph{metric} part of a network's advantage, the
 part an anisotropic kernel would recover, and it says this part is a rate gain
 only under an approximate-rank gap; without one it is the constant
 $\sigma_1^{\,s}$ alone. The rest is \emph{representational}: a stationary
@@ -609,20 +675,20 @@ closes a factor of $1.1$ to $1.5$ out of a tenfold gap
 direct evidence is that the same kernel machinery applied to the network's
 learned features recovers the network's accuracy and slightly exceeds it.
 
-The rate half of the proposition is tested rather than assumed, and the test is
+The rate half of the heuristic is tested rather than assumed, and the test is
 the more interesting for not going our way. Both kernel rows are refit at
 nested training sizes over a sixteenfold range, at ten seeds per band. The
 sensitivity map's approximate rank is $0.54$ to $0.60$ of the input dimension,
-a gap wide enough that the proposition would permit a rate gain; the measured
+a gap wide enough that the calculation would permit a rate gain; the measured
 difference between the two empirical exponents is nevertheless small on all
-three bands and consistent with zero on one. The bound is an upper bound with
-no matching lower bound, so this does not contradict it --- the adapted rate is
-free to beat its own bound --- but it does mean that on these problems the
-rank gap is not converted into a rate, and a reader should take from
+three bands and consistent with zero on one. The displays are upper bounds
+with no matching lower bound, so this does not contradict them --- the adapted
+rate is free to beat its own bound --- but it does mean that on these problems
+the rank gap is not converted into a rate, and a reader should take from
 Proposition~\ref{prop:aniso} only the part the measurement supports: an
 anisotropic metric is worth a constant. The controlled rank-gap target of the
 verification suite, where the construction is exactly the idealization the
-proposition assumes, does show the adapted exponent improving; the distance
+calculation assumes, does show the adapted exponent improving; the distance
 between that and the OCO-2 bands is the distance between the idealization and
 a real sensitivity map.
 

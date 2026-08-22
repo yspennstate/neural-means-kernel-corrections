@@ -5,9 +5,11 @@ single precision for network training and double precision for all kernel
 solves and error computations, and it is those recomputed values that the
 tables report. One exception is stated where it occurs: the six-member
 configuration of Table~\ref{tab:ablation} completed at two campaign seeds and
-is reported from those. The run records do not carry a device field, so the
-device statements here describe the machines the campaign ran on and are not
-recoverable from the artifacts. The dataset is the
+is reported from those. The run records carry no device field, but each
+network trainer prints the device it selected when it starts, and the ten
+structural-mechanics pipeline logs hold that line for every launch, restarts
+included: 54 launches, all \texttt{cpu}. The kernel stages are NumPy and SciPy
+and run on the CPU by construction. The dataset is the
 distributed \texttt{StructuralMechanics} file pair (40000 samples); inputs are
 reduced to $\mathbb R^{41}$ after verifying the broadcast structure exactly.
 Splits: the training block is samples 1--20000, the test set is samples
@@ -87,12 +89,14 @@ is quoted as a check on the crossing rather than as a precision claim. Tables re
 mean and standard deviation across seeds. What the repository carries is the
 per-seed result record for every stage of every run --- the JSON files the
 tables and this appendix are computed from, together with the scripts that
-compute them. The prediction arrays and network checkpoints those records
-were derived from are too large to distribute and are not included, so a
-reader can recheck every reported number against the records and can rerun
-the pipeline from the code, but cannot rescore a new rule on our stored
-predictions without retraining. Where a statement below turns on an array
-rather than on a record, it is marked.
+compute them. The network checkpoints and the full prediction arrays those
+records were derived from are too large for the repository; what is released
+in their place, for the structural-mechanics chain, is the residual of every
+member at every seed, in the form described under ``Released residuals''
+below. A reader can therefore recheck every reported number against the
+records, rescore a new combination rule on the stored residuals, and rerun the
+pipeline from the code. Where a statement below turns on an array rather than
+on a record, it is marked.
 
 \paragraph{What the campaign completed.} The structural-mechanics chain was
 enqueued at ten seeds on four CPU instances and the members completed at all
@@ -155,6 +159,107 @@ whose split happens to be the reference. Reconciliation is run at every seed and
 every member. On the test block, which no seed moves, all forty pairs agree with
 their recorded reflection-averaged error to between $10^{-14}$ and $6\times10^{-8}$,
 the precision at which the arrays are stored.
+
+\paragraph{Released residuals.} The residual and selection analyses of
+Sections~\ref{sec:diversity} and~\ref{sec:members-seeds} consume the member
+residuals $r_m=f_m-y$ rather than the predictions, and the residuals are what
+we release. For each of the ten seeds one compressed NumPy archive,
+\texttt{sm\_residuals\_s$k$.npz}, holds the test-block residual of each of the
+five members and of the reported pipeline (per-pixel stack plus kernel
+correction) as a $20000\times1681$ array, the validation-split residual of each
+member as a $1000\times1681$ array, the target norms $\|y\|$ of every sample on
+both splits, and the index arrays of both splits; the residuals are stored in
+IEEE half precision (\texttt{float16}), the norms and indices at full width.
+The archives were written from the reconciled arrays above by
+\texttt{campaign/export\_residuals.py}, which also recomputes every member's
+validation and test error from the half-precision residual and compares it
+with the stage record the tables are built from: over all 110 arrays the two
+agree to within $5.4\times10^{-8}$ in the relative-error unit, and the largest
+residual in any array is $192$ against target norms of $3.7\times10^3$ to
+$1.7\times10^4$, so the rounding is far below the seed-to-seed spread of any
+quantity in the paper. At $384$\,MB per seed, $3.84$\,GB in all, the archives
+exceed what the code repository can carry; they are to be deposited with the
+published version, and the repository keeps the manifest
+(\texttt{runs/residuals\_manifest.json}: per array the seed, the split seed,
+member, split, shape, dtype, the SHA-256 of its bytes, the largest residual
+and the three errors just described; per archive its size and SHA-256), so a
+deposited file can be checked byte for byte against the version the paper was
+computed from. From these files alone, without the dataset, a reader can
+recompute every member error of Table~\ref{tab:members} as the mean of
+$\|r_m\|/\|y\|$ over samples; the second-moment matrix $S$, the simplex
+weights, the predicted and realized risks and the dispersion factor of
+Proposition~\ref{prop:secmom} (\texttt{campaign/secmom\_seeded5.py} does
+nothing else with the arrays than form $r_m/\|y\|$ on the validation split
+and evaluate $\|\sum_m w_m r_m\|/\|y\|$ on test, which is exact because the
+weights sum to one); the pairwise residual correlations and the
+equicorrelated floor; the equal-weight and fitted ensembles, the spatial error
+maps and the hard-sample comparison of Section~\ref{sec:diversity}; and the
+raw conformal scores $\|r\|$ of the pipeline, calibrated on the same
+seed-drawn subset of the test block. The per-pixel affine refit and the
+kernel correction need the predictions themselves, $f_m=y+r_m$, and the
+kernel's posterior scale needs the Gram matrix; both follow from the
+distributed dataset and the released code. The network checkpoints, the
+training-split predictions and the OCO-2 and ClimSim arrays remain with the
+runs, as stated where they arise.
+
+\paragraph{Compute record.} The campaign recorded wall clock but not memory,
+and Table~\ref{tab:compute} reports what it recorded; nothing in it is a new
+measurement. Each member's trainer writes its own elapsed minutes and the
+epoch of the checkpoint it kept into its run record, prints a cumulative
+timer every ten epochs, and prints the device it selected; the kernel stage
+prints the elapsed seconds of every grid cell, one Cholesky factorization and
+solve of the $19000\times19000$ system followed by the validation prediction,
+and the out-of-fold stage the seconds per fold at $n=14250$. Every task ran
+six threads, five tasks to an instance, so the figures are wall clock under
+the campaign's own load rather than the cost of an isolated job, and the
+spread across seeds is mostly the spread across hosts: the four seeds the
+larger instance lists as its own in the campaign's task records (2, 4, 8 and
+9) are separated from the other six by the kernel's per-cell time without
+overlap, $20$--$35$\,s against $42$--$113$\,s, and the table keeps the two
+classes apart. The FNO is the one member without a completed record. Its
+rate is read from the ten-epoch timer prints: the uninterrupted intervals run
+at $467$--$625$\,s per epoch on the standard instances and $348$--$410$\,s on
+the larger one, and the remaining intervals, which reach $10^4$\,s per epoch,
+record contention and suspension on the shared hosts rather than the method,
+which is why the table gives the median of all intervals alongside the
+minimum. The checkpoints that were kept sit at epochs 10 to 70 and were
+reached after $1.3$--$8.0$\,h of training at the five seeds whose timer ran
+uninterrupted to that epoch, and after $9.0$--$16.9$\,h at the other five,
+whose timers include such periods. The inference time for the test block
+was not recorded for any member (the prediction logs carry the score only),
+and no stage recorded peak memory; the out-of-memory marker at seed 4 is the
+Gram-matrix failure described above. The harvest, with the per-seed values
+behind every entry, is \texttt{runs/timing\_harvest.json}, produced by
+\texttt{campaign/harvest\_timing.py} from the run records and logs.
+
+\begin{table}[t]
+\centering
+\caption{Compute record of the structural-mechanics members, as written by the
+campaign's own trainers and logs (all stages on CPU, six threads per task,
+five tasks sharing each instance). Network rows: the trainer's elapsed
+minutes from the first epoch to the final evaluation, as the range over seeds,
+with the scheduled epochs and the epoch of the kept checkpoint (range over the
+ten seeds). The FNO row gives seconds per epoch from the ten-epoch timer
+prints, minimum and median over all intervals (count in parentheses), since
+no seed completed the schedule. Kernel rows: the whole stage (fifteen grid
+cells and the refit) and the single factor-and-solve it repeats, as ranges,
+with the number of timed cells or folds in parentheses. The two columns are
+the two instance classes of the campaign, with the seed count behind each.}
+\label{tab:compute}
+\begin{tabular}{llcc}
+\toprule
+Stage & Epochs: scheduled / kept & Standard instances (6 seeds) & Larger instance (4 seeds) \\
+\midrule
+Metric-loss MLP & 400 / 39--79 & 129--158 min & 26--35 min \\
+MSE MLP & 120 / 99--119 & 9.7--11.9 min & 6.6--11.1 min \\
+Refiner & 100 / 99 & 9.9--13.1 min & 7.9--33.7 min \\
+FNO, per epoch & 200 / 10--70 & 467 s min, 581 s median (88) & 348 s min, 437 s median (56) \\
+Kernel ridge, grid and refit & --- & 17.0--26.0 min & 6.1--7.4 min \\
+\ \ one factor-and-solve, $n=19000$ & --- & 42--113 s (90) & 20--35 s (60) \\
+\ \ out-of-fold fold, $n=14250$ & --- & 32--66 s (24) & 13--22 s (16) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \paragraph{Stacking.} Global weights: convex, initialized at the simplex
 minimizer of the measured second-moment matrix $S$

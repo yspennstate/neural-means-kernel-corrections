@@ -15,3 +15,5 @@ campaign/boxes.local.json
 # records. They are small JSON and they are the evidence, so they ship. The
 # large arrays they were computed from (member predictions, checkpoints) do
 # not; those are covered by the runs/ rules above.
+
+release_artifacts/

@@ -11,7 +11,7 @@
 \numberwithin{theorem}{section}
 \newtheorem{assumption}[theorem]{Assumption}
 
-\jmlrheading{}{2026}{1-63}{8/26}{}{}{Yitzchak Shmalo}
+\jmlrheading{}{2026}{1-66}{8/26}{}{}{Yitzchak Shmalo}
 \ShortHeadings{Neural means and kernel corrections for operator learning}{Shmalo}
 \firstpageno{1}
 
@@ -115,40 +115,25 @@
 \maketitle
 
 \begin{abstract}%
-We combine neural network means with exact Mat\'ern kernel regressions of
-their residuals and of their learned features, and evaluate the pairing on two
-public emulation problems with published baselines: the structural-mechanics
-benchmark of de Hoop et al.\ and the OCO-2 radiative-transfer emulator of
-Lamminp\"a\"a et al. On structural mechanics the pipeline reaches
-\errPipe\% test error with a standard deviation of \errPipeSd{} points over ten
-independently seeded replicates: below every published method except the best
-one, from which it is not separable once the test block's own sampling error is
-counted. It reaches $\errBestLow\pm\errBestLowSd$\%, again over ten seeds,
-against a published \pubBestLo\% in the
-low-data regime. On
-OCO-2, replicated at ten seeds on each of the three spectral bands, it improves
-on the published Gaussian-process emulator on that problem's
-own test points and on both of its error metrics at once --- on every seed of
-two bands and on nine of ten of the third; the same kernel
-that trails the network tenfold on the raw state overtakes it on the network's
-features, and we measure why (the target's squared native-space norm drops
-about fortyfold at fixed effective dimension) and prove the mechanism. Where
-the two families tie instead, the residuals of every architecture we train
-correlate above \corrNetLo{} at every seed, their shared component is flat in
-diversity and sample size, and the hardest cases are hard for every member at
-once, which reads the published plateau as a property of the data. The seed
-spread of our own pipeline is some sixty times smaller than the span of the
-published architectures, so that reading does not rest on
-run-to-run noise. The supporting results cover the deployed estimators
-themselves: a second-moment identity whose stacking prediction we check
-prospectively at every seed, where it tracks the realized risk to within a
-dispersion factor of \dispFac{} with a seed spread of \dispFacSd; finite-sample
-guarantees with measured constants for the fitted stacks, the per-coordinate
-selection and the grid-tuned correction; an optimal-recovery certificate; and
-a distribution-free coverage band whose hypotheses the calibration protocol
-satisfies exactly, which is the only uncertainty signal that survives our
-tests and whose observed coverage falls inside the exact finite-sample band at
-ten seeds out of ten. Every stated result is also checked numerically.
+A neural network mean followed by an exact Mat\'ern kernel regression has,
+on two public emulation problems with published baselines, two distinct
+uses. On the structural-mechanics benchmark of de Hoop et al., where kernel
+methods and neural operators are competitive, the kernel corrects the
+residual of a stacked neural mean: the pipeline reaches
+$\errPipe\pm\errPipeSd$\% test error over ten seeded replicates, below every
+published method except PARA-Net at \pubBestHi\%, a tie within the test
+block's sampling error, and $\errBestLow\pm\errBestLowSd$\% in the
+1250-sample protocol against a published \pubBestLo\%. On the OCO-2
+radiative-transfer problem of Lamminp\"a\"a et al., where the same kernel on
+the raw atmospheric state trails the network tenfold, the kernel belongs on
+the network's learned features: there it overtakes the network, and a
+per-coordinate combination improves on the published Gaussian-process
+emulator on both of that problem's error metrics on all three spectral
+bands, at ten seeds per band. The replicates also show why ensembles
+saturate on structural mechanics: the residuals of every architecture we
+train correlate above \corrNetLo{} at every seed and their shared component
+is flat in diversity and sample size, consistent with a floor set by the
+benchmark data. The supporting bounds are checked numerically.
 \end{abstract}
 
 \begin{keywords}

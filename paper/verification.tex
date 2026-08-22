@@ -9,8 +9,8 @@ leave-half-out identity and unbiasedness of Proposition~\ref{prop:kf} are
 checked by direct enumeration; the effective-dimension
 identity of Lemma~\ref{lem:deff} is checked to machine precision and the
 closed form of Corollary~\ref{cor:mp} against the empirical spectrum of an
-i.i.d.-entry Gram matrix; and the rate mechanism of
-Proposition~\ref{prop:aniso} is exercised on a controlled warped target
+i.i.d.-entry Gram matrix; and the rate mechanism of the heuristic calculation
+in Proposition~\ref{prop:aniso} is exercised on a controlled warped target
 $G=g(A\,\cdot)$ with a known singular-value profile, where the adapted metric
 must dominate at every sample size and improve the empirical rate. All four
 pass: the largest relative violation of the optimal-recovery bound is
@@ -53,13 +53,28 @@ band-seeds. Section~\ref{sec:secmom-margin} reports what that scoring found,
 which is not a uniform verdict: the rule's accuracy is governed by the margin
 between the two quantities it compares. The selection conditions of
 Propositions~\ref{prop:percoord}, \ref{prop:selectcoord} and~\ref{prop:affine}
-are checked against the realized selections, with the measured constants $b$,
-$W$ and $\kappa$ of Corollary~\ref{cor:certificate} and the certificate
-evaluated next to the realized excess; $\kappa$ is a supremum over a test probe
-and therefore a measured lower bound, $31.2\pm0.9$ over the three seeds at
-which it was evaluated at the working configuration ($29.3$ at a
-single-seed probe run outside the campaign) and
-falling to $3.0$ at the largest nugget and length scale of the grid. The
+are checked against the realized selections, with the measured constants $b$
+and $W$ of Proposition~\ref{prop:affine} and Corollary~\ref{cor:certificate}
+released next to the realized excesses of the affine stack and of the
+corrected surrogate. Both are capacity bounds: the affine bound evaluated at
+the measured $b$ and $W$ exceeds its realized excess by many orders of
+magnitude, and the corollary's right-hand side, whose remaining constant is
+the analytic $\kappa_{\mathrm{an}}=10^{3}$ of Lemma~\ref{lem:kappa} (the
+smallest nugget on the grid to the power $-1/2$), is larger still; the
+constants are released for what they show about the bounds rather than as a
+guarantee. The realized scale of the correction weights is measured
+separately: the largest $\ell^1$ norm of $c_\gamma(u)$ over the grid and over
+a fixed $500$-point test probe is $31.2\pm0.9$ at the three seeds at which it
+was evaluated at the working configuration ($29.3$ at a single-seed probe run
+outside the campaign), falling to $3.0$ at the largest nugget and length
+scale of the grid. Being a supremum over a finite probe, that value is a
+lower bound on $\sup_{u,\gamma}\|c_\gamma(u)\|_1$ and not a constant the
+corollary can be evaluated at; the collection script is written to insert it
+where it assembles the bound, which would understate the right-hand side by a
+factor of close to a thousand through the $(1+\kappa)^2$ term and leave it
+vacuous all the same. The probe value sits a factor of about thirty below
+$\kappa_{\mathrm{an}}$, and every per-configuration probe value respects the
+lemma's bound $\lambda^{-1/2}$ at its own nugget. The
 coverage of Proposition~\ref{prop:conf} is computed at every seed and each
 observed value placed against the exact Beta law of Remark~\ref{rem:covlaw}:
 at the $90\%$ level ten of ten fall inside the central band $[88.1\%,91.8\%]$,
@@ -67,9 +82,10 @@ and at the $95\%$ level ten of ten inside $[93.6\%,96.3\%]$. Finally the
 data-scaling sweep of the two raw-input kernel rows is refit at nested training
 sizes and at ten seeds per band. The approximate rank of the sensitivity map
 is $12$ of $20$ on O2 and $13$--$14$ of $24$ on the two CO$_2$ bands, a rank
-ratio between $0.54$ and $0.60$, so Proposition~\ref{prop:aniso} would permit
-a rate gain here and not merely a constant; the sweep finds the constant and
-not the rate, and Section~\ref{sec:aniso-measured} reports it that way.
+ratio between $0.54$ and $0.60$, so the heuristic calculation of
+Proposition~\ref{prop:aniso} would permit a rate gain here and not merely a
+constant; the sweep finds the constant and not the rate, and
+Section~\ref{sec:aniso-measured} reports it that way.
 
 The bound comparisons are reported as measured constants, bound value and
 realized excess side by side; where an oracle risk is needed it is estimated by

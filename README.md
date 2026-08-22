@@ -31,13 +31,8 @@ model, a per-coordinate combination that beats the emulator on both metrics
 at once -- at ten of ten seeds on O2 and SCO2 and nine of ten on WCO2.
 Earlier versions of this README reported single-seed numbers from a longer
 training budget (O2 3.8% / 0.027%); see docs/reproduce.md for how the two
-budgets relate. Historically WCO2 was an exception where two separate
-deep-kernel heads split the metrics (the flat-feature head for the reduced
-metric, the weighted-feature head for the radiance metric); a single combined
-WCO2 model was not produced, so its two numbers are the best single head per
-metric rather than one model. The winner on the reduced metric is an exact
-kernel head on the flat-trained network's features; on the radiance metric,
-the same head on a radiance-trained network's features. The same kernel scores
+budgets relate. WCO2 carries the thin margin: the radiance win there is nine
+of ten seeds, the exception missing by 0.0015 points. The same kernel scores
 40% on the raw input: its limitation was the features, not the solve.
 
 **Structural mechanics** (de Hoop, Huang, Qian and Stuart; boundary load to
@@ -62,7 +57,8 @@ linear end of the same regime picture.
 ## Layout
 
 ```
-paper/            LaTeX source, figures, compiled PDF
+paper/            LaTeX source, figures, compiled PDF (pdflatex + bibtex;
+                  the JMLR style file is included)
 common.py         structural mechanics: data, splits, metric
 prep_data.py      one-time extraction from the distributed arrays
 train_*.py        the neural means (MLP, MSE variant, refiner, FNO, UNet, transformer)
@@ -77,7 +73,7 @@ campaign/         the seed campaign: per-seed pipelines, matched kernel
                   tuning, conformal calibration, verification suite, analyses
 analyze_corr.py / ensemble_theory.py / ensemble_uq.py / uq_spectra.py
                   the diversity, stacking-identity and uncertainty analyses
-figures.py / fig_corr.py / freeze.py
+figures.py / fig_corr.py / fig_floor.py / freeze.py
                   paper figures and the macro freeze
 runs/             per-run JSON summaries backing every reported number
 docs/reproduce.md every number, with its exact command and hyperparameters

@@ -227,7 +227,25 @@ because the deviations are uniform over the ball. The selection chain
 $\bar R(\widehat\gamma)\le\widehat{\bar R}(\widehat\gamma)+Z\le
 \widehat{\bar R}(\gamma^\ast)+Z\le\bar R(\gamma^\ast)+2Z$ with
 $\gamma^\ast$ the aggregate oracle then gives the display, whose constant is
-$2Z$ in the factored form stated. \qed
+$2Z$ in the factored form stated. When the $c_\gamma$ are kernel ridge
+weights, Lemma~\ref{lem:kappa} supplies the hypothesis with
+$\kappa=\kappa_{\mathrm{an}}$. \qed
+
+\subsection{Proof of Lemma~\ref{lem:kappa}}
+
+Fix $u$ and write $k_u=k(X,u)$, $A=K+n\lambda I$ and $c=A^{-1}k_u$. The
+proof of Theorem~\ref{thm:or} below shows that
+$\rho(u)^2=k(u,u)-k_u^\top A^{-1}k_u-n\lambda\|c\|_2^2
+=P_\lambda(u)^2-n\lambda\|c\|_2^2$ is the squared $\mathcal H_k$-norm of
+$k(u,\cdot)-\sum_ic_ik(u_i,\cdot)$, hence nonnegative, so
+$n\lambda\|c\|_2^2\le P_\lambda(u)^2\le k(u,u)\le k_{\max}$, the middle
+inequality because $k_u^\top A^{-1}k_u\ge0$. Cauchy--Schwarz gives
+$\|c\|_1\le\sqrt n\,\|c\|_2$, and combining,
+$\|c\|_1^2\le n\|c\|_2^2\le P_\lambda(u)^2/\lambda\le k_{\max}/\lambda$.
+For the Mat\'ern kernel of Section~\ref{sec:method-kernel}, $k(u,u)=1$ and
+the smallest nugget on the grid is $10^{-6}$, so
+$\sup_{u,\gamma}\|c_\gamma(u)\|_1\le\max_\gamma\lambda_\gamma^{-1/2}=10^{3}$
+irrespective of the length scale and of the design. \qed
 
 \subsection{Proof of Proposition~\ref{prop:secmom}}
 
@@ -332,13 +350,14 @@ $\|h\circ\varphi\|_{\mathcal H_{k_\varphi}}\le\|h\|_{\mathcal H_k}$, and
 substituting this bound into Theorem~\ref{thm:or} applied with the kernel
 $k_\varphi$ replaces $\|G\|$ by $\|h\|_{\mathcal H_k}$. \qed
 
-\subsection{Proof sketch of Proposition~\ref{prop:aniso}}
+\subsection{Heuristic derivation of Proposition~\ref{prop:aniso}}
 
-This appendix records the argument at the level of the idealization stated
-with the proposition --- projected image marginal bounded above and below,
-exact rank at the working resolution, and the interpolation limit standing in
-for the validated nugget --- without tracking constants; no lower bound is
-claimed. The argument has five steps: a pointwise error bound whose design dependence
+The proposition is labelled informal, and this appendix records the
+calculation behind it at the level of the idealization stated with it ---
+projected image marginal bounded above and below, exact rank at the working
+resolution, and the interpolation limit standing in for the validated nugget
+--- as a sketch, without tracking constants; no lower bound is claimed. The
+argument has five steps: a pointwise error bound whose design dependence
 is the power function; a fill-distance bound for random designs; an upper
 bound on the warped target's native norm; the two substitutions; and the
 reduction from the validated nugget to the interpolation scale. Throughout,
@@ -425,11 +444,11 @@ and selects on validation. For any fixed $\lambda$ the pathwise bound of
 Theorem~\ref{thm:or} controls the ridge estimator by
 $\|F\|_K\,\sup_uP_\lambda(u)$, and a two-line spectral computation compares
 the regularized power function with the interpolation one: with
-$\kappa=k(X,u)$ and $A_\lambda=K+n\lambda I$,
+$k_u=k(X,u)$ and $A_\lambda=K+n\lambda I$,
 \[
-P_\lambda(u)^2-P_0(u)^2=\kappa^\top\big(K^{-1}-A_\lambda^{-1}\big)\kappa
-=n\lambda\,\kappa^\top K^{-1}A_\lambda^{-1}\kappa\;\le\;
-\frac{n\lambda\,\|\kappa\|_2^2}{\lambda_{\min}(K)\,
+P_\lambda(u)^2-P_0(u)^2=k_u^\top\big(K^{-1}-A_\lambda^{-1}\big)k_u
+=n\lambda\,k_u^\top K^{-1}A_\lambda^{-1}k_u\;\le\;
+\frac{n\lambda\,\|k_u\|_2^2}{\lambda_{\min}(K)\,
 \big(\lambda_{\min}(K)+n\lambda\big)},
 \]
 which vanishes as $\lambda\to0$. Validation selection over the grid can only
@@ -440,14 +459,14 @@ lower bound is claimed. \qed
 
 \subsection{Proof of Theorem~\ref{thm:or}}
 
-Fix $u$ and write $\kappa=k(X,u)\in\mathbb R^n$, $A=K+n\lambda I$,
-$w=A^{-1}\kappa$. For each component $j$, membership $r_j\in\mathcal H_k$ and
+Fix $u$ and write $k_u=k(X,u)\in\mathbb R^n$, $A=K+n\lambda I$,
+$w=A^{-1}k_u$. For each component $j$, membership $r_j\in\mathcal H_k$ and
 the reproducing property give
 \[
 r_j(u)-\widehat r_{\lambda,j}(u)
 = \Big\langle r_j,\; k(u,\cdot)-\sum_{i=1}^n w_i\,k(u_i,\cdot)\Big\rangle_{\mathcal H_k},
 \]
-because $\widehat r_{\lambda,j}(u)=\kappa^\top A^{-1}r_j(X)=\sum_i w_i\,r_j(u_i)$
+because $\widehat r_{\lambda,j}(u)=k_u^\top A^{-1}r_j(X)=\sum_i w_i\,r_j(u_i)$
 and $r_j(u_i)=\langle r_j,k(u_i,\cdot)\rangle$. Cauchy--Schwarz yields
 \[
 \big|r_j(u)-\widehat r_{\lambda,j}(u)\big|\;\le\;\|r_j\|_{\mathcal H_k}\,
@@ -455,12 +474,12 @@ and $r_j(u_i)=\langle r_j,k(u_i,\cdot)\rangle$. Cauchy--Schwarz yields
 \]
 and the second factor is independent of $j$; call it $\rho(u)$. Expanding,
 \[
-\rho(u)^2 = k(u,u) - 2\,w^\top\kappa + w^\top K w
-= k(u,u) - \kappa^\top A^{-1}\big(2A-K\big)A^{-1}\kappa .
+\rho(u)^2 = k(u,u) - 2\,w^\top k_u + w^\top K w
+= k(u,u) - k_u^\top A^{-1}\big(2A-K\big)A^{-1}k_u .
 \]
 Since $2A-K=A+n\lambda I$,
 \[
-\rho(u)^2 = k(u,u)-\kappa^\top A^{-1}\kappa - n\lambda\,\|A^{-1}\kappa\|_2^2
+\rho(u)^2 = k(u,u)-k_u^\top A^{-1}k_u - n\lambda\,\|A^{-1}k_u\|_2^2
 =\widetilde P_\lambda(u)^2\;\le\;P_\lambda(u)^2 .
 \]
 Summing the squared componentwise bounds,

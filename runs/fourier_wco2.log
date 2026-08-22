@@ -1,0 +1,7 @@
+wco2 reference silu: test 0.1637
+  sigma 0.30: test 31.07%  corr 0.537  no (thr 0.527)  [2.1 min]
+  sigma 0.60: test 116.71%  corr 0.166  no (thr 0.140)  [1.4 min]
+  sigma 1.00: test 143.95%  corr 0.111  HELPS (thr 0.114)  [1.8 min]
+  sigma 1.50: test 143.84%  corr 0.105  HELPS (thr 0.114)  [1.6 min]
+  sigma 2.00: test 144.98%  corr 0.114  no (thr 0.113)  [1.4 min]
+saved fourier_wco2.npz

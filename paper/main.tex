@@ -1,21 +1,19 @@
 \pdfoutput=1
-\documentclass[11pt]{article}
-\usepackage[margin=1.1in]{geometry}
+\documentclass[twoside,11pt]{article}
 \usepackage{amsmath,amssymb,amsthm,mathtools}
-\usepackage{graphicx}
+\usepackage{jmlr2e}
 \usepackage{booktabs}
 \usepackage[dvipsnames,table]{xcolor}
 \usepackage{microtype}
-\usepackage[numbers,sort&compress]{natbib}
-\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black,urlcolor=blue!60!black]{hyperref}
 \usepackage{subcaption}
 
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{proposition}[theorem]{Proposition}
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{corollary}[theorem]{Corollary}
-\newtheorem{remark}[theorem]{Remark}
+% jmlr2e defines theorem, lemma, proposition, corollary and remark; number them by section.
+\numberwithin{theorem}{section}
 \newtheorem{assumption}[theorem]{Assumption}
+
+\jmlrheading{}{2026}{1-63}{8/26}{}{}{Yitzchak Shmalo}
+\ShortHeadings{Neural means and kernel corrections for operator learning}{Shmalo}
+\firstpageno{1}
 
 % ---- result macros: single source of truth for all reported numbers ----
 % Every macro below whose name ends in Sd is a standard deviation over the ten
@@ -103,19 +101,20 @@
 \newcommand{\pubKernelHi}{5.18}      % published kernel method, high data
 \newcommand{\ttaGainMLP}{0.16}       % MLP reflection-averaging gain, ten-seed mean
 
-\title{Neural means and kernel corrections for operator learning}
-\author{%
-Yitzchak Shmalo%
-\thanks{Einstein Institute of Mathematics, The Hebrew University of Jerusalem,
-Jerusalem, Israel. \texttt{yitzchak.shmalo@gmail.com}.
-Code, data pointers, and the per-run summaries behind every number reported here are at
-\url{https://github.com/yspennstate/neural-means-kernel-corrections}.}}
-\date{July 2026}
-
 \begin{document}
+
+\title{Neural means and kernel corrections for operator learning}
+
+\author{\name Yitzchak Shmalo \email yitzchak.shmalo@gmail.com \\
+       \addr Einstein Institute of Mathematics\\
+       The Hebrew University of Jerusalem\\
+       Jerusalem, Israel}
+
+\editor{Under review}
+
 \maketitle
 
-\begin{abstract}
+\begin{abstract}%
 We combine neural network means with exact Mat\'ern kernel regressions of
 their residuals and of their learned features, and evaluate the pairing on two
 public emulation problems with published baselines: the structural-mechanics
@@ -152,9 +151,13 @@ tests and whose observed coverage falls inside the exact finite-sample band at
 ten seeds out of ten. Every stated result is also checked numerically.
 \end{abstract}
 
+\begin{keywords}
+operator learning, kernel ridge regression, deep kernel learning, ensembles,
+conformal prediction, emulation
+\end{keywords}
+
 \section{Introduction}
 \label{sec:intro}
-% written after results freeze -- see draft in intro.tex include
 \input{intro}
 
 \section{Benchmark, protocol, and related work}
@@ -223,7 +226,6 @@ and the kernel-flow emulator's predictions through the OSF project
 \texttt{u2t8a}; and the ClimSim data through the LEAP repository
 \texttt{subsampled\_low\_res}.
 
-\bibliographystyle{abbrvnat}
 \bibliography{refs}
 
 \appendix

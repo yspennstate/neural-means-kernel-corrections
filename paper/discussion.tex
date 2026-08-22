@@ -81,20 +81,20 @@ only object here that plays that role. Training the means on the metric, the
 reflection steps and the stacking are benchmark-agnostic, but the error
 levels reported here are properties of these datasets and protocols.
 
-Three runs are incomplete, and their stopping rules are stated here once. The
-Fourier neural operator was stopped at every seed by the campaign's 36-hour
-per-task wall clock and is finalized from the best-validation checkpoint
-written before the stop, between epochs 10 and 70 of a scheduled 200, with
-its cosine schedule never annealed; nothing was retrained. The UNet member,
-scheduled after it, completed at two of ten seeds, so the six-member
-configuration that included it is not among the reported results. The OCO-2
-networks are trained at a matched 250-epoch budget that is short of
-convergence; a single 750-epoch run reaches lower levels on the O2 band
-without changing the orderings (Section~\ref{sec:aniso-measured}). The
-kernel-ridge baseline of Table~\ref{tab:lowdata} is a single run. Our
-low-data protocol reproduces that of \citet{mora2025operator} up to the
-ambiguity of which 1250 samples are used; we use the first 1250 of the
-training block and the same 20000-sample test set, and release the splits.
+Three runs are incomplete, with their stopping rules stated once in
+Section~\ref{sec:seeds}: the Fourier neural operator was stopped at every
+seed by the campaign's wall clock and finalized from the best-validation
+checkpoint written before the stop, nothing retrained; the UNet member
+completed at two seeds of ten, so the six-member configuration that
+included it is not among the reported results; and the OCO-2 networks are
+trained at a matched 250-epoch budget short of convergence, a single
+750-epoch run reaching lower levels on the O2 band without changing the
+orderings (Section~\ref{sec:aniso-measured}). The kernel-ridge row of
+Table~\ref{tab:lowdata} is a single run, and our low-data protocol
+reproduces that of \citet{mora2025operator} up to the ambiguity of which
+$1250$ samples are used; we use the first $1250$ of the training block and
+the same 20000-sample test set, and release the splits.
+
 
 The reading of the structural-mechanics plateau as a data floor is an
 inference from surrogates alone. The experiment that would decide it is to

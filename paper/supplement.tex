@@ -1,0 +1,98 @@
+\pdfoutput=1
+\documentclass[twoside,11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{jmlr2e}
+\usepackage{booktabs}
+\usepackage[dvipsnames,table]{xcolor}
+\usepackage{microtype}
+\usepackage{subcaption}
+\usepackage{xr}
+\externaldocument{main}
+
+% Sections here are numbered S1, S2, ...; theorem-like environments inherit the
+% prefix through the section counter, so results read Proposition S1.2 and so on.
+\renewcommand{\thesection}{S\arabic{section}}
+\numberwithin{theorem}{section}
+\newtheorem{assumption}[theorem]{Assumption}
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
+
+\jmlrheading{}{2026}{}{8/26}{}{}{Yitzchak Shmalo}
+\ShortHeadings{Supplement: neural means and kernel corrections}{Shmalo}
+\firstpageno{1}
+
+\input{macros}
+
+\begin{document}
+
+\title{Online supplement to ``Neural means and kernel corrections for
+operator learning''}
+
+\author{\name Yitzchak Shmalo \email yitzchak.shmalo@gmail.com \\
+       \addr Einstein Institute of Mathematics\\
+       The Hebrew University of Jerusalem\\
+       Jerusalem, Israel}
+
+\editor{Under review}
+
+\maketitle
+
+\begin{abstract}%
+This supplement accompanies the main text and is archived with the code
+repository. Section~S1 states the finite-sample bounds behind every fitted
+stage of the pipeline; Section~S2 the margin law and the per-coordinate
+selection results; Section~S3 the effective-dimension identity and its
+Mar\v{c}enko--Pastur closed form; Section~S4 the additional
+structural-mechanics results (ablation, error localization, spectra,
+uncertainty quantification, cost); Section~S5 the OCO-2 input-metric study
+and the data-scaling and ClimSim results; Sections~S6--S8 all proofs, the
+implementation and compute record, and the numerical verification of every
+stated result.
+Numbering of the form S$n$ refers to this document; all other references
+point to the main text.
+\end{abstract}
+
+\section{Guarantees for the fitted stages}
+\label{supp:stages}
+\input{supp_theory_stages}
+
+\section{Decision rules: margins and per-coordinate selection}
+\label{supp:rules}
+\input{supp_theory_rules}
+
+\section{Distribution-free coverage for the reported band}
+\label{supp:conf}
+\input{supp_theory_conf}
+
+\section{The rest of the suite, and the mirror-symmetry check}
+\label{supp:benchmark}
+\input{supp_benchmark}
+
+\section{Effective dimension from the Gram spectrum}
+\label{supp:deff}
+\input{supp_theory_deff}
+
+\section{Additional structural-mechanics results}
+\label{supp:experiments}
+\input{supp_experiments}
+
+\section{The OCO-2 input metric, and data scaling}
+\label{supp:oco2}
+\input{supp_oco2}
+
+\section{Proofs}
+\label{app:proofs}
+\input{proofs}
+
+\section{Implementation details}
+\label{app:impl}
+\input{impl}
+
+\section{Numerical verification of the stated results}
+\label{app:verification}
+\input{verification}
+
+\bibliography{refs}
+
+\end{document}

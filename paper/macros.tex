@@ -1,0 +1,85 @@
+% ---- result macros: single source of truth for all reported numbers ----
+% Every macro below whose name ends in Sd is a standard deviation over the ten
+% campaign seeds; seeded quantities are written mean/sd as a pair. Filled from the
+% campaign artifacts (seeds/sm_s*/runs/*.json, pix4_s*.json, ens_s*.json,
+% conf_s*.json) -- see Appendix~\ref{app:impl}.
+%
+% Replicated pipeline (ten seeds, five members)
+\newcommand{\errPipe}{4.572}         % corrected pipeline, mean over ten seeds (%)
+\newcommand{\errPipeSd}{0.010}       % its seed standard deviation (points)
+\newcommand{\errStack}{4.595}        % affine stack before correction, ten-seed mean
+\newcommand{\errStackSd}{0.008}
+\newcommand{\corrGain}{0.024}        % correction's gain over the stack (points)
+\newcommand{\corrGainSd}{0.005}
+\newcommand{\errEnsEq}{4.648}        % equal-weight five-member ensemble, test
+\newcommand{\errEnsEqSd}{0.005}
+\newcommand{\errEnsFit}{4.627}       % val-fitted weights, scored on test
+\newcommand{\errEnsFitSd}{0.006}
+\newcommand{\errEndToEnd}{0.140}     % best member -> corrected pipeline (points)
+\newcommand{\errEndToEndSd}{0.014}
+% The four-member pipeline, kept because the FNO's admission is measured against it
+\newcommand{\errPipeFour}{4.611}     % same pipeline without the FNO
+\newcommand{\errPipeFourSd}{0.005}
+\newcommand{\fnoGain}{0.039}         % five members over four, paired within seed
+\newcommand{\fnoGainSd}{0.011}
+% Uncertainty budget
+\newcommand{\seTest}{0.012}          % test-block standard error (points)
+\newcommand{\seOwn}{0.016}           % seed and test block combined
+\newcommand{\seUnpaired}{0.020}      % against a published number, unpaired
+% Six-member configuration: the UNet completed at two of the ten campaign seeds
+\newcommand{\errBestOne}{4.538}      % six-member configuration, mean of the two completed seeds
+\newcommand{\errStackOne}{4.557}     % its per-pixel stack, same two seeds
+\newcommand{\errUNetG}{4.99}         % UNet member + TTA, one seed
+\newcommand{\errStackFam}{4.67}      % MLP-family stack, one seed
+% Members, ten seeds, reflection-averaged where the member has it
+\newcommand{\errMLP}{4.836}          % residual MLP, metric loss
+\newcommand{\errMLPSd}{0.018}
+\newcommand{\errMSE}{4.712}          % residual MLP, normalized MSE
+\newcommand{\errMSESd}{0.006}
+\newcommand{\errRef}{4.730}          % kernel-conditioned refiner
+\newcommand{\errRefSd}{0.006}
+\newcommand{\errFNOG}{4.754}         % FNO member + TTA, ten seeds
+\newcommand{\errFNOGSd}{0.031}
+\newcommand{\errKRRload}{5.197}      % kernel ridge on loads
+\newcommand{\errKRRloadSd}{0.003}
+\newcommand{\errBestLow}{5.433}      % low-data pipeline test error, ten seeds, N=1250 (%)
+\newcommand{\errBestLowSd}{0.093}    % its standard deviation over the ten seeds
+\newcommand{\errKRRloadLow}{6.66}    % multiscale kernel ridge on loads, N=1250
+% Second-moment prediction, ten seeds, five members, simplex QP solved by SLSQP
+\newcommand{\predRMS}{4.940}         % predicted RMS relative error of the best mixture
+\newcommand{\predRMSSd}{0.057}
+\newcommand{\dispFac}{0.938}         % realized mean / predicted RMS
+\newcommand{\dispFacSd}{0.003}
+\newcommand{\corrBar}{0.913}         % mean pairwise residual correlation
+\newcommand{\corrBarSd}{0.005}
+\newcommand{\corrNetLo}{0.83}        % min pairwise residual corr over seeds
+\newcommand{\corrNetHi}{0.97}        % max pairwise residual corr over seeds
+\newcommand{\corrKerLo}{0.86}        % min kernel-network residual corr
+\newcommand{\corrKerHi}{0.88}        % max kernel-network residual corr
+\newcommand{\corrFnoLo}{0.95}        % min FNO-network residual corr
+\newcommand{\corrFnoHi}{0.97}        % max FNO-network residual corr
+\newcommand{\ensFloor}{4.922}        % equicorrelated floor e*sqrt(rho), ten-seed mean
+\newcommand{\ensFloorSd}{0.056}
+% Error localization, ten seeds
+\newcommand{\hardBest}{10.24}        % hardest twenty validation samples, best member (%)
+\newcommand{\hardEns}{10.18}         % same samples, five-member ensemble
+\newcommand{\hardAll}{10.28}         % same samples, mean over members
+\newcommand{\medRel}{4.44}           % median per-sample relative error
+\newcommand{\rmsBnd}{8.99}           % boundary rms of the pointwise error
+\newcommand{\rmsInt}{5.64}           % interior rms
+\newcommand{\rmsBndEns}{8.87}        % boundary rms after averaging
+\newcommand{\rmsIntEns}{5.59}        % interior rms after averaging
+% Uncertainty
+\newcommand{\normRatio}{271}         % RKHS norm ratio direct/residual
+\newcommand{\uqCoverNom}{90}         % nominal conformal level (%)
+\newcommand{\uqCover}{90.2}          % empirical conformal coverage, ten-seed mean (%)
+\newcommand{\uqCoverSd}{0.6}
+\newcommand{\uqCorrAbs}{0.08}        % corr(power fn, absolute error) -- weak
+\newcommand{\uqCorrNorm}{0.65}       % corr(power fn, output norm) -- the confound
+\newcommand{\uqDisAbs}{0.074}        % corr(disagreement, abs err), five members, ten seeds
+\newcommand{\uqDisAbsFour}{0.083}    % same for four members, ten seeds
+\newcommand{\uqDisAbsDiv}{0.08}      % same for the six-member configuration, one seed
+\newcommand{\pubBestHi}{4.55}        % best published high-data (PARA-Net)
+\newcommand{\pubBestLo}{6.49}        % best published low-data (FNO-mean GP)
+\newcommand{\pubKernelHi}{5.18}      % published kernel method, high data
+\newcommand{\ttaGainMLP}{0.16}       % MLP reflection-averaging gain, ten-seed mean

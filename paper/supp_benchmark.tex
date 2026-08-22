@@ -1,0 +1,67 @@
+\subsection{The remaining problems of the suite: an uncontrolled survey}
+\label{sec:suite}
+For orientation we also ran one fixed recipe, unchanged, on the other
+problems of the operator-learning suite that \citet{batlle2024kernel}
+assembled from \citet{dehoop2022cost} and \citet{lu2022comprehensive}: a
+Mat\'ern kernel at the median length scale with the fit capped at 6000
+points, a residual MLP mean, outputs reduced by PCA, and the stage selected on
+validation. Table~\ref{tab:suite} lists the results next to the best
+published number on each problem. The comparison is not controlled, and we
+draw nothing from it beyond orientation: the published numbers are
+per-problem methods tuned by their authors; our rows are single runs without
+seed replication; Burgers and Darcy use slightly smaller training splits than
+their baselines (800 and 824 pairs) and Darcy a different grid, from the
+copies we could obtain; and we report no number for Advection~I. What the
+survey shows is the sorting one would expect: where the map is smooth and
+data are plentiful (Helmholtz, Navier--Stokes, Darcy) the kernel stage wins
+the recipe's internal selection and lands within a factor of two of the tuned
+per-problem kernels, and on Burgers the corrected mean sits near the Fourier
+neural operator. The two problems studied in depth, with replication, are the
+subject of the rest of the paper.
+
+\begin{table}[t]
+\centering
+\caption{The remaining problems of the suite: an uncontrolled survey. Best
+published mean relative $L^2$ test error on each problem (per-problem
+methods tuned by their authors), against one recipe run unchanged and once
+per problem, without seed replication, on training splits and grids that
+differ from the baselines' in the cases noted in the text.}
+\label{tab:suite}
+\begin{tabular}{llcc}
+\toprule
+Problem & Map & Best published & This work (single run) \\
+\midrule
+Burgers & initial condition $\to$ solution & 1.93\% (FNO) & 2.38\% \\
+Darcy flow & permeability $\to$ pressure & 2.32\% (POD-DeepONet) & 2.01\% \\
+Advection~I & smooth pulse $\to$ solution & $\approx0\%$ (kernel) & --- \\
+Advection~II & discontinuous pulse $\to$ solution & 11.28\% (linear kernel) & 11.29\% \\
+Helmholtz & wavespeed $\to$ field & 1.00\% (kernel) & 1.75\% \\
+Navier--Stokes & vorticity $\to$ vorticity & 0.12\% (kernel) & 0.51\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{A data-driven check of the mirror symmetry}
+\label{sec:symcheck}
+The continuous problem is invariant under $x_1\mapsto1-x_1$: the domain and
+boundary partition are symmetric, and the input law has a symmetric
+covariance. On the grid, reflecting the load ($S$) should reflect the stress
+field along the first grid coordinate ($T$), i.e.\ $G(Su)=TG(u)$. Rather than
+assume this, we test it on the data. For each of the first 200 samples we
+searched all 40000 loads for the nearest neighbor of the reflected load $Su_i$
+and compared the corresponding outputs. For the five best-matching pairs, the
+input mismatch $\|Su_i-u_j\|/\|u_j\|$ ranges over $0.27$--$0.32$, while the
+output mismatch $\|Tv_i-v_j\|/\|v_j\|$ ranges over $0.085$--$0.14$; reflecting
+along the second coordinate instead gives output mismatches of order one.
+Outputs of near-mirror inputs are far closer than the inputs themselves,
+which is what equivariance plus a Lipschitz solution map predicts, and the
+effect singles out the correct output reflection axis. A complementary check
+on the input law: the empirical mean and covariance of the training loads are
+invariant under reflection to within 1.1\% and 1.5\% respectively, as required
+for Proposition~\ref{prop:sym}. Consistently with all of this, reflection
+averaging at test time improves twenty-nine of the thirty reflected members of
+the seed campaign (Section~\ref{sec:experiments}), which is what
+Proposition~\ref{prop:sym} predicts: it constrains the expected loss, so a
+finite test sample is free to go the other way, and at one seed it does.
+
+

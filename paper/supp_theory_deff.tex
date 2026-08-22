@@ -1,0 +1,86 @@
+\subsection{Effective dimension from the Gram spectrum}
+\label{sec:theory-rmt}
+
+The remaining design choice is the nugget $\lambda$, selected by
+cross-validation in the pipeline. The following exact identity connects that
+choice to the spectrum of the Gram matrix and, through it, to random matrix
+descriptions of the design.
+
+\begin{lemma}[effective dimension and the empirical Stieltjes transform]
+\label{lem:deff}
+Let $K$ be a symmetric positive semidefinite $n\times n$ matrix with
+eigenvalues $\lambda_1,\dots,\lambda_n\ge0$, let
+$\widehat m(z)=\tfrac1n\sum_{i=1}^n(\lambda_i/n-z)^{-1}$ be the Stieltjes
+transform of the empirical spectral distribution of $K/n$. Then for every
+$\lambda>0$ the effective dimension of ridge regression with nugget $\lambda$
+satisfies
+\[
+d_{\mathrm{eff}}(\lambda)\;:=\;\operatorname{tr}\!\big(K(K+n\lambda I)^{-1}\big)
+\;=\;n\big(1-\lambda\,\widehat m(-\lambda)\big).
+\]
+In particular, if the empirical spectral distribution of $K/n$ converges
+weakly to a limit law $F$ as $n\to\infty$, then
+$d_{\mathrm{eff}}(\lambda)/n\to 1-\lambda\,m_F(-\lambda)$ with $m_F$ the
+Stieltjes transform of $F$.
+\end{lemma}
+
+The identity is unconditional; the random-matrix content enters through the
+choice of $F$. For the benchmark's simplest reference model, isotropic linear
+features, the limit can be evaluated in closed form.
+
+\begin{corollary}[effective dimension under a Mar\v{c}enko--Pastur limit]
+\label{cor:mp}
+Let $K=XX^\top$ with $X\in\mathbb R^{n\times p}$ having i.i.d.\ entries of
+mean zero and variance $\sigma^2$, and let $p/n\to\gamma\in(0,1]$. Then
+\[
+\frac{d_{\mathrm{eff}}(\lambda)}{n}\;\longrightarrow\;
+\gamma\big(1-\lambda\,m(-\lambda)\big),\qquad
+m(-\lambda)=\frac{\sqrt{\big(\lambda+\sigma^2(1-\gamma)\big)^2+4\gamma\sigma^2\lambda}
+-\big(\lambda+\sigma^2(1-\gamma)\big)}{2\gamma\sigma^2\lambda},
+\]
+almost surely, where $m$ is the Stieltjes transform of the
+Mar\v{c}enko--Pastur law with ratio $\gamma$ and scale $\sigma^2$. In a
+simulation with $n=3000$, $p=900$, $\sigma^2=1.7$, the formula agrees with
+the empirical $d_{\mathrm{eff}}(\lambda)/n$ to four decimal places across
+$\lambda\in[10^{-3},10]$.
+\end{corollary}
+
+Two uses. Quantitatively, the formula makes the nugget--capacity trade-off
+explicit for the bulk of a feature Gram matrix: eigenvalue mass of
+Mar\v{c}enko--Pastur type is absorbed or discarded by $\lambda$ according to a
+single closed-form curve, and outlying (spiked) eigenvalues $x_s$ simply add
+their terms $x_s/(x_s+n\lambda)$ on top. Qualitatively, it separates the two
+regimes visible in Figure~\ref{fig:spectra}: the Mat\'ern Gram matrix on the
+loads is nothing like a Mar\v{c}enko--Pastur bulk (its spectrum decays
+exponentially, which is why $d_{\mathrm{eff}}$ is a few hundred out of
+19000), whereas the Gram matrices of learned penultimate features do show a
+bulk-plus-spikes shape, and for them the corollary describes how much of the
+bulk the cross-validated nugget retains. For the feature Gram matrices of the trained networks we
+observe the familiar picture of a bulk that is well fitted by a
+Mar\v{c}enko--Pastur law \citep{marchenko1967distribution} together with a
+small number of outlying eigenvalues carrying the regression signal, as in
+spiked covariance models \citep{baik2005phase}; for the Mat\'ern Gram matrix
+on the 41-dimensional loads the spectrum decays rapidly and
+$d_{\mathrm{eff}}$ is small ($\approx$ a few hundred at the cross-validated
+$\lambda$, out of $n=19000$; Figure~\ref{fig:spectra}). This gives a
+post-hoc reading of the cross-validated nugget: $\lambda$ lands where
+$d_{\mathrm{eff}}(\lambda)$ has absorbed the outlying eigenvalues and the
+leading bulk, and further decreasing $\lambda$ buys capacity precisely where
+the spectrum carries little signal. It also explains why the exact solve is
+affordable: the correction is numerically a problem of dimension
+$d_{\mathrm{eff}}$, not $n$.
+
+The effective dimension is also exactly the total budget of the design
+factor from Theorem~\ref{thm:or}. Writing $A=K+n\lambda I$, the posterior
+variances at the training inputs sum to
+\[
+\sum_{i=1}^{n}P_\lambda(u_i)^2
+=\operatorname{tr}(K)-\operatorname{tr}(K A^{-1}K)
+=\operatorname{tr}\!\big(n\lambda\,KA^{-1}\big)
+=n\lambda\,d_{\mathrm{eff}}(\lambda),
+\]
+using $KA^{-1}K=K-n\lambda\,KA^{-1}$. So the same $d_{\mathrm{eff}}$ that reads
+the nugget off the spectrum also fixes, up to the factor $n\lambda$, the total
+posterior-variance mass the correction distributes over the design; the two
+halves of this section are one quantity seen from two sides.
+

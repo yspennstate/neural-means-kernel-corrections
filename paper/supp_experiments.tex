@@ -1,0 +1,434 @@
+\subsection{Ablation}
+\label{sec:ablation}
+Table~\ref{tab:ablation} builds the pipeline up one component at a time. The
+kernel ridge on loads and the reflection-averaged neural mean start at
+\errKRRload\% and \errMLP\%. Stacking is trivial with a single high-data mean
+and leaves it unchanged; the value of the combination appears once there are
+several means to combine and again in the correction stage. The feature-space
+and second input-space corrections did not improve validation error beyond the
+first correction with a single mean and so were not selected; we report the
+stages that the validation split actually chose.
+
+Two smaller effects are worth isolating. Reflection test-time averaging lowers
+the metric-trained MLP's test error by $\ttaGainMLP$ points, consistent in
+direction with Proposition~\ref{prop:sym}, which fixes the sign of the
+expected change but not its size; the effect is much smaller on the normalized-MSE
+network ($0.02$ points) and absent by construction from the refiner, which
+trains symmetrized. Adding the kernel-flow regularizer
+(Section~\ref{sec:theory-kf}) to the low-data MLP did not help here (it moved
+test error from 5.64\% to 5.87\% at a single seed, a comparison the seed
+campaign did not repeat and which is smaller than the low-data chain's own
+seed spread of $0.09$ points, so we record it as a null result rather than an
+effect); Proposition~\ref{prop:kf} says what the term
+estimates, not that estimating it is useful on every problem, and on this
+smooth-output benchmark the plain metric loss was already a good proxy. Nor
+does a richer correction kernel help: replacing the single tuned Mat\'ern with
+a sum of Mat\'ern kernels at several bandwidths leaves the validation error
+unchanged to two decimals, which is consistent with the residual being close to
+kernel-irreducible in the input geometry, and is why the boosted correction
+stages of Section~\ref{sec:method-kernel} were not selected. The correction's
+own grid confirms the same reading from the other side: at all ten seeds the
+tuner selected the largest nugget on its grid, $\lambda=10^{-3}$, at nine of
+the ten (the tenth took $10^{-5}$), and a length scale of twice the median at
+five, of the median itself at four and of four times it at one --- the most
+heavily regularized correction available to it, chosen independently at nearly
+every seed. The length scale is the less stable of the two choices, and the
+four-member ablation concentrates more tightly than this (eight seeds at twice
+the median), so the spread here belongs to the five-member configuration.
+
+One positive lesson emerges from the refiner variants. Conditioning the refiner
+on the kernel method's prediction (test error \errRef\%) beats conditioning it
+on another network's prediction (4.84\% at one seed), even though the two conditioning
+fields have almost the same accuracy; the kernel field carries information
+complementary to the network's inductive bias, whereas a second network's field
+is largely redundant. Enlarging the ensemble beyond the residual family is the
+subject of Section~\ref{sec:diversity}, where the returns of each addition turn
+out to be predictable in advance from the correlation structure of the members'
+errors.
+
+\begin{table}[t]
+\centering
+\caption{Building the high-data pipeline. Mean relative $L^2$ test error under
+the 20000-sample protocol; ``+'' rows are cumulative. All rows are mean $\pm$
+standard deviation over ten seeds.}
+\label{tab:ablation}
+\begin{tabular}{lc}
+\toprule
+Stage & Test error (\%) \\
+\midrule
+Kernel ridge on loads & $\errKRRload\pm\errKRRloadSd$ \\
+Reflection-averaged neural mean & $\errMLP\pm\errMLPSd$ \\
+\ \ + refiner and MSE variant, affine stack & $4.628\pm0.009$ \\
+\ \ \ \ + residual kernel correction & $\errPipeFour\pm\errPipeFourSd$ \\
+\ \ + FNO member, affine stack & $\errStack\pm\errStackSd$ \\
+\ \ \ \ + residual kernel correction & $\errPipe\pm\errPipeSd$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{Where the remaining error is}
+\label{sec:errors}
+
+The seed replicates make it possible to ask not just how large the error is but
+where it sits, and whether the ensemble touches it. Both questions have the
+same answer at every seed.
+
+Per sample, the error is concentrated and the concentration is not where an
+ensemble can help. Ranked by relative error on the validation split, the twenty
+hardest cases sit at $\hardBest\%$ against a median of $\medRel\%$, a factor of
+$2.31$. On exactly those cases the five-member ensemble reaches $\hardEns\%$
+and the mean over the individual members is $\hardAll\%$: averaging five
+members, including the architecturally distinct one, recovers a tenth of a point
+against the average member and six hundredths against the best one, on cases
+whose error is more than twice the median. Everywhere else the ensemble buys
+what Section~\ref{sec:diversity} says it should; on the hard tail it buys almost
+nothing, because the members fail there together --- and adding the spectral
+member, which helps everywhere else, does not change that. Within this
+ensemble, then, the hard tail is not a shortage of member diversity; whether
+a surrogate class we did not train would fail there too is not something five
+architectures can settle, but the location of these cases, at the loaded edge
+and the supports, is where the shared residual of
+Section~\ref{sec:diversity} concentrates.
+
+Spatially, the error is a boundary phenomenon. The root-mean-square pointwise
+error over the validation samples is $\rmsBnd$ on the perimeter of the
+$41\times41$ grid against $\rmsInt$ in the interior, a ratio of $1.59$; both
+figures are stable across seeds to under a percent of themselves. Averaging
+lowers them to $\rmsBndEns$ and $\rmsIntEns$, so the ensemble takes about a
+tenth off a boundary error of nine and half that off an interior error of five
+and a half: it shaves the concentration slightly but does not touch its shape.
+The location agrees with the anatomy of the shared component above and with the
+error maps of Figure~\ref{fig:fields}: it is the loaded edge and the supports,
+where the traction condition meets the geometry, not a diffuse modeling deficit.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\linewidth]{figs/corr.pdf}
+\caption{Correlation of per-sample normalized residuals on the validation
+split, drawn at one seed from the original single-run study, which also
+trained a UNet member (test-set values agree to two decimals). Across the ten
+replicated seeds, whose five members all appear here, every pair correlates
+between \corrNetLo{} and \corrNetHi{}, with a mean of
+$\corrBar\pm\corrBarSd$; the kernel predictor, the most alien member by
+construction, still correlates \corrKerLo--\corrKerHi{} with the most
+accurate network at every one of them.}
+\label{fig:corr}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/shared.pdf}
+\caption{Anatomy of the shared residual $c$ (across-member mean of the
+residual fields), at one seed. Left to right: rms of $c$ over the grid; rms of
+the member-specific remainders; radial DCT band energies of the stress fields,
+of $c$, and of the specific parts; and the norm of $c$ against the output norm,
+whose correlation is $0.01$.}
+\label{fig:shared}
+\end{figure}
+
+
+\subsection{Spectra and effective dimension}
+\label{sec:spectra}
+Figure~\ref{fig:spectra} shows the spectrum of the Mat\'ern Gram matrix on the
+loads and the effective dimension $d_{\mathrm{eff}}(\lambda)$ computed from it
+by the exact identity of Lemma~\ref{lem:deff}. The spectrum decays quickly: a
+few hundred eigenvalues carry essentially all the mass, the tail falling many
+orders of magnitude below the leading modes. At the cross-validated nugget the
+effective dimension is a few hundred out of $n=19000$. This is a statistical
+statement, not a computational one --- the dense factorization costs its full
+$n^3$ operations regardless --- but it is why the correction generalizes
+despite interpolating nineteen thousand points: the problem the kernel solves
+has the statistical dimension of the retained spectrum, not of the sample. The
+cross-validated $\lambda$ sits at the shoulder of the $d_{\mathrm{eff}}$ curve,
+past the leading modes and into the rapidly decaying tail, matching the reading
+of Lemma~\ref{lem:deff}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/spectra.pdf}
+\caption{Left: eigenvalues of the Mat\'ern Gram matrix $K/n$ on the loads
+(log scale); the spectrum decays by many orders of magnitude within a few
+hundred modes. Right: the effective dimension $d_{\mathrm{eff}}(\lambda)$ from
+the exact identity of Lemma~\ref{lem:deff}, with the cross-validated nugget
+marked.}
+\label{fig:spectra}
+\end{figure}
+
+
+\subsection{Cost and reproducibility}
+\label{sec:cost}
+The pipeline was built on a single laptop and replicated on four cloud CPU
+instances. The kernel stages are exact: one Cholesky factorization of the
+$19000\times19000$ Mat\'ern Gram matrix in double precision takes $24$ seconds
+on the laptop's CPU ($16$ threads, OpenBLAS; the matrix itself is $2.9$\,GB),
+and between $18$ and $32$ seconds on the campaign instances, on which it ran
+ten times, once per seed. Prediction is two matrix products; there are no
+inducing points, stochastic solvers, or preconditioners, and no GPU is needed
+for the correction. The factorization performs the full
+$n^3/3\approx2.3\times10^{12}$ floating-point operations --- numerical low rank
+does not reduce the work of a dense Cholesky --- and the measured rate, about
+$100$ gigaflops per second, is simply what a current multicore CPU delivers;
+exactness at this $n$ costs half a minute, not a cluster. What the low effective
+dimension of Section~\ref{sec:spectra} buys is statistical rather than
+computational: it describes where the solve's information concentrates at the
+working nugget, not its flop count.
+
+Building the Gram matrix, not factoring it, is the stage that needs care at
+this size: forming it through a full squared-distance matrix and its
+elementwise transforms allocates several $2.9$\,GB temporaries at once, which
+exhausted a $31$\,GB instance during the campaign. Filling it in row blocks into
+a single preallocated array holds the peak at the matrix itself and is what the
+released code does. The neural means are small by the standards of the
+literature (a few million parameters) and train in the metric itself. Every
+split is fixed by a published permutation seed, the input is consumed as the
+41-dimensional load after the exact broadcast check of
+Section~\ref{sec:benchmark}, and every model is selected on the validation
+split and evaluated once on the test set; we release the splits, the code, and
+the per-seed result record behind every stage of every run, so any row of any
+table can be rechecked against the records or regenerated end to end by
+rerunning the pipeline. The prediction arrays and checkpoints themselves are
+not distributed, so regenerating a row means retraining it.
+
+\subsection{Uncertainty quantification}
+Theorem~\ref{thm:or} certifies the corrected surrogate's error by
+$\|G-m\|_K\,P_\lambda(u)$, and it is tempting to read the design factor
+$P_\lambda$ as a pointwise error bar. On this benchmark that reading fails, in
+an instructive way. Table~\ref{tab:norms} confirms the operator factor behaves
+as the theory predicts: the computable squared RKHS norm of the fitted
+correction is about \normRatio$\times$ smaller when the kernel regresses
+ensemble residuals than when it regresses raw stress fields, so an accurate
+mean genuinely leaves a smoother remainder and a tighter certificate (the
+bound, linear in the norm, by the square root of that). But the design factor
+$P_\lambda$ correlates only weakly with the corrected surrogate's absolute
+error (Pearson \uqCorrAbs), and \emph{negatively} with the benchmark's
+relative error. The cause is measurable: $P_\lambda$ is large for loads far
+from the training set, those loads tend to have large amplitude, large-amplitude
+loads produce large-norm stress fields, and dividing by the output norm makes
+their relative error small. Indeed $P_\lambda$ correlates \uqCorrNorm{} with
+the output norm (Figure~\ref{fig:uq}). The error is dominated by the neural
+mean, whose mistakes are not a function of the input-space geometry that
+$P_\lambda$ sees, so a purely input-space power function cannot rank them.
+
+The obvious alternative fares no better, and it fails in the same direction, which
+is the part worth noticing. Ensemble disagreement, the spread of the members'
+predictions, is the standard deep-ensemble error signal. Its correlation with
+the corrected surrogate's absolute error is $\uqDisAbs\pm0.006$ over the ten
+seeds, and with the benchmark's relative error it is $-0.25\pm0.04$: weakly
+positive against the quantity the theory speaks about, negative against the
+quantity the benchmark reports, exactly as for $P_\lambda$, and for the same
+amplitude reason. Two uncertainty signals of quite different provenance --- one
+a Gaussian-process design factor computed from the inputs alone, the other a
+spread across trained models --- fail on this problem in the same way and to the
+same degree. Adding the spectral member does not repair it: the same
+correlation is \uqDisAbsFour{} on the four-member ensemble, so the member
+whose admission is worth $\fnoGain$ points of accuracy buys nothing as an
+uncertainty signal. Section~\ref{sec:diversity} says why it cannot: disagreement
+measures the member-specific components of the error, which carry under a tenth
+of the residual energy, while the ranking signal for the shared component is
+invisible to any within-ensemble statistic, because the members agree precisely
+where they are jointly wrong. Section~\ref{sec:errors} is the same fact seen on
+the hard tail.
+
+What does hold is coverage, and it holds at every seed. We take the exact
+split-conformal quantile of the corrected surrogate's error score on a
+calibration subset drawn from the test block --- $1000$ calibration cases
+against $19000$ evaluation cases, neither used for training, checkpointing,
+stacking, or kernel tuning --- and evaluate coverage on the disjoint remainder.
+Conformal validity needs no correlation between the score and the error, only
+exchangeability, which this protocol supplies exactly
+(Section~\ref{sec:theory-conf}). At the nominal \uqCoverNom\% level the observed
+coverage is $\uqCover\pm\uqCoverSd\%$, and the right comparison is not with
+$90\%$ but with the exact finite-sample law: with $m=1000$ calibration points
+the coverage of a split-conformal band is $\mathrm{Beta}(901,100)$ distributed,
+whose central $95\%$ interval is $[88.1\%, 91.8\%]$. All ten seeds fall inside
+it. At the $95\%$ level the band is $[93.6\%, 96.3\%]$ and the observed
+coverage is $95.0\pm0.6\%$, again with all ten inside. Scaling the score by
+ensemble disagreement, which the correlations above say should not help, indeed
+does not: it changes mean coverage by three tenths of a point and leaves every
+seed inside the same band. The lesson is narrow but real: a valid pointwise bound
+(Theorem~\ref{thm:or}) is not automatically a useful pointwise indicator, the
+standard uncertainty signals can both fail on the same problem, and a
+relative-error metric has to have its normalization accounted for before a
+posterior standard deviation means what it appears to.
+
+\begin{table}[t]
+\centering
+\caption{Squared RKHS norm of the fitted kernel interpolant,
+$\operatorname{tr}(\alpha^\top K\alpha)$, when the same validated kernel and
+design regress raw stress fields versus ensemble residuals.}
+\label{tab:norms}
+\begin{tabular}{lc}
+\toprule
+Kernel regresses & $\|\widehat r\|_K^2$ \\
+\midrule
+Raw stress fields ($m=0$) & $1.39\times10^{10}$ \\
+Ensemble residuals & $5.14\times10^{7}$ \\
+\midrule
+Ratio & \normRatio$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/uq.pdf}
+\caption{Both panels are one seed. Left: the Gaussian process posterior
+standard deviation $P_\lambda$ against the corrected surrogate's relative error
+on the test set; the association is weak and, because of the output-amplitude
+confound, slightly negative. Right: decile calibration of $P_\lambda$ against
+absolute error, the theory-consistent quantity. Across all ten seeds the
+distribution-free conformal band attains $\uqCover\pm\uqCoverSd\%$ coverage at
+the nominal \uqCoverNom\% level, inside the exact finite-sample interval at ten
+seeds out of ten.}
+\label{fig:uq}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/scaling.pdf}
+\caption{Relative test error against training set size for the kernel ridge on
+loads (log-log), with the full pipeline and the best published results marked
+in both regimes.}
+\label{fig:scaling}
+\end{figure}
+
+
+\subsection{Which uncertainty is the binding one}
+
+Seeds are not the only source of uncertainty in Table~\ref{tab:main}, and on
+this benchmark they are not the largest. Every seed is scored on the same fixed
+$20000$-sample test block, so the seed standard deviation measures training and
+selection variability and nothing else. The test block is itself a sample. Its
+contribution is the standard error of the mean relative error over those $20000$
+cases, and at a per-sample standard deviation of $0.0169$ that is $\seTest$
+points, slightly larger than the pipeline's seed spread of \errPipeSd. Treating
+the two as independent, the uncertainty on our reported \errPipe\% is about
+$\seOwn$ points, and the seeds contribute a little under half of it. A study
+that replicates seeds and stops has measured the smaller half and is liable to
+quote it as though it were the whole.
+
+This decides what the table can and cannot support. Comparisons against a
+published number are unpaired, because we do not hold those methods'
+per-sample predictions, and so carry the test-block error twice: about
+$\seUnpaired$ points in quadrature. The separation from PCA-Net, $0.098$ points,
+is five of those and real. The separation from PARA-Net is $0.022$ points, about
+one, and is therefore not a separation at all. Both figures are
+conservative, since scoring on identical test points
+makes the two errors positively correlated in a way we cannot exploit without
+the baselines' predictions.
+
+Comparisons inside the pipeline are paired, and pairing is worth far more here
+than seeds are. Evaluating the corrected surrogate and the best single member on
+the same cases removes the shared difficulty of each case, and the gain of
+$\errEndToEnd$ points is then resolved at roughly a hundred standard errors at
+every seed. The same holds for the FNO's admission: $\fnoGain$ points, paired,
+is overwhelming on any one seed, while the interesting quantity --- whether it
+survives retraining --- is the across-seed spread of $\pm\fnoGainSd$ and the
+count of ten seeds out of ten. The practical rule the budget implies is the
+ordinary one, and the campaign is what made it visible: replicate seeds to learn
+whether a design choice survives retraining, pair on the test set to learn
+whether it helps, and never use either number to answer the other's question.
+
+
+The weights it assigns are as informative as the risk it predicts, and they
+correct something. The optimum spreads across all five members at essentially
+every seed --- refiner $0.31\pm0.04$, FNO $0.34\pm0.06$, normalized-MSE network
+$0.24\pm0.08$, kernel $0.06\pm0.03$, metric-trained MLP $0.06\pm0.04$ --- with
+the kernel receiving a nonzero share at ten seeds out of ten and the plain MLP
+at nine. (An earlier version of this work reported zero weight for those two
+members; its solver took clipped gradient steps rather than projecting onto
+the simplex and stopped at near-vertex points $0.8$--$3.6\%$ above the true
+minimum.) Solved properly the answer is a spread, not a vertex: every member
+earns some weight.
+
+That the FNO takes the largest single share while ranking only third on the
+metric is the whole content of the diversity argument. $S$ is a matrix of
+second moments, so what it rewards is a residual that is both small and unlike
+the others', and the spectral member is the only architecture here that is
+structurally unlike the residual-MLP family. The pairwise admission test of
+part~(i) --- a member of error $e_2$ helps a reference of error $e_1$ when their
+correlation falls below $e_1/e_2$ --- admits it at all ten seeds, though
+narrowly: correlation $\corrFnoLo$--$\corrFnoHi$ against a threshold of
+$0.987$--$1.001$. The kernel is admitted more comfortably,
+$\corrKerLo$--$\corrKerHi$ against $0.905$--$0.918$, and also enters the
+deployed pipeline twice more, through the refiner it conditions and through the
+affine stack, where weights are not constrained to be nonnegative.
+
+Part~(ii) of the proposition puts the infinite-ensemble floor of an
+equicorrelated family at $\bar e\sqrt{\bar\varrho}$, which at these measurements
+is $\ensFloor\pm\ensFloorSd\%$. That number and the pipeline's \errPipe\% are
+not on the same footing, and the comparison has to be made carefully for the
+reason Remark~\ref{rem:metric} gives: the floor is a root-mean-square
+quantity and \errPipe\% is a mean, so the mean lies below the floor by
+Jensen's inequality whatever the estimator does, and a comparison across the
+two would establish nothing. Converted into the floor's own metric with this
+pipeline's measured dispersion factor, \errPipe\% corresponds to about
+$4.87\%$, which sits within $\ensFloorSd$ of the floor with the sign
+undetermined. We therefore claim no margin below the floor here. What can be
+said without a conversion is the qualitative point, and it is unaffected:
+the floor bounds convex combinations of the members, while the deployed
+estimator fits an affine stack per grid point and then corrects its residual
+with a kernel, neither of which is a convex combination. What the floor
+measures is how little the convex operation can buy, and the answer, at every
+seed, is a few hundredths of a point.
+
+Three further measurements are consistent with the same reading. First, the
+residual kernel correction, which regresses the stack's residual on the load,
+improves the stack by $\corrGain$ points at $n=19000$ whatever the kernel
+scale, and its tuner reaches for the smoothest kernel and the largest nugget
+on its grid: at this sample size the shared residual is not a function of the
+load in any way a Mat\'ern RKHS on $\mathbb R^{41}$ can see. Second, the error
+stops responding to data. Under identical recipes at a single seed, the MLP's
+test error is $4.95\%$ with $3500$ training samples, $4.86\%$ with $8500$, and
+$4.86\%$ with $19000$ (Figure~\ref{fig:scaling}); the ten-seed value at the
+largest size is $\errMLP\pm\errMLPSd\%$, so the last five-and-a-half-fold
+increase in data buys nothing that seed noise does not already cover. The
+kernel ridge curve still falls, at roughly $n^{-0.11}$, but toward the same
+region. Third, and this is what ten seeds add, the error does not respond to
+reseeding either, and the scale of the comparison is what makes it an
+argument: the five published architectures in Table~\ref{tab:main} span
+$0.65$ points, while ten reseedings of our own pipeline span $0.034$, about
+five percent of it. A modeling limitation would be expected to yield to
+capacity, diversity, data, or reseeding; within the range we could test, this
+error yields to none of them, which is the pattern a floor in the data would
+produce.
+
+On the structural-mechanics benchmark the measured spreads
+($\varrho\in[\corrNetLo,\corrNetHi]$ across member pairs and seeds, at member
+errors within about ten percent of one another) put the window at roughly a
+fifth of the squared floor: the correlation spread alone is $0.14$, a sixth
+of $\bar\varrho=\corrNetLo$, and the $1/M$ term adds a few hundredths. The
+best convex mixture of the measured $S$ sits at the bottom of that window,
+$\predRMS\pm\predRMSSd\%$ against a floor of $\ensFloor\pm\ensFloorSd\%$,
+both in the root-mean-square metric $\mathcal E_2$ in which the corollary is
+stated. The bracket is evaluated against the realized ensemble risk at every
+seed, and its stability is the point: the realized mean relative error
+$\mathcal E_1$ of the mixture is a factor $\dispFac\pm\dispFacSd$ of the
+predicted root mean square, the dispersion factor of Remark~\ref{rem:metric},
+so ten independent redraws of the validation split and of every network
+initialization move the prediction by six hundredths of a point and the ratio
+by three thousandths.
+
+The stages are more reproducible than the members they are built from, and the
+way the seed spread moves along the chain is itself informative. Equal
+weighting, which fits nothing, takes the members' spread down to $0.005$ points
+on test --- ordinary variance reduction. Each subsequent stage fits something,
+and each gives a little of that back: fitted global weights $0.006$, the affine
+stack \errStackSd, the correction \errPipeSd. The end of the chain is both the
+most accurate stage and the least reproducible one. Fitting is not free, and a
+stack that is tuned harder is not automatically a stack that reproduces better.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/seedspread.pdf}
+\caption{Left: the corrected pipeline's test error at each of the ten seeds
+(points), their mean (dashed), and the five published single numbers on the
+same axis (grey). The scatter of one pipeline across seeds is a small fraction
+of the differences the benchmark is used to adjudicate, so the published
+cluster cannot be attributed to run-to-run noise. Right: the same ten seeds followed down the pipeline, each stage
+scored on test, with the stage mean marked. Fitting per-pixel weights lowers the
+mean and widens the scatter; the correction lowers both.}
+\label{fig:seedspread}
+\end{figure}
+

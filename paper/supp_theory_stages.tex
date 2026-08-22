@@ -1,0 +1,283 @@
+\subsection{Symmetry averaging does not increase the risk}
+\label{sec:theory-sym}
+
+The elasticity problem behind the benchmark is invariant under the reflection
+$x_1\mapsto 1-x_1$: the domain, the boundary partition, and the constitutive
+model are all symmetric, the input distribution has a reflection-invariant
+covariance, and reflecting the load reflects the stress field. On the discrete
+grid this is expressed by two permutation matrices: $S\in\mathbb R^{p\times p}$
+reverses the load samples and $T\in\mathbb R^{q\times q}$ reverses the rows of
+the stress field. Both are orthogonal involutions. Section~\ref{sec:benchmark}
+describes a direct data-driven check of the equivariance
+$G(Su)=T\,G(u)$; we treat it as an assumption here.
+
+\begin{proposition}[symmetrization]\label{prop:sym}
+Assume $G(Su)=TG(u)$ for $\mu$-a.e.\ $u$, that $\mu$ is invariant under $S$,
+and that $T$ is an orthogonal involution ($T^2=I$). For a measurable
+$\widehat G:\mathcal U\to\mathcal V$ define its symmetrization
+\[
+\widehat G_S(u)\;=\;\tfrac12\left(\widehat G(u)+T\,\widehat G(Su)\right).
+\]
+Then, for every loss $\ell(\cdot,v)$ that is convex in its first argument and
+satisfies $\ell(Tw,Tv)=\ell(w,v)$,
+\[
+\mathbb E_{u\sim\mu}\,\ell\big(\widehat G_S(u),G(u)\big)\;\le\;
+\mathbb E_{u\sim\mu}\,\ell\big(\widehat G(u),G(u)\big).
+\]
+\end{proposition}
+
+The relative error satisfies both hypotheses ($T$ orthogonal gives
+$\ell(Tw,Tv)=\ell(w,v)$). Proposition~\ref{prop:sym} justifies the two uses of
+the symmetry in the pipeline: averaging each trained model with its reflected
+evaluation at test time can only help on average, and training on
+reflection-augmented data is ordinary empirical risk minimization for the
+symmetrized class. The measured effect is small and, being an expectation, need
+not hold sample by sample: over the thirty reflected members of the seed
+campaign it helps twenty-nine times and hurts once, by a thousandth of a point
+(Section~\ref{app:verification}). The convexity argument behind the
+proposition is the standard one for group-averaged predictors;
+\citet{lyle2020benefits} give a general account.
+
+\subsection{What the kernel-flow regularizer estimates}
+\label{sec:theory-kf}
+
+The kernel-flow (KF) loss of Owhadi and Yoo \citep{owhadi2019kernel}, in the
+$\ell^2$ variant used by \citet{yoo2021deep} to regularize deep networks,
+enters our ablation study as an optional term in the training of the neural
+means. Its motivation is often stated informally (``a kernel is good if
+half the data predicts the rest''). The following observation makes the
+statement exact. Let $z_i=\phi_\theta(u_i)$ be the features of a batch
+$B=\{1,\dots,b\}$ ($b$ even), let $k$ be a positive definite kernel on feature
+space, and for $C\subset B$, $|C|=b/2$, let $I_C$ denote the $k$-interpolant
+of $\{(z_j,v_j):j\in C\}$. The batch KF loss is
+\begin{equation}\label{eq:kf}
+e_2(\theta;C)\;=\;\sum_{i\in B}\big\|v_i-I_C(z_i)\big\|_2^2 .
+\end{equation}
+
+\begin{proposition}[KF loss is a leave-half-out estimate]\label{prop:kf}
+Let $C$ be drawn uniformly among the subsets of $B$ of size $b/2$ and assume
+$k$ restricted to $\{z_i\}_{i\in B}$ is strictly positive definite. Then
+$e_2(\theta;C)=\sum_{i\in B\setminus C}\|v_i-I_C(z_i)\|_2^2$, and
+\[
+\mathbb E_C\big[e_2(\theta;C)\big]\;=\;\frac b2\;
+\mathbb E_{C,\,i\,\sim\,\mathrm{Unif}(B\setminus C)}
+\big[\big\|v_i-I_C(z_i)\big\|_2^2\big],
+\]
+i.e.\ $\tfrac2b\,e_2$ is an unbiased estimator, over the split randomness, of
+the expected squared error committed on a held-out point by the kernel
+predictor trained on a random half of the batch. When $(B,C)$ are
+resampled at every step, the stochastic gradient
+$\nabla_\theta e_2(\theta;C)$ is unbiased for
+$\nabla_\theta\,\mathbb E_{B,C}[e_2(\theta;C)]$ whenever the expectation and
+derivative commute (e.g.\ under local Lipschitz domination).
+\end{proposition}
+
+The training loss we minimize for a neural mean is a sum of an empirical risk
+term and, optionally, $\beta\,e_2$: the first term is a linear functional of
+the empirical measure of the batch and measures fit, while
+Proposition~\ref{prop:kf} shows the second measures the \emph{generalization
+of a kernel method built on the learned features}. This is the sense in which
+a KF-regularized network is trained to be a good feature map for the kernel
+correction that follows.
+
+
+\subsection{Stacking on a held-out split is safe}
+\label{sec:theory-stack}
+
+Between the means and the correction sits one more fitted object: the convex
+weights of the stacked ensemble, chosen to minimize the empirical risk on the
+validation split. Two elementary facts justify this step. First, by convexity,
+a convex combination of predictors is never worse than the corresponding
+weighted average of their risks, so stacking cannot be hurt by a weak member
+beyond its weight. Second, the weights live on a low-dimensional simplex and
+are fitted on hundreds of samples, so the selection cannot meaningfully
+overfit; the following proposition quantifies this with explicit constants.
+
+\begin{proposition}[validation stacking]\label{prop:stack}
+Let $f_1,\dots,f_M:\mathcal U\to\mathcal V$ be fixed maps, let
+$\Delta=\{w\in\mathbb R^M:w_m\ge0,\sum_m w_m=1\}$, and for $w\in\Delta$ write
+$F_w=\sum_m w_m f_m$. Assume the members' per-sample relative errors are
+bounded: $\ell(f_m(u),G(u))\le B$ for $\mu$-a.e.\ $u$ and every $m$.
+\begin{enumerate}
+\item[(i)] For every $w\in\Delta$,
+$\ell(F_w(u),G(u))\le\sum_m w_m\,\ell(f_m(u),G(u))$ pointwise; in particular
+$R(F_w)\le\sum_m w_m R(f_m)\le\max_m R(f_m)$, and $\ell(F_w(u),G(u))\le B$.
+\item[(ii)] Let $\widehat w$ minimize the empirical risk
+$\widehat R(w)=\tfrac1m\sum_{i=1}^m\ell(F_w(\tilde u_i),G(\tilde u_i))$ over
+$\Delta$, computed on an i.i.d.\ validation sample
+$\tilde u_1,\dots,\tilde u_m\sim\mu$ independent of $f_1,\dots,f_M$. Then for
+every $\delta\in(0,1)$, with probability at least $1-\delta$,
+\[
+R(F_{\widehat w})\;\le\;\min_{w\in\Delta}R(F_w)\;+\;\frac{8B}{m}\;+\;
+B\sqrt{\frac{2\big((M-1)\log\!\big(m(M-1)+1\big)+\log(2/\delta)\big)}{m}} .
+\]
+\end{enumerate}
+\end{proposition}
+
+With $M=5$ members, $m=1000$ validation samples and $\delta=0.05$ the right-hand
+excess evaluates to about $0.28\,B$; at $B=0.25$, the largest per-sample member
+error we observe, this caps the selection cost at roughly seven percentage
+points. The bound is conservative, as such bounds are: the realized
+validation-to-test gap of the stack in Section~\ref{sec:experiments} is two
+orders of magnitude smaller. Its role is the scaling $\sqrt{M\log m/m}$, which
+says that fitting a handful of convex weights on a thousand held-out samples
+is statistically almost free; this is why the pipeline spends its validation
+data there and on the kernel hyperparameters and nowhere else.
+
+The stack the pipeline deploys on the structural-mechanics benchmark is finer
+than a single convex vector: the weights are affine and vary per grid point,
+fitted by ridge on the validation split, and the choice between this object
+and the global convex stack is itself made on held-out data (fit both on one
+half of the split, keep whichever wins on the other half, refit the winner on
+the full split). Proposition~\ref{prop:stack} does not cover that
+construction; the following two statements do, in the same elementary style.
+
+\begin{lemma}[validated selection]\label{lem:select}
+Let $g_1,\dots,g_K:\mathcal U\to\mathcal V$ be fixed maps with
+$\ell(g_k(u),G(u))\le B$ for $\mu$-a.e.\ $u$ and every $k$, and let
+$\widehat k$ minimize the empirical risk over an i.i.d.\ sample of size $m'$
+drawn from $\mu$ independently of everything used to build the $g_k$. Then,
+with probability at least $1-\delta$,
+\[
+R(g_{\widehat k})\;\le\;\min_{k\le K}R(g_k)\;+\;
+B\sqrt{\frac{2\log(2K/\delta)}{m'}} .
+\]
+\end{lemma}
+
+Here $K=2$ and $m'=500$: comparing two candidate stacks on half the
+validation split costs at most a few points of risk in the worst case, and in
+practice far less. The refit winner is covered by the next statement, which
+prices the per-coordinate affine fit itself.
+
+\begin{proposition}[per-pixel affine stacking]\label{prop:affine}
+Fix members $f_1,\dots,f_M$, write $D=\sqrt{M+1}$, and for each output
+coordinate $j$ let $\varphi_j(u)=(f_1(u)_j,\dots,f_M(u)_j,b)\in\mathbb R^{M+1}$,
+where $b$ bounds all member and target values:
+$|G(u)_j|\le b$, $|f_m(u)_j|\le b$ for $\mu$-a.e.\ $u$ and all $j,m$. Consider
+the per-coordinate affine class
+$\{u\mapsto w^\top\varphi_j(u):\|w\|_2\le W\}$ and the coordinate risks
+$R_j(w)=\mathbb E\,(w^\top\varphi_j(u)-G(u)_j)^2$, estimated on an i.i.d.\
+validation sample of size $m$ independent of the members.
+\begin{enumerate}
+\item[(i)] If $\widehat w_j$ minimizes the empirical risk of coordinate $j$
+over the class, then with probability at least $1-\delta$,
+\[
+\frac1q\sum_{j=1}^q\Big[R_j(\widehat w_j)-\min_{\|w\|_2\le W}R_j(w)\Big]
+\;\le\;\frac{8\,W b^2 D\,(1+WD)+2\,b^2(1+WD)^2\sqrt{\tfrac12\log(4q/\delta)}}
+{\sqrt m}.
+\]
+\item[(ii)] If instead $\widehat w_j$ minimizes the ridge objective
+$\widehat R_j(w)+\lambda\|w\|_2^2$ and satisfies $\|\widehat w_j\|_2\le W$,
+the same bound holds with an additional $\lambda W^2$ on the right.
+\end{enumerate}
+\end{proposition}
+
+This is a capacity bound, and it should be read as one. Its content is the
+rate: with a handful of members the per-coordinate fit is paid for by the
+validation split at rate $\sqrt{(M+1)/m}$ per coordinate, uniformly over
+coordinates, and the ridge form the pipeline uses adds only its explicit
+penalty ($\lambda=10^{-3}$ here, so $\lambda W^2$ is small against the
+coordinate risks at the fitted weight norms, which the released runs report).
+Its evaluated value is not informative. The bound is stated for the
+coordinatewise mean-squared risk in the units of the stress field, not for
+the relative error of the tables, and the constants $b$ and $W$ enter it
+polynomially; at the measured values ($b$ is the largest stress value in
+original units, about a thousand) the right-hand side exceeds the realized
+excess by many orders of magnitude, as the released evaluation shows. What
+the statement establishes is that fitting $q(M{+}1)$ numbers on a thousand
+held-out samples is a selection problem of the ordinary $m^{-1/2}$ kind, with
+no dependence on $q$ beyond the logarithm; the half-split comparison of
+Lemma~\ref{lem:select} then guards the one discrete choice that remains.
+
+One stage of the pipeline is still uncovered at this point: the residual
+correction, whose scale and nugget are chosen from a finite grid on the same
+validation split that fitted the stack. The next statement closes the chain.
+Its key observation is structural: for a fixed grid point the correction is
+fit to the training residual of the stack, which is affine in the stack
+weights, so the corrected predictor is again a per-coordinate affine function
+of $w$ with a transformed feature map, and the machinery of
+Proposition~\ref{prop:affine} applies to the composite class at the cost of
+one further constant, a uniform bound on the correction weights, which
+Lemma~\ref{lem:kappa} below supplies in closed form.
+
+\begin{corollary}[capacity bound for the deployed corrected surrogate]
+\label{cor:certificate}
+Assume the setting of Proposition~\ref{prop:affine}, and let $\Gamma$ be a
+finite set of correction configurations, each defining weights
+$c_\gamma(u)\in\mathbb R^{n_{\mathrm{tr}}}$ with the corrected predictor
+\[
+h_{w,\gamma}(u)_j\;=\;w_j^\top\varphi_j(u)
++c_\gamma(u)^\top\big(Y_j-\Phi_j w_j\big),
+\]
+where $Y_j\in\mathbb R^{n_{\mathrm{tr}}}$ collects the training targets of
+coordinate $j$ and $\Phi_j$ the members' training predictions; $\gamma=0$
+(no correction, $c_0\equiv0$) is included in $\Gamma$. Suppose the correction
+weights are uniformly bounded, $\sup_{u,\gamma}\|c_\gamma(u)\|_1\le\kappa$.
+If the deployed surrogate uses any validation-measurable choice
+$(\widehat w,\widehat\gamma)$ with $\|\widehat w_j\|_2\le W$ and
+$\widehat\gamma$ minimizing the empirical validation risk, aggregated over
+coordinates, among $\gamma\in\Gamma$ at the fitted $\widehat w$ (the grid
+choice is shared across coordinates, as in the pipeline), then with
+probability at least $1-\delta$,
+\[
+\frac1q\sum_j R_j\big(h_{\widehat w,\widehat\gamma}\big)\;\le\;
+\min_{\gamma\in\Gamma}\;\frac1q\sum_j R_j\big(h_{\widehat w,\gamma}\big)
+\;+\;\frac{2(1+\kappa)^2\,b^2(1+WD)\Big(4WD+(1+WD)
+\sqrt{\tfrac12\log\big(4q|\Gamma|/\delta\big)}\Big)}{\sqrt m}.
+\]
+Since $\gamma=0$ is among the candidates, the oracle on the right is at most
+the fitted stack's own risk, and combining with
+Proposition~\ref{prop:affine}(ii) bounds the deployed risk against the best
+affine stack itself. The constants $b$ and $W$ are measured and released with
+the runs; for kernel ridge weights, $\kappa$ is supplied by the next lemma.
+\end{corollary}
+
+The hypothesis on the correction weights is not an empirical assumption. In
+the pipeline each $\gamma=(s,\lambda)$ is a length scale and a nugget, and
+the weights are those of kernel ridge regression,
+$c_\gamma(u)=(K_\gamma+n\lambda I)^{-1}k_\gamma(X,u)$, so that
+$\widehat r(u)=c_\gamma(u)^\top R$ in the notation of
+Section~\ref{sec:method-kernel}. Their $\ell^1$ norm is bounded uniformly in
+$u$ by the nugget alone.
+
+\begin{lemma}[uniform bound on kernel ridge weights]\label{lem:kappa}
+Let $k$ be a positive definite kernel with $k(u,u)\le k_{\max}$ for all $u$,
+let $X=(u_1,\dots,u_n)$ be any design with Gram matrix $K$, and let
+$\lambda>0$. The kernel ridge weights
+$c_\lambda(u)=(K+n\lambda I)^{-1}k(X,u)$ satisfy, for every $u$,
+\[
+\|c_\lambda(u)\|_1\;\le\;\sqrt n\,\|c_\lambda(u)\|_2\;\le\;
+\frac{P_\lambda(u)}{\sqrt\lambda}\;\le\;\sqrt{\frac{k_{\max}}{\lambda}} ,
+\]
+where $P_\lambda(u)^2=k(u,u)-k(u,X)(K+n\lambda I)^{-1}k(X,u)$ is the
+posterior variance of Section~\ref{sec:theory-or}, equation~\eqref{eq:power}.
+In particular, for the residual correction of Section~\ref{sec:method-kernel}
+--- a Mat\'ern kernel with $k(u,u)=1$ and the nugget grid
+$\lambda\in\{10^{-6},10^{-5},10^{-3}\}$ --- the hypothesis of
+Corollary~\ref{cor:certificate} holds, whatever the length scale, with
+\[
+\kappa_{\mathrm{an}}\;:=\;\max_{\gamma\in\Gamma}\lambda_\gamma^{-1/2}\;=\;10^{3}.
+\]
+\end{lemma}
+
+The proof is two lines in Section~\ref{app:proofs}, and the bound is the
+right kind of constant for the corollary: it depends on nothing that is
+estimated. It is also why the corollary is a capacity bound and not a
+certificate. The excess term carries $(1+\kappa)^2$, so at
+$\kappa_{\mathrm{an}}=10^3$ the corollary's right-hand side is, like that of
+Proposition~\ref{prop:affine} before it, vacuous at the shipped constants by
+many orders of magnitude. The realized scale of the weights is far smaller:
+on a test probe of five hundred points the largest $\ell^1$ norm over the
+grid averages $31.2$ across three seeds (Section~\ref{app:verification}),
+about a thirtieth of $\kappa_{\mathrm{an}}$, so that evaluating the display
+at the probe value would shrink it by a factor of close to a thousand. But a
+supremum over a finite probe is a lower bound on the constant the corollary
+needs, not the constant, and we do not use it as one. What the corollary
+establishes is structural: the object the pipeline ships --- fitted stack,
+grid-tuned correction, validated final choice --- is covered by an oracle
+inequality of the ordinary $m^{-1/2}$ form, in the coordinatewise
+mean-squared metric, whose every constant is either measured or given in
+closed form. The certificate of this paper, in the sense of a bound whose
+evaluated value is the quantity reported, is Theorem~\ref{thm:or}.
+
+

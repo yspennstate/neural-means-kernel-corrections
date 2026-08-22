@@ -35,10 +35,10 @@ transformer \citep{vaswani2017attention,dosovitskiy2021image} that tokenizes
 the 41 load samples and decodes the field by cross-attention at the grid
 points; it is a natural further architecture family, but we were unable to
 train it to the level of the others on the hardware available for this study
-and report the ensemble without it (Appendix~\ref{app:impl}).
+and report the ensemble without it (Supplement~\ref{app:impl}).
 
 All means are trained with AdamW and a cosine schedule, batches of 128--256,
-for up to a few hundred epochs (Appendix~\ref{app:impl} lists every
+for up to a few hundred epochs (Supplement~\ref{app:impl} lists every
 hyperparameter).
 During training each batch is reflected with probability $1/2$ (load reversed,
 target field reflected along the first grid coordinate); at test time each

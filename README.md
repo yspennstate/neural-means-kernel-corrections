@@ -12,6 +12,30 @@ application reports; an exact Matern kernel solve, applied either to the raw
 input, to the network's residual, or to the network's learned features; and a
 per-coordinate combination of members selected on a validation split.
 
+## Paper and supplement
+
+`paper/main.pdf` is the manuscript: 25 pages of text on the two problems, the
+method, and the results, in JMLR format. `paper/supplement.pdf` is the online
+supplement it refers to as S1–S8, and holds the material a reader needs only
+if they want to check something: the finite-sample bounds behind every fitted
+stage and all the proofs, the margin and per-coordinate selection results, the
+effective-dimension identity, the ablation and error-localization measurements,
+the spectra, the uncertainty-quantification study, the cost accounting, the
+uncontrolled survey of the rest of the suite, the mirror-symmetry check, the
+OCO-2 input-metric study with the data-scaling and ClimSim results, the
+implementation and compute record, and the numerical verification of every
+stated result. The two build from one set of sources and one bibliography:
+
+```
+cd paper
+pdflatex main && bibtex main && pdflatex main && pdflatex main
+pdflatex supplement && bibtex supplement && pdflatex supplement && pdflatex supplement
+```
+
+Run the pair twice if you have changed a cross-reference: each document reads
+the other's `.aux` through `xr`, so a reference that crosses between them
+settles on the second pass. The JMLR style file is included.
+
 ## Results
 
 **OCO-2 radiative-transfer emulation** (Lamminpää et al., AMT 2025; reduced
@@ -57,8 +81,8 @@ linear end of the same regime picture.
 ## Layout
 
 ```
-paper/            LaTeX source, figures, compiled PDF (pdflatex + bibtex;
-                  the JMLR style file is included)
+paper/            LaTeX source, figures, and both compiled PDFs: main.pdf
+                  (the manuscript) and supplement.pdf (the online supplement)
 common.py         structural mechanics: data, splits, metric
 prep_data.py      one-time extraction from the distributed arrays
 train_*.py        the neural means (MLP, MSE variant, refiner, FNO, UNet, transformer)

@@ -322,7 +322,7 @@ stages that the validation split actually chose.
 Two smaller effects are worth isolating. Reflection test-time averaging lowers
 the metric-trained MLP's test error by $\ttaGainMLP$ points, consistent in
 direction with Proposition~\ref{prop:sym}, which guarantees the sign of the
-change but not its size; the effect is much smaller on the normalized-MSE
+expected change but not its size; the effect is much smaller on the normalized-MSE
 network ($0.02$ points) and absent by construction from the refiner, which
 trains symmetrized. Adding the kernel-flow regularizer
 (Section~\ref{sec:theory-kf}) to the low-data MLP did not help here (it moved

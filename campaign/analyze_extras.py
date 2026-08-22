@@ -334,7 +334,7 @@ elif name.startswith("sm_"):
     W_b, D_b, m_b, q_b, lam_b = float(wn.max()), _math.sqrt(M_ + 1), len(Yva), Dq, 1e-3
     aff_bound = ((8 * W_b * b_meas ** 2 * D_b * (1 + W_b * D_b)
                   + 2 * b_meas ** 2 * (1 + W_b * D_b) ** 2
-                  * _math.sqrt(0.5 * _math.log(2 * q_b / delta_)))
+                  * _math.sqrt(0.5 * _math.log(4 * q_b / delta_)))
                  / _math.sqrt(m_b)) + lam_b * W_b ** 2
     # lem:select on the honesty comparison (K=2 on half the validation split)
     sel = dict(K=2, m_half=len(Yva) // 2,

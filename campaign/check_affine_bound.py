@@ -47,7 +47,7 @@ for trial in range(100):
     excess_avg = float(np.mean(excesses))
     W = Wmax
     bound = (8 * W * b * b * D * (1 + W * D)
-             + 2 * b * b * (1 + W * D) ** 2 * np.sqrt(0.5 * np.log(2 * q / delta))) \
+             + 2 * b * b * (1 + W * D) ** 2 * np.sqrt(0.5 * np.log(4 * q / delta))) \
         / np.sqrt(m) + lam * W * W
     worst = max(worst, excess_avg / bound)
     if excess_avg > bound:

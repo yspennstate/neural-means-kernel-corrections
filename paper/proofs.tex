@@ -119,14 +119,15 @@ $|w^\top\varphi(u)-Y(u)|\le b(1+WD)$. The losses
 $\ell_w(u)=(w^\top\varphi(u)-Y(u))^2$ therefore take values in
 $[0,L_\infty]$ with $L_\infty=b^2(1+WD)^2$.
 
-\emph{Uniform deviation.} Let
-$Z=\sup_{\|w\|_2\le W}|\widehat R_j(w)-R_j(w)|$ over the validation sample of
-size $m$. Changing one sample moves $Z$ by at most $L_\infty/m$, so
-McDiarmid's inequality gives
-$Z\le\mathbb E Z+L_\infty\sqrt{\log(2q/\delta)/(2m)}$ with probability at
-least $1-\delta/q$ (we use the two-sided form for a margin). By
-symmetrization, $\mathbb E Z\le 2\,\mathfrak R_m(\mathcal L)$, the Rademacher
-complexity of the loss class. The loss is the composition of $t\mapsto t^2$,
+\emph{Uniform deviation.} Consider the one-sided suprema
+$Z^{+}=\sup_{\|w\|_2\le W}\big(\widehat R_j(w)-R_j(w)\big)$ and
+$Z^{-}=\sup_{\|w\|_2\le W}\big(R_j(w)-\widehat R_j(w)\big)$ over the
+validation sample of size $m$. Changing one sample moves either supremum by
+at most $L_\infty/m$, so McDiarmid's inequality gives
+$Z^{\pm}\le\mathbb E Z^{\pm}+L_\infty\sqrt{\log(4q/\delta)/(2m)}$, each with
+probability at least $1-\delta/(2q)$. By
+symmetrization, $\mathbb E Z^{\pm}\le 2\,\mathfrak R_m(\mathcal L)$, the
+Rademacher complexity of the loss class. The loss is the composition of $t\mapsto t^2$,
 restricted to $|t|\le b(1+WD)$ where it is $2b(1+WD)$-Lipschitz, with the
 class $\{u\mapsto w^\top\varphi(u)-Y(u)\}$; translation by the fixed function
 $Y$ leaves the Rademacher average unchanged (the translated term does not
@@ -141,16 +142,17 @@ $\ell^2$ ball,
 by Jensen's inequality. Talagrand's contraction lemma then gives
 $\mathfrak R_m(\mathcal L)\le 2b(1+WD)\cdot WbD/\sqrt m$, hence
 \[
-Z\;\le\;\frac{4Wb^2D(1+WD)}{\sqrt m}
-+L_\infty\sqrt{\frac{\log(2q/\delta)}{2m}}
-\qquad\text{with probability}\ge 1-\delta/q .
+Z^{\pm}\;\le\;\frac{4Wb^2D(1+WD)}{\sqrt m}
++L_\infty\sqrt{\frac{\log(4q/\delta)}{2m}}
+\qquad\text{jointly with probability}\ge 1-\delta/q .
 \]
 
 \emph{Empirical risk minimization.} On this event, for any minimizer
 $w^\ast$ of $R_j$ over the ball,
-$R_j(\widehat w_j)\le\widehat R_j(\widehat w_j)+Z
-\le\widehat R_j(w^\ast)+Z\le R_j(w^\ast)+2Z$, and $2Z$ is bounded by the
-displayed excess. A union bound over the $q$ coordinates makes all events
+$R_j(\widehat w_j)\le\widehat R_j(\widehat w_j)+Z^{-}
+\le\widehat R_j(w^\ast)+Z^{-}\le R_j(w^\ast)+Z^{+}+Z^{-}$, and
+$Z^{+}+Z^{-}$ is bounded by the displayed excess. A union bound over the two
+tails of each of the $q$ coordinates makes all events
 hold simultaneously with probability at least $1-\delta$, and averaging over
 $j$ preserves the (coordinate-uniform) bound. This proves (i).
 
@@ -206,15 +208,15 @@ The argument of Proposition~\ref{prop:affine} now applies verbatim to the
 class indexed by $w$ in the $W$-ball, for this fixed $(j,\gamma)$: the
 Rademacher complexity of the affine part is at most
 $W\,bD(1+\kappa)/\sqrt m$, contraction multiplies it by $2\tilde c$,
-symmetrization doubles it, and McDiarmid at level $\delta/(q|\Gamma|)$ adds
-$\tilde c^{\,2}\sqrt{\log(2q|\Gamma|/\delta)/(2m)}$. A union bound over the
-$q|\Gamma|$ pairs makes, with probability at least $1-\delta$, every
-deviation
-$Z_{j,\gamma}=\sup_{\|w\|\le W}|\widehat R_{j,\gamma}(w)-R_{j,\gamma}(w)|$
+symmetrization doubles it, and McDiarmid at level $\delta/(2q|\Gamma|)$ adds
+$\tilde c^{\,2}\sqrt{\log(4q|\Gamma|/\delta)/(2m)}$. A union bound over the
+two tails of the $q|\Gamma|$ pairs makes, with probability at least
+$1-\delta$, each one-sided deviation $Z^{\pm}_{j,\gamma}$, defined as in the
+proof of Proposition~\ref{prop:affine},
 at most
 \[
 \frac{4W b^2D(1+WD)(1+\kappa)^2}{\sqrt m}
-+b^2(1+WD)^2(1+\kappa)^2\sqrt{\frac{\log(2q|\Gamma|/\delta)}{2m}} .
++b^2(1+WD)^2(1+\kappa)^2\sqrt{\frac{\log(4q|\Gamma|/\delta)}{2m}} .
 \]
 On that event, write $\bar R(\gamma)=\tfrac1q\sum_jR_j(h_{\widehat w,\gamma})$
 and $\widehat{\bar R}(\gamma)$ for its empirical version; averaging the
@@ -330,9 +332,13 @@ $\|h\circ\varphi\|_{\mathcal H_{k_\varphi}}\le\|h\|_{\mathcal H_k}$, and
 substituting this bound into Theorem~\ref{thm:or} applied with the kernel
 $k_\varphi$ replaces $\|G\|$ by $\|h\|_{\mathcal H_k}$. \qed
 
-\subsection{Proof of Proposition~\ref{prop:aniso}}
+\subsection{Proof sketch of Proposition~\ref{prop:aniso}}
 
-The argument has five steps: a pointwise error bound whose design dependence
+This appendix records the argument at the level of the idealization stated
+with the proposition --- projected image marginal bounded above and below,
+exact rank at the working resolution, and the interpolation limit standing in
+for the validated nugget --- without tracking constants; no lower bound is
+claimed. The argument has five steps: a pointwise error bound whose design dependence
 is the power function; a fill-distance bound for random designs; an upper
 bound on the warped target's native norm; the two substitutions; and the
 reduction from the validated nugget to the interpolation scale. Throughout,

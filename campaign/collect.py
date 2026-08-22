@@ -196,7 +196,7 @@ if sm_ex:
             g = bo["n_grid"] + 1
             row["cert_bound"] = (2 * (1 + row["kappa"]) ** 2 * b2 * (1 + W * D)
                                  * (4 * W * D + (1 + W * D)
-                                    * math.sqrt(0.5 * math.log(2 * bo["q"] * g
+                                    * math.sqrt(0.5 * math.log(4 * bo["q"] * g
                                                                / bo["delta"])))
                                  / math.sqrt(bo["m"])) + bo["affine"]["bound"]
         per_seed.append(row)

@@ -50,7 +50,9 @@ reflection-augmented data is ordinary empirical risk minimization for the
 symmetrized class. The measured effect is small and, being an expectation, need
 not hold sample by sample: over the thirty reflected members of the seed
 campaign it helps twenty-nine times and hurts once, by a thousandth of a point
-(Appendix~\ref{app:verification}).
+(Appendix~\ref{app:verification}). The convexity argument behind the
+proposition is the standard one for group-averaged predictors;
+\citet{lyle2020benefits} give a general account.
 
 \subsection{What the kernel-flow regularizer estimates}
 \label{sec:theory-kf}
@@ -117,7 +119,7 @@ $\ell(F_w(u),G(u))\le\sum_m w_m\,\ell(f_m(u),G(u))$ pointwise; in particular
 $R(F_w)\le\sum_m w_m R(f_m)\le\max_m R(f_m)$, and $\ell(F_w(u),G(u))\le B$.
 \item[(ii)] Let $\widehat w$ minimize the empirical risk
 $\widehat R(w)=\tfrac1m\sum_{i=1}^m\ell(F_w(\tilde u_i),G(\tilde u_i))$ over
-$\Delta$, computed on a validation sample
+$\Delta$, computed on an i.i.d.\ validation sample
 $\tilde u_1,\dots,\tilde u_m\sim\mu$ independent of $f_1,\dots,f_M$. Then for
 every $\delta\in(0,1)$, with probability at least $1-\delta$,
 \[
@@ -127,9 +129,9 @@ B\sqrt{\frac{2\big((M-1)\log\!\big(m(M-1)+1\big)+\log(2/\delta)\big)}{m}} .
 \end{enumerate}
 \end{proposition}
 
-With $M=4$ members, $m=1000$ validation samples and $\delta=0.05$ the right-hand
-excess evaluates to about $0.24\,B$; at $B=0.25$, the largest per-sample member
-error we observe, this caps the selection cost at roughly six percentage
+With $M=5$ members, $m=1000$ validation samples and $\delta=0.05$ the right-hand
+excess evaluates to about $0.28\,B$; at $B=0.25$, the largest per-sample member
+error we observe, this caps the selection cost at roughly seven percentage
 points. The bound is conservative, as such bounds are: the realized
 validation-to-test gap of the stack in Section~\ref{sec:experiments} is two
 orders of magnitude smaller. Its role is the scaling $\sqrt{M\log m/m}$, which
@@ -169,14 +171,14 @@ where $b$ bounds all member and target values:
 $|G(u)_j|\le b$, $|f_m(u)_j|\le b$ for $\mu$-a.e.\ $u$ and all $j,m$. Consider
 the per-coordinate affine class
 $\{u\mapsto w^\top\varphi_j(u):\|w\|_2\le W\}$ and the coordinate risks
-$R_j(w)=\mathbb E\,(w^\top\varphi_j(u)-G(u)_j)^2$, estimated on a validation
-sample of size $m$ independent of the members.
+$R_j(w)=\mathbb E\,(w^\top\varphi_j(u)-G(u)_j)^2$, estimated on an i.i.d.\
+validation sample of size $m$ independent of the members.
 \begin{enumerate}
 \item[(i)] If $\widehat w_j$ minimizes the empirical risk of coordinate $j$
 over the class, then with probability at least $1-\delta$,
 \[
 \frac1q\sum_{j=1}^q\Big[R_j(\widehat w_j)-\min_{\|w\|_2\le W}R_j(w)\Big]
-\;\le\;\frac{8\,W b^2 D\,(1+WD)+2\,b^2(1+WD)^2\sqrt{\tfrac12\log(2q/\delta)}}
+\;\le\;\frac{8\,W b^2 D\,(1+WD)+2\,b^2(1+WD)^2\sqrt{\tfrac12\log(4q/\delta)}}
 {\sqrt m}.
 \]
 \item[(ii)] If instead $\widehat w_j$ minimizes the ridge objective
@@ -228,7 +230,7 @@ probability at least $1-\delta$,
 \frac1q\sum_j R_j\big(h_{\widehat w,\widehat\gamma}\big)\;\le\;
 \min_{\gamma\in\Gamma}\;\frac1q\sum_j R_j\big(h_{\widehat w,\gamma}\big)
 \;+\;\frac{2(1+\kappa)^2\,b^2(1+WD)\Big(4WD+(1+WD)
-\sqrt{\tfrac12\log\big(2q|\Gamma|/\delta\big)}\Big)}{\sqrt m}.
+\sqrt{\tfrac12\log\big(4q|\Gamma|/\delta\big)}\Big)}{\sqrt m}.
 \]
 Since $\gamma=0$ is among the candidates, the oracle on the right is at most
 the fitted stack's own risk, and combining with
@@ -272,6 +274,12 @@ $\min_{w}w^\top Sw=e^2\big(\varrho+(1-\varrho)/M\big)$, attained at uniform
 weights and decreasing to $e^2\varrho$ as $M\to\infty$.
 \end{enumerate}
 \end{proposition}
+
+Part~(i) is the classical two-member minimum-variance rule, and part~(ii) is
+the equicorrelated case of the ambiguity decomposition of ensemble learning
+\citep{krogh1995neural}; see \citet{ueda1996generalization} for the
+generalization-error form and \citet{brown2005diversity} for a survey. Both
+enter here as measurable decision tools on the estimated $S$.
 
 Everything in this subsection is stated for the squared metric, and the tables
 of Sections~\ref{sec:experiments} and~\ref{sec:oco2} report a different one.
@@ -416,8 +424,9 @@ for more than the window.
 On the structural-mechanics benchmark the measured spreads
 ($\varrho\in[\corrNetLo,\corrNetHi]$ across member pairs and seeds, at member
 errors within a few percent of one another) put the window at roughly a tenth
-of the squared floor, which is the margin by which the fitted convex stack sits
-above $\bar e\sqrt{\bar\varrho}$ in Section~\ref{sec:experiments}. The bracket
+of the squared floor, and the fitted convex stack of
+Section~\ref{sec:experiments} lands well inside it, within a percent of
+$\bar e\sqrt{\bar\varrho}$ in the squared metric. The bracket
 is evaluated against the realized ensemble risk at every seed, and its
 stability is the point: the predicted risk is $\predRMS\pm\predRMSSd\%$ and the
 realized risk a factor $\dispFac\pm\dispFacSd$ of it, so ten independent
@@ -553,7 +562,12 @@ $\sigma_1\ge\dots\ge\sigma_d$ of $A$; they are the rates at which $G$ varies
 along the input directions. Suppose $A$ has \emph{approximate rank} $r$ at the
 sample size, meaning the trailing singular values fall below the achievable
 resolution, $\sigma_{r+1}\lesssim n^{-1/r}$, so the image $A\,\mathcal U$ is
-effectively $r$-dimensional at scale $n^{-1/r}$.
+effectively $r$-dimensional at scale $n^{-1/r}$. The idealization beneath the
+display also takes the leading-$r$ projection of the image design to keep a
+density bounded above and below, the trailing directions to be exact zeros at
+the working resolution, and the interpolation limit $\lambda\to0$;
+Appendix~\ref{app:proofs} records the argument at that level, as a sketch
+rather than a complete proof.
 
 \begin{proposition}[isotropic and adapted kernel rates]\label{prop:aniso}
 Let $\widehat G^{\mathrm{iso}}_n$ be kernel ridge regression with a Mat\'ern
@@ -572,7 +586,7 @@ When $A$ is close to full rank ($r\approx d$) the two rates coincide and only
 the constant $\sigma_1^{\,s}$ separates them.
 \end{proposition}
 
-The proof (Appendix~\ref{app:proofs}) is the scattered-data estimate
+The sketch (Appendix~\ref{app:proofs}) is the scattered-data estimate
 $\|G-\widehat G_n\|\lesssim h_X^{\,s}\|G\|_{H^s}$ applied to the two designs:
 one length scale must fill all $d$ directions, so $h_X\asymp n^{-1/d}$ and the
 norm carries $\sigma_1^{\,s}$; the adapted metric, when $A$ has a spectral gap,
@@ -630,7 +644,8 @@ a native space of the same size, where the exact solve reaches it.
 
 This is not an accident of the O2 band; it is what a pulled-back kernel does.
 Writing $\varphi$ for the feature map and $k$ for the base kernel, the deep
-kernel head uses $k_\varphi(x,x')=k(\varphi(x),\varphi(x'))$.
+kernel head uses $k_\varphi(x,x')=k(\varphi(x),\varphi(x'))$, the construction
+studied as deep kernel learning \citep{wilson2016deep,calandra2016manifold}.
 
 \begin{proposition}[feature pullback]\label{prop:pullback}
 The native space of $k_\varphi$ is $\mathcal H_{k_\varphi}=\{f\circ\varphi:
@@ -645,7 +660,7 @@ $G$ in the raw-input space.
 \end{proposition}
 
 The proof (Appendix~\ref{app:proofs}) is the standard pullback identity for
-reproducing kernels. Its content here is the reading: a fixed kernel on the
+reproducing kernels \citep{saitoh1997integral,paulsen2016introduction}. Its content here is the reading: a fixed kernel on the
 raw input must carry the whole warped map $G$, whose native-space norm is
 large when $G$ has fine structure; the same kernel on the features carries
 only the unwarped $h$, and training drives $\varphi$ toward exactly the
@@ -842,7 +857,7 @@ m(-\lambda)=\frac{\sqrt{\big(\lambda+\sigma^2(1-\gamma)\big)^2+4\gamma\sigma^2\l
 \]
 almost surely, where $m$ is the Stieltjes transform of the
 Mar\v{c}enko--Pastur law with ratio $\gamma$ and scale $\sigma^2$. In a
-simulation with $n=6000$, $p=1800$, $\sigma^2=1.7$, the formula agrees with
+simulation with $n=3000$, $p=900$, $\sigma^2=1.7$, the formula agrees with
 the empirical $d_{\mathrm{eff}}(\lambda)/n$ to four decimal places across
 $\lambda\in[10^{-3},10]$.
 \end{corollary}

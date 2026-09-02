@@ -1,0 +1,75 @@
+{
+ "tag": "hidata_NavierStokes_s0_p400",
+ "kind": "hidata",
+ "name": "NavierStokes",
+ "seed": 0,
+ "ntrain": 20000,
+ "ntest": 2000,
+ "npca": 400,
+ "npca_in": 200,
+ "fit": 19000,
+ "epochs": 150,
+ "smoke": false,
+ "results": {
+  "kernel": {
+   "test": 0.002799646305222562,
+   "val": 0.0028086690036870678
+  },
+  "kernel_pca_in": {
+   "test": 0.002802494377900935,
+   "val": 0.0028115488564526576
+  },
+  "mean": {
+   "test": 0.023815425112843513,
+   "val": 0.023845721036195755
+  },
+  "mean_plus_kernel": {
+   "test": 0.004738335760212275,
+   "val": 0.00473088384877595
+  },
+  "mean_plus_kernel_pca_in": {
+   "test": 0.004742682733219296,
+   "val": 0.004735184139025584
+  },
+  "select": {
+   "test": 0.0028174773324280977,
+   "picks": {
+    "kernel": 216,
+    "kernel_pca_in": 182,
+    "mean": 0,
+    "mean_plus_kernel": 2
+   }
+  },
+  "val_selected": "kernel"
+ },
+ "hyper": {
+  "kernel": {
+   "scale": 4,
+   "med": 88.94909854434655,
+   "val": 0.0028086690036870678,
+   "fit": 19000
+  },
+  "kernel_pca_in": {
+   "scale": 4,
+   "med": 89.19887830464819,
+   "val": 0.0028115488564526576,
+   "fit": 19000
+  },
+  "mean_plus_kernel": {
+   "scale": 2,
+   "med": 89.6082669519705,
+   "val": 0.00473088384877595,
+   "fit": 19000
+  },
+  "mean_plus_kernel_pca_in": {
+   "scale": 2,
+   "med": 89.32324391710608,
+   "val": 0.004735184139025584,
+   "fit": 19000
+  }
+ },
+ "pca_floor_te": 4.482567987906805e-07,
+ "pca_var_out": 1.0000001192092896,
+ "pca_var_in": 1.0,
+ "minutes": 90.2
+}

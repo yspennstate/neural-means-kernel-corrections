@@ -1,0 +1,75 @@
+{
+ "tag": "hidata_Helmholtz_s1_p400",
+ "kind": "hidata",
+ "name": "Helmholtz",
+ "seed": 1,
+ "ntrain": 20000,
+ "ntest": 2000,
+ "npca": 400,
+ "npca_in": 200,
+ "fit": 19000,
+ "epochs": 150,
+ "smoke": false,
+ "results": {
+  "kernel": {
+   "test": 0.012314041332857437,
+   "val": 0.012291292211075817
+  },
+  "kernel_pca_in": {
+   "test": 0.012298610207017405,
+   "val": 0.012276359422313999
+  },
+  "mean": {
+   "test": 0.060127854347229004,
+   "val": 0.06046658009290695
+  },
+  "mean_plus_kernel": {
+   "test": 0.013114092856459557,
+   "val": 0.013012857524486268
+  },
+  "mean_plus_kernel_pca_in": {
+   "test": 0.013122583791490556,
+   "val": 0.013021321565158226
+  },
+  "select": {
+   "test": 0.011864589527249336,
+   "picks": {
+    "kernel": 2,
+    "kernel_pca_in": 377,
+    "mean": 0,
+    "mean_plus_kernel": 21
+   }
+  },
+  "val_selected": "kernel_pca_in"
+ },
+ "hyper": {
+  "kernel": {
+   "scale": 2,
+   "med": 131.1193546059398,
+   "val": 0.012291292211075817,
+   "fit": 19000
+  },
+  "kernel_pca_in": {
+   "scale": 2,
+   "med": 132.66326145912979,
+   "val": 0.012276359422313999,
+   "fit": 19000
+  },
+  "mean_plus_kernel": {
+   "scale": 2,
+   "med": 131.4698448207312,
+   "val": 0.013012857524486268,
+   "fit": 19000
+  },
+  "mean_plus_kernel_pca_in": {
+   "scale": 2,
+   "med": 130.5887660430209,
+   "val": 0.013021321565158226,
+   "fit": 19000
+  }
+ },
+ "pca_floor_te": 7.397509762085974e-05,
+ "pca_var_out": 1.0000001192092896,
+ "pca_var_in": 1.0000001192092896,
+ "minutes": 104.0
+}

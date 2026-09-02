@@ -9,34 +9,45 @@ validation. Table~\ref{tab:suite} lists the results next to the best
 published number on each problem. The comparison is not controlled, and we
 draw nothing from it beyond orientation: the published numbers are
 per-problem methods tuned by their authors; our rows are single runs without
-seed replication; Burgers and Darcy use slightly smaller training splits than
+seed replication, except Helmholtz and Navier--Stokes, which were rerun at
+three seeds with the exact solve on 19{,}000 training pairs once it was found
+that the recipe's output rank of 40, adequate for the stress fields, left a
+reconstruction floor of 1.7\% and 8.2\% on these two problems (the rerun uses
+rank 400, whose floor is below 0.01\%, and every rerun head sits well above
+it); Burgers and Darcy use slightly smaller training splits than
 their baselines (800 and 824 pairs) and Darcy a different grid, from the
 copies we could obtain; and we report no number for Advection~I. What the
 survey shows is the sorting one would expect: where the map is smooth and
 data are plentiful (Helmholtz, Navier--Stokes, Darcy) the kernel stage wins
-the recipe's internal selection and lands within a factor of two of the tuned
-per-problem kernels, and on Burgers the corrected mean sits near the Fourier
-neural operator. The two problems studied in depth, with replication, are the
+the recipe's internal selection and lands within a factor of 1.2 (Helmholtz)
+to 2.3 (Navier--Stokes) of the tuned per-problem kernels, whose Cholesky
+preconditioning of the input the recipe does not use, and on Burgers the
+corrected mean sits near the Fourier neural operator. On Helmholtz the
+per-coordinate selection improves on the kernel alone ($1.17\%$ against
+$1.22\%$) by handing a few dozen of the 400 output coordinates to the
+corrected mean; on Navier--Stokes it selects the kernel almost everywhere.
+The two problems studied in depth, with replication, are the
 subject of the rest of the paper.
 
 \begin{table}[t]
 \centering
 \caption{The remaining problems of the suite: an uncontrolled survey. Best
 published mean relative $L^2$ test error on each problem (per-problem
-methods tuned by their authors), against one recipe run unchanged and once
-per problem, without seed replication, on training splits and grids that
-differ from the baselines' in the cases noted in the text.}
+methods tuned by their authors), against one recipe run unchanged, on
+training splits and grids that differ from the baselines' in the cases noted
+in the text: single runs, except the two rows marked three seeds (mean
+$\pm$ standard deviation, exact solve on 19{,}000 pairs, output rank 400).}
 \label{tab:suite}
 \begin{tabular}{llcc}
 \toprule
-Problem & Map & Best published & This work (single run) \\
+Problem & Map & Best published & This work \\
 \midrule
 Burgers & initial condition $\to$ solution & 1.93\% (FNO) & 2.38\% \\
 Darcy flow & permeability $\to$ pressure & 2.32\% (POD-DeepONet) & 2.01\% \\
 Advection~I & smooth pulse $\to$ solution & $\approx0\%$ (kernel) & --- \\
 Advection~II & discontinuous pulse $\to$ solution & 11.28\% (linear kernel) & 11.29\% \\
-Helmholtz & wavespeed $\to$ field & 1.00\% (kernel) & 1.75\% \\
-Navier--Stokes & vorticity $\to$ vorticity & 0.12\% (kernel) & 0.51\% \\
+Helmholtz & wavespeed $\to$ field & 1.00\% (kernel) & 1.17\% $\pm$ 0.01 (three seeds) \\
+Navier--Stokes & vorticity $\to$ vorticity & 0.12\% (kernel) & 0.28\% $\pm$ 0.00 (three seeds) \\
 \bottomrule
 \end{tabular}
 \end{table}

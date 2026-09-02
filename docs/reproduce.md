@@ -151,9 +151,28 @@ five-member sets (`campaign/collected/secmom6_seeded.json`,
 `secmom5c_seeded.json`); `campaign/run_kappa_fill.sh` completes the
 correction-weight constant at ten seeds with a cross-machine control; and
 `campaign/runtime_ledger.py` harvests the member costs into
-`campaign/collected/dgx/runtime_ledger.csv`. `campaign/collect.py --no-pull`
-aggregates the collected records and `campaign/audit_reported_macros.py`
-recomputes every macro in `paper/macros.tex` from them.
+`campaign/collected/dgx/runtime_ledger.csv`. `campaign/seedarch.py` (launched
+by `campaign/run_analysis.sh`, which also refits the kernel ridge at the
+learning-curve sizes) compares the sixty test-prediction arrays, ten seeds of
+six architectures, on a fixed calibration/evaluation split of the test block
+and writes `campaign/collected/dgx/seedarch.json`; `campaign/run_curve.sh`
+trains the normalized-MSE MLP at seven training sizes and ten seeds under the
+fixed-carve protocol (`--ntrain n --lowval 1000`), harvested into
+`campaign/collected/dgx/learning_curve.json`.
+`campaign/dropone.py` re-solves the pool's convex optima with each
+architecture's ten seeds removed, from the released second-moment matrices
+(`campaign/collected/dgx/dropone.json`).
+`campaign/pool_pipeline.py` runs the pipeline over the pool, each
+architecture's ten-seed mean as a member, with every fitted choice made on
+the calibration half of the test block and every number read on the
+evaluation half (`campaign/collected/dgx/pool_pipeline.json`).
+`campaign/verify_floor_and_certificate.py` checks the block floor theorem,
+the exchange-rate proposition, the sharpened weight bound with its equality
+case, the sharpness and minimax identity of the certified bound and the
+signed-stack corollary on synthetic objects and on the released
+sixty-predictor matrix. `campaign/collect.py --no-pull` aggregates the
+collected records and `campaign/audit_reported_macros.py` recomputes every
+macro in `paper/macros.tex` from them.
 
 One OCO-2 band at one seed (three networks including the exact
 radiance-metric one, matched raw-kernel rows, deep-kernel heads, both

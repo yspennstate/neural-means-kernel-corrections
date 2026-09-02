@@ -289,10 +289,15 @@ seeds out of ten.}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{figs/scaling.pdf}
-\caption{Relative test error against training set size for the kernel ridge on
-loads (log-log), with the full pipeline and the best published results marked
-in both regimes.}
+\includegraphics[width=\linewidth]{figs/curve_seeded.pdf}
+\caption{Learning curves at ten seeds under one protocol (the first $N$ rows
+of the training pool, a fixed $1000$-case validation carve, the full test
+block): mean relative test error of the normalized-MSE network, mean and
+standard deviation over ten seeds, and of the deterministic Mat\'ern kernel
+ridge on loads, against the number of training samples, both axes
+logarithmic. The horizontal lines mark the six-member pipeline at $19000$
+samples and the best published result. Error bars are smaller than the
+markers above $4000$.}
 \label{fig:scaling}
 \end{figure}
 
@@ -362,6 +367,21 @@ at all ten seeds: the annealed FNO at correlation $0.974$--$0.980$ against a
 threshold of $0.992$--$0.998$, the UNet at $0.943$--$0.961$ against
 $0.985$--$1.000$, the kernel at $0.859$--$0.879$ against $0.905$--$0.918$.
 
+Proposition~\ref{prop:exchange} prices what the anneal did to the FNO. In
+the root-mean-square metric on the validation split the member improved
+from $\fnoRmsA\%$ to $\fnoRmsB\%$, by $\fnoImprove$ percent, and its
+correlation with the normalized-MSE network rose from $\corrFnoLo$--$\corrFnoHi$
+to $0.974$--$0.980$. At the first campaign's values, $t=\tRatioA$ and
+$\varrho\approx0.96$, the exchange rate $(1-\varrho^2)/(t-\varrho)$ is
+$\exchRateA$, so a $\fnoImprove$-percent improvement is cancelled by a rise
+of about $0.019$ in the correlation; the anneal produced a rise of about
+$0.016$. The two-member optimum of the pair accordingly moved from about
+$\vTwoA\%$ to $\vTwoB\%$, and the five-member prediction of
+Proposition~\ref{prop:secmom} from $\predRMS\%$ to $\predRMSFiveC\%$. At the
+second campaign's values ($t=\tRatioB$, $\varrho=\rhoFnoB$) the rate has
+risen to $\exchRateB$: the closer a member sits to the admission threshold,
+the more of its accuracy the stack asks it to pay for in correlation.
+
 Part~(ii) of the proposition puts the infinite-ensemble floor of an
 equicorrelated family at $\bar e\sqrt{\bar\varrho}$, which at these measurements
 is $\ensFloor\pm\ensFloorSd\%$ on five members and
@@ -389,14 +409,25 @@ residual kernel correction, which regresses the stack's residual on the load,
 improves the stack by $\corrGain$ points at $n=19000$ whatever the kernel
 scale, and its tuner reaches for the smoothest kernel and the largest nugget
 on its grid: at this sample size the shared residual is not a function of the
-load in any way a Mat\'ern RKHS on $\mathbb R^{41}$ can see. Second, the error
-stops responding to data. Under identical recipes the MLP's test error is
-$4.95\%$ with $3500$ training samples and $4.86\%$ with $8500$ in the
-scaling sweep of Figure~\ref{fig:scaling}, against $\errMLP\pm\errMLPSd\%$
-at $19000$ over the ten seeds, so the last five-and-a-half-fold increase in
-data buys nothing that seed noise does not already cover. The
-kernel ridge curve still falls, at roughly $n^{-0.11}$, but toward the same
-region. Third, and this is what ten seeds add, the error does not respond to
+load in any way a Mat\'ern RKHS on $\mathbb R^{41}$ can see. Second, the response
+to data is small. Figure~\ref{fig:scaling} gives the learning curve at ten
+seeds under one protocol, the first $N$ rows of the training pool with a
+fixed $1000$-case validation carve and the full test block: the
+normalized-MSE network goes from $\lcMlpOneK\pm\lcMlpOneKSd\%$ at $N=1000$
+to $\lcMlpEightK\pm\lcMlpEightKSd\%$ at $8000$ and
+$\lcMlpNineteenK\pm\lcMlpNineteenKSd\%$ at $19000$, the kernel ridge from
+$\lcKrrOneK\%$ to $\lcKrrEightK\%$ and $\lcKrrNineteenK\%$. Above $8000$ the
+network's log-log slope is $-\lcSlopeMlp\pm\lcSlopeMlpSd$, fitted seed by
+seed, and the kernel's $-\lcSlopeKrr$; the last step, $16000$ to $19000$,
+gains $\lcLastGain\pm\lcLastGainSd$ points, positive at nine seeds of ten,
+and the last two steps $\lcLastTwoGain\pm\lcLastTwoGainSd$, positive at all
+ten. A three-parameter fit $e_\infty+cN^{-\alpha}$ to the ten-seed means
+puts the network's asymptote at $4.64\%$ and the kernel's at $4.88\%$, the
+kernel still far from its asymptotic range; the two do not agree, so the
+curve alone does not locate a common floor and we do not read one from it.
+What it fixes is the rate: at this size a doubling of the data is worth a
+few hundredths to the network, an order of magnitude less than the span of
+the published architectures. Third, and this is what ten seeds add, the error does not respond to
 reseeding either, and the scale of the comparison is what makes it an
 argument: the five published architectures in Table~\ref{tab:main} span
 $0.65$ points, while ten reseedings of our own pipeline span $0.034$, about
@@ -424,6 +455,31 @@ on six, the dispersion factor of Remark~\ref{rem:metric}, so ten independent
 redraws of the validation split and of every network initialization move
 the prediction by six hundredths of a point and the ratio by three
 thousandths.
+
+\paragraph{The sixty-predictor pool.} The measurement of
+Section~\ref{sec:seeds-arch} uses every test prediction array of the second
+campaign (\texttt{campaign/seedarch.py}, record
+\texttt{campaign/collected/dgx/seedarch.json}). The test block is split once,
+by a fixed permutation, into $1000$ calibration and $19000$ evaluation cases;
+second-moment and correlation matrices are formed on each half from the
+normalized residuals, convex optima are solved by the same sequential
+quadratic program as everywhere else, and seed-ensemble curves are averaged
+over all subsets of a given size where there are at most $45$ of them and
+over $40$ random subsets otherwise. Per architecture, the root-mean-square
+floor that no number of its own seeds can pass, read off the smallest
+within-architecture second moment, is $4.93\%$ for the FNO, $4.96\%$ for the
+normalized-MSE network, $4.97\%$ for the refiner, $4.94\%$ for the UNet,
+$4.90\%$ for the metric-loss MLP and $5.46\%$ for the kernel ridge; the
+ten-seed equal-weight averages sit within a hundredth or two of those
+floors, so the seed axis is exhausted at ten. The block form of
+Theorem~\ref{thm:blockfloor} with the pool's mean second moments in place of
+its minima returns the uniform sixty-member mixture's value exactly, as it
+must, since for uniform weights the display is an identity. Fitting
+per-pixel affine weights over all sixty members from the $1000$ calibration
+cases overfits, at $\saPerpixSixty\%$, where the same fit over the six
+ten-seed means reaches $\saPerpixMeans\%$ and over the six members of seed~0
+alone $\saPerpixSeedZero\%$. Dropping the UNet's ten seeds from the pool moves
+the equal-weight average from $\saSixtyEq\%$ to $\saFiftyEq\%$.
 
 The stages are more reproducible than the members they are built from, and the
 way the seed spread moves along the chain is itself informative. Equal

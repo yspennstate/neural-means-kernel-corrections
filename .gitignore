@@ -17,3 +17,5 @@ campaign/boxes.local.json
 # not; those are covered by the runs/ rules above.
 
 release_artifacts/
+*.fdb_latexmk
+*.fls

@@ -64,8 +64,8 @@ replication is what lets gains of a few hundredths of a point be resolved at
 all; it also shows why ensembles saturate there. The residuals of every
 architecture we train correlate between \corrNetLoSix{} and \corrNetHiSix{}
 at every seed; their shared component concentrates at the corners of the
-loaded edge, where the finite element solution is least reliable, and is
-flat in ensemble diversity and in training-set size; and the spread of our
+loaded edge, where the finite element solution is least reliable, and moves
+by hundredths with ensemble diversity and with training-set size; and the spread of our
 own pipelines across seeds, \errPipeSd{} and \errSixSd{} points, is sixty to
 two hundred times smaller than the span of the published architectures, so
 the published cluster near $4.5\%$ is not run-to-run noise. That evidence is consistent with a floor
@@ -103,16 +103,20 @@ $n=19000$, one dense Cholesky factorization rather than an approximation;
 the controlled raw-input versus learned-feature comparison above; the
 per-coordinate treatment of OCO-2's two metrics, which trade off coordinate
 by coordinate and had been won by different models; the residual-correlation
-diagnosis of why ensembles saturate on the structural-mechanics benchmark;
-and a replicated audit, at ten seeds, of every stage. The theory of
+diagnosis of why ensembles saturate on the structural-mechanics benchmark,
+carried to a pool of sixty predictors; and a replicated audit, at ten seeds,
+of every stage. The theory of
 Section~\ref{sec:theory} supports the deployed estimators rather than
 idealizations of them, and is kept in proportion: a symmetrization
 inequality behind the reflection averaging; a second-moment identity that
-predicts the stacked risk from measured residual correlations and brackets
-how close any convex ensemble sits to its floor; capacity bounds for the
+predicts the stacked risk from measured residual correlations, brackets how
+close any convex ensemble sits to its floor, and, for pools of seeds and
+architectures, separates what reseeding can buy from what a new
+architecture can (Theorem~\ref{thm:blockfloor}); capacity bounds for the
 fitted stacks and the grid-tuned correction, with constants measured on the
-runs; the residual-norm bound of Theorem~\ref{thm:or}, which is the one
-statement we call a certificate, and the pullback identity; an informal rate
+runs; the residual-norm bound of Theorem~\ref{thm:or}, sharp and, by
+Theorem~\ref{thm:minimax}, the smallest any method can certify from the
+same data, and the pullback identity; an informal rate
 calculation (Proposition~\ref{prop:aniso}) for what an input metric can buy
 a kernel, whose rate half the OCO-2 sweep does not bear out; and a
 distribution-free coverage statement whose hypotheses the calibration

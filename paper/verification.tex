@@ -51,7 +51,15 @@ six it is $0.972\pm0.005$ inside $[0.933\pm0.007,\,1.032\pm0.004]$, and the
 inequalities hold at every seed. The signed optimum of
 Corollary~\ref{cor:signed} coincides with the convex one at every seed and
 for both member sets, the unconstrained minimizer having no negative
-coordinate. The two-member rule of
+coordinate. The bound of Theorem~\ref{thm:blockfloor} is evaluated on the
+sixty predictors of Section~\ref{sec:seeds-arch} with the pool's smallest
+member error and smallest within- and between-architecture second moments:
+$\saBound\%$ against a hindsight convex optimum of $\saSixtyOracleRms\%$ and
+a uniform mixture of $\saSixtyEqRms\%$, root mean square, so the bound holds
+and sits six hundredths below the best mixture any rule could have chosen.
+The exchange rate of Proposition~\ref{prop:exchange} is evaluated at the
+measured values of both campaigns in Supplement~\ref{supp:experiments}. The
+two-member rule of
 Proposition~\ref{prop:secmom}(i) is scored prospectively on every member pair
 of every seed rather than on selected examples --- decided on the validation
 split and checked on the test block, $840$ pairs over the thirty OCO-2
@@ -94,6 +102,30 @@ ratio between $0.54$ and $0.60$, so the heuristic calculation of
 Proposition~\ref{prop:aniso} would permit a rate gain here and not merely a
 constant; the sweep finds the constant and not the rate, and
 Section~\ref{sec:aniso-measured} reports it that way.
+
+The floor theorem, the exchange rate, the sharpened weight bound, the
+minimax identity and the signed-stack corollary have their own released
+check, fifteen tests in all, in
+\texttt{campaign/verify\_floor\_and\allowbreak\_certificate.py}.
+The block floor of Theorem~\ref{thm:blockfloor} is an identity in the exact
+block-correlated model, and the identity closes to $3\times10^{-18}$ over
+two thousand random convex weight vectors; on a perturbed pool, and on the
+released sixty-predictor matrix, twenty thousand random convex mixtures never
+pass the bound evaluated with the pool's minima, and the mean-entry form of
+the display returns the uniform mixture's value exactly. The two partial
+derivatives of Proposition~\ref{prop:exchange} agree with central
+differences to $4\times10^{-9}$ over two thousand interior points, both are
+positive there, and along the stated direction the change in the optimal
+risk is second order in the step. The sharpened bound of
+Lemma~\ref{lem:kappa} holds on fifteen hundred random Mat\'ern designs and
+evaluation points, the largest ratio to the bound being $0.87$, and the
+cosine-kernel construction attains it to $7\times10^{-15}$. The identity of
+Theorem~\ref{thm:minimax} closes to $4\times10^{-14}$, the ordering
+$P_0\le\widetilde P_\lambda\le P_\lambda$ holds on every draw, the residual
+that the proof of Theorem~\ref{thm:or} exhibits attains the certified bound
+with equality to $10^{-14}$, and the signed optimum of
+Corollary~\ref{cor:signed} matches its closed form and never lies above a
+sampled convex mixture.
 
 The bound comparisons are reported as measured constants, bound value and
 realized excess side by side; where an oracle risk is needed it is estimated by

@@ -65,7 +65,12 @@ campaign on one 40-core host), level with the best published architecture
 (PARA-Net, 4.55%) rather than beating it -- the differences are at most one
 standard error -- and below FNO (4.76%), PCA-Net (4.67%), DeepONet (5.20%)
 and the optimal-recovery kernel (5.18%); in the 1250-sample regime it reaches
-**5.433% +- 0.093%** over ten seeds against a published best of 6.49%. The paper argues from measured
+**5.433% +- 0.093%** over ten seeds against a published best of 6.49%. Sixty
+predictors, ten seeds of six architectures, reach 4.61% at equal weights and
+4.58% at the best convex weights chosen in hindsight on the test block: one
+seed of each architecture beats ten seeds of the best one, and a block floor
+theorem places the number from the within- and between-architecture residual
+correlations. The paper argues from measured
 residual correlations, the spatial structure of the shared error, and
 flat scaling in the sample size that the published plateau near 4.5% is a
 property of this benchmark's data rather than of any architecture.

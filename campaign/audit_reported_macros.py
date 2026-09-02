@@ -131,11 +131,114 @@ if len(six) == 10:
         chk("fnoScheduleWash", st.mean(wash), 3)
         chk("fnoScheduleWashSd", st.stdev(wash), 3)
         sm5c = os.path.join(HERE, "collected", "secmom5c_seeded.json")
-        if os.path.exists(sm5c):
+        smA = os.path.join(HERE, "collected", "secmom_seeded5.json")
+        if os.path.exists(sm5c) and os.path.exists(smA):
             rec5 = json.load(open(sm5c, encoding="utf-8"))
+            recA = json.load(open(smA, encoding="utf-8"))
             chk("predRMSFiveC", 100 * st.mean(r["pred_rms"] for r in rec5), 3)
+            # Proposition exchange at the measured values: V = e1^2 e2^2 (1-rho^2)/(e1^2+e2^2-2 rho e1 e2)
+            def V(e1, e2, rho):
+                return e1 * e1 * e2 * e2 * (1 - rho * rho) / (e1 * e1 + e2 * e2 - 2 * rho * e1 * e2)
+            eA1 = st.mean(r["member_err"]["mlpMSE"] for r in recA); eA2 = st.mean(r["member_err"]["fno"] for r in recA)
+            chk("fnoRmsA", 100 * eA2, 3)
+            chk("tRatioA", eA2 / eA1, 3)
+            chk("vTwoA", 100 * V(eA1, eA2, 0.96) ** 0.5, 2)
+            chk("exchRateA", (1 - 0.96 ** 2) / (eA2 / eA1 - 0.96), 1)
+            nm = rec5[0]["members"]; i1, i2 = nm.index("mlpMSE"), nm.index("fno")
+            eB2 = st.mean(r["member_err"]["fno"] for r in rec5)
+            chk("fnoRmsB", 100 * eB2, 3)
+            chk("fnoImprove", 100 * (eA2 - eB2) / eA2, 1)
+            chk("tRatioB", st.mean(r["member_err"]["fno"] / r["member_err"]["mlpMSE"] for r in rec5), 3)
+            chk("rhoFnoB", st.mean(r["C"][i1][i2] for r in rec5), 3)
+            chk("vTwoB", 100 * st.mean(V(r["member_err"]["mlpMSE"], r["member_err"]["fno"], r["C"][i1][i2]) ** 0.5 for r in rec5), 2)
+            chk("exchRateB", st.mean((1 - r["C"][i1][i2] ** 2) / (r["member_err"]["fno"] / r["member_err"]["mlpMSE"] - r["C"][i1][i2]) for r in rec5), 1)
     else:
         print("  unetGain: %d of 10 seeds present, not checked" % len(five))
+    sa_path = os.path.join(DGX, "seedarch.json")
+    if os.path.exists(sa_path):
+        import itertools
+        sa = json.load(open(sa_path, encoding="utf-8"))
+        A_ = sa["arch"]; nm_ = sa["names"]
+        chk("saWithinLo", min(v["min"] for v in sa["within"].values()), 2)
+        chk("saWithinHi", max(v["max"] for v in sa["within"].values()), 2)
+        chk("saWithinMean", st.mean(v["mean"] for v in sa["within"].values()), 2)
+        chk("saBetweenLo", min(v["min"] for v in sa["between"].values()), 2)
+        chk("saBetweenHi", max(v["max"] for v in sa["between"].values()), 2)
+        chk("saBetweenMean", sa["rho_b_mean"], 2)
+        sc = sa["seed_curves"]
+        chk("saFnoOne", 100 * sc["fno"]["1"]["e1_mean"], 3)
+        chk("saFnoOneRms", 100 * sc["fno"]["1"]["e2_mean"], 3)
+        chk("saFnoTen", 100 * sc["fno"]["10"]["e1_mean"], 3)
+        chk("saFnoTenRms", 100 * sc["fno"]["10"]["e2_mean"], 3)
+        chk("saMseOne", 100 * sc["mlpMSE"]["1"]["e1_mean"], 3)
+        chk("saMseTen", 100 * sc["mlpMSE"]["10"]["e1_mean"], 3)
+        chk("saMlpGain", 100 * (sc["mlp"]["1"]["e1_mean"] - sc["mlp"]["10"]["e1_mean"]), 2)
+        e6 = [r["e1"] for r in sa["six_arch_one_seed_equal"]]; r6 = [r["e2"] for r in sa["six_arch_one_seed_equal"]]
+        chk("saSixEq", 100 * st.mean(e6), 3); chk("saSixEqSd", 100 * st.stdev(e6), 3)
+        chk("saSixEqRms", 100 * st.mean(r6), 3); chk("saSixEqRmsSd", 100 * st.stdev(r6), 3)
+        c6 = [r["e1"] for r in sa["six_arch_one_seed_convex_cal_to_ev"]]
+        chk("saSixConvex", 100 * st.mean(c6), 3); chk("saSixConvexSd", 100 * st.stdev(c6), 3)
+        chk("saSixtyEq", 100 * sa["sixty_equal"]["e1"], 3); chk("saSixtyEqRms", 100 * sa["sixty_equal"]["e2"], 3)
+        chk("saSixtyConvex", 100 * sa["sixty_convex_cal_to_ev"]["e1"], 3); chk("saSixtyConvexRms", 100 * sa["sixty_convex_cal_to_ev"]["e2_ev"], 3)
+        chk("saSixtyOracle", 100 * sa["sixty_convex_oracle_ev"]["e1"], 3); chk("saSixtyOracleRms", 100 * sa["sixty_convex_oracle_ev"]["e2"], 3)
+        chk("saFiftyEq", 100 * sa["fifty_equal_no_unet"]["e1"], 3)
+        chk("saPerpixMeans", 100 * sa["perpixel_six_seed_means"], 3)
+        chk("saPerpixSeedZero", 100 * sa["perpixel_six_seed0"], 3)
+        chk("saPerpixSixty", 100 * sa["perpixel_sixty"], 3)
+        h = sa["hard_tail_1pct"]
+        chk("saHardSingle", 100 * h["best_single"], 2); chk("saHardTen", 100 * h["best_arch_ten_seeds"], 2)
+        chk("saHardSixty", 100 * h["sixty_equal"], 2); chk("saHardMedian", 100 * h["median_best_single"], 2)
+        # Theorem blockfloor with the pool's minima
+        Smat = sa["S_ev"]; arch_of = [A_.index(n.split("_s")[0]) for n in nm_]; N_ = len(nm_)
+        e2min = min(Smat[i][i] for i in range(N_))
+        win = [Smat[p][q] for p in range(N_) for q in range(p + 1, N_) if arch_of[p] == arch_of[q]]
+        bet = [Smat[p][q] for p in range(N_) for q in range(N_) if arch_of[p] != arch_of[q]]
+        rw, rb = min(win) / e2min, min(bet) / e2min
+        chk("saBound", 100 * (e2min * (rb + (rw - rb) / len(A_) + (1 - rw) / N_)) ** 0.5, 3)
+        dep = os.path.join(DGX, "deployed_on_ev.json")
+        if os.path.exists(dep):
+            dv = json.load(open(dep, encoding="utf-8"))["hpix_corr_pred_test.npy"]
+            chk("saDeployedEv", 100 * st.mean(dv), 3)
+            chk("saDeployedEvSd", 100 * st.stdev(dv), 3)
+        pp_path = os.path.join(DGX, "pool_pipeline.json")
+        if os.path.exists(pp_path):
+            pp = json.load(open(pp_path, encoding="utf-8"))
+            chk("saPoolPipeline", 100 * pp["final_ev"], 3)
+            chk("saPerpixMeans", 100 * pp["stack_ev"], 3)
+        do_path = os.path.join(DGX, "dropone.json")
+        if os.path.exists(do_path):
+            do = json.load(open(do_path, encoding="utf-8"))
+            for a, key in (("mlpR", "saDropMlpR"), ("unet", "saDropUnet"), ("fno", "saDropFno"), ("krr", "saDropKrr")):
+                chk(key, 100 * do["drop_" + a]["d_oracle_rms"], 3)
+            chk("saOnlyFnoRms", 100 * do["only_fno"]["oracle_rms"], 3)
+            chk("saOnlyMlpRRms", 100 * do["only_mlpR"]["oracle_rms"], 3)
+            chk("saCorrMlpRUnet", sa["between"]["mlpR-unet"]["mean"], 2)
+            chk("saCorrMlpRFno", sa["between"]["mlpR-fno"]["mean"], 2)
+            chk("saCorrMseFno", sa["between"]["mlpMSE-fno"]["mean"], 2)
+    else:
+        print("  seedarch.json absent, sixty-predictor macros not checked")
+    lc_path = os.path.join(DGX, "learning_curve.json")
+    if os.path.exists(lc_path):
+        lc = json.load(open(lc_path, encoding="utf-8"))
+        rows = {r["N"]: r for r in lc["rows"]}
+        for N, key in ((1000, "lcMlpOneK"), (2000, "lcMlpTwoK"), (4000, "lcMlpFourK"), (8000, "lcMlpEightK"), (12000, "lcMlpTwelveK"), (16000, "lcMlpSixteenK"), (19000, "lcMlpNineteenK")):
+            if N in rows and key in mac:
+                chk(key, rows[N]["mlp_mean"], 3)
+                chk(key + "Sd", rows[N]["mlp_sd"], 3)
+        for N, key in ((1000, "lcKrrOneK"), (4000, "lcKrrFourK"), (8000, "lcKrrEightK"), (16000, "lcKrrSixteenK"), (19000, "lcKrrNineteenK")):
+            if N in rows and key in mac:
+                chk(key, rows[N]["krr"], 3)
+        if "slope_mlp_hi" in lc and "lcSlopeMlp" in mac:
+            chk("lcSlopeMlp", -lc["slope_mlp_hi"], 3)
+            chk("lcSlopeMlpSd", lc["slope_mlp_hi_per_seed_sd"], 3)
+        if "slope_krr_hi" in lc and "lcSlopeKrr" in mac:
+            chk("lcSlopeKrr", -lc["slope_krr_hi"], 3)
+        if "last_step" in lc and "lcLastGain" in mac:
+            chk("lcLastGain", lc["last_step"]["gain_mean"], 3)
+            chk("lcLastGainSd", lc["last_step"]["gain_sd"], 3)
+        if "last_two_steps" in lc and "lcLastTwoGain" in mac:
+            chk("lcLastTwoGain", lc["last_two_steps"]["gain_mean"], 3)
+            chk("lcLastTwoGainSd", lc["last_two_steps"]["gain_sd"], 3)
     cov90 = [100 * six[s]["uq"]["a0.1"]["scaled"]["coverage"] for s in S]
     cov95 = [100 * six[s]["uq"]["a0.05"]["scaled"]["coverage"] for s in S]
     chk("uqCoverSix", st.mean(cov90), 1)

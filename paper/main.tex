@@ -49,9 +49,12 @@ per-coordinate combination improves on the published Gaussian-process
 emulator on both of that problem's error metrics on all three spectral
 bands, at ten seeds per band. The replicates also show why ensembles
 saturate on structural mechanics: the residuals of every architecture we
-train correlate above \corrNetLoSix{} at every seed and their shared
-component is flat in diversity and sample size, consistent with a floor set
-by the benchmark data. The supporting bounds are checked numerically.
+train correlate above \corrNetLoSix{} at every seed, sixty predictors, ten
+seeds of six architectures, reach $\saSixtyOracle$\% at the best convex
+weights chosen in hindsight, and the shared component is flat in diversity
+and sample size, consistent with a floor set by the benchmark data. A floor
+theorem for pools of seeds and architectures places that number from three
+measured correlations; the supporting bounds are checked numerically.
 \end{abstract}
 
 \begin{keywords}

@@ -313,6 +313,62 @@ using $\sum_{m\neq k}w_mw_k=(\sum_m w_m)^2-\|w\|_2^2=1-\|w\|_2^2$. The bracket
 is a convex combination of $1$ and $\bar\varrho$, hence at least
 $\bar\varrho$. \qed
 
+\subsection{Proof of Theorem~\ref{thm:blockfloor}}
+
+Write $W_a=\sum_kw_{a,k}$ for the total weight of architecture $a$, so that
+$\sum_aW_a=1$. Split the quadratic form into its diagonal terms, the terms
+between two seeds of one architecture and the terms between architectures,
+and bound each entry below by its hypothesis; the weights are nonnegative,
+so the inequalities survive the multiplication:
+\[
+w^\top Sw\;\ge\;\bar e^{\,2}\Big(\|w\|_2^2
++\varrho_w\big(\textstyle\sum_aW_a^2-\|w\|_2^2\big)
++\varrho_b\big(1-\sum_aW_a^2\big)\Big),
+\]
+using $\sum_{k\ne l}w_{a,k}w_{a,l}=W_a^2-\sum_kw_{a,k}^2$ within an
+architecture and $\sum_{a\ne b}W_aW_b=1-\sum_aW_a^2$ across them.
+Rearranged, the right side is
+$\bar e^{\,2}\big(\varrho_b+(\varrho_w-\varrho_b)\sum_aW_a^2
++(1-\varrho_w)\|w\|_2^2\big)$. Both coefficients are nonnegative by
+hypothesis; $\sum_aW_a^2\ge1/M$ by Cauchy--Schwarz, with equality at
+$W_a=1/M$; and $\|w\|_2^2\ge1/(MK)$ with equality at uniform weights, which
+also give $W_a=1/M$. So the minimum of the right side over the simplex is
+attained at uniform weights and equals the display. When the three
+hypotheses hold with equality,
+$S=\bar e^{\,2}\big((1-\varrho_w)I+(\varrho_w-\varrho_b)B
++\varrho_b\mathbf 1\mathbf 1^\top\big)$ with $B$ the indicator of a shared
+architecture, the first inequality is an identity for every $w$, and uniform
+weights attain the bound. The three limits follow by letting $K$, then $M$,
+grow. \qed
+
+\subsection{Proof of Proposition~\ref{prop:exchange}}
+
+Proposition~\ref{prop:secmom}(i) gives $V=e_1^2e_2^2(1-\varrho^2)/(e_1^2+e_2^2
+-2\varrho e_1e_2)=e_1^2\,t^2(1-\varrho^2)/D$ with $D=1+t^2-2\varrho t$, valid
+whenever the unconstrained minimizer lies in the open simplex, which is the
+condition $\varrho<\min(t,1/t)$. Differentiating,
+\[
+\frac{\partial V}{\partial t}
+=\frac{e_1^2\big[2t(1-\varrho^2)D-t^2(1-\varrho^2)(2t-2\varrho)\big]}{D^2}
+=\frac{2e_1^2\,t(1-\varrho^2)\big(D-t^2+\varrho t\big)}{D^2}
+=\frac{2e_1^2\,t(1-\varrho^2)(1-\varrho t)}{D^2},
+\]
+and
+\[
+\frac{\partial V}{\partial\varrho}
+=\frac{e_1^2\big[-2\varrho t^2D+2t^3(1-\varrho^2)\big]}{D^2}
+=\frac{2e_1^2\,t^2\big(t-\varrho-\varrho t^2+\varrho^2t\big)}{D^2}
+=\frac{2e_1^2\,t^2(t-\varrho)(1-\varrho t)}{D^2}.
+\]
+Both are positive on the interior region, since $t-\varrho>0$ and
+$1-\varrho t>0$ there. Setting
+$\mathrm dV=(\partial V/\partial t)\,\mathrm dt
++(\partial V/\partial\varrho)\,\mathrm d\varrho=0$ and cancelling the common
+factor $2e_1^2t(1-\varrho t)/D^2$ gives
+$(1-\varrho^2)\,\mathrm dt+t(t-\varrho)\,\mathrm d\varrho=0$, which is the
+stated rate; substituting $\mathrm dt=-\epsilon t$ gives the fractional
+form. \qed
+
 \subsection{Proof of Proposition~\ref{prop:percoord}}
 
 The metric is diagonal, so the squared norm splits over coordinates and the

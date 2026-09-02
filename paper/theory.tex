@@ -181,6 +181,63 @@ global weights buys nothing here, and what the deployed per-pixel stack
 gains over the convex one ($0.032$ and $0.035$ points in the two campaigns)
 is the variation of the weights over the grid, not their sign.
 
+The members of a pool are usually of two kinds at once, architectures and
+seeds of each architecture, and the floor separates the two.
+
+\begin{theorem}[seeds and architectures]\label{thm:blockfloor}
+Let the pool consist of $K$ seeds of each of $M$ architectures, and suppose
+$S_{ii}\ge\bar e^{\,2}$ for every member, $S_{ij}\ge\varrho_w\bar e^{\,2}$
+for two seeds of the same architecture and $S_{ij}\ge\varrho_b\bar e^{\,2}$
+for members of different architectures, with $0\le\varrho_b\le\varrho_w\le1$.
+Then every convex combination obeys
+\[
+\mathbb E\,\ell\big(f_w(u),G(u)\big)^2\;\ge\;\bar e^{\,2}\Big(\varrho_b
++\frac{\varrho_w-\varrho_b}{M}+\frac{1-\varrho_w}{MK}\Big),
+\]
+with equality at uniform weights when the three inequalities are equalities.
+In particular no number of seeds of one architecture takes the
+root-mean-square error below $\bar e\sqrt{\varrho_w}$, no number of seeds of
+$M$ architectures takes it below
+$\bar e\sqrt{\varrho_b+(\varrho_w-\varrho_b)/M}$, and no pool of any size
+takes it below $\bar e\sqrt{\varrho_b}$.
+\end{theorem}
+
+Three measured quantities therefore set what any ensemble of trained members
+can reach: the member error, the seed-to-seed correlation of one
+architecture, which reseeding divides away, and the correlation between
+architectures, which it cannot touch. Section~\ref{sec:seeds-arch} measures
+all three on sixty predictors and compares the display with what the sixty
+achieve.
+
+The two-member rule of Proposition~\ref{prop:secmom}(i) can be read the same
+way, as a statement about what a member's accuracy is worth against its
+correlation, and the exchange rate is explicit.
+
+\begin{proposition}[the price of accuracy in correlation]\label{prop:exchange}
+In the setting of Proposition~\ref{prop:secmom}(i) write $t=e_2/e_1$ and
+suppose the optimum is interior, $\varrho<\min(t,1/t)$. The optimal
+two-member risk is $V=e_1^2\,t^2(1-\varrho^2)/(1+t^2-2\varrho t)$, and
+\[
+\frac{\partial V}{\partial t}
+=\frac{2e_1^2\,t\,(1-\varrho^2)(1-\varrho t)}{(1+t^2-2\varrho t)^2}>0,
+\qquad
+\frac{\partial V}{\partial\varrho}
+=\frac{2e_1^2\,t^2(t-\varrho)(1-\varrho t)}{(1+t^2-2\varrho t)^2}>0 .
+\]
+A change $(\mathrm dt,\mathrm d\varrho)$ in the second member therefore
+leaves the optimal risk unchanged to first order exactly when
+$\mathrm d\varrho=-(1-\varrho^2)\,\mathrm dt/\big(t(t-\varrho)\big)$: an
+improvement of the second member's error by a fraction $\epsilon$ is
+cancelled by a rise of $\epsilon(1-\varrho^2)/(t-\varrho)$ in its correlation
+with the first.
+\end{proposition}
+
+Near the admission threshold, where $t-\varrho$ is small, the rate is large,
+and a member that becomes more accurate by converging toward the others can
+be worth nothing more to the stack; Section~\ref{sec:members-seeds} reports
+the case, and Supplement~\ref{supp:experiments} evaluates the display at
+the measured values.
+
 
 A second consequence of the same decomposition explains the final OCO-2
 surrogate. Evaluation metrics there are diagonal in the output coordinates

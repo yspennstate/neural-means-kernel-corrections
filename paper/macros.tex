@@ -74,6 +74,79 @@
 \newcommand{\uqCoverSixSd}{0.4}
 \newcommand{\uqCoverSixHi}{95.0}     % at the 95% level
 \newcommand{\uqCoverSixHiSd}{0.8}
+% The two-member optimum of the MSE network and the FNO (Proposition exchange), RMS metric on validation
+\newcommand{\fnoRmsA}{5.047}         % FNO member RMS error, early-stopped checkpoints, ten-seed mean
+\newcommand{\fnoRmsB}{4.991}         % the same, annealed
+\newcommand{\fnoImprove}{1.1}        % its fractional improvement, percent
+\newcommand{\tRatioA}{1.006}         % e_fno / e_mse, first campaign
+\newcommand{\tRatioB}{0.995}         % second campaign
+\newcommand{\vTwoA}{4.98}            % two-member optimum, first campaign, at rho 0.96 (range 4.97-4.99 over rho 0.95-0.97)
+\newcommand{\vTwoB}{4.97}            % two-member optimum, second campaign, ten-seed mean at the measured rho
+\newcommand{\exchRateA}{1.7}         % exchange rate (1-rho^2)/(t-rho) at the first campaign's values
+\newcommand{\exchRateB}{2.5}         % at the second campaign's values, ten-seed mean
+\newcommand{\rhoFnoB}{0.976}         % correlation of the annealed FNO with the MSE network, ten-seed mean
+% Seeds against architectures: sixty predictors on the evaluation half of the test block (collected/dgx/seedarch.json)
+\newcommand{\saWithinLo}{0.92}       % seed-to-seed correlation within an architecture, min over architectures and pairs
+\newcommand{\saWithinHi}{0.99}
+\newcommand{\saWithinMean}{0.98}     % mean over architectures of the within-architecture mean
+\newcommand{\saBetweenLo}{0.83}      % between architectures, min over pairs
+\newcommand{\saBetweenHi}{0.98}
+\newcommand{\saBetweenMean}{0.92}
+\newcommand{\saFnoOne}{4.679}        % FNO, one seed, mean over the ten seeds
+\newcommand{\saFnoOneRms}{4.967}
+\newcommand{\saFnoTen}{4.649}        % FNO, ten seeds, equal weights
+\newcommand{\saFnoTenRms}{4.940}
+\newcommand{\saMseOne}{4.709}
+\newcommand{\saMseTen}{4.680}
+\newcommand{\saMlpGain}{0.16}        % metric-loss MLP: ten seeds over one, points
+\newcommand{\saSixEq}{4.623}         % six architectures, one seed, equal weights, mean over seeds
+\newcommand{\saSixEqSd}{0.003}
+\newcommand{\saSixEqRms}{4.916}
+\newcommand{\saSixEqRmsSd}{0.003}
+\newcommand{\saSixConvex}{4.600}     % six architectures, one seed, convex weights fitted on the calibration half
+\newcommand{\saSixConvexSd}{0.003}
+\newcommand{\saSixtyEq}{4.611}
+\newcommand{\saSixtyEqRms}{4.905}
+\newcommand{\saSixtyConvex}{4.586}   % convex fitted on the calibration half
+\newcommand{\saSixtyConvexRms}{4.880}
+\newcommand{\saSixtyOracle}{4.581}   % convex chosen in hindsight on the evaluation half
+\newcommand{\saSixtyOracleRms}{4.876}
+\newcommand{\saBound}{4.814}         % Theorem blockfloor with the pool's minima, RMS
+\newcommand{\saFiftyEq}{4.630}       % the fifty without the UNet, equal weights
+\newcommand{\saPerpixMeans}{4.556}   % per-pixel affine over the six ten-seed means, calibration -> evaluation
+\newcommand{\saPerpixSeedZero}{4.567}
+\newcommand{\saPerpixSixty}{4.682}
+\newcommand{\saHardSingle}{10.71}    % hardest one percent of the evaluation half, best single member
+\newcommand{\saHardTen}{10.66}       % its ten-seed average on the same cases
+\newcommand{\saHardSixty}{10.63}     % the sixty-member average on the same cases
+\newcommand{\saHardMedian}{4.43}
+\newcommand{\saDeployedEv}{4.543}    % the deployed six-member pipeline scored on the same evaluation half, ten-seed mean
+\newcommand{\saDeployedEvSd}{0.003}
+% learning curve at ten seeds, fixed-carve protocol (campaign/run_curve.sh -> collected/dgx/learning_curve.json):
+% normalized-MSE MLP (w1024 d4, mirror, TTA) mean +- sd over ten seeds, and the deterministic Matern-5/2 KRR, at N training samples
+\newcommand{\lcMlpOneK}{5.985}\newcommand{\lcMlpOneKSd}{0.028}
+\newcommand{\lcMlpTwoK}{5.320}\newcommand{\lcMlpTwoKSd}{0.013}
+\newcommand{\lcMlpFourK}{4.966}\newcommand{\lcMlpFourKSd}{0.005}
+\newcommand{\lcMlpEightK}{4.799}\newcommand{\lcMlpEightKSd}{0.003}
+\newcommand{\lcMlpTwelveK}{4.743}\newcommand{\lcMlpTwelveKSd}{0.009}
+\newcommand{\lcMlpSixteenK}{4.719}\newcommand{\lcMlpSixteenKSd}{0.003}
+\newcommand{\lcMlpNineteenK}{4.712}\newcommand{\lcMlpNineteenKSd}{0.004}
+\newcommand{\lcKrrOneK}{6.924}\newcommand{\lcKrrFourK}{5.761}\newcommand{\lcKrrEightK}{5.444}\newcommand{\lcKrrSixteenK}{5.254}\newcommand{\lcKrrNineteenK}{5.198}
+\newcommand{\lcSlopeMlp}{0.022}\newcommand{\lcSlopeMlpSd}{0.001}   % minus the log-log slope over N >= 8000 (per-seed fits)
+\newcommand{\lcSlopeKrr}{0.052}
+\newcommand{\lcLastGain}{0.006}\newcommand{\lcLastGainSd}{0.004}     % 16000 -> 19000, paired over seeds; positive at 9 of 10
+\newcommand{\lcLastTwoGain}{0.030}\newcommand{\lcLastTwoGainSd}{0.010} % 12000 -> 19000; positive at 10 of 10
+\newcommand{\saPoolPipeline}{4.533}   % the pipeline (per-pixel affine + tuned kernel correction) over the six ten-seed means, fitted on cal, read on ev (campaign/pool_pipeline.py)
+% removal cost of one architecture (all ten seeds) from the sixty-predictor pool, hindsight convex optimum, RMS points (campaign/dropone.py -> collected/dgx/dropone.json)
+\newcommand{\saDropMlpR}{0.021}
+\newcommand{\saDropUnet}{0.018}
+\newcommand{\saDropFno}{0.005}
+\newcommand{\saDropKrr}{0.001}
+\newcommand{\saOnlyFnoRms}{4.937}     % hindsight convex optimum over one architecture's ten seeds, RMS
+\newcommand{\saOnlyMlpRRms}{4.979}
+\newcommand{\saCorrMlpRUnet}{0.92}    % mean between-architecture residual correlation over the hundred seed pairs
+\newcommand{\saCorrMlpRFno}{0.94}
+\newcommand{\saCorrMseFno}{0.97}
 % Correction weights (Lemma kappa): supremum over the grid and a 500-point test probe
 \newcommand{\kappaTen}{32.2}         % ten-seed mean
 \newcommand{\kappaTenSd}{2.9}

@@ -407,16 +407,22 @@ correction improves the stack by $\corrGain$ points at $n=19000$ whatever
 the kernel scale, its tuner reaching for the smoothest kernel and the
 largest nugget on the grid: at this sample size the shared residual is not
 a function of the load in any way a Mat\'ern RKHS on $\mathbb R^{41}$ can
-see. The error stops responding to data --- under identical recipes the
-MLP scores $4.95\%$ at $3500$ training samples, $4.86\%$ at $8500$ and
-$4.86\%$ at $19000$, so the last five-and-a-half-fold increase buys nothing
-that seed noise does not already cover. And it does not respond to
-reseeding either, at a scale that makes the comparison an argument: the
-five published architectures of Table~\ref{tab:main} span $0.65$ points,
-ten reseedings of our own pipeline $0.034$, about five percent of it. A
-modeling limitation would be expected to yield to capacity, diversity,
-data or reseeding; within the range we could test, this error yields to
-none of them, which is the pattern a floor in the data would produce.
+see. The response to data is small and, at ten seeds, resolved: under one
+protocol the normalized-MSE network's test error falls from
+$\lcMlpEightK\pm\lcMlpEightKSd\%$ at $8000$ training samples to
+$\lcMlpNineteenK\pm\lcMlpNineteenKSd\%$ at $19000$, a log-log slope of
+$-\lcSlopeMlp\pm\lcSlopeMlpSd$ over that range against $-\lcSlopeKrr$ for
+the kernel ridge, and the last $3000$ samples buy $\lcLastGain\pm\lcLastGainSd$
+points, paired over seeds. A doubling of the data, on either a power law or
+a floor fit to the ten-seed curve, is worth between four and eight
+hundredths, less than the stack and the correction buy at the present size.
+And the error does not respond to reseeding, at a scale that makes the
+comparison an argument: the five published architectures of
+Table~\ref{tab:main} span $0.65$ points, ten reseedings of our own pipeline
+$0.034$, about five percent of it. A modeling limitation would be expected
+to yield to capacity, diversity, data or reseeding; within the range we
+could test, this error yields to each of them by hundredths, which is the
+pattern a floor in the data would produce.
 
 
 The spatial structure of the remaining error --- its concentration at
@@ -424,6 +430,103 @@ the corners of the loaded edge, at every seed and in every member ---
 is quantified in the online supplement (Section~S3), together with
 the ablation of the pipeline's stages, the error spectra, and the
 cost accounting.
+
+\subsection{Seeds against architectures}
+\label{sec:seeds-arch}
+
+The second campaign leaves sixty trained predictors on one test block: ten
+seeds of each of six architectures, the kernel ridge among them.
+Theorem~\ref{thm:blockfloor} says what such a pool can reach in terms of
+three numbers, and the sixty let all three be measured on identical
+samples. The test block is split once into a calibration half of $1000$
+cases and an evaluation half of $19000$, neither ever touched by training,
+checkpointing, stacking or tuning; weights are fitted on the first and every
+number below is read on the second.
+
+The seed-to-seed correlation of one architecture is high: \saWithinLo{} to
+\saWithinHi{} across the six, \saWithinMean{} on average, against
+\saBetweenLo{} to \saBetweenHi{} between architectures, \saBetweenMean{} on
+average. Reseeding therefore buys little. Averaging ten seeds of the FNO
+takes it from $\saFnoOne\%$ to $\saFnoTen\%$ and ten seeds of the
+normalized-MSE network from $\saMseOne\%$ to $\saMseTen\%$; the metric-loss
+MLP, the least reproducible member, gains the most, $\saMlpGain$ points, and
+still ends above the others. Six architectures at a single seed, averaged
+with equal weights, reach $\saSixEq\pm\saSixEqSd\%$: one seed of each
+architecture beats ten seeds of the best one. All sixty together, at equal
+weights, reach $\saSixtyEq\%$; with convex weights fitted on the calibration
+half, $\saSixtyConvex\%$; and the convex mixture chosen in hindsight on the
+evaluation half itself, which no rule can beat, reaches $\saSixtyOracle\%$,
+or $\saSixtyOracleRms\%$ in the root-mean-square metric. The bound of
+Theorem~\ref{thm:blockfloor}, evaluated with the smallest member error and
+the smallest within- and between-architecture second moments of the pool,
+is $\saBound\%$ in that metric: no convex combination of these sixty can pass
+it, and the hindsight optimum sits six hundredths above it
+(Table~\ref{tab:seedarch}).
+
+Which architectures the pool cannot do without is a different ranking from
+which are best alone. Removing all ten seeds of one architecture and
+re-solving the hindsight optimum costs $\saDropMlpR$ points, root mean
+square, for the metric-loss MLP with reflection averaging, $\saDropUnet$ for
+the UNet, $\saDropFno$ for the FNO and $\saDropKrr$ for the kernel ridge, and
+nothing for the flat-loss and normalized-MSE networks, whose hindsight
+weights are zero; the mixture fitted on the calibration half moves by the
+same amounts within two thousandths of a point. The FNO is the best
+architecture on its own, at $\saOnlyFnoRms\%$ over its ten seeds, and the
+reflection-averaged MLP the worst of the neural members at
+$\saOnlyMlpRRms\%$, yet the pool misses the second four times more than the
+first. It is the neural member least correlated with the others,
+\saCorrMlpRUnet{} with the UNet and \saCorrMlpRFno{} with the FNO, where the
+normalized-MSE network and the FNO correlate at \saCorrMseFno{}; what a
+member is worth to a mixture is its decorrelation and not its own error,
+which is the second-moment identity read the other way.
+
+Two readings follow. What a pool of trained members can reach on this
+benchmark is set by the correlation between architectures, and sixty
+members move it by hundredths; the deployed pipeline, six members at one
+seed with a per-pixel affine stack and a kernel correction, scores
+$\saDeployedEv\pm\saDeployedEvSd\%$ on the same evaluation half, below the
+hindsight optimum of every convex mixture of the sixty, because it is not a
+convex mixture; the same pipeline run over the ten-seed means of the six
+architectures, its stack and its correction fitted on the calibration half,
+reaches $\saPoolPipeline\%$, one hundredth lower, which is what
+Theorem~\ref{thm:blockfloor} allows reseeding to buy once the architectures
+are fixed. And the
+hardest cases do not move at all: on the hardest one percent of the
+evaluation half, ranked by the best single member, that member scores
+$\saHardSingle\%$, its ten-seed average $\saHardTen\%$ and the sixty-member
+average $\saHardSixty\%$, against a median of $\saHardMedian\%$. Sixty
+predictors of six kinds agree on where the benchmark is hard, which is the
+shared residual of Section~\ref{sec:diversity} seen from the largest pool we
+can assemble.
+
+\begin{table}[t]
+\centering
+\caption{Sixty predictors, ten seeds of six architectures, on the evaluation
+half of the test block ($19000$ cases). Mean relative $L^2$ error, and the
+root mean square where the theory speaks in that metric. Convex weights are
+fitted on the disjoint calibration half ($1000$ cases) unless marked
+hindsight, where they are chosen on the evaluation half itself. Rows with
+$\pm$ are means over the ten seeds.}
+\label{tab:seedarch}
+\begin{tabular}{lcc}
+\toprule
+Pool and weights & Error (\%) & RMS (\%) \\
+\midrule
+FNO, one seed & \saFnoOne & \saFnoOneRms \\
+FNO, ten seeds, equal weights & \saFnoTen & \saFnoTenRms \\
+Six architectures, one seed, equal weights & $\saSixEq\pm\saSixEqSd$ & $\saSixEqRms\pm\saSixEqRmsSd$ \\
+Six architectures, one seed, convex, fitted & $\saSixConvex\pm\saSixConvexSd$ & -- \\
+Sixty, equal weights & \saSixtyEq & \saSixtyEqRms \\
+Sixty, convex, fitted & \saSixtyConvex & \saSixtyConvexRms \\
+Sixty, convex, hindsight & \saSixtyOracle & \saSixtyOracleRms \\
+Lower bound of Theorem~\ref{thm:blockfloor} on the sixty & -- & \saBound \\
+Six ten-seed means, per-pixel affine, fitted & \saPerpixMeans & -- \\
+Six ten-seed means, per-pixel affine and kernel correction, fitted & \saPoolPipeline & -- \\
+Deployed six-member pipeline, one seed & $\saDeployedEv\pm\saDeployedEvSd$ & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Uncertainty quantification}
 \label{sec:uq}
 Theorem~\ref{thm:or} bounds the corrected surrogate's error by

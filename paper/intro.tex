@@ -42,7 +42,7 @@ OCO-2, weak CO$_2$ & reduced & 24.06\% & $16.28\pm0.06\%$ \\
 OCO-2, strong CO$_2$ & reduced & 16.14\% & $8.08\pm0.01\%$ \\
  & radiance & 0.1147\% & $0.0584\pm0.0041\%$ \\
 \midrule
-Structural mechanics, 20000 samples & relative $L^2$ & \pubBestHi\% (PARA-Net) & $\errPipe\pm\errPipeSd\%$ \\
+Structural mechanics, 20000 samples & relative $L^2$ & \pubBestHi\% (PARA-Net) & $\errSix\pm\errSixSd\%$ \\
 Structural mechanics, 1250 samples & relative $L^2$ & \pubBestLo\% (FNO-mean GP) & $\errBestLow\pm\errBestLowSd\%$ \\
 \bottomrule
 \end{tabular}
@@ -53,22 +53,22 @@ families are competitive: the published neural operators and the kernel
 method of \citet{batlle2024kernel} sit within $0.65$ points of one another,
 and our own kernel ridge reproduces the published kernel number. There the
 kernel's role is to correct the residual of a stacked neural mean, and the
-corrected pipeline reaches $\errPipe\pm\errPipeSd\%$ under the 20000-sample
-protocol, replicated at ten independently seeded runs: below every published
-method but PARA-Net's \pubBestHi\%, and within one standard error of that
-one once the test block's own sampling error is counted, which we read as a
-tie. Under the 1250-sample protocol of \citet{mora2025operator} it reaches
+corrected pipeline reaches $\errSix\pm\errSixSd\%$ under the 20000-sample
+protocol, replicated at ten independently seeded runs: level with the best
+published number, PARA-Net's \pubBestHi\%, once the test block's own
+sampling error is counted, which we read as a tie, and below every other.
+Under the 1250-sample protocol of \citet{mora2025operator} it reaches
 $\errBestLow\pm\errBestLowSd\%$ against a published best of \pubBestLo\%.
 The published numbers on this benchmark carry no uncertainties, and
 replication is what lets gains of a few hundredths of a point be resolved at
 all; it also shows why ensembles saturate there. The residuals of every
-architecture we train correlate between \corrNetLo{} and \corrNetHi{} at
-every seed; their shared component concentrates at the corners of the loaded
-edge, where the finite element solution is least reliable, and is flat in
-ensemble diversity and in training-set size; and the spread of our own
-pipeline across seeds, \errPipeSd{} points, is some sixty times smaller than
-the span of the published architectures, so the published cluster near
-$4.5\%$ is not run-to-run noise. That evidence is consistent with a floor
+architecture we train correlate between \corrNetLoSix{} and \corrNetHiSix{}
+at every seed; their shared component concentrates at the corners of the
+loaded edge, where the finite element solution is least reliable, and is
+flat in ensemble diversity and in training-set size; and the spread of our
+own pipelines across seeds, \errPipeSd{} and \errSixSd{} points, is sixty to
+two hundred times smaller than the span of the published architectures, so
+the published cluster near $4.5\%$ is not run-to-run noise. That evidence is consistent with a floor
 set by the benchmark's data rather than by any surrogate class, but it is
 circumstantial: the experiment that would decide it --- re-solving a set of
 the hardest cases on a refined mesh or with higher-order elements and

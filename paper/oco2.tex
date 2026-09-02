@@ -10,10 +10,10 @@ kernel-flow emulator's own predictions on them; we verified the two sets share
 no point. We split the pool $18000/2000$ into training and validation, and
 every choice in our pipeline --- the network checkpoints, the kernel head's
 length scale and nugget, and the per-coordinate winners of the combination
-below --- is made on that validation split; the $2000$ public test states are
-used once, for the final numbers. The comparison is therefore computed on
-identical test points against the published emulator itself rather than
-against our reimplementation of it.
+below --- is made on that validation split; the $2000$ public test states
+enter no optimizer and are evaluated once per run, for the final numbers.
+The comparison is therefore computed on identical test points against the
+published emulator itself rather than against our reimplementation of it.
 
 Two error metrics matter, and they disagree in an instructive way. The
 \emph{reduced} metric is the relative $L^2$ error on the $40$ standardized
@@ -40,10 +40,8 @@ Mat\'ern solve as everywhere else in this paper, and the two raw-input rows
 are fit by that same routine under the same budget as the feature heads:
 the same scale grid $\{0.5,1,2,4\}$ times the median distance, the same
 nugget grid $\{10^{-8},10^{-6},10^{-4}\}$, the same $6000$-sample tuning
-subsample, and the winner refit on all $18000$ training points. An earlier
-version of this work fit those rows with a lighter diagnostic script and
-said so; the rows here are the matched ones, which is why the selected
-hyperparameters vary from seed to seed. The ARD radiance cell is left empty because validation,
+subsample, and the winner refit on all $18000$ training points, which is why
+the selected hyperparameters vary from seed to seed. The ARD radiance cell is left empty because validation,
 which scores the reduced metric, ties between two hyperparameter
 configurations whose radiance differs by a factor of $2.2$ ($0.150\%$ at seven
 seeds, $0.329\%$ at three); a mean over that mixture would describe the

@@ -1,0 +1,26 @@
+{
+ "kind": "fno",
+ "args": {
+  "seed": 0,
+  "epochs": 200,
+  "width": 64,
+  "modes": 14,
+  "layers": 4,
+  "batch": 128,
+  "lr": 0.0015,
+  "wd": 1e-06,
+  "mirror": 1,
+  "final": 0,
+  "kf": 0.0,
+  "ntrain": 0,
+  "lowval": 0,
+  "threads": 7,
+  "tag": "fno200"
+ },
+ "params": 6447873,
+ "val": 0.04820101087349486,
+ "test": 0.04800039162629545,
+ "test_mirror_tta": 0.047322077133658234,
+ "best_ep": 29,
+ "minutes": 2099.9959020614624
+}

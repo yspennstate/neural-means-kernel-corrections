@@ -233,19 +233,52 @@ $\kappa=\kappa_{\mathrm{an}}$. \qed
 
 \subsection{Proof of Lemma~\ref{lem:kappa}}
 
-Fix $u$ and write $k_u=k(X,u)$, $A=K+n\lambda I$ and $c=A^{-1}k_u$. The
-proof of Theorem~\ref{thm:or} below shows that
-$\rho(u)^2=k(u,u)-k_u^\top A^{-1}k_u-n\lambda\|c\|_2^2
-=P_\lambda(u)^2-n\lambda\|c\|_2^2$ is the squared $\mathcal H_k$-norm of
-$k(u,\cdot)-\sum_ic_ik(u_i,\cdot)$, hence nonnegative, so
-$n\lambda\|c\|_2^2\le P_\lambda(u)^2\le k(u,u)\le k_{\max}$, the middle
-inequality because $k_u^\top A^{-1}k_u\ge0$. Cauchy--Schwarz gives
+Fix $u$ and write $k_u=k(X,u)$, $t=n\lambda$, $A=K+tI$ and $c=A^{-1}k_u$.
+Because $k$ is positive definite, the Gram matrix of the $n+1$ points
+$u_1,\dots,u_n,u$ is positive semidefinite, and by the generalized Schur
+complement this places $k_u$ in the range of $K$ with
+$k_u^\top K^{+}k_u\le k(u,u)$, $K^{+}$ the pseudo-inverse. Diagonalize
+$K=\sum_i\mu_iv_iv_i^\top$ and expand $k_u=\sum_i\beta_iv_i$ over the
+eigenvectors with $\mu_i>0$; the Schur condition reads
+$\sum_i\beta_i^2/\mu_i\le k(u,u)$. Then
+\[
+\|c\|_2^2=\sum_i\frac{\beta_i^2}{(\mu_i+t)^2}
+=\sum_i\frac{\beta_i^2}{\mu_i}\cdot\frac{\mu_i}{(\mu_i+t)^2}
+\;\le\;\frac{1}{4t}\sum_i\frac{\beta_i^2}{\mu_i}\;\le\;\frac{k(u,u)}{4t},
+\]
+because $(\mu+t)^2\ge4\mu t$ for all $\mu,t\ge0$. Cauchy--Schwarz gives
 $\|c\|_1\le\sqrt n\,\|c\|_2$, and combining,
-$\|c\|_1^2\le n\|c\|_2^2\le P_\lambda(u)^2/\lambda\le k_{\max}/\lambda$.
+$\|c\|_1^2\le n\|c\|_2^2\le k(u,u)/(4\lambda)$.
+
+For the sharpness take $k(x,y)=\cos(x-y)$, a positive definite kernel on
+the line (its native space is spanned by $\cos$ and $\sin$), the two points
+$x_1=0$ and $x_2=\theta$ with $\theta\in(0,\pi)$ chosen so that
+$1-\cos\theta=2\lambda$, and $u=(\theta+\pi)/2$. Then
+$K=\begin{psmallmatrix}1&\cos\theta\\ \cos\theta&1\end{psmallmatrix}$ has
+the eigenvector $v=(1,-1)/\sqrt2$ with eigenvalue $\mu=1-\cos\theta=t$, and
+$k_u=(\cos u,\cos(u-\theta))=-\sin(\theta/2)\,(1,-1)$ is proportional to
+$v$, with $\beta^2/\mu=2\sin^2(\theta/2)/(1-\cos\theta)=1=k(u,u)$. Hence
+$c=A^{-1}k_u=k_u/(2t)$ has entries of equal magnitude,
+$\|c\|_2^2=\beta^2/(2t)^2=1/(4t)$, and
+$\|c\|_1=\sqrt2\,\|c\|_2=\sqrt n\,\|c\|_2=\tfrac12\lambda^{-1/2}$, so every
+inequality in the display is an equality.
+
 For the Mat\'ern kernel of Section~\ref{sec:method-kernel}, $k(u,u)=1$ and
 the smallest nugget on the grid is $10^{-6}$, so
-$\sup_{u,\gamma}\|c_\gamma(u)\|_1\le\max_\gamma\lambda_\gamma^{-1/2}=10^{3}$
+$\sup_{u,\gamma}\|c_\gamma(u)\|_1\le\tfrac12\max_\gamma\lambda_\gamma^{-1/2}=500$
 irrespective of the length scale and of the design. \qed
+
+\subsection{Proof of Corollary~\ref{cor:signed}}
+
+The objective is strictly convex on the hyperplane $\{\mathbf 1^\top w=1\}$,
+so its minimizer there is the unique stationary point of the Lagrangian
+$w^\top Sw-\nu(\mathbf 1^\top w-1)$, namely $w=\tfrac{\nu}{2}S^{-1}\mathbf 1$
+with $\nu$ fixed by the constraint: $w^\star=S^{-1}\mathbf 1/(\mathbf
+1^\top S^{-1}\mathbf 1)$, at which $w^{\star\top}Sw^\star=1/(\mathbf 1^\top
+S^{-1}\mathbf 1)$. The simplex is a subset of the hyperplane, so the convex
+minimum is at least this value, and by uniqueness of the minimizer the two
+agree exactly when $w^\star$ lies in the simplex, that is, has no negative
+coordinate. \qed
 
 \subsection{Proof of Proposition~\ref{prop:secmom}}
 
@@ -486,13 +519,57 @@ Summing the squared componentwise bounds,
 \[
 \big\|r(u)-\widehat r_\lambda(u)\big\|_2^2=\sum_j\big(r_j(u)-\widehat
 r_{\lambda,j}(u)\big)^2\le\rho(u)^2\sum_j\|r_j\|^2_{\mathcal H_k}
-=\widetilde P_\lambda(u)^2\,\|r\|_K^2 . \qed
+=\widetilde P_\lambda(u)^2\,\|r\|_K^2 .
 \]
+For the sharpness, write $g_u=k(u,\cdot)-\sum_iw_ik(u_i,\cdot)$, so that
+$\|g_u\|_{\mathcal H_k}=\rho(u)=\widetilde P_\lambda(u)$. If
+$\widetilde P_\lambda(u)=0$ both sides of the bound vanish for every $r$.
+Otherwise take $r_1=(\|G-m\|_K/\rho(u))\,g_u$ and $r_j=0$ for $j\ge2$: this
+residual has norm $\|G-m\|_K$, and since the estimator is built from its own
+training values $r_1(X)=g_u(X)$, the first display gives
+$r_1(u)-\widehat r_{\lambda,1}(u)=\langle r_1,g_u\rangle_{\mathcal
+H_k}=\|G-m\|_K\,\rho(u)$, equality in Cauchy--Schwarz. \qed
 
 Note that the argument does not use interpolation: it holds for every
 $\lambda\ge0$, with the (slightly sharper) factor $\widetilde P_\lambda$
 showing that smoothing can only tighten this particular bound relative to the
 posterior standard deviation $P_\lambda$ that we report.
+
+\subsection{Proof of Theorem~\ref{thm:minimax}}
+
+Write $k_u=k(X,u)$ and let $g_u=k(u,\cdot)-\sum_i(K^{-1}k_u)_ik(u_i,\cdot)$
+be the function of the previous proof at $\lambda=0$. It vanishes on the
+design, since $g_u(u_j)=k(u,u_j)-k_u^\top K^{-1}Ke_j=0$, and
+$g_u(u)=\|g_u\|_{\mathcal H_k}^2=k(u,u)-k_u^\top K^{-1}k_u=P_0(u)^2$. If
+$P_0(u)=0$ the lower bound is trivial. Otherwise set
+$r^{\pm}=\pm(\rho/P_0(u))\,g_u\,e_1$, two residual operators of norm $\rho$
+whose training values are both zero, so that any $\Psi$ returns the same
+vector $\psi=\Psi(0)$ for both; their values at $u$ are $\pm\rho P_0(u)e_1$,
+hence
+$\max_\pm\|r^{\pm}(u)-\psi\|_2\ge\max_\pm|{\pm}\rho P_0(u)-\psi_1|\ge\rho
+P_0(u)$. This is the lower bound. Theorem~\ref{thm:or} with $\lambda=0$
+bounds the interpolant's error by $\|r\|_KP_0(u)\le\rho P_0(u)$ on the whole
+ball, so the interpolant attains it, and for $\lambda>0$ the same theorem
+together with its sharpness case gives the ridge correction's worst case
+as exactly $\rho\,\widetilde P_\lambda(u)$.
+
+For the identity, put $t=n\lambda$ and $A=K+tI$, which commutes with $K$.
+From the proof of Theorem~\ref{thm:or},
+$\widetilde P_\lambda(u)^2=k(u,u)-k_u^\top A^{-1}(2A-K)A^{-1}k_u$, while
+$P_0(u)^2=k(u,u)-k_u^\top K^{-1}k_u$, so
+\[
+\widetilde P_\lambda(u)^2-P_0(u)^2
+=k_u^\top\big(K^{-1}-2A^{-1}+A^{-1}KA^{-1}\big)k_u
+=k_u^\top A^{-2}K^{-1}\big(A^2-2AK+K^2\big)k_u
+=k_u^\top A^{-2}K^{-1}(A-K)^2k_u ,
+\]
+and $A-K=tI$. The right-hand side is nonnegative because $A^{-2}K^{-1}$ is
+positive definite, which gives $P_0\le\widetilde P_\lambda$; the upper
+inequality $\widetilde P_\lambda\le P_\lambda$ was shown above. Expanding
+$k_u$ in the eigenbasis of $K$ as in the proof of Lemma~\ref{lem:kappa},
+the difference equals $\sum_i(\beta_i^2/\mu_i)\,(t/(\mu_i+t))^2$, each term
+of which is bounded by $\beta_i^2/\mu_i$ and tends to zero with $t$, so the
+difference vanishes as $\lambda\to0$ by dominated convergence. \qed
 
 \subsection{Proof of Proposition~\ref{prop:conf}}
 

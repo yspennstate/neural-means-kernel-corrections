@@ -27,10 +27,10 @@ per-coordinate affine stack, and the grid-tuned correction
 (Propositions~\ref{prop:stack} and~\ref{prop:affine},
 Lemma~\ref{lem:select}, Corollary~\ref{cor:certificate}), the last
 with an analytic uniform bound on the correction weights
-(Lemma~\ref{lem:kappa}, $\kappa_{\mathrm{an}}=10^{3}$). All are
-capacity bounds, vacuous at the shipped constants and reported for
-their scaling; the one statement whose evaluated value is the
-quantity reported is Theorem~\ref{thm:or} below.
+(Lemma~\ref{lem:kappa}, $\kappa_{\mathrm{an}}=500$, sharp over kernels and
+designs). All are capacity bounds, vacuous at the shipped constants and
+reported for their scaling; the statements whose evaluated value is the
+quantity reported are Theorems~\ref{thm:or} and~\ref{thm:minimax} below.
 \subsection{What the stack can achieve}
 \label{sec:theory-secmom}
 
@@ -154,12 +154,32 @@ window of the floor, and conversely no tuning of the weights can be blamed
 for more than the window.
 \end{corollary}
 
-On the structural-mechanics benchmark the measured spreads put that window
-at roughly a fifth of the squared floor, and the best convex mixture of
-the measured $S$ sits at the bottom of it: $\predRMS\pm\predRMSSd\%$
-against a floor of $\ensFloor\pm\ensFloorSd\%$, both in the
-root-mean-square metric $\mathcal E_2$ the corollary is stated in.
-Supplement~\ref{supp:experiments} evaluates the bracket at every seed.
+On the structural-mechanics benchmark the bracket, evaluated with the
+one-sided bounds read off the measured $S$, is about a tenth of the squared
+floor wide, and the best convex mixture sits in its lower half at every
+seed: normalized by $\bar e^{\,2}$, the minimum is $0.980\pm0.003$ inside
+$[0.949,1.039]$ on five members and $0.972\pm0.005$ inside $[0.933,1.032]$
+on six (Supplement~\ref{app:verification}). In the root-mean-square metric
+$\mathcal E_2$ the corollary is stated in, the mixture is at
+$\predRMS\pm\predRMSSd\%$ against a floor of $\ensFloor\pm\ensFloorSd\%$.
+
+The floor is stated for convex weights, and the deployed stack is not
+convex: its per-pixel weights are affine and unconstrained in sign. For
+global weights the sign constraint can be removed exactly.
+
+\begin{corollary}[signed stacks]\label{cor:signed}
+If $S$ is positive definite, the minimum of $w^\top Sw$ over all $w$ with
+$\sum_m w_m=1$, of either sign, is $1/(\mathbf 1^\top S^{-1}\mathbf 1)$,
+attained at $w^\star=S^{-1}\mathbf 1/(\mathbf 1^\top S^{-1}\mathbf 1)$; it
+is at most the convex minimum, with equality exactly when $w^\star$ has no
+negative coordinate.
+\end{corollary}
+
+On the measured $S$ the two coincide at every seed and for both member sets:
+the unconstrained minimizer has no negative coordinate, so allowing signed
+global weights buys nothing here, and what the deployed per-pixel stack
+gains over the convex one ($0.032$ and $0.035$ points in the two campaigns)
+is the variation of the weights over the grid, not their sign.
 
 
 A second consequence of the same decomposition explains the final OCO-2
@@ -283,7 +303,10 @@ For every $u\in\mathcal U$ and every $\lambda\ge0$,
 \]
 where
 $\widetilde P_\lambda(u)^2=P_\lambda(u)^2-n\lambda\,\|(K+n\lambda
-I)^{-1}k(X,u)\|_2^2$.
+I)^{-1}k(X,u)\|_2^2$. The first inequality is sharp: for every $u$ there is
+a residual operator of norm $\|G-m\|_K$ at which it holds with equality, so
+$\widetilde P_\lambda(u)$ is the exact worst-case error of the correction
+over the ball $\{r:\|r\|_K\le\|G-m\|_K\}$.
 \end{theorem}
 
 Three comments. First, the inequality is algebraic: it holds pathwise for
@@ -315,6 +338,41 @@ drop by a factor of about \normRatio{} when the kernel is moved from raw
 targets to ensemble residuals (Table~\ref{tab:norms}). The neural mean does
 not merely reduce the size of the residual in $L^2$; it leaves behind a
 residual operator that is genuinely smoother as seen by the kernel.
+
+The design factor cannot be improved by a better estimator either. Among
+all rules that see the same training residuals, the interpolant is optimal
+in the worst case over the ball, and the price of a positive nugget in the
+certificate is explicit.
+
+\begin{theorem}[optimality of the certificate]\label{thm:minimax}
+Fix a design $X$ with $K$ positive definite, a point $u$ and a radius
+$\rho>0$. For every map $\Psi:\mathbb R^{n\times q}\to\mathbb R^q$ that
+estimates $r(u)$ from the training residuals $r(X)$,
+\[
+\sup_{\|r\|_K\le\rho}\big\|r(u)-\Psi\big(r(X)\big)\big\|_2\;\ge\;\rho\,P_0(u),
+\]
+and the kernel interpolant $\Psi(R)=k(u,X)K^{-1}R$ attains the bound. For
+$\lambda>0$ the worst case of the ridge correction over the same ball is
+$\rho\,\widetilde P_\lambda(u)$, and, with $k_u=k(X,u)$ and
+$A_\lambda=K+n\lambda I$,
+\[
+P_0(u)^2\;\le\;\widetilde P_\lambda(u)^2\;\le\;P_\lambda(u)^2,\qquad
+\widetilde P_\lambda(u)^2-P_0(u)^2=(n\lambda)^2\,k_u^\top
+A_\lambda^{-2}K^{-1}k_u ,
+\]
+so the nugget's cost in the certificate is a computable quantity that
+vanishes as $\lambda\to0$.
+\end{theorem}
+
+The lower bound is the classical optimal-recovery argument
+\citep{owhadi2019operator}: two residuals of norm $\rho$ that vanish on the
+design and take opposite values at $u$ are indistinguishable from the data,
+so any rule errs by at least $\rho P_0(u)$ on one of them. What the theorem
+adds for the pipeline is a reading of the reported quantity: at $\lambda=0$
+the certificate $\|G-m\|_K\,P_0(u)$ is not merely valid but the smallest
+constant any method could certify from these data, and at the validated
+nugget the gap to it is the displayed correction term, evaluable from the
+Gram matrix alone.
 
 \subsection{Distribution-free coverage for the reported band}
 \label{sec:theory-conf}

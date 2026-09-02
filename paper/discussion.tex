@@ -16,8 +16,11 @@ them separable from noise. The largest single lever is which members the
 stack contains: removing the spectral member costs $\fnoGain\pm\fnoGainSd$
 points, more than any stage above, although it ranks third of five on the
 metric. What a member is worth to a stack is set by how its errors covary
-with the others', not by how small they are, and a stack of near-duplicates
-cannot be repaired by tuning the combination harder.
+with the others', not by how small they are --- the second campaign's FNO,
+annealed to the end of its schedule, is $\fnoCompleteGain$ points more
+accurate and worth nothing more, while a UNet that ranks fifth of six is
+worth $\unetGain$ --- and a stack of near-duplicates cannot be repaired by
+tuning the combination harder.
 
 On OCO-2 the kernel on the raw state trails the network by an order of
 magnitude, a stack gains nothing measurable from it, and its value moves
@@ -32,13 +35,18 @@ ratio, which the second-moment identity turns into a keep-or-drop verdict for
 each candidate.
 
 Against PARA-Net the five-member pipeline is level, $0.022$ points or about
-one standard error, which we read as a tie; without the spectral member the
-same pipeline trails by $0.061$ points, about three standard errors, so the
-tie belongs to the configuration that carries that member. The margin over
-the other published methods survives both error bars of
+one standard error, and the six-member pipeline of the second campaign is
+level too, $0.004$ points the other way; we read both as a tie. Without the
+spectral member the pipeline trails by $0.061$ points, about three standard
+errors, so the tie belongs to the configurations that carry that member. The
+margin over the other published methods survives both error bars of
 Section~\ref{sec:uncertainty-budget}. These are the last few learnable
 hundredths above what Section~\ref{sec:diversity} reads as evidence of a
-floor in the benchmark data, not a step on the way to zero.
+floor in the benchmark data, not a step on the way to zero: a sixth
+architecture moves the pipeline by $\unetGain$ points, training the FNO to
+the end of its schedule moves the member by $\fnoCompleteGain$ points and
+the pipeline not at all, and the residual correlations that set the floor do
+not move either.
 
 \paragraph{Relation to prior work.}
 Neither component of the pairing is new. \citet{mora2025operator} place a
@@ -81,19 +89,17 @@ only object here that plays that role. Training the means on the metric, the
 reflection steps and the stacking are benchmark-agnostic, but the error
 levels reported here are properties of these datasets and protocols.
 
-Three runs are incomplete, with their stopping rules stated once in
-Section~\ref{sec:seeds}: the Fourier neural operator was stopped at every
-seed by the campaign's wall clock and finalized from the best-validation
-checkpoint written before the stop, nothing retrained; the UNet member
-completed at two seeds of ten, so the six-member configuration that
-included it is not among the reported results; and the OCO-2 networks are
-trained at a matched 250-epoch budget short of convergence, a single
-750-epoch run reaching lower levels on the O2 band without changing the
-orderings (Section~\ref{sec:aniso-measured}). The kernel-ridge row of
-Table~\ref{tab:lowdata} is a single run, and our low-data protocol
-reproduces that of \citet{mora2025operator} up to the ambiguity of which
-$1250$ samples are used; we use the first $1250$ of the training block and
-the same 20000-sample test set, and release the splits.
+The two structural-mechanics campaigns differ in the FNO's schedule, and the
+difference is measured rather than assumed: the early-stopped member of the
+first campaign trails the annealed member of the second by
+$\fnoCompleteGain$ points at every seed (Section~\ref{sec:members-seeds}),
+and the stage-by-stage accounting is reported for both. The OCO-2 networks
+are trained at a matched 250-epoch budget short of convergence; a 750-epoch
+run reaches lower levels on the O2 band without changing the orderings
+(Supplement~\ref{supp:oco2}). Our low-data protocol reproduces that of
+\citet{mora2025operator} up to the ambiguity of which $1250$ samples are
+used; we use the first $1250$ of the training block and the same
+20000-sample test set, and release the splits.
 
 
 The reading of the structural-mechanics plateau as a data floor is an

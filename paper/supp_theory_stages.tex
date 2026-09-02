@@ -247,32 +247,37 @@ $\lambda>0$. The kernel ridge weights
 $c_\lambda(u)=(K+n\lambda I)^{-1}k(X,u)$ satisfy, for every $u$,
 \[
 \|c_\lambda(u)\|_1\;\le\;\sqrt n\,\|c_\lambda(u)\|_2\;\le\;
-\frac{P_\lambda(u)}{\sqrt\lambda}\;\le\;\sqrt{\frac{k_{\max}}{\lambda}} ,
+\frac12\sqrt{\frac{k(u,u)}{\lambda}}\;\le\;\frac12\sqrt{\frac{k_{\max}}{\lambda}} ,
 \]
-where $P_\lambda(u)^2=k(u,u)-k(u,X)(K+n\lambda I)^{-1}k(X,u)$ is the
-posterior variance of Section~\ref{sec:theory-or}, equation~\eqref{eq:power}.
-In particular, for the residual correction of Section~\ref{sec:method-kernel}
---- a Mat\'ern kernel with $k(u,u)=1$ and the nugget grid
-$\lambda\in\{10^{-6},10^{-5},10^{-3}\}$ --- the hypothesis of
-Corollary~\ref{cor:certificate} holds, whatever the length scale, with
+and the constant $\tfrac12$ cannot be improved: for every $\lambda\in(0,1)$
+there are a kernel, a two-point design and a point $u$ at which the first
+and last members are equal. In particular, for the residual correction of
+Section~\ref{sec:method-kernel} --- a Mat\'ern kernel with $k(u,u)=1$ and
+the nugget grid $\lambda\in\{10^{-6},10^{-5},10^{-3}\}$ --- the hypothesis
+of Corollary~\ref{cor:certificate} holds, whatever the length scale and the
+design, with
 \[
-\kappa_{\mathrm{an}}\;:=\;\max_{\gamma\in\Gamma}\lambda_\gamma^{-1/2}\;=\;10^{3}.
+\kappa_{\mathrm{an}}\;:=\;\tfrac12\max_{\gamma\in\Gamma}\lambda_\gamma^{-1/2}\;=\;500.
 \]
 \end{lemma}
 
-The proof is two lines in Section~\ref{app:proofs}, and the bound is the
-right kind of constant for the corollary: it depends on nothing that is
-estimated. It is also why the corollary is a capacity bound and not a
+The proof is a few lines in Section~\ref{app:proofs}: the Gram matrix of
+the design together with $u$ is positive semidefinite, which confines
+$k(X,u)$ to the range of $K$ with $k(X,u)^\top K^{+}k(X,u)\le k(u,u)$, and
+$\mu/(\mu+n\lambda)^2\le1/(4n\lambda)$ for every eigenvalue $\mu$. The bound
+is the right kind of constant for the corollary: it depends on nothing that
+is estimated. It is also why the corollary is a capacity bound and not a
 certificate. The excess term carries $(1+\kappa)^2$, so at
-$\kappa_{\mathrm{an}}=10^3$ the corollary's right-hand side is, like that of
+$\kappa_{\mathrm{an}}=500$ the corollary's right-hand side is, like that of
 Proposition~\ref{prop:affine} before it, vacuous at the shipped constants by
 many orders of magnitude. The realized scale of the weights is far smaller:
 on a test probe of five hundred points the largest $\ell^1$ norm over the
-grid averages $31.2$ across three seeds (Section~\ref{app:verification}),
-about a thirtieth of $\kappa_{\mathrm{an}}$, so that evaluating the display
-at the probe value would shrink it by a factor of close to a thousand. But a
-supremum over a finite probe is a lower bound on the constant the corollary
-needs, not the constant, and we do not use it as one. What the corollary
+grid averages $\kappaTen$ over the ten seeds
+(Section~\ref{app:verification}), about a fifteenth of
+$\kappa_{\mathrm{an}}$, so that evaluating the display at the probe value
+would shrink it by a factor of about two hundred and forty. But a supremum
+over a finite probe is a lower bound on the constant the corollary needs,
+not the constant, and we do not use it as one. What the corollary
 establishes is structural: the object the pipeline ships --- fitted stack,
 grid-tuned correction, validated final choice --- is covered by an oracle
 inequality of the ordinary $m^{-1/2}$ form, in the coordinatewise

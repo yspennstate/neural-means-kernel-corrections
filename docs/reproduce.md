@@ -9,16 +9,17 @@ precision, network training single precision. Splits are fixed by the seeds
 below; every model is selected on the validation split and evaluated once on
 the test set.
 
-Seed coverage is not uniform, and the table below is not the campaign. Ten
-pipeline seeds back the structural-mechanics members, stack, correction,
-second-moment measurement and conformal calibration, the low-data pipeline,
-and each of the three OCO-2 bands. The six-member configuration completed at
-two seeds, the low-data kernel-ridge row at one, and ClimSim at five/three/
-three by training size. The per-member table immediately below is a single
-seed-0 laptop run kept for its command lines; its numbers differ from the
-ten-seed means the paper reports (for instance FNO 4.70 here against
-4.754 +- 0.031, MLP 4.86 against 4.836 +- 0.018), and the paper's values are
-the campaign ones.
+Seed coverage: ten pipeline seeds back the structural-mechanics members,
+stack, correction, second-moment measurement and conformal calibration, in
+both structural-mechanics campaigns (the five-member one and the six-member
+complete-schedule one), the low-data pipeline, and each of the three OCO-2
+bands; ClimSim has five/three/three seeds by training size, and the low-data
+kernel-ridge row is a deterministic computation on a fixed split. The
+per-member table immediately below is a single seed-0 laptop run kept for
+its command lines; its numbers differ from the ten-seed means the paper
+reports (for instance FNO 4.70 here against 4.754 +- 0.031 early-stopped and
+4.682 +- 0.009 at the complete schedule, MLP 4.86 against 4.836 +- 0.018),
+and the paper's values are the campaign ones.
 
 What ships: the per-seed result records (JSON) for every stage of every run,
 under `campaign/collected/` and `campaign/{pix4,pix5,ens5,conf5}/`, plus the
@@ -47,7 +48,7 @@ Members (mean relative L2 on the 20000-sample test set, reflection-averaged):
 | MLP, MSE loss | 4.71% | `train_mlp.py --mse 1`; identical except the loss (mean squared error on standardized targets) and 120 epochs |
 | kernel-conditioned refiner | 4.73% | `train_mlp_refine.py --epochs 100`; input is the load concatenated with the kernel's predicted field, four-fold out-of-fold on train (`krr_oof.py`), full-train fields at evaluation; 100 epochs, otherwise as the MLP |
 | FNO | 4.70% | `train_fno.py --mirror 1`; width 64, 14 modes, 4 spectral layers, batch 256, lr 2e-3, weight decay 1e-6, 200 epochs (best validation at epoch 59) |
-| UNet | 4.99% | `train_unet.py --mirror 1`; widths 48/96/192/384 over three scales, batch 256, lr 1.5e-3, weight decay 1e-5; best-validation checkpoint (epoch 50 of a 200-epoch schedule) |
+| UNet | 4.99% | `train_unet.py --mirror 1`; widths 48/96/192/384 over three scales, batch 256, lr 1.5e-3, weight decay 1e-5; best-validation checkpoint (epoch 50 of a 200-epoch schedule); the campaign value at a complete 100-epoch schedule is 4.740 +- 0.030 over ten seeds |
 
 Pipeline: `gen_preds.py --run <member>` writes train/val/test predictions with
 reflection averaging; `stack_correct.py --members <list> --krr 1` fits a global
@@ -101,10 +102,9 @@ emulator's own stored predictions):
 
 Our columns are mean +- standard deviation over ten seeds at a matched
 250-epoch budget, aggregated from `campaign/collected/*/oco_<band>_s*.json`
-by `campaign/gen_oco_table.py`. The earlier single-seed numbers (O2 3.83% /
-0.0267%) came from a longer training budget; a 750-epoch run of the seeded
-code reproduces that level (3.71% reduced, 0.0174% radiance) and is recorded
-in `oco_o2_s900.json`.
+by `campaign/gen_oco_table.py`. A 750-epoch run of the seeded code reaches
+3.71% reduced and 0.0174% radiance on O2 and is recorded in
+`oco_o2_s900.json`; the table's numbers are at the matched 250-epoch budget.
 
 The seed campaign below replicates the full band pipeline at ten seeds,
 adds a network trained in the exact radiance-relative metric (loss computed
@@ -137,6 +137,23 @@ One structural-mechanics seed, end to end (trains six members, stacks,
 corrects, calibrates):
 
     NMKC_ROOT=<root> NMKC_SEED=<s> python campaign/seed_pipeline.py
+
+The first campaign ran that command with its default 200-epoch schedule for
+the FNO and the UNet under a 36-hour task limit; the second campaign, on one
+40-core host, ran it with `NMKC_EP_FNO=100 NMKC_EP_UNET=100` so that both
+convolutional members complete a 100-epoch cosine schedule
+(`campaign/run_sm_lane.sh` style lanes; per-seed records under
+`campaign/collected/dgx/`). Its companions: `campaign/run_b5.sh` re-runs the
+stack, correction, global stack and calibration on the same five members
+without the UNet (the paired UNet ablation); `campaign/run_secmom.sh` and
+`campaign/secmom6.py` write the second-moment records for the six- and
+five-member sets (`campaign/collected/secmom6_seeded.json`,
+`secmom5c_seeded.json`); `campaign/run_kappa_fill.sh` completes the
+correction-weight constant at ten seeds with a cross-machine control; and
+`campaign/runtime_ledger.py` harvests the member costs into
+`campaign/collected/dgx/runtime_ledger.csv`. `campaign/collect.py --no-pull`
+aggregates the collected records and `campaign/audit_reported_macros.py`
+recomputes every macro in `paper/macros.tex` from them.
 
 One OCO-2 band at one seed (three networks including the exact
 radiance-metric one, matched raw-kernel rows, deep-kernel heads, both

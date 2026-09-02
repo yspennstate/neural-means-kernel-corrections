@@ -53,16 +53,16 @@ Our columns are mean +- standard deviation over ten seeds per band at a
 matched 250-epoch budget. On all three bands the "ours" entries are one
 model, a per-coordinate combination that beats the emulator on both metrics
 at once -- at ten of ten seeds on O2 and SCO2 and nine of ten on WCO2.
-Earlier versions of this README reported single-seed numbers from a longer
-training budget (O2 3.8% / 0.027%); see docs/reproduce.md for how the two
-budgets relate. WCO2 carries the thin margin: the radiance win there is nine
+WCO2 carries the thin margin: the radiance win there is nine
 of ten seeds, the exception missing by 0.0015 points. The same kernel scores
 40% on the raw input: its limitation was the features, not the solve.
 
 **Structural mechanics** (de Hoop, Huang, Qian and Stuart; boundary load to
 von Mises stress field). The pipeline reaches **4.572% +- 0.010%** relative
-test error over ten seeds, level with the best published architecture
-(PARA-Net, 4.55%) rather than beating it -- the difference is about one
+test error over ten seeds with five members, and **4.546% +- 0.003%** with
+the FNO trained to a complete schedule and a UNet added (a second ten-seed
+campaign on one 40-core host), level with the best published architecture
+(PARA-Net, 4.55%) rather than beating it -- the differences are at most one
 standard error -- and below FNO (4.76%), PCA-Net (4.67%), DeepONet (5.20%)
 and the optimal-recovery kernel (5.18%); in the 1250-sample regime it reaches
 **5.433% +- 0.093%** over ten seeds against a published best of 6.49%. The paper argues from measured

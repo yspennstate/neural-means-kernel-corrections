@@ -27,10 +27,9 @@ architecture. We also use a Fourier neural operator \citep{li2021fourier}
 that consumes the broadcast load as a field and an MSE-trained variant of the
 MLP; both are drop-in means, both enter the ensemble of
 Section~\ref{sec:diversity}, and their pairwise error correlations are one of
-the measurements of this paper. A UNet on the same field representation was
-part of the pre-specified configuration but completed at only two of the ten
-campaign seeds, so it is absent from the reported ensemble
-(Section~\ref{sec:seeds}). We additionally implement an encoder--decoder
+the measurements of this paper. A UNet on the same field representation is
+the sixth member of the second campaign (Section~\ref{sec:seeds}). We
+additionally implement an encoder--decoder
 transformer \citep{vaswani2017attention,dosovitskiy2021image} that tokenizes
 the 41 load samples and decodes the field by cross-attention at the grid
 points; it is a natural further architecture family, but we were unable to

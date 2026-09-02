@@ -15,13 +15,10 @@ direction with Proposition~\ref{prop:sym}, which fixes the sign of the
 expected change but not its size; the effect is much smaller on the normalized-MSE
 network ($0.02$ points) and absent by construction from the refiner, which
 trains symmetrized. Adding the kernel-flow regularizer
-(Section~\ref{sec:theory-kf}) to the low-data MLP did not help here (it moved
-test error from 5.64\% to 5.87\% at a single seed, a comparison the seed
-campaign did not repeat and which is smaller than the low-data chain's own
-seed spread of $0.09$ points, so we record it as a null result rather than an
-effect); Proposition~\ref{prop:kf} says what the term
-estimates, not that estimating it is useful on every problem, and on this
-smooth-output benchmark the plain metric loss was already a good proxy. Nor
+(Section~\ref{sec:theory-kf}) to the low-data MLP did not help and was not
+selected; Proposition~\ref{prop:kf} says what the term estimates, not that
+estimating it is useful on every problem, and on this smooth-output benchmark
+the plain metric loss was already a good proxy. Nor
 does a richer correction kernel help: replacing the single tuned Mat\'ern with
 a sum of Mat\'ern kernels at several bandwidths leaves the validation error
 unchanged to two decimals, which is consistent with the residual being close to
@@ -36,12 +33,11 @@ every seed. The length scale is the less stable of the two choices, and the
 four-member ablation concentrates more tightly than this (eight seeds at twice
 the median), so the spread here belongs to the five-member configuration.
 
-One positive lesson emerges from the refiner variants. Conditioning the refiner
-on the kernel method's prediction (test error \errRef\%) beats conditioning it
-on another network's prediction (4.84\% at one seed), even though the two conditioning
-fields have almost the same accuracy; the kernel field carries information
-complementary to the network's inductive bias, whereas a second network's field
-is largely redundant. Enlarging the ensemble beyond the residual family is the
+The refiner's conditioning field is the kernel prediction, and the choice is
+not incidental: of all the members, the kernel's residual is the least
+correlated with the networks' (Section~\ref{sec:diversity}), so the field it
+supplies carries information complementary to the network's inductive bias
+in a way a second network's field would not. Enlarging the ensemble beyond the residual family is the
 subject of Section~\ref{sec:diversity}, where the returns of each addition turn
 out to be predictable in advance from the correlation structure of the members'
 errors.
@@ -50,7 +46,8 @@ errors.
 \centering
 \caption{Building the high-data pipeline. Mean relative $L^2$ test error under
 the 20000-sample protocol; ``+'' rows are cumulative. All rows are mean $\pm$
-standard deviation over ten seeds.}
+standard deviation over ten seeds; the last two are the second campaign of
+Section~\ref{sec:seeds}.}
 \label{tab:ablation}
 \begin{tabular}{lc}
 \toprule
@@ -62,6 +59,8 @@ Reflection-averaged neural mean & $\errMLP\pm\errMLPSd$ \\
 \ \ \ \ + residual kernel correction & $\errPipeFour\pm\errPipeFourSd$ \\
 \ \ + FNO member, affine stack & $\errStack\pm\errStackSd$ \\
 \ \ \ \ + residual kernel correction & $\errPipe\pm\errPipeSd$ \\
+\ \ + complete FNO schedule and UNet member, affine stack & $\errSixStack\pm\errSixStackSd$ \\
+\ \ \ \ + residual kernel correction & $\errSix\pm\errSixSd$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -106,13 +105,11 @@ where the traction condition meets the geometry, not a diffuse modeling deficit.
 \centering
 \includegraphics[width=0.62\linewidth]{figs/corr.pdf}
 \caption{Correlation of per-sample normalized residuals on the validation
-split, drawn at one seed from the original single-run study, which also
-trained a UNet member (test-set values agree to two decimals). Across the ten
-replicated seeds, whose five members all appear here, every pair correlates
-between \corrNetLo{} and \corrNetHi{}, with a mean of
-$\corrBar\pm\corrBarSd$; the kernel predictor, the most alien member by
-construction, still correlates \corrKerLo--\corrKerHi{} with the most
-accurate network at every one of them.}
+split, six members, averaged over the ten seeds of the second campaign.
+Across seeds and pairs the entries range between \corrNetLoSix{} and
+\corrNetHiSix{}, with a mean of $\corrBarSix\pm\corrBarSixSd$; the kernel
+predictor, the most alien member by construction, still correlates
+\corrKerLo--\corrKerHi{} with the most accurate network at every seed.}
 \label{fig:corr}
 \end{figure}
 
@@ -194,12 +191,14 @@ not distributed, so regenerating a row means retraining it.
 Theorem~\ref{thm:or} certifies the corrected surrogate's error by
 $\|G-m\|_K\,P_\lambda(u)$, and it is tempting to read the design factor
 $P_\lambda$ as a pointwise error bar. On this benchmark that reading fails, in
-an instructive way. Table~\ref{tab:norms} confirms the operator factor behaves
-as the theory predicts: the computable squared RKHS norm of the fitted
+an instructive way. Table~\ref{tab:norms} shows the operator factor moving in
+the direction the theory suggests: the squared RKHS norm of the fitted
 correction is about \normRatio$\times$ smaller when the kernel regresses
-ensemble residuals than when it regresses raw stress fields, so an accurate
-mean genuinely leaves a smoother remainder and a tighter certificate (the
-bound, linear in the norm, by the square root of that). But the design factor
+ensemble residuals than when it regresses raw stress fields. The norm of a
+fitted interpolant is a lower bound on the norm of the target it interpolates,
+so the ratio compares two lower bounds and is read as a diagnostic of the
+fitted objects rather than as a bound on the constant of
+Theorem~\ref{thm:or}. The design factor
 $P_\lambda$ correlates only weakly with the corrected surrogate's absolute
 error (Pearson \uqCorrAbs), and \emph{negatively} with the benchmark's
 relative error. The cause is measurable: $P_\lambda$ is large for loads far
@@ -243,7 +242,11 @@ $90\%$ but with the exact finite-sample law: with $m=1000$ calibration points
 the coverage of a split-conformal band is $\mathrm{Beta}(901,100)$ distributed,
 whose central $95\%$ interval is $[88.1\%, 91.8\%]$. All ten seeds fall inside
 it. At the $95\%$ level the band is $[93.6\%, 96.3\%]$ and the observed
-coverage is $95.0\pm0.6\%$, again with all ten inside. Scaling the score by
+coverage is $95.0\pm0.6\%$, again with all ten inside. The six-member
+pipeline gives $\uqCoverSix\pm\uqCoverSixSd\%$ and
+$\uqCoverSixHi\pm\uqCoverSixHiSd\%$, with all ten seeds inside at the $90\%$
+level and nine at the $95\%$ level, the tenth on the band's upper edge.
+Scaling the score by
 ensemble disagreement, which the correlations above say should not help, indeed
 does not: it changes mean coverage by three tenths of a point and leaves every
 seed inside the same band. The lesson is narrow but real: a valid pointwise bound
@@ -336,11 +339,11 @@ correct something. The optimum spreads across all five members at essentially
 every seed --- refiner $0.31\pm0.04$, FNO $0.34\pm0.06$, normalized-MSE network
 $0.24\pm0.08$, kernel $0.06\pm0.03$, metric-trained MLP $0.06\pm0.04$ --- with
 the kernel receiving a nonzero share at ten seeds out of ten and the plain MLP
-at nine. (An earlier version of this work reported zero weight for those two
-members; its solver took clipped gradient steps rather than projecting onto
-the simplex and stopped at near-vertex points $0.8$--$3.6\%$ above the true
-minimum.) Solved properly the answer is a spread, not a vertex: every member
-earns some weight.
+at nine. Solved properly the answer is a spread, not a vertex: every member
+earns some weight. On the six members of the second campaign the shares are
+UNet $0.32\pm0.06$, FNO $0.30\pm0.07$, refiner $0.27\pm0.04$, kernel
+$0.06\pm0.02$, normalized-MSE network $0.03\pm0.04$ and metric-trained MLP
+$0.02\pm0.02$.
 
 That the FNO takes the largest single share while ranking only third on the
 metric is the whole content of the diversity argument. $S$ is a matrix of
@@ -353,25 +356,33 @@ narrowly: correlation $\corrFnoLo$--$\corrFnoHi$ against a threshold of
 $0.987$--$1.001$. The kernel is admitted more comfortably,
 $\corrKerLo$--$\corrKerHi$ against $0.905$--$0.918$, and also enters the
 deployed pipeline twice more, through the refiner it conditions and through the
-affine stack, where weights are not constrained to be nonnegative.
+affine stack, where weights are not constrained to be nonnegative. In the
+second campaign every member is admitted against the normalized-MSE network
+at all ten seeds: the annealed FNO at correlation $0.974$--$0.980$ against a
+threshold of $0.992$--$0.998$, the UNet at $0.943$--$0.961$ against
+$0.985$--$1.000$, the kernel at $0.859$--$0.879$ against $0.905$--$0.918$.
 
 Part~(ii) of the proposition puts the infinite-ensemble floor of an
 equicorrelated family at $\bar e\sqrt{\bar\varrho}$, which at these measurements
-is $\ensFloor\pm\ensFloorSd\%$. That number and the pipeline's \errPipe\% are
-not on the same footing, and the comparison has to be made carefully for the
-reason Remark~\ref{rem:metric} gives: the floor is a root-mean-square
-quantity and \errPipe\% is a mean, so the mean lies below the floor by
-Jensen's inequality whatever the estimator does, and a comparison across the
-two would establish nothing. Converted into the floor's own metric with this
-pipeline's measured dispersion factor, \errPipe\% corresponds to about
-$4.87\%$, which sits within $\ensFloorSd$ of the floor with the sign
-undetermined. We therefore claim no margin below the floor here. What can be
-said without a conversion is the qualitative point, and it is unaffected:
-the floor bounds convex combinations of the members, while the deployed
-estimator fits an affine stack per grid point and then corrects its residual
-with a kernel, neither of which is a convex combination. What the floor
-measures is how little the convex operation can buy, and the answer, at every
-seed, is a few hundredths of a point.
+is $\ensFloor\pm\ensFloorSd\%$ on five members and
+$\ensFloorSix\pm\ensFloorSixSd\%$ on six. Those numbers and the pipelines'
+\errPipe\% and \errSix\% are not on the same footing, and the comparison has
+to be made carefully for the reason Remark~\ref{rem:metric} gives: the floor
+is a root-mean-square quantity and the table entries are means, so the mean
+lies below the floor by Jensen's inequality whatever the estimator does, and
+a comparison across the two would establish nothing. Converted into the
+floor's own metric with the measured dispersion factors, \errPipe\% and
+\errSix\% correspond to about $4.87\%$ and $4.85\%$, each within about one
+standard deviation of its floor. We therefore claim no margin below the
+floor. What can be said without a conversion is the qualitative point, and
+it is unaffected: the floor bounds convex combinations of the members, while
+the deployed estimator fits an affine stack per grid point and then corrects
+its residual with a kernel, neither of which is a convex combination; and
+Corollary~\ref{cor:signed} shows that the sign constraint is not where the
+difference lies, since the unconstrained global optimum coincides with the
+convex one at every seed. What the floor measures is how little the convex
+operation can buy, and the answer, at every seed and for either member set,
+is a few hundredths of a point.
 
 Three further measurements are consistent with the same reading. First, the
 residual kernel correction, which regresses the stack's residual on the load,
@@ -379,11 +390,11 @@ improves the stack by $\corrGain$ points at $n=19000$ whatever the kernel
 scale, and its tuner reaches for the smoothest kernel and the largest nugget
 on its grid: at this sample size the shared residual is not a function of the
 load in any way a Mat\'ern RKHS on $\mathbb R^{41}$ can see. Second, the error
-stops responding to data. Under identical recipes at a single seed, the MLP's
-test error is $4.95\%$ with $3500$ training samples, $4.86\%$ with $8500$, and
-$4.86\%$ with $19000$ (Figure~\ref{fig:scaling}); the ten-seed value at the
-largest size is $\errMLP\pm\errMLPSd\%$, so the last five-and-a-half-fold
-increase in data buys nothing that seed noise does not already cover. The
+stops responding to data. Under identical recipes the MLP's test error is
+$4.95\%$ with $3500$ training samples and $4.86\%$ with $8500$ in the
+scaling sweep of Figure~\ref{fig:scaling}, against $\errMLP\pm\errMLPSd\%$
+at $19000$ over the ten seeds, so the last five-and-a-half-fold increase in
+data buys nothing that seed noise does not already cover. The
 kernel ridge curve still falls, at roughly $n^{-0.11}$, but toward the same
 region. Third, and this is what ten seeds add, the error does not respond to
 reseeding either, and the scale of the comparison is what makes it an
@@ -394,21 +405,25 @@ capacity, diversity, data, or reseeding; within the range we could test, this
 error yields to none of them, which is the pattern a floor in the data would
 produce.
 
-On the structural-mechanics benchmark the measured spreads
-($\varrho\in[\corrNetLo,\corrNetHi]$ across member pairs and seeds, at member
-errors within about ten percent of one another) put the window at roughly a
-fifth of the squared floor: the correlation spread alone is $0.14$, a sixth
-of $\bar\varrho=\corrNetLo$, and the $1/M$ term adds a few hundredths. The
-best convex mixture of the measured $S$ sits at the bottom of that window,
-$\predRMS\pm\predRMSSd\%$ against a floor of $\ensFloor\pm\ensFloorSd\%$,
-both in the root-mean-square metric $\mathcal E_2$ in which the corollary is
-stated. The bracket is evaluated against the realized ensemble risk at every
+On the structural-mechanics benchmark the bracket of
+Corollary~\ref{cor:floorpinch}, with $\bar e^{\,2}$ the smallest diagonal
+entry of the measured $S$ and the one-sided bounds read off its entries, is
+$[0.949\pm0.005,\,1.039\pm0.004]$ on five members and
+$[0.933\pm0.007,\,1.032\pm0.004]$ on six, about a tenth of the squared floor
+wide, and the normalized minimum sits inside it at every seed, at
+$0.980\pm0.003$ and $0.972\pm0.005$. In the root-mean-square metric
+$\mathcal E_2$ in which the corollary is stated, the best convex mixture of
+the measured $S$ is at $\predRMS\pm\predRMSSd\%$ against a floor of
+$\ensFloor\pm\ensFloorSd\%$ on five members and at
+$\predRMSSix\pm\predRMSSixSd\%$ against $\ensFloorSix\pm\ensFloorSixSd\%$ on
+six. The bracket is evaluated against the realized ensemble risk at every
 seed, and its stability is the point: the realized mean relative error
 $\mathcal E_1$ of the mixture is a factor $\dispFac\pm\dispFacSd$ of the
-predicted root mean square, the dispersion factor of Remark~\ref{rem:metric},
-so ten independent redraws of the validation split and of every network
-initialization move the prediction by six hundredths of a point and the ratio
-by three thousandths.
+predicted root mean square on five members and $\dispFacSix\pm\dispFacSixSd$
+on six, the dispersion factor of Remark~\ref{rem:metric}, so ten independent
+redraws of the validation split and of every network initialization move
+the prediction by six hundredths of a point and the ratio by three
+thousandths.
 
 The stages are more reproducible than the members they are built from, and the
 way the seed spread moves along the chain is itself informative. Equal

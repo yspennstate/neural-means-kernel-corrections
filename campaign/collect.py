@@ -65,6 +65,16 @@ summary = {}
 
 # structural mechanics seeds
 sm_all = [r for r in rows if r.get("kind") == "structmech_seed" and r.get("seed", 99) < 90]
+# Two structural-mechanics campaigns share the seed numbers: the box lanes and the
+# complete-schedule six-member campaign (collected/dgx). Keep one row per seed, the
+# dgx one when both exist, so the summary describes that campaign at ten seeds.
+_by_seed = {}
+for r in sorted(sm_all, key=lambda r: r.get("_host") != "dgx"):
+    _by_seed.setdefault(r["seed"], r)
+if len(_by_seed) < len(sm_all):
+    print(f"NOTE: structmech: {len(sm_all) - len(_by_seed)} box-lane rows superseded by the "
+          f"complete-schedule campaign at the same seeds")
+sm_all = list(_by_seed.values())
 sm = [r for r in sm_all if "stack_test" in r]
 for r in sm_all:
     if r not in sm:

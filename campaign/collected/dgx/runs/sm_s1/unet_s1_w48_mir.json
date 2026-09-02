@@ -1,0 +1,23 @@
+{
+ "kind": "unet",
+ "args": {
+  "seed": 1,
+  "epochs": 100,
+  "width": 48,
+  "batch": 256,
+  "lr": 0.0015,
+  "wd": 1e-05,
+  "mirror": 1,
+  "ntrain": 0,
+  "lowval": 0,
+  "final": 0,
+  "threads": 10,
+  "tag": "unet"
+ },
+ "params": 4382977,
+ "val": 0.047608741945762326,
+ "test": 0.04808183386506117,
+ "test_mirror_tta": 0.04792830587054042,
+ "best_ep": 99,
+ "minutes": 600.9554274519285
+}

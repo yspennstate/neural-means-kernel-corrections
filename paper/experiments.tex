@@ -15,42 +15,39 @@ scale). Errors concentrate in the high-traction corner, as also reported by
 \subsection{What is replicated, and at how many seeds}
 \label{sec:seeds}
 
-Every structural-mechanics number in this section is reported over ten seeds
-unless it is marked otherwise. A seed here is not a reinitialization of one
-network: it redraws the $1000$-sample validation split from the training pool
-and reinitializes every trainable member, so the seed spread contains both the
-model-selection noise and the optimization noise. The test block of $20000$
-samples is fixed by the benchmark's convention and never moves, at any seed.
+Every structural-mechanics number in this section is reported over ten seeds.
+A seed here is not a reinitialization of one network: it redraws the
+$1000$-sample validation split from the training pool and reinitializes every
+trainable member, so the seed spread contains both the model-selection noise
+and the optimization noise. The test block of $20000$ samples is fixed by the
+benchmark's convention and never moves, at any seed.
 
-Five members are available at all ten seeds: the kernel ridge on loads, the
-residual MLP trained on the reported metric, the same architecture trained on
-normalized mean squared error, the kernel-conditioned refiner, and a Fourier
-neural operator. The stack and the residual correction are run at all ten
-seeds from those five, and so are the second-moment measurement and the
-conformal calibration.
-
-Two runs are incomplete, and their stopping rules are stated here once. The
-FNO was stopped at every seed by the campaign's 36-hour per-task wall clock
-and is finalized from the best-validation checkpoint its trainer wrote before
-the stop, which falls between epochs 10 and 70 of a scheduled 200, so its
-cosine schedule never annealed; nothing is retrained, and
-Supplement~\ref{app:impl} records how far each run got. The one full-schedule
-run of this architecture we have scored $4.705\%$ against the $\errFNOG\%$
-the checkpoints average, so the truncation costs the member accuracy; the
-tables report the truncated member because it is what the campaign produced.
-A sixth member, a UNet, was scheduled after the FNO and completed at two of
-the ten seeds before the wall clock, so the six-member configuration that
-included it is not reported; as a preliminary observation only, at those two
-seeds the corrected six-member pipeline scored $4.539\%$ and $4.537\%$.
+Two campaigns share those seeds. The first trains five members at every seed:
+the kernel ridge on loads, the residual MLP trained on the reported metric,
+the same architecture trained on normalized mean squared error, the
+kernel-conditioned refiner, and a Fourier neural operator. Its FNO member is
+the best-validation checkpoint of a run that a 36-hour task limit stopped
+between epochs 10 and 70 of a 200-epoch cosine schedule, so that member never
+annealed. The stack, the residual correction, the second-moment measurement
+and the conformal calibration are built on those five, and the four-member
+versions of each are kept, because the FNO's admission is a measurement and
+the reader should see what it was measured against. The second campaign, on
+one 40-core host, retrains the kernel ridge and the three MLP-family members
+under the same seeds --- they reproduce the first campaign's test errors to
+the printed precision, seeded CPU training being deterministic --- trains the
+FNO to the end of a 100-epoch cosine schedule, and adds a sixth member, a
+UNet on the same field representation. Every stage is then run again on the
+six. The first campaign is the reference for the stage-by-stage accounting of
+Sections~\ref{sec:members-seeds}--\ref{sec:diversity}; the second supplies
+the configuration this paper reports as its best, and repeats that
+accounting on six members.
 
 The five-member set is not a configuration searched for after seeing results:
-it is the pre-specified six-member configuration minus the member the campaign
-could not supply. Whether five members are preferred to four is decided on
-validation, per seed, by the same rule that governs every other stage choice
-here, and it prefers five at ten seeds out of ten
-(Section~\ref{sec:members-seeds}). The four-member pipeline is reported
-alongside throughout, because the FNO's admission is a measurement and the
-reader should see what it was measured against.
+it is the pre-specified six-member configuration minus the member the first
+campaign's task limit did not reach. Whether five members are preferred to
+four is decided on validation, per seed, by the same rule that governs every
+other stage choice here, and it prefers five at ten seeds out of ten
+(Section~\ref{sec:members-seeds}).
 
 The low-data pipeline and the OCO-2 combination have the seed coverage stated
 where they appear, which is ten in both.
@@ -70,25 +67,23 @@ of a point, because the only randomness it carries is the validation draw).
 We take that agreement as evidence that the protocols are aligned, so the gap
 opened by the rest of the pipeline is not an artifact of evaluation choices.
 
-The replicated pipeline reaches $\errPipe\pm\errPipeSd\%$, the uncertainty
-being the spread over seeds. That is below every published method except
-PARA-Net, and it is not separable from PARA-Net: the difference is $0.022$
-points against an unpaired standard error of $\seUnpaired$
-(Section~\ref{sec:uncertainty-budget}), so about one. We claim a tie there and
-nothing more. Against PCA-Net (4.67\%) the separation is $0.098$
-points, five standard errors, and the margins over the FNO (4.76\%), DeepONet
-(5.20\%) and the optimal-recovery kernel (5.18\%) are larger still.
-
-One correction to an earlier version of this work belongs here. That version
-reported this configuration at $4.55\%$ from a single run and presented the
-number as matching PARA-Net. Rebuilt across ten seeds, first without the FNO
-and then with it, the pipeline gives $\errPipeFour\pm\errPipeFourSd\%$ and
-$\errPipe\pm\errPipeSd\%$: the four-member figure sits three standard errors
-above PARA-Net and the five-member figure is level with it, so the earlier
-claim survives only at the configuration that carries the spectral member,
-and only as a tie. Section~\ref{sec:diversity} presents evidence, consistent
-with a floor in the benchmark data rather than a coincidence of tuning, for
-why the published cluster sits where it does, and says what would settle it.
+The five-member pipeline reaches $\errPipe\pm\errPipeSd\%$, the uncertainty
+being the spread over seeds, and the six-member pipeline of the second
+campaign $\errSix\pm\errSixSd\%$; the two are paired within seed, and the
+second is lower at every one of the ten, by $\sixGain\pm\sixGainSd$ points.
+Both are below every published method except PARA-Net, and neither is
+separable from PARA-Net: the differences are $0.022$ and $0.004$ points
+against an unpaired standard error of $\seUnpaired$
+(Section~\ref{sec:uncertainty-budget}). We claim a tie there and nothing
+more. Against PCA-Net (4.67\%) the separations are $0.098$ and $0.124$
+points, five and six standard errors, and the margins over the FNO (4.76\%),
+DeepONet (5.20\%) and the optimal-recovery kernel (5.18\%) are larger still.
+Without the spectral member the pipeline gives
+$\errPipeFour\pm\errPipeFourSd\%$, three standard errors above PARA-Net, so
+the tie belongs to the configurations that carry that member.
+Section~\ref{sec:diversity} presents evidence, consistent with a floor in the
+benchmark data rather than a coincidence of tuning, for why the published
+cluster sits where it does, and says what would settle it.
 
 \begin{table}[t]
 \centering
@@ -98,8 +93,9 @@ published results on the same data, quoted without uncertainties because none
 were reported. Rows below are ours: mean $\pm$ standard deviation over ten
 seeds. The four-member row is the same pipeline with the FNO removed, kept
 because the FNO's admission is a measurement rather than a design choice
-(Section~\ref{sec:members-seeds}). TTA denotes reflection averaging at test
-time.}
+(Section~\ref{sec:members-seeds}); the last two rows are the second campaign
+of Section~\ref{sec:seeds}, with the FNO trained to the end of its schedule
+and a UNet added. TTA denotes reflection averaging at test time.}
 \label{tab:main}
 \begin{tabular}{lcc}
 \toprule
@@ -116,6 +112,8 @@ Residual MLP + reflection TTA & $\errMLP\pm\errMLPSd$ & 4.9M \\
 \ \ + affine stack over five members & $\errStack\pm\errStackSd$ & 22.9M \\
 \ \ + residual kernel correction & $\errPipe\pm\errPipeSd$ & 22.9M \\
 \ \ \ \ the same pipeline without the FNO & $\errPipeFour\pm\errPipeFourSd$ & 16.5M \\
+\ \ + complete FNO schedule and UNet, affine stack over six & $\errSixStack\pm\errSixStackSd$ & 27.3M \\
+\ \ + residual kernel correction & $\errSix\pm\errSixSd$ & 27.3M \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -129,7 +127,9 @@ standard deviation over ten seeds. Which stage the validation split selects
 varies with the seed --- the input-space kernel correction at six seeds, its
 two-stage form at three, the feature-space one at the remaining seed --- so
 the row is the error of the selected pipeline, not of a fixed final stage.
-The kernel-ridge row is a single run at the multiscale setting.}
+The kernel-ridge row is the multiscale construction of
+Supplement~\ref{app:impl}, which has no random component under this protocol
+and therefore no seed spread.}
 \label{tab:lowdata}
 \begin{tabular}{lc}
 \toprule
@@ -141,7 +141,7 @@ Zero-mean GP \citep{mora2025operator} & 6.74 \\
 FNO & 6.62 \\
 FNO-mean GP \citep{mora2025operator} & 6.49 \\
 \midrule
-Kernel ridge on loads (ours, multiscale, one seed) & \errKRRloadLow \\
+Kernel ridge on loads (ours, multiscale) & \errKRRloadLow \\
 Full pipeline (ours, ten seeds) & $\errBestLow\pm\errBestLowSd$ \\
 \bottomrule
 \end{tabular}
@@ -150,8 +150,9 @@ Full pipeline (ours, ten seeds) & $\errBestLow\pm\errBestLowSd$ \\
 \subsection{Members and the stack, across seeds}
 \label{sec:members-seeds}
 
-Table~\ref{tab:members} gives the five replicated members and the stages built
-on them. Four features of it are worth naming.
+Table~\ref{tab:members} gives the five members of the first campaign and the
+stages built on them, then the second campaign's six. Four features of the
+first block are worth naming; the second block repeats the lesson of each.
 
 The ordering of the members is stable at the top and not below it, and the
 seeds are what separate the two cases. Scored on the reflection-averaged
@@ -176,6 +177,33 @@ second-moment analysis of Section~\ref{sec:diversity} says what is, and the
 simplex weights there give the FNO the largest single share despite its being
 third on the metric.
 
+The second campaign says what the anneal was worth. Trained to the end of a
+100-epoch schedule, the same architecture at the same seeds scores
+$\errFNOc\pm\errFNOcSd\%$, better than its early-stopped checkpoint at every
+seed by $\fnoCompleteGain\pm\fnoCompleteGainSd$ points, and its seed spread
+falls from $\errFNOGSd$ to $\errFNOcSd$ points: the spread was the checkpoint
+lottery, not the architecture. It is then the most accurate member at nine
+seeds of ten. The better member does not make a better stack. Rebuilt on the
+same five members with the annealed FNO in place of the early-stopped one,
+the corrected pipeline is $\errFiveC\pm\errFiveCSd\%$ against
+$\errPipe\pm\errPipeSd\%$, a paired difference of
+$\fnoScheduleWash\pm\fnoScheduleWashSd$ points in the wrong direction. The
+reason is in the residuals: the annealed FNO correlates $0.974$--$0.980$
+with the normalized-MSE network where the early-stopped one correlated
+$\corrFnoLo$--$\corrFnoHi$, so what the member gained in accuracy it gave
+back in diversity, and the second-moment matrix predicts the wash before any
+stack is fit, the predicted best-mixture risk moving from $\predRMS\%$ to
+$\predRMSFiveC\%$ (Section~\ref{sec:diversity}). The six-member pipeline
+then sits $\sixGain\pm\sixGainSd$ points below the first campaign's, paired
+within seed, at ten of ten, and that gain is the UNet's: removing it from
+the six costs the corrected pipeline $\unetGain\pm\unetGainSd$ points at ten
+seeds of ten. The UNet lands fifth of six on the metric at
+$\errUNet\pm\errUNetSd\%$, behind both residual MLPs, and takes the largest
+convex share at four seeds of ten all the same. The second campaign repeats,
+with a new architecture, what the first said about the FNO, and adds the
+converse: a member that becomes more accurate and more like the others is
+worth nothing more.
+
 The stages are more reproducible than the members they are built from, and
 the way the seed spread moves along the chain is itself informative: equal
 weighting, which fits nothing, takes the members' spread down to $0.005$
@@ -194,7 +222,12 @@ beats fitted global weights by $0.032\pm0.005$, and the kernel correction beats
 the stack by $\corrGain\pm\corrGainSd$. All four improve at ten seeds out of
 ten, as does the end-to-end figure of $\errEndToEnd\pm\errEndToEndSd$ points off
 the best member the pipeline contains. Each is a few hundredths of a point,
-which is precisely the resolution a single seed cannot deliver.
+which is precisely the resolution a single seed cannot deliver. The
+six-member chain resolves the same way: per-pixel weights beat the fitted
+global weights by $0.035\pm0.003$ points, the correction beats the stack by
+$\corrGainSix\pm\corrGainSixSd$, and the corrected pipeline sits
+$\errEndToEndSix\pm\errEndToEndSixSd$ points below its best member, each at
+ten seeds of ten.
 
 \begin{table}[t]
 \centering
@@ -202,8 +235,10 @@ which is precisely the resolution a single seed cannot deliver.
 deviation over ten seeds. Member errors are reflection-averaged where the
 member has a reflection; the kernel ridge and the refiner train with the
 symmetrization already applied. ``Fitted'' weights are solved on the validation
-split and read out once on test; equal weights involve no fitting and are
-reported on both splits.}
+split and read out once on test; equal weights involve no fitting. The lower
+block is the second campaign of Section~\ref{sec:seeds}; its kernel ridge and
+MLP-family members coincide with the upper block's to the printed precision
+and are not repeated.}
 \label{tab:members}
 \begin{tabular}{llc}
 \toprule
@@ -213,12 +248,19 @@ Kernel ridge on loads & Mat\'ern-$5/2$ & $\errKRRload\pm\errKRRloadSd$ \\
 Residual MLP & MLP, metric loss & $\errMLP\pm\errMLPSd$ \\
 Residual MLP & MLP, normalized MSE & $\errMSE\pm\errMSESd$ \\
 Kernel-conditioned refiner & MLP on $(u,\mathrm{KRR}(u))$ & $\errRef\pm\errRefSd$ \\
-Fourier neural operator & spectral, metric loss & $\errFNOG\pm\errFNOGSd$ \\
+Fourier neural operator & spectral, metric loss, early-stopped & $\errFNOG\pm\errFNOGSd$ \\
 \midrule
 Equal-weight ensemble & no fitting & $\errEnsEq\pm\errEnsEqSd$ \\
 Fitted-weight ensemble & solved on validation & $\errEnsFit\pm\errEnsFitSd$ \\
 Affine stack (per-pixel) & selected on a held-out half & $\errStack\pm\errStackSd$ \\
 \ \ + residual kernel correction & -- & $\errPipe\pm\errPipeSd$ \\
+\midrule
+Fourier neural operator & spectral, metric loss, complete schedule & $\errFNOc\pm\errFNOcSd$ \\
+UNet & convolutional, metric loss & $\errUNet\pm\errUNetSd$ \\
+Equal-weight ensemble, six members & no fitting & $\errSixEq\pm\errSixEqSd$ \\
+Fitted-weight ensemble, six members & solved on validation & $\errSixGlob\pm\errSixGlobSd$ \\
+Affine stack (per-pixel), six members & selected on a held-out half & $\errSixStack\pm\errSixStackSd$ \\
+\ \ + residual kernel correction & -- & $\errSix\pm\errSixSd$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -232,7 +274,9 @@ they were declined at one. The correction is accepted on validation at all ten.
 And the member set itself is chosen the same way --- validation prefers five
 members to four at ten seeds out of ten, which is what admits the FNO. The
 test-set consequence of that last decision, $\fnoGain\pm\fnoGainSd$ points, is
-read out afterwards and plays no part in making it.
+read out afterwards and plays no part in making it. In the second campaign
+the per-pixel weights are accepted at all ten seeds with six members and the
+correction at all ten.
 
 \subsection{Which uncertainty is the binding one}
 \label{sec:uncertainty-budget}
@@ -252,11 +296,13 @@ This decides what the table can support. Comparisons against a published
 number are unpaired, because we do not hold those methods' per-sample
 predictions, and so carry the test-block error twice: about $\seUnpaired$
 points in quadrature. The separation from PCA-Net, $0.098$ points, is five
-of those and real; the separation from PARA-Net, $0.022$ points, is about
-one, and is therefore not a separation at all. Comparisons inside the
+of those and real; the separation from PARA-Net, $0.022$ points for the
+five-member pipeline and $0.004$ for the six-member one, is at most one, and
+is therefore not a separation at all. Comparisons inside the
 pipeline are paired, and pairing is worth far more here than seeds are:
 the end-to-end gain of $\errEndToEnd$ points is resolved at roughly a
-hundred standard errors at every seed. Supplement~\ref{supp:experiments}
+hundred standard errors at every seed, and the second campaign's
+$\sixGain$ points over the first at about three. Supplement~\ref{supp:experiments}
 works the budget through, including what it implies for the FNO's
 admission; the rule it leaves is the ordinary one --- replicate seeds to
 learn whether a design choice survives retraining, pair on the test set to
@@ -277,8 +323,13 @@ between members. Over the ten seeds every pair of members correlates between
 by construction, an exact solve on the raw loads rather than a trained network
 --- still correlates $\corrKerLo$--$\corrKerHi$ with the most accurate network.
 The mean pairwise correlation is $\corrBar\pm\corrBarSd$ across seeds. The
-members are not making different mistakes. They are making the same mistake
-with small private variations, and how small does not depend on the seed.
+second campaign adds a sixth architecture and changes none of this: over its
+six members every pair correlates between \corrNetLoSix{} and
+\corrNetHiSix{}, the mean is $\corrBarSix\pm\corrBarSixSd$, and the UNet
+correlates $0.91$--$0.96$ with the networks it joins. The members are not
+making different mistakes. They are making the same mistake with small
+private variations, and how small does not depend on the seed or on the
+number of architectures.
 
 The second-moment identity of Proposition~\ref{prop:secmom} makes the
 consequence quantitative before any weights are fitted, and the campaign lets
@@ -287,31 +338,40 @@ seed we measure the matrix $S$ of normalized residual second moments on the
 validation split, solve for the optimal simplex weights, and compare the
 predicted root-mean-square relative error $\sqrt{w^\top S w}$ with what those
 weights realize. The prediction is $\predRMS\pm\predRMSSd\%$ and the realized
-mean relative error is a factor $\dispFac\pm\dispFacSd$ of it. That factor is
-the dispersion between a root-mean-square and a mean, and its stability to
-three thousandths across ten independent replicates is the substantive claim:
-$S$ alone, measured without ever evaluating the metric, predicts the stack.
+mean relative error is a factor $\dispFac\pm\dispFacSd$ of it; on the six
+members of the second campaign the prediction is
+$\predRMSSix\pm\predRMSSixSd\%$ and the factor $\dispFacSix\pm\dispFacSixSd$.
+That factor is the dispersion between a root-mean-square and a mean, and its
+stability to three thousandths across ten independent replicates and two
+member sets is the substantive claim: $S$ alone, measured without ever
+evaluating the metric, predicts the stack.
 
 The weights it assigns are as informative as the risk it predicts. The
 optimum spreads across all five members at essentially every seed, the
 kernel taking a nonzero share at ten seeds out of ten and the plain MLP at
-nine; solved properly the answer is a spread, not a vertex. (An earlier
-version of this work reported zero weight for those two members, from a
-solver that took clipped gradient steps rather than projecting onto the
-simplex.) That the FNO takes the largest single share while ranking only
-third on the metric is the whole content of the diversity argument: $S$
-rewards a residual that is both small and unlike the others', and the
-spectral member is the only architecture here structurally unlike the
-residual-MLP family. Part~(ii) of the proposition puts the
-infinite-ensemble floor of an equicorrelated family at
-$\bar e\sqrt{\bar\varrho}=\ensFloor\pm\ensFloorSd\%$; that is a
-root-mean-square quantity and \errPipe\% is a mean, so the two are not on
-the same footing and we claim no margin below the floor
-(Remark~\ref{rem:metric}). What the floor measures is how little the
-convex operation can buy, and the answer, at every seed, is a few
-hundredths of a point. Supplement~\ref{supp:experiments} carries the
-per-member weights, the pairwise admission tests, and the metric
-conversion.
+nine; solved properly the answer is a spread, not a vertex. That the FNO
+takes the largest single share while ranking only third on the metric is the
+whole content of the diversity argument: $S$ rewards a residual that is both
+small and unlike the others', and the spectral member is the only
+architecture here structurally unlike the residual-MLP family. The second
+campaign makes the point twice more. With a member that is not accurate:
+the optimum splits the weight three ways between the annealed FNO, the UNet
+and the refiner ($0.30$, $0.32$ and $0.27$), the UNet taking the largest
+share at four seeds of ten while ranking fifth of six on the metric, and
+removing it costs the pipeline $\unetGain$ points. And with one that is: the
+annealed FNO is $\fnoCompleteGain$ points more accurate than its
+early-stopped checkpoint and worth nothing more to a stack of the same five
+members (Section~\ref{sec:members-seeds}), because its residual moved closer
+to the networks'. Part~(ii) of the proposition
+puts the infinite-ensemble floor of an equicorrelated family at
+$\bar e\sqrt{\bar\varrho}=\ensFloor\pm\ensFloorSd\%$ on five members and
+$\ensFloorSix\pm\ensFloorSixSd\%$ on six; that is a root-mean-square
+quantity and \errPipe\% is a mean, so the two are not on the same footing
+and we claim no margin below the floor (Remark~\ref{rem:metric}). What the
+floor measures is how little the convex operation can buy, and the answer,
+at every seed and for either member set, is a few hundredths of a point.
+Supplement~\ref{supp:experiments} carries the per-member weights, the
+pairwise admission tests, and the metric conversion.
 
 
 Where does the common mistake live? Write $r_m$ for member $m$'s residual field
@@ -397,8 +457,13 @@ finite-sample law rather than with $90\%$: the coverage of such a band is
 $\mathrm{Beta}(901,100)$ distributed, whose central $95\%$ interval is
 $[88.1\%,91.8\%]$, and all ten seeds fall inside it; at the $95\%$ level
 the interval is $[93.6\%,96.3\%]$ and the observed coverage
-$95.0\pm0.6\%$, again ten of ten. Rescaling the score by ensemble
-disagreement, which the correlations say should not help, indeed does not.
+$95.0\pm0.6\%$, again ten of ten. The six-member pipeline repeats the check:
+$\uqCoverSix\pm\uqCoverSixSd\%$ at the $90\%$ level with all ten seeds
+inside the band, and $\uqCoverSixHi\pm\uqCoverSixHiSd\%$ at the $95\%$
+level with nine inside and the tenth on the band's upper edge --- one
+excursion in twenty checks against central $95\%$ bands, which is the rate
+the law itself predicts. Rescaling the score by ensemble disagreement, which
+the correlations say should not help, indeed does not.
 Supplement~\ref{supp:experiments} carries the measurements behind each of
 these statements. The lesson is narrow but real: a valid pointwise bound is
 not automatically a useful pointwise indicator, two uncertainty signals of

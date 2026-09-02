@@ -21,7 +21,12 @@ TASK_ID = os.environ.get("TASK_ID", f"sm_seed_s{SEED}")
 THREADS = int(os.environ.get("NMKC_THREADS", "6"))
 SMOKE = os.environ.get("NMKC_SMOKE", "") == "1"
 # smoke mode: two epochs everywhere, full data path -- exercises every stage
-EP = dict(mlp=400, mlpMSE=120, mlpR=100, fno=200, unet=200) if not SMOKE else \
+# The first campaign scheduled the FNO and the UNet for 200 epochs; the second
+# campaign (the complete-schedule six-member run) set both to 100 through these
+# two variables, so one file reproduces either.
+EP = dict(mlp=400, mlpMSE=120, mlpR=100,
+          fno=int(os.environ.get("NMKC_EP_FNO", "200")),
+          unet=int(os.environ.get("NMKC_EP_UNET", "200"))) if not SMOKE else \
      dict(mlp=2, mlpMSE=2, mlpR=2, fno=2, unet=2)
 CODE = ROOT / "code"
 DATA = ROOT / "data" / "structmech"

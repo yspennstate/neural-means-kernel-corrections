@@ -2,7 +2,9 @@
 % Every macro below whose name ends in Sd is a standard deviation over the ten
 % campaign seeds; seeded quantities are written mean/sd as a pair. Filled from the
 % campaign artifacts (seeds/sm_s*/runs/*.json, pix4_s*.json, ens_s*.json,
-% conf_s*.json) -- see Appendix~\ref{app:impl}.
+% conf_s*.json, and collected/dgx/sm_seed_s*.json for the complete-schedule
+% campaign) -- see Appendix~\ref{app:impl}. campaign/audit_reported_macros.py
+% recomputes every value from those files.
 %
 % Replicated pipeline (ten seeds, five members)
 \newcommand{\errPipe}{4.572}         % corrected pipeline, mean over ten seeds (%)
@@ -26,11 +28,57 @@
 \newcommand{\seTest}{0.012}          % test-block standard error (points)
 \newcommand{\seOwn}{0.016}           % seed and test block combined
 \newcommand{\seUnpaired}{0.020}      % against a published number, unpaired
-% Six-member configuration: the UNet completed at two of the ten campaign seeds
-\newcommand{\errBestOne}{4.538}      % six-member configuration, mean of the two completed seeds
-\newcommand{\errStackOne}{4.557}     % its per-pixel stack, same two seeds
-\newcommand{\errUNetG}{4.99}         % UNet member + TTA, one seed
-\newcommand{\errStackFam}{4.67}      % MLP-family stack, one seed
+% Complete-schedule campaign (ten seeds, six members): the same four deterministic
+% members under the same seeds, the FNO trained to the end of a 100-epoch cosine
+% schedule, and a UNet added. collected/dgx/sm_seed_s*.json.
+\newcommand{\errSix}{4.546}          % six-member pipeline, corrected
+\newcommand{\errSixSd}{0.003}
+\newcommand{\errSixStack}{4.567}     % its per-pixel affine stack
+\newcommand{\errSixStackSd}{0.004}
+\newcommand{\corrGainSix}{0.021}     % correction's gain over that stack, paired
+\newcommand{\corrGainSixSd}{0.003}
+\newcommand{\errSixGlob}{4.602}      % global convex six-member stack, fitted on validation
+\newcommand{\errSixGlobSd}{0.003}
+\newcommand{\errSixGlobCorr}{4.554}  % the same after its own correction
+\newcommand{\errSixGlobCorrSd}{0.004}
+\newcommand{\errSixEq}{4.626}        % equal-weight six-member ensemble, test
+\newcommand{\errSixEqSd}{0.003}
+\newcommand{\sixGain}{0.026}         % six-member pipeline over the five-member one, paired within seed
+\newcommand{\sixGainSd}{0.010}
+\newcommand{\errEndToEndSix}{0.135}  % best member -> corrected six-member pipeline
+\newcommand{\errEndToEndSixSd}{0.008}
+\newcommand{\errFNOc}{4.682}         % FNO member + TTA, complete 100-epoch schedule
+\newcommand{\errFNOcSd}{0.009}
+\newcommand{\fnoCompleteGain}{0.072} % complete-schedule FNO over the early-stopped one, paired
+\newcommand{\fnoCompleteGainSd}{0.031}
+\newcommand{\errUNet}{4.740}         % UNet member + TTA, ten seeds
+\newcommand{\errUNetSd}{0.030}
+\newcommand{\unetGain}{0.032}        % six members over the same five (annealed FNO, no UNet), paired within seed
+\newcommand{\unetGainSd}{0.004}
+\newcommand{\errFiveC}{4.578}        % the same five members with the annealed FNO, corrected pipeline (hpix5; hstk5 where the rule declined the per-pixel stack)
+\newcommand{\errFiveCSd}{0.005}
+\newcommand{\fnoScheduleWash}{0.006} % that pipeline minus the early-stopped-FNO pipeline, paired: positive = the annealed one is WORSE
+\newcommand{\fnoScheduleWashSd}{0.013}
+\newcommand{\predRMSFiveC}{4.940}    % predicted RMS of the best convex mixture, five members with the annealed FNO
+\newcommand{\predRMSSix}{4.920}      % predicted RMS of the best convex six-member mixture
+\newcommand{\predRMSSixSd}{0.057}
+\newcommand{\dispFacSix}{0.938}      % realized mean / predicted RMS, six members
+\newcommand{\dispFacSixSd}{0.003}
+\newcommand{\corrBarSix}{0.919}      % mean pairwise residual correlation, six members
+\newcommand{\corrBarSixSd}{0.005}
+\newcommand{\corrNetLoSix}{0.82}     % min pairwise residual corr over seeds, six members
+\newcommand{\corrNetHiSix}{0.98}
+\newcommand{\ensFloorSix}{4.910}     % equicorrelated floor, six members
+\newcommand{\ensFloorSixSd}{0.057}
+\newcommand{\uqCoverSix}{90.1}       % six-member conformal coverage at the 90% level
+\newcommand{\uqCoverSixSd}{0.4}
+\newcommand{\uqCoverSixHi}{95.0}     % at the 95% level
+\newcommand{\uqCoverSixHiSd}{0.8}
+% Correction weights (Lemma kappa): supremum over the grid and a 500-point test probe
+\newcommand{\kappaTen}{32.2}         % ten-seed mean
+\newcommand{\kappaTenSd}{2.9}
+\newcommand{\kappaTenLo}{28.9}
+\newcommand{\kappaTenHi}{37.3}
 % Members, ten seeds, reflection-averaged where the member has it
 \newcommand{\errMLP}{4.836}          % residual MLP, metric loss
 \newcommand{\errMLPSd}{0.018}
@@ -38,13 +86,13 @@
 \newcommand{\errMSESd}{0.006}
 \newcommand{\errRef}{4.730}          % kernel-conditioned refiner
 \newcommand{\errRefSd}{0.006}
-\newcommand{\errFNOG}{4.754}         % FNO member + TTA, ten seeds
+\newcommand{\errFNOG}{4.754}         % FNO member + TTA, ten seeds, early-stopped checkpoints
 \newcommand{\errFNOGSd}{0.031}
 \newcommand{\errKRRload}{5.197}      % kernel ridge on loads
 \newcommand{\errKRRloadSd}{0.003}
 \newcommand{\errBestLow}{5.433}      % low-data pipeline test error, ten seeds, N=1250 (%)
 \newcommand{\errBestLowSd}{0.093}    % its standard deviation over the ten seeds
-\newcommand{\errKRRloadLow}{6.66}    % multiscale kernel ridge on loads, N=1250
+\newcommand{\errKRRloadLow}{6.66}    % multiscale kernel ridge on loads, N=1250 (deterministic)
 % Second-moment prediction, ten seeds, five members, simplex QP solved by SLSQP
 \newcommand{\predRMS}{4.940}         % predicted RMS relative error of the best mixture
 \newcommand{\predRMSSd}{0.057}
@@ -78,7 +126,6 @@
 \newcommand{\uqCorrNorm}{0.65}       % corr(power fn, output norm) -- the confound
 \newcommand{\uqDisAbs}{0.074}        % corr(disagreement, abs err), five members, ten seeds
 \newcommand{\uqDisAbsFour}{0.083}    % same for four members, ten seeds
-\newcommand{\uqDisAbsDiv}{0.08}      % same for the six-member configuration, one seed
 \newcommand{\pubBestHi}{4.55}        % best published high-data (PARA-Net)
 \newcommand{\pubBestLo}{6.49}        % best published low-data (FNO-mean GP)
 \newcommand{\pubKernelHi}{5.18}      % published kernel method, high data

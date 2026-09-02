@@ -1,0 +1,67 @@
+{
+ "task_id": "a5_kappa_s8",
+ "kind": "kappa",
+ "seed": 8,
+ "med": 8.105233460890037,
+ "n_train": 19000,
+ "n_test_probe": 500,
+ "kappa": 37.2697730206379,
+ "per_config": [
+  {
+   "smult": 1.0,
+   "lam": 1e-06,
+   "kappa_max": 37.2697730206379,
+   "kappa_med": 15.851816238524616
+  },
+  {
+   "smult": 1.0,
+   "lam": 1e-05,
+   "kappa_max": 16.704683247955217,
+   "kappa_med": 9.09339065509515
+  },
+  {
+   "smult": 1.0,
+   "lam": 0.001,
+   "kappa_max": 3.9104475020254483,
+   "kappa_med": 3.1510070032569693
+  },
+  {
+   "smult": 2.0,
+   "lam": 1e-06,
+   "kappa_max": 25.820949689066268,
+   "kappa_med": 9.692885058805357
+  },
+  {
+   "smult": 2.0,
+   "lam": 1e-05,
+   "kappa_max": 13.634296843563158,
+   "kappa_med": 6.150500085977578
+  },
+  {
+   "smult": 2.0,
+   "lam": 0.001,
+   "kappa_max": 3.7416312574594937,
+   "kappa_med": 2.5751377942859266
+  },
+  {
+   "smult": 4.0,
+   "lam": 1e-06,
+   "kappa_max": 16.199204006185024,
+   "kappa_med": 6.2023738195264535
+  },
+  {
+   "smult": 4.0,
+   "lam": 1e-05,
+   "kappa_max": 9.57987014304953,
+   "kappa_med": 4.20557927459282
+  },
+  {
+   "smult": 4.0,
+   "lam": 0.001,
+   "kappa_max": 3.2511841564113197,
+   "kappa_med": 1.93206735640315
+  }
+ ],
+ "note": "supremum over a 500-point test probe; a measured lower bound",
+ "minutes": 12.3
+}

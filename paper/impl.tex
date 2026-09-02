@@ -3,9 +3,9 @@ The pipeline was developed on a single laptop (one NVIDIA RTX~PRO~2000, 8~GB;
 from scratch on CPU-only cloud instances under the seed protocol below, in
 single precision for network training and double precision for all kernel
 solves and error computations, and it is those recomputed values that the
-tables report. One exception is stated where it occurs: the six-member
-configuration of Table~\ref{tab:ablation} completed at two campaign seeds and
-is reported from those. The run records carry no device field, but each
+tables report; the second campaign of Section~\ref{sec:seeds} ran on one
+40-core CPU host (Intel Xeon E5-2698 v4) under the same protocol. The run
+records carry no device field, but each
 network trainer prints the device it selected when it starts, and the ten
 structural-mechanics pipeline logs hold that line for every launch, restarts
 included: 54 launches, all \texttt{cpu}. The kernel stages are NumPy and SciPy
@@ -98,55 +98,69 @@ records, rescore a new combination rule on the stored residuals, and rerun the
 pipeline from the code. Where a statement below turns on an array rather than
 on a record, it is marked.
 
-\paragraph{What the campaign completed.} The structural-mechanics chain was
-enqueued at ten seeds on four CPU instances and the members completed at all
-ten: the kernel ridge, the metric-loss MLP, the normalized-MSE MLP, and the
-refiner, forty trained artifacts in total. The campaign's 36-hour per-task wall
-clock then landed inside the FNO stage at every seed, which is why the two
-remaining members of the published configuration are in different states. The
-FNO has a best-validation checkpoint at all ten seeds, written by the trainer
-each time validation improved; those checkpoints are finalized here by running
-the tail of the trainer on them (evaluate, then save the named artifact), so
-the FNO is a ten-seed member and nothing about it is retrained. The UNet was
-scheduled after the FNO, and the wall clock reached it at only two of the ten
-seeds; it is the one member of Table~\ref{tab:ablation}'s six-member row that
-the campaign supplies at two seeds rather than ten, and completing that row
-would require training eight more UNets. The FNO's own training curves are worth recording because they
-bound what the truncation cost: its best validation epoch falls between 10 and
-70 of the scheduled 200, and at every seed validation was already rising again
-by the last epoch reached, in several cases sharply (seed 3, $0.0489$ at its
-best against $0.0550$ at epoch 150; seed 5, $0.0483$ against $0.0557$). The
-member is therefore the early-stopped optimum a full run would also have kept,
-with the caveat that the cosine schedule never annealed and a late anneal might
-have found more. With the FNO finalized, all ten seeds carry the five-member
-stack, the residual correction, the second-moment measurement and the conformal
-calibration; the four-member versions of each are retained and reported so that
-the FNO's contribution is a measurement rather than an assumption. Two
-tasks were lost to conditions worth recording because they shape what a reader
-should expect from a rerun: one instance was killed by the operating system
-while forming the $19000\times19000$ Gram matrix through full-size temporaries
-(the released code fills it in row blocks instead, Section~\ref{sec:cost}), and
-four seeds hit the wall clock during stack stages and were completed on a
-larger instance afterwards. The OCO-2 and ClimSim sweeps of
-Section~\ref{sec:scaling} report their own seed counts, which are ten per band
-and five, three and three by training size respectively. The low-data chain
-completed at ten seeds. The OCO-2 head pipeline is replicated at ten seeds on
-each of the three bands --- thirty band-seeds at a matched $250$-epoch budget,
-with one further run at $750$ epochs to separate budget effects from
-ordering effects. Each band-seed writes its member predictions and
-per-sample errors, which is what makes the combination rules, the floors and
-the scoreboard of Section~\ref{sec:oco2} recomputable without retraining;
-those arrays stay with the run and are not part of the distributed release.
-Seven of the thirty band-seeds were additionally run a second time, on
-different hardware, as a queue was being drained. That accident is a useful
-control, and we report it as measured: six of the ten rows reproduce to the
-printed precision across the two runs, including the kernel rows, the
-flat-metric network, its feature head and the combination that the paper
-reports, while the three weighted-loss members and their heads move by up to
-$0.39$ points. Seeding fixes the initialization and the data order but not
-every reduction the training performs, so a seeded rerun of those members
-should be expected to land nearby rather than exactly; the tables' standard
-deviations, which are over seeds, are larger than this in every case.
+\paragraph{What the two campaigns completed.} The first structural-mechanics
+chain was enqueued at ten seeds on four CPU instances. The kernel ridge, the
+metric-loss MLP, the normalized-MSE MLP and the refiner completed at all ten,
+forty trained artifacts in total. The campaign's 36-hour per-task limit then
+landed inside the FNO stage at every seed. The FNO has a best-validation
+checkpoint at all ten seeds, written by the trainer each time validation
+improved, and those checkpoints are finalized by running the tail of the
+trainer on them (evaluate, then save the named artifact), so the FNO of that
+campaign is a ten-seed member and nothing about it is retrained. Its training
+curves bound what the early stop cost: the best validation epoch falls
+between 10 and 70 of the scheduled 200, and at every seed validation was
+rising again by the last epoch reached, in several cases sharply (seed 3,
+$0.0489$ at its best against $0.0550$ at epoch 150; seed 5, $0.0483$ against
+$0.0557$), so the member is the early-stopped optimum a full run would also
+have kept, short of the anneal. The UNet, scheduled after the FNO, did not
+run inside that limit. With the FNO finalized, all ten seeds carry the
+five-member stack, the residual correction, the second-moment measurement and
+the conformal calibration; the four-member versions of each are retained and
+reported so that the FNO's contribution is a measurement rather than an
+assumption. One instance was killed by the operating system while forming
+the $19000\times19000$ Gram matrix through full-size temporaries (the
+released code fills it in row blocks instead, Section~\ref{sec:cost}), and
+four seeds hit the task limit during stack stages and were completed on a
+larger instance afterwards.
+
+The second chain ran the same ten seeds on one 40-core CPU host. It trained
+the kernel ridge and the three MLP-family members again under the same seeds
+--- seeded CPU training is deterministic, and their test errors agree with
+the first campaign's to within $6\times10^{-8}$ in the relative-error unit
+for the two MLPs and the kernel ridge and $6\times10^{-6}$ for the refiner
+--- and then the FNO and the UNet under a
+100-epoch cosine schedule, each to the end of it: nine of the ten FNO runs
+and all ten UNet runs keep their final checkpoint, the tenth FNO its
+epoch-79 one. The schedule is normalized to its own budget, so it anneals
+fully to $10^{-6}$; it is a complete shorter schedule, not the first
+campaign's schedule cut short. The per-pixel stack, the residual correction,
+the global convex stack, the second-moment measurement and the conformal
+calibration were then run on the six members at every seed and, for the
+paired comparisons of Section~\ref{sec:members-seeds}, on the same five
+without the UNet; in that five-member run the half-split rule declined the
+per-pixel weights at one seed, where the deployed pipeline is the corrected
+global convex stack, as the rule prescribes. The member cost is recorded in
+Table~\ref{tab:memcost}.
+
+The OCO-2 and ClimSim sweeps of Section~\ref{sec:scaling} report their own
+seed counts, which are ten per band and five, three and three by training
+size respectively. The low-data chain completed at ten seeds. The OCO-2 head
+pipeline is replicated at ten seeds on each of the three bands --- thirty
+band-seeds at a matched $250$-epoch budget, with one further run at $750$
+epochs to separate budget effects from ordering effects. Each band-seed
+writes its member predictions and per-sample errors, which is what makes the
+combination rules, the floors and the scoreboard of Section~\ref{sec:oco2}
+recomputable without retraining; those arrays stay with the run and are not
+part of the distributed release. Seven of the thirty band-seeds were run a
+second time on different hardware, which serves as a reproducibility check:
+six of the ten rows reproduce to the printed precision across the two runs,
+including the kernel rows, the flat-metric network, its feature head and the
+combination that the paper reports, while the three weighted-loss members
+and their heads move by up to $0.39$ points. Seeding fixes the
+initialization and the data order but not every reduction the training
+performs, so a seeded rerun of those members should be expected to land
+nearby rather than exactly; the tables' standard deviations, which are over
+seeds, are larger than this in every case.
 
 \paragraph{Reconciling the stored arrays.} Every member's saved prediction
 arrays are checked against the metric recorded in its own training record
@@ -216,7 +230,7 @@ spread across seeds is mostly the spread across hosts: the four seeds the
 larger instance lists as its own in the campaign's task records (2, 4, 8 and
 9) are separated from the other six by the kernel's per-cell time without
 overlap, $20$--$35$\,s against $42$--$113$\,s, and the table keeps the two
-classes apart. The FNO is the one member without a completed record. Its
+classes apart. In this campaign the FNO has no completed record, and its
 rate is read from the ten-epoch timer prints: the uninterrupted intervals run
 at $467$--$625$\,s per epoch on the standard instances and $348$--$410$\,s on
 the larger one, and the remaining intervals, which reach $10^4$\,s per epoch,
@@ -246,6 +260,8 @@ cells and the refit) and the single factor-and-solve it repeats, as ranges,
 with the number of timed cells or folds in parentheses. The two columns are
 the two instance classes of the campaign, with the seed count behind each.}
 \label{tab:compute}
+\small
+\setlength{\tabcolsep}{3.5pt}
 \begin{tabular}{llcc}
 \toprule
 Stage & Epochs: scheduled / kept & Standard instances (6 seeds) & Larger instance (4 seeds) \\
@@ -257,6 +273,48 @@ FNO, per epoch & 200 / 10--70 & 467 s min, 581 s median (88) & 348 s min, 437 s 
 Kernel ridge, grid and refit & --- & 17.0--26.0 min & 6.1--7.4 min \\
 \ \ one factor-and-solve, $n=19000$ & --- & 42--113 s (90) & 20--35 s (60) \\
 \ \ out-of-fold fold, $n=14250$ & --- & 32--66 s (24) & 13--22 s (16) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{What the members cost.} Table~\ref{tab:memcost} is the second
+campaign's cost record at all ten seeds, every member trained to the end of
+its schedule on one host. Thread counts differ across members because the
+host was shared with the rest of the campaign, so the comparable unit is
+core-minutes, wall clock times threads. At about $7900$ core-minutes against
+$54$ for the MSE MLP, the FNO costs roughly $150$ times the cheapest neural
+member and returns $0.03$ points of relative test error for it; the UNet
+costs about $115$ times as much and is beaten by the MSE MLP and the refiner.
+That ratio is not a capacity effect: at 6.45M parameters the FNO is 1.3 times
+the size of the MLP and smaller than the 6.64M-parameter refiner, and the
+UNet is the smallest member of the six at 4.38M. What separates them is the
+cost of a spectral or spatial convolution over a $41\times41$ field against
+that of a dense layer.
+
+\begin{table}[t]
+\centering
+\caption{Cost record of the second campaign on a shared 40-core CPU host,
+every member trained to the end of its schedule; ranges over the ten seeds.
+Wall minutes are the trainer's own elapsed record; core-minutes is wall clock
+times the thread count (10 for the convolutional members, 10 to 16 for the
+MLPs, which is why those ranges are wide); the kernel stage does not write a
+thread count. Test errors are reflection-averaged where the member has a
+reflection, as in Table~\ref{tab:members}. The harvest is
+\texttt{campaign/collected/dgx/runtime\_ledger.csv}, produced by
+\texttt{runtime\_ledger.py} from the run records.}
+\label{tab:memcost}
+\small
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{lccccc}
+\toprule
+Member & Parameters & Epochs & Wall (min) & Core-min & Test error (\%) \\
+\midrule
+Kernel ridge, grid and refit & --- & --- & 5.8--10.0 & --- & 5.193--5.200 \\
+Metric-loss MLP & 4.91M & 400 & 8.8--19.2 & 132--192 & 4.809--4.858 \\
+MSE MLP & 4.91M & 120 & 2.6--5.8 & 39--58 & 4.703--4.719 \\
+Refiner & 6.64M & 100 & 2.6--6.1 & 41--61 & 4.721--4.742 \\
+FNO & 6.45M & 100 & 662--836 & 6618--8355 & 4.665--4.697 \\
+UNet & 4.38M & 100 & 573--689 & 5734--6892 & 4.683--4.793 \\
 \bottomrule
 \end{tabular}
 \end{table}

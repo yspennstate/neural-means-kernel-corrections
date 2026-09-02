@@ -1,0 +1,22 @@
+{
+ "kind": "hybrid",
+ "runs": [
+  "hpix"
+ ],
+ "pipe_seed": 0,
+ "report": {
+  "stack": {
+   "val": 0.045598173993913665,
+   "test": 0.04570813874215752
+  },
+  "plus_corr": {
+   "val": 0.04553033919032947,
+   "test": 0.04549000062772188,
+   "smult": 2.0,
+   "lam": 0.001
+  },
+  "final_stage": "plus_corr",
+  "final_test": 0.04549000062772188
+ },
+ "ntrain": 19000
+}

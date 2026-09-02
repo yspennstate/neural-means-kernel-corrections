@@ -22,7 +22,7 @@ magnitude; and the adapted metric dominates the isotropic one at every sample
 size of the warped construction.
 
 The second kind evaluates the statements whose subject is the pipeline itself
-on the pipeline's own released artifacts, at every seed the campaign completed.
+on the pipeline's own released artifacts, at every seed.
 The symmetrization inequality of Proposition~\ref{prop:sym} is checked on every
 trained member. It is a statement about the expected loss, so a finite test
 sample may go the other way, and at ten seeds one does: over the thirty members
@@ -33,19 +33,25 @@ single reversal is the sampling noise the proposition permits and a single-seed
 check cannot see. The second-moment identity of
 Proposition~\ref{prop:secmom} is measured on the validation residual matrix at
 each seed and its predicted risk compared with the realized risk of the weights
-it implies; the ratio is $\dispFac\pm\dispFacSd$ over ten seeds. The simplex
-minimization behind that comparison is solved by sequential quadratic
-programming under an explicit sum-to-one constraint. The routine released with
-the earlier version of this work used projected gradient with clipping and
-renormalization, which is not a projection onto the simplex; on the five-member
-matrix it terminated $0.8$--$3.6\%$ above the true minimum, at near-vertex
-points, and the weight vectors it reported were wrong in a way that read as a
-finding rather than as a numerical failure. The check that caught it is the
-cheapest one available and is now part of the suite: evaluate the objective at
-the returned point, at every pure-member vertex, and at a properly solved
-optimum, and require the first to be no worse than the others. The bracket of
-Corollaries~\ref{cor:floor} and~\ref{cor:floorpinch} is evaluated against the
-realized convex stack at each seed, and the two-member rule of
+it implies; the ratio is $\dispFac\pm\dispFacSd$ over ten seeds on five
+members and $\dispFacSix\pm\dispFacSixSd$ on six. The simplex minimization
+behind that comparison is solved by sequential quadratic programming under an
+explicit sum-to-one constraint, and the suite guards the solve with the
+cheapest check available: it evaluates the objective at the returned point,
+at every pure-member vertex and at a re-solved optimum, and requires the
+first to be no worse than the others. A clip-and-renormalize projected
+gradient, which is not a projection onto the simplex, fails that check on
+this matrix, stopping $0.8$--$3.6\%$ above the minimum at near-vertex
+points. The bracket of Corollaries~\ref{cor:floor}
+and~\ref{cor:floorpinch} is evaluated against the realized convex stack at
+each seed, with the one-sided bounds read off the measured $S$: on five
+members the normalized minimum $\min_w w^\top Sw/\bar e^{\,2}$ is
+$0.980\pm0.003$ inside a bracket of $[0.949\pm0.005,\,1.039\pm0.004]$, on
+six it is $0.972\pm0.005$ inside $[0.933\pm0.007,\,1.032\pm0.004]$, and the
+inequalities hold at every seed. The signed optimum of
+Corollary~\ref{cor:signed} coincides with the convex one at every seed and
+for both member sets, the unconstrained minimizer having no negative
+coordinate. The two-member rule of
 Proposition~\ref{prop:secmom}(i) is scored prospectively on every member pair
 of every seed rather than on selected examples --- decided on the validation
 split and checked on the test block, $840$ pairs over the thirty OCO-2
@@ -59,26 +65,28 @@ released next to the realized excesses of the affine stack and of the
 corrected surrogate. Both are capacity bounds: the affine bound evaluated at
 the measured $b$ and $W$ exceeds its realized excess by many orders of
 magnitude, and the corollary's right-hand side, whose remaining constant is
-the analytic $\kappa_{\mathrm{an}}=10^{3}$ of Lemma~\ref{lem:kappa} (the
+the analytic $\kappa_{\mathrm{an}}=500$ of Lemma~\ref{lem:kappa} (half the
 smallest nugget on the grid to the power $-1/2$), is larger still; the
 constants are released for what they show about the bounds rather than as a
 guarantee. The realized scale of the correction weights is measured
 separately: the largest $\ell^1$ norm of $c_\gamma(u)$ over the grid and over
-a fixed $500$-point test probe is $31.2\pm0.9$ at the three seeds at which it
-was evaluated at the working configuration ($29.3$ at a single-seed probe run
-outside the campaign), falling to $3.0$ at the largest nugget and length
-scale of the grid. Being a supremum over a finite probe, that value is a
-lower bound on $\sup_{u,\gamma}\|c_\gamma(u)\|_1$ and not a constant the
-corollary can be evaluated at; the collection script is written to insert it
-where it assembles the bound, which would understate the right-hand side by a
-factor of close to a thousand through the $(1+\kappa)^2$ term and leave it
-vacuous all the same. The probe value sits a factor of about thirty below
-$\kappa_{\mathrm{an}}$, and every per-configuration probe value respects the
-lemma's bound $\lambda^{-1/2}$ at its own nugget. The
+a fixed $500$-point test probe is $\kappaTen\pm\kappaTenSd$ over the ten
+seeds, between $\kappaTenLo$ and $\kappaTenHi$, falling to $3.1$ at the
+largest nugget and length scale of the grid, and recomputing seed~0 on a
+second machine reproduces its value to $10^{-12}$. Being a supremum over a
+finite probe, that value is a lower bound on
+$\sup_{u,\gamma}\|c_\gamma(u)\|_1$ and not a constant the corollary can be
+evaluated at, and the corollary is evaluated at $\kappa_{\mathrm{an}}$. The
+probe value sits a factor of about fifteen below $\kappa_{\mathrm{an}}$, and
+every per-configuration probe value respects the lemma's bound
+$\tfrac12\lambda^{-1/2}$ at its own nugget, the closest approach being
+$0.27$ of the bound, at $\lambda=10^{-3}$. The
 coverage of Proposition~\ref{prop:conf} is computed at every seed and each
 observed value placed against the exact Beta law of Remark~\ref{rem:covlaw}:
 at the $90\%$ level ten of ten fall inside the central band $[88.1\%,91.8\%]$,
-and at the $95\%$ level ten of ten inside $[93.6\%,96.3\%]$. Finally the
+and at the $95\%$ level ten of ten inside $[93.6\%,96.3\%]$; on the
+six-member pipeline the counts are ten of ten and nine of ten, the tenth
+sitting on the upper edge of the $95\%$ band. Finally the
 data-scaling sweep of the two raw-input kernel rows is refit at nested training
 sizes and at ten seeds per band. The approximate rank of the sensitivity map
 is $12$ of $20$ on O2 and $13$--$14$ of $24$ on the two CO$_2$ bands, a rank

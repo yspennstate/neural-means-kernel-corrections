@@ -14,9 +14,11 @@ per-coordinate combination of members selected on a validation split.
 
 ## Paper and supplement
 
-`paper/main.pdf` is the manuscript: 25 pages of text on the two problems, the
-method, and the results, in JMLR format. `paper/supplement.pdf` is the online
-supplement it refers to as S1–S8, and holds the material a reader needs only
+`paper/main.pdf` is the manuscript on the two problems, the method, and the
+results, in JMLR format. `paper/supplement.pdf` is the online supplement it
+refers to as S1–S8 (direct link:
+https://github.com/yspennstate/neural-means-kernel-corrections/blob/main/paper/supplement.pdf),
+and holds the material a reader needs only
 if they want to check something: the finite-sample bounds behind every fitted
 stage and all the proofs, the margin and per-coordinate selection results, the
 effective-dimension identity, the ablation and error-localization measurements,

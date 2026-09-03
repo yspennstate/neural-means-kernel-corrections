@@ -1,7 +1,7 @@
 \pdfoutput=1
 \documentclass[twoside,11pt]{article}
 \usepackage{amsmath,amssymb,amsthm,mathtools}
-\usepackage{jmlr2e}
+\usepackage[preprint]{jmlr2e}
 \usepackage{booktabs}
 \usepackage[dvipsnames,table]{xcolor}
 \usepackage{microtype}
@@ -13,7 +13,7 @@
 \numberwithin{theorem}{section}
 \newtheorem{assumption}[theorem]{Assumption}
 
-\jmlrheading{}{2026}{1-66}{8/26}{}{}{Yitzchak Shmalo}
+\jmlrheading{}{2026}{}{}{}{}{Yitzchak Shmalo}
 \ShortHeadings{Neural means and kernel corrections for operator learning}{Shmalo}
 \firstpageno{1}
 
@@ -27,8 +27,6 @@
        \addr Einstein Institute of Mathematics\\
        The Hebrew University of Jerusalem\\
        Jerusalem, Israel}
-
-\editor{Under review}
 
 \maketitle
 
@@ -134,10 +132,10 @@ and the kernel-flow emulator's predictions through the OSF project
 
 \section*{Supplementary material}
 An online supplement accompanies this paper, referenced throughout as
-Supplement~S1--S8 and archived with the code at
-\url{https://github.com/yspennstate/neural-means-kernel-corrections}
-(\texttt{paper/supplement.pdf}, built from the same sources as this
-manuscript). It contains the finite-sample bounds for every fitted stage and
+Supplement~S1--S8. It is available at
+\url{https://github.com/yspennstate/neural-means-kernel-corrections/blob/main/paper/supplement.pdf},
+in the repository that holds the code, and is built from the same sources as
+this manuscript. It contains the finite-sample bounds for every fitted stage and
 all proofs, the margin and per-coordinate selection results, the
 effective-dimension identity, the ablation, error-localization, spectra,
 uncertainty-quantification and cost detail on structural mechanics, the

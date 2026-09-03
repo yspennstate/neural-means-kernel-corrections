@@ -38,6 +38,37 @@ Run the pair twice if you have changed a cross-reference: each document reads
 the other's `.aux` through `xr`, so a reference that crosses between them
 settles on the second pass. The JMLR style file is included.
 
+## After-campaign checks
+
+The last paragraph of the section "Seeds against architectures" and two rows
+of its table come from six scripts under `campaign/dgx_checks/`, run on the
+same seeds, run directories and calibration/evaluation split as the campaign
+(the split is the permutation with seed 20260902 used by `seedarch.py`).
+The records they wrote are `campaign/collected/dgx/p1_members_eval.json` and
+`campaign/collected/dgx/sm_ens_rmt.json`; the rank-400 survey records are
+under `campaign/collected/dgx/hidata_p400/`. Paths at the top of each script
+(`ROOT`, `P2`, `SM_DATA`, `NMKC_HIDATA`) point at the run and data
+directories.
+
+```
+# Helmholtz and Navier-Stokes survey cells, output rank 400, exact solve on 19,000 pairs (three seeds each)
+python hidata_seeded.py --name Helmholtz    --grid 101 --seed 0 --npca 400 --fit 19000
+python hidata_seeded.py --name NavierStokes --grid 64  --seed 0 --npca 400 --fit 19000
+# learned kernels for the kernel member (ten seeds): isotropic grid, kernel-flow ARD, empirical-Bayes ARD, additive
+python kf_kernels.py --problem structmech --seed 0 --methods val_iso,kf_ard,eb_ard,add_kf
+# regularization selectors for the kernel member: validation, GCV, LOO, KARE, MP truncation and shrinkage
+python rmt_krr.py --problem structmech --seed 0 --nfit 8000
+# kernel-flow-regularized members (weights 0.3 and 1.0), the campaign's own training script
+python train_mlp.py --seed 0 --mirror 1 --epochs 400 --kf 0.3 --tag mlpKF03 --threads 4
+python train_mlp.py --seed 0 --mirror 1 --epochs 400 --kf 1.0 --tag mlpKF1  --threads 4
+# the sixty-member per-pixel stacks with GCV, LOO, per-pixel GCV, MP-edge PCR, Ledoit-Wolf and shrinkage, plus the
+# 300- and 120-row calibration regimes
+python ens_rmt_dgx.py
+# the paragraph's numbers: KF-regularized members from the run records, learned kernels on the evaluation half,
+# and the six- and seven-mean stacks at the fixed and the leave-one-out ridge
+python p1_members_eval.py
+```
+
 ## Results
 
 **OCO-2 radiative-transfer emulation** (Lamminpää et al., AMT 2025; reduced

@@ -499,6 +499,36 @@ predictors of six kinds agree on where the benchmark is hard, which is the
 shared residual of Section~\ref{sec:diversity} seen from the largest pool we
 can assemble.
 
+Three checks were run on the same split after the campaign. The first
+concerns the per-pixel stack over all sixty, which at the fixed ridge of the
+pipeline reads $\saPerpixSixty\%$ against $\saPerpixMeans\%$ for the six
+ten-seed means: the gap is the ridge, not the member count. With the ridge
+chosen by leave-one-out on the calibration half, the sixty read
+$\saPerpixSixtyLoo\%$ and the six means $\saPerpixMeansLoo\%$, and when the
+calibration half is cut to $300$ or $120$ rows the sixty stay ahead
+($\saSixtyLooThreeH\%$ against $\saMeansThreeH\%$, $\saSixtyLooOneTwenty\%$
+against $\saMeansOneTwenty\%$). The second concerns the kernel member. A
+Mat\'ern kernel with one length scale per load point, the scales learned on
+the training rows by the kernel flow of \cite{owhadi2019kernel} or by
+empirical Bayes and the overall size and nugget then set on validation, takes
+the kernel-ridge member from $\saKrrMemberEv\%$ on the evaluation half to
+$\saKrrKfArdEv\%$ and $\saKrrEbArdEv\%$ over ten seeds, where the isotropic
+kernel with the same validation grid reads $\saKrrIsoEv\%$ and the
+metric-loss MLP $\saMlpMemberEv\%$; a programmed additive kernel, first-order
+modes plus a full mode with weights learned by the same flow, reaches
+$\saKrrAddEv\%$. Its ridge can be chosen without a validation split:
+generalized cross-validation, the leave-one-out identity and the kernel
+alignment risk estimator select the same value as the validation rows at all
+ten seeds ($\saSelAgree\%$ at $8000$-row fits). Added to the six means as a
+seventh, the learned kernel's ten-seed mean moves the stack from
+$\saPerpixMeans\%$ to $\saSevenMeans\%$, and from $\saPerpixMeansLoo\%$ to
+$\saSevenMeansLoo\%$ with the leave-one-out ridge: a member that improves on
+the kernel by three tenths of a point is worth a thousandth to the pool,
+which is the decorrelation reading once more. The third is the kernel-flow
+regularizer of Section~\ref{sec:theory-kf} on the high-data network, at ten
+seeds: the member reads $\saKfMlpZero\%$ without it and $\saKfMlpThree\%$
+with it at weight $0.3$, and $\saKfMlpOne\%$ at weight $1.0$ over five seeds.
+
 \begin{table}[t]
 \centering
 \caption{Sixty predictors, ten seeds of six architectures, on the evaluation
@@ -521,6 +551,8 @@ Sixty, convex, fitted & \saSixtyConvex & \saSixtyConvexRms \\
 Sixty, convex, hindsight & \saSixtyOracle & \saSixtyOracleRms \\
 Lower bound of Theorem~\ref{thm:blockfloor} on the sixty & -- & \saBound \\
 Six ten-seed means, per-pixel affine, fitted & \saPerpixMeans & -- \\
+Sixty, per-pixel affine, leave-one-out ridge, fitted & \saPerpixSixtyLoo & -- \\
+Six means and the learned kernel, per-pixel affine, leave-one-out ridge & \saSevenMeansLoo & -- \\
 Six ten-seed means, per-pixel affine and kernel correction, fitted & \saPoolPipeline & -- \\
 Deployed six-member pipeline, one seed & $\saDeployedEv\pm\saDeployedEvSd$ & -- \\
 \bottomrule

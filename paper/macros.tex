@@ -203,3 +203,22 @@
 \newcommand{\pubBestLo}{6.49}        % best published low-data (FNO-mean GP)
 \newcommand{\pubKernelHi}{5.18}      % published kernel method, high data
 \newcommand{\ttaGainMLP}{0.16}       % MLP reflection-averaging gain, ten-seed mean
+% after-campaign checks on the DGX (campaign/collected/dgx/p1_members_eval.json, sm_ens_rmt.json): same calibration/evaluation split as seedarch
+\newcommand{\saPerpixSixtyLoo}{4.547}   % per-pixel affine over all sixty, ridge chosen by leave-one-out on the calibration half (lambda = 10)
+\newcommand{\saPerpixMeansLoo}{4.548}   % the six ten-seed means with the leave-one-out ridge
+\newcommand{\saSixtyLooThreeH}{4.563}   % sixty, leave-one-out ridge, 300 calibration rows (mean of five draws)
+\newcommand{\saMeansThreeH}{4.593}      % six means, ridge 1e-3, the same 300 rows
+\newcommand{\saSixtyLooOneTwenty}{4.581} % sixty, leave-one-out ridge, 120 calibration rows
+\newcommand{\saMeansOneTwenty}{4.672}    % six means, ridge 1e-3, the same 120 rows
+\newcommand{\saKrrMemberEv}{5.19}       % paper's kernel-ridge member on the evaluation half, ten-seed mean (kf_kernels lanes)
+\newcommand{\saKrrIsoEv}{5.14}          % isotropic Matern with the lanes' validation grid, same rows
+\newcommand{\saKrrKfArdEv}{4.89}        % per-load-point length scales learned by the kernel flow, size and nugget on validation
+\newcommand{\saKrrEbArdEv}{4.88}        % the same by empirical Bayes, size and nugget on validation
+\newcommand{\saKrrAddEv}{5.03}          % programmed additive kernel (first-order modes plus a full mode), weights by the kernel flow
+\newcommand{\saMlpMemberEv}{4.83}       % the metric-loss MLP member on the same rows, ten-seed mean
+\newcommand{\saSevenMeans}{4.555}       % six means plus the ten-seed mean of the learned kernel, ridge 1e-3
+\newcommand{\saSevenMeansLoo}{4.546}    % the same with the leave-one-out ridge
+\newcommand{\saKfMlpZero}{4.99}         % high-data MLP member, test error over the full block, ten seeds, no regularizer
+\newcommand{\saKfMlpThree}{4.99}        % the same with the kernel-flow regularizer at weight 0.3, ten seeds
+\newcommand{\saKfMlpOne}{5.05}          % weight 1.0, five seeds
+\newcommand{\saSelAgree}{5.473}         % kernel member at 8,000-row fits: validation, GCV, LOO and KARE choose the same ridge at all ten seeds

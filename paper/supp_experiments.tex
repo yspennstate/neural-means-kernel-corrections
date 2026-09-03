@@ -18,7 +18,10 @@ trains symmetrized. Adding the kernel-flow regularizer
 (Section~\ref{sec:theory-kf}) to the low-data MLP did not help and was not
 selected; Proposition~\ref{prop:kf} says what the term estimates, not that
 estimating it is useful on every problem, and on this smooth-output benchmark
-the plain metric loss was already a good proxy. Nor
+the plain metric loss was already a good proxy. The same holds at high data
+and at ten seeds (Section~\ref{sec:seeds-arch}): $\saKfMlpThree\%$ with the
+regularizer at weight $0.3$ against $\saKfMlpZero\%$ without, and
+$\saKfMlpOne\%$ at weight $1.0$. Nor
 does a richer correction kernel help: replacing the single tuned Mat\'ern with
 a sum of Mat\'ern kernels at several bandwidths leaves the validation error
 unchanged to two decimals, which is consistent with the residual being close to

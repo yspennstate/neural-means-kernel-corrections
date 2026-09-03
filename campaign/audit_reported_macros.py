@@ -275,6 +275,14 @@ if len(six) == 10:
         chk("alignRatioHi", by[("n4000", 1e-08, 2.0)]["ratio_aKa"], 0)
         if ("full", 1e-08, 1.0) in by:
             chk("alignRatioFull", by[("full", 1e-08, 1.0)]["ratio_aKa"], 0)
+    f = os.path.join(DGX, "exp", "residual_spectrum_s0.json")
+    if os.path.exists(f):
+        r = json.load(open(f, encoding="utf-8"))
+        recs = list(r["members"].values()) + [r["corrected_pipeline"]]
+        chk("specSharedEnergy", st.mean(x["energy_above_edge"] for x in r["members"].values()), 2)
+        chk("specCompsLo", min(x["n_above_edge"] for x in recs), 0)
+        chk("specCompsHi", max(x["n_above_edge"] for x in recs), 0)
+        chk("specEffRank", st.median(x["eff_rank"] for x in r["members"].values()), 0)
     f = os.path.join(DGX, "sm_norm_check_hpix_s1.json")
     if os.path.exists(f):
         r = json.load(open(f, encoding="utf-8"))

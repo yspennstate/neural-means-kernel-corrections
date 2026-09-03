@@ -261,6 +261,12 @@
 \newcommand{\alignRatioFull}{77}        % the norm ratio on the full 18000-row training block (nugget 1e-8, median scale)
 \newcommand{\normRatioLo}{1800}         % the raw fitted-norm ratio at the seed whose correction chose scale multiplier 1 (seed 1); seeds 0 and 2 (multiplier 2): 4900 and 4300
 \newcommand{\normRatioNormLo}{3.2}      % the energy-normalized ratio at seed 1; seeds 0 and 2: 8.8 and 7.6
+% residual-spectrum floor test (campaign/dgx_checks/residual_spectrum_test.py, seed 0, six members + krr + mean +
+% corrected; test residual matrices 20000 x 1681 against the Marchenko-Pastur edge): collected/dgx/exp/residual_spectrum_s0.json
+\newcommand{\specSharedEnergy}{0.96}    % fraction of residual energy above the MP edge, mean over members
+\newcommand{\specCompsLo}{39}           % fewest components above the edge (the corrected pipeline)
+\newcommand{\specCompsHi}{57}           % most components above the edge (the pruned MSE network)
+\newcommand{\specEffRank}{8}            % effective rank of the residual covariance, typical member
 % structural-mechanics fitted-norm diagnostic recomputed with the deployed correction kernel of seed 0
 % (campaign/dgx_checks/sm_norm_check.py; six-member stack; smult 2, nugget 1e-3): collected/dgx/sm_norm_check_hpix_s0.json
 \newcommand{\normRatio}{4900}           % raw over residual, fitted squared RKHS norms (was 271 at the original single-seed nugget)

@@ -407,7 +407,16 @@ not a demonstration: every measurement here is made on surrogates. The
 experiment that would decide it is to re-solve a set of the hardest cases on
 a refined mesh or with higher-order elements and compare the solver
 discrepancy, case by case, with $c$; we have not run it, and the remaining
-measurements in this section should be read with that in mind.
+measurements in this section should be read with that in mind. What can be
+said without it is that the shared residual is structured rather than
+noise-like: the singular-value spectrum of every member's test residual
+matrix ($20000\times1681$) places about \specSharedEnergy{} of its energy
+above the Marchenko--Pastur edge of a noise matrix with the same shape and
+total variance, in \specCompsLo{} to \specCompsHi{} components of effective
+rank about \specEffRank, and the leading residual directions of different
+architectures coincide (first principal angle near zero), which is the
+pool-level statement behind the correlations above (records under
+\texttt{campaign/collected/dgx/exp/}).
 
 Three further measurements are consistent with the same reading, and are
 reported in full in Supplement~\ref{supp:experiments}. The residual kernel

@@ -43,13 +43,14 @@ the 1250-sample protocol against a published \pubBestLo\%. On the OCO-2
 radiative-transfer problem of Lamminp\"a\"a et al., where the same kernel on
 the raw state trails the network tenfold, it belongs on the network's
 learned features, and a per-coordinate combination improves on the
-published Gaussian-process emulator on both error metrics on all three
-bands. The replicates show why ensembles saturate on structural mechanics:
-every architecture's residuals correlate above \corrNetLoSix{} at every
-seed, sixty predictors reach $\saSixtyOracle$\% at hindsight-optimal convex
-weights, and a floor theorem for pools of seeds and architectures places
-that number from three measured correlations. Finite-sample bounds for
-each stage are checked numerically.
+published Gaussian-process emulator on that paper's two rescored error
+metrics on all three bands. The replicates show why ensembles saturate on
+structural mechanics: every architecture's residuals align above
+\corrNetLoSix{} at every seed, sixty predictors reach $\saSixtyOracle$\% at
+hindsight-optimal convex weights, and a floor theorem for pools of seeds
+and architectures places that number, for the pool trained, from three
+measured alignments. The supporting bounds are stated with their
+conditions and checked numerically.
 \end{abstract}
 
 \begin{keywords}
@@ -129,7 +130,7 @@ and the kernel-flow emulator's predictions through the OSF project
 
 \section*{Supplementary material}
 An online supplement accompanies this paper, referenced throughout as
-Supplement~S1--S8. It is available at
+Supplement~S1--S10. It is available at
 \url{https://github.com/yspennstate/neural-means-kernel-corrections/blob/main/paper/supplement.pdf},
 in the repository that holds the code, and is built from the same sources as
 this manuscript. It contains the finite-sample bounds for every fitted stage and

@@ -100,7 +100,22 @@ for and how it is judged --- as a predictor, scored against the same kernel
 on the raw input under one tuning routine and budget
 (Section~\ref{sec:oco2}), with coverage supplied by split-conformal
 calibration rather than by the posterior --- and what we add is not the
-construction but that controlled comparison.
+construction but that controlled comparison. The residual construction
+itself is older than any of these: it is the discrepancy model of
+\citet{kennedy2000predicting}, in which a Gaussian process corrects a cheap
+approximation, and the reduced-order-model error surrogates of
+\citet{drohmann2015romes} put a Gaussian process on the error of a
+physics-based surrogate in the same way; universal kriging with a trained
+mean is the same estimator in geostatistical dress. Within operator
+learning, \citet{kumar2024neural} induce a Gaussian process from a neural
+operator, \citet{magnani2025linearization} linearize a trained neural
+operator into a function-valued Gaussian process, and
+\citet{ma2024calibrated} calibrate operator predictions by split conformal
+prediction, the same coverage device we use in Section~\ref{sec:uq}.
+\citet{ober2021promises} document how deep kernel learning overfits when
+the feature map and the kernel are trained together and the same data
+select both, which is one reason our feature-space stage trains the
+network first and tunes the kernel by validation afterwards.
 
 Two further threads inform the design. The kernel-flow method
 \citep{owhadi2019kernel} learns a kernel from data by minimizing a

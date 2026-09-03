@@ -7,7 +7,7 @@ Section~\ref{sec:diversity} has something to say about solver error. We write
 $\ell(w,v)=\|w-v\|_2/\|v\|_2$ for the relative error and
 $R(\widehat G)=\mathbb E_{u\sim\mu}\,\ell(\widehat G(u),G(u))$ for the risk, which is
 the quantity reported in Section~\ref{sec:experiments}. The results below are
-largely elementary, but each one licenses a specific design decision in the
+largely elementary, but each one motivates a specific design decision in the
 pipeline of Section~\ref{sec:method}, and each has a measurable footprint in
 the experiments: one statement per stage, from the symmetry handling and the
 kernel-flow term through stacking, the residual correction, its coverage
@@ -17,15 +17,20 @@ Supplement~\ref{app:proofs}.
 \subsection{Guarantees for the fitted stages}
 \label{sec:theory-stages-summary}
 
-Every fitted stage of the pipeline carries an elementary finite-sample
-bound, stated and proved in the online supplement (Section~S1). The
-bounds are stated for the pipeline as deployed: every selection --- the
-member set, the stack weights, the kernel scale and nugget, and the choice
-between the stacked and the corrected surrogate --- is made on the
-validation split, the test block is read once, and the conformal
-calibration split is drawn from the test block after all selections are
-fixed, so the independence that the coverage statement needs holds by
-construction rather than by assumption. The bounds are: a symmetrization inequality behind the reflection
+Every fitted stage of the pipeline has an elementary finite-sample
+bound, stated and proved in the online supplement (Section~S1). Their
+status should be read exactly: they are conditional capacity calculations
+for candidates fixed before the validation sample is drawn, and the
+pipeline as deployed does not satisfy that hypothesis, because the same
+validation split that scores the stacks and the kernel grids also selects
+the network checkpoints, the member set and, on OCO-2, the coordinate
+winners. We therefore present them as the scaling behind each design
+decision, with constants measured on the runs, and not as guarantees for
+the shipped estimator; as Section~S1 notes, several are numerically vacuous
+at the campaign's sizes in any case. The one statement that holds for the
+pipeline as deployed is the split-conformal coverage of
+Section~\ref{sec:theory-conf}, whose calibration split is drawn from the
+test block after every selection is fixed. The bounds are: a symmetrization inequality behind the reflection
 averaging (Proposition~\ref{prop:sym}), the leave-half-out reading of
 the kernel-flow regularizer (Proposition~\ref{prop:kf}), capacity
 bounds for the validated stack, the honesty comparison, the
@@ -254,9 +259,14 @@ coordinate's member on a validation split costs a uniform deviation term
 of the usual $\sqrt{\log(Mq/\delta)/m}$ size
 (Propositions~\ref{prop:percoord} and~\ref{prop:selectcoord} with
 Corollary~\ref{cor:percoordw}, Supplement~\ref{supp:rules}). This is what
-licenses the per-coordinate combination of Section~\ref{sec:oco2}, and it
-is why that combination can improve on every single model on both metrics
-at once when different models win different coordinates.
+motivates the per-coordinate combination of Section~\ref{sec:oco2}. The
+propositions cover separable squared objectives with fixed coordinate
+weights; the two metrics the paper reports are means of relative norms,
+whose per-case denominators make them non-separable, so the theory does
+not make one selector simultaneously optimal for both. That the
+validation-selected combination improves on every single model on both
+metrics at once is an empirical finding, and Section~\ref{sec:oco2} reports
+the selector it comes from and the weighted variant beside it.
 
 \subsection{Metric and representation: when a fixed kernel loses to a network}
 \label{sec:theory-aniso}
@@ -293,17 +303,30 @@ The representational term has a precise reading through the same
 optimal-recovery bound that Section~\ref{sec:theory-or} makes exact. That
 bound factors the error as $\|G-m\|_{\mathcal H}\cdot P_\lambda$, a product of
 the target's norm in the kernel's native space and a design factor set by the
-Gram spectrum. Changing the features changes both in principle, but on the
-O2 band only one moves. The effective dimension of the Mat\'ern Gram, the
-quantity Lemma~\ref{lem:deff} controls, is nearly identical on the raw input
-and on the learned features (at $n=4000$ and a matched median length scale,
-$3995$ against $3994$ at a $10^{-8}$ nugget, with equal leading eigenvalue
-mass), so the design factor is essentially fixed. The native-space norm of
-the target is not: interpolating the same outputs through the two kernels,
-the raw-input kernel carries the target at squared norm $1.64\times10^{6}$ and
-the feature kernel at $3.87\times10^{4}$, a factor of $42$. The network does
-not condition the kernel better; it moves the target to a low-norm corner of
-a native space of the same size, where the exact solve reaches it.
+Gram spectrum. Changing the features changes both in principle, and on the
+O2 band the two move by very different amounts. The effective dimension of
+the Mat\'ern Gram, the quantity Lemma~\ref{lem:deff} controls, is nearly
+identical on the raw input and on the learned features (at $n=4000$ and a
+matched median length scale, $\alignDeffRaw$ against $\alignDeffFeat$ at a
+$10^{-8}$ nugget); the design factor itself is not fixed by that trace, and
+measured directly at the $2000$ test inputs the feature kernel's power
+function is smaller, its median $\alignRatioP$ times below the raw kernel's.
+The fitted-norm diagnostic moves far more: regressing the same outputs
+through the two kernels at that setting, the squared native-space norm of
+the fitted interpolant, $\operatorname{tr}(\alpha^\top K\alpha)$, is
+$\alignRatioNorm$ times smaller on the features than on the raw input. (An
+earlier draft quoted $42$ from $\alpha^\top Y$, which adds the term
+$n\lambda\|\alpha\|^2$; at this nugget the two agree to three digits, and
+the network retrained for the check lands at $38$.) Both numbers are
+finite-design diagnostics: the fitted norm is a lower bound on the unknown
+target norm, and the ratio depends on the kernel scale --- $\alignRatioLo$
+at half the median length scale, $\alignRatioHi$ at twice it --- and
+collapses toward one at a $10^{-4}$ nugget, where the ridge no longer
+interpolates. Read as diagnostics, they say that the learned features hand
+the same kernel a target it interpolates with a much smaller coefficient
+norm, and a somewhat smaller pointwise design factor, which is the direction
+Proposition~\ref{prop:pullback} predicts; they do not identify a causal
+decomposition into a fixed design factor and a moving norm.
 
 This is not an accident of the O2 band; it is what a pulled-back kernel does.
 Writing $\varphi$ for the feature map and $k$ for the base kernel, the deep
@@ -327,10 +350,11 @@ reproducing kernels \citep{saitoh1997integral,paulsen2016introduction}. Its cont
 raw input must carry the whole warped map $G$, whose native-space norm is
 large when $G$ has fine structure; the same kernel on the features carries
 only the unwarped $h$, and training drives $\varphi$ toward exactly the
-factorization that makes $h$ simple. The measured factor of $42$ is that norm
-gap, and it is the representational advantage that an anisotropic metric,
-which rescales the input but cannot re-express the map, leaves untouched
-(recovering only the factor $1.4$).
+factorization that makes $h$ simple. The measured factor of $\alignRatioNorm$
+in the fitted norm is the finite-design shadow of that gap, and it is the
+representational advantage that an anisotropic metric, which rescales the
+input but cannot re-express the map, leaves untouched (recovering only the
+factor $1.4$).
 
 \subsection{An error bound for the residual kernel correction}
 \label{sec:theory-or}
@@ -358,7 +382,7 @@ P_\lambda(u)^2\;=\;k(u,u)-k(u,X)\,(K+n\lambda I)^{-1}k(X,u)
 denote the Gaussian process posterior variance with the same nugget (for
 $\lambda=0$ this is the classical power function of the point set $X$).
 
-\begin{theorem}[certified pointwise bound]\label{thm:or}
+\begin{theorem}[conditional power-function bound]\label{thm:or}
 For every $u\in\mathcal U$ and every $\lambda\ge0$,
 \[
 \big\|G(u)-m(u)-\widehat r_\lambda(u)\big\|_2\;\le\;\|G-m\|_K\;
@@ -381,11 +405,17 @@ Second, the bound factorizes into a quantity that depends only on
 the residual operator ($\|G-m\|_K$) and a quantity that depends only on the
 kernel and the design ($P_\lambda$), and the second factor is exactly the
 posterior standard deviation that a Gaussian process interpretation of the
-correction would report. This is the sense in which the bound is certified:
-whatever error the corrected surrogate commits at $u$ is controlled by the
-reported $P_\lambda(u)$ times a constant that does not depend on $u$. We stress
-that this is a statement about a valid upper bound, not about the usefulness of
-$P_\lambda$ as a pointwise error \emph{ranking}. Section~\ref{sec:uq} finds
+correction would report. The bound is conditional in two ways that the
+reader should keep in view: it presumes that every coordinate of the
+residual $G-m$ lies in the Mat\'ern native space, which is not established
+for a finite-element target on $\mathbb R^{41}$, and its constant
+$\|G-m\|_K$ is unknown --- the fitted norms of Table~\ref{tab:norms} are
+lower bounds on it, not estimates --- so the theorem does not deliver a
+numerical error bar. What it delivers is the shape of the worst case: the
+error at $u$ is $P_\lambda(u)$ times a constant that does not depend on
+$u$. We stress that this is a statement about the form of a valid upper
+bound, not about the usefulness of $P_\lambda$ as a pointwise error
+\emph{ranking}. Section~\ref{sec:uq} finds
 that on this benchmark $P_\lambda$ ranks the error poorly, because the neural
 mean supplies most of the error and the relative metric is confounded by output
 amplitude; a distribution-free conformal rescaling of $P_\lambda$ nonetheless
@@ -398,16 +428,20 @@ RKHS norms of the \emph{fitted} interpolants,
 $\smash{\|\widehat r_\lambda\|_K^2=\operatorname{tr}(\alpha^\top K\alpha)}$ with
 $\alpha=(K+n\lambda I)^{-1}R$, are computable lower-bound proxies, and they
 drop by a factor of about \normRatio{} when the kernel is moved from raw
-targets to ensemble residuals (Table~\ref{tab:norms}). The neural mean does
-not merely reduce the size of the residual in $L^2$; it leaves behind a
-residual operator that is genuinely smoother as seen by the kernel.
+targets to ensemble residuals (Table~\ref{tab:norms}). That ratio is a
+finite-design diagnostic and no more: it compares two lower bounds, and much
+of it is amplitude, since the residual is already a few percent of the
+target; normalized by the energy of what each kernel regresses, the drop is
+about \normRatioNorm{} rather than \normRatio{} (Table~\ref{tab:norms}). It
+says that the fitted residual interpolant has a much smaller diagnostic
+norm, not that the residual operator is smoother in the native-space sense.
 
 The design factor cannot be improved by a better estimator either. Among
 all rules that see the same training residuals, the interpolant is optimal
-in the worst case over the ball, and the price of a positive nugget in the
-certificate is explicit.
+in the worst case over the ball, and the price of a positive nugget in that
+worst case is explicit.
 
-\begin{theorem}[optimality of the certificate]\label{thm:minimax}
+\begin{theorem}[minimax optimality over the native-space ball]\label{thm:minimax}
 Fix a design $X$ with $K$ positive definite, a point $u$ and a radius
 $\rho>0$. For every map $\Psi:\mathbb R^{n\times q}\to\mathbb R^q$ that
 estimates $r(u)$ from the training residuals $r(X)$,
@@ -423,7 +457,7 @@ P_0(u)^2\;\le\;\widetilde P_\lambda(u)^2\;\le\;P_\lambda(u)^2,\qquad
 \widetilde P_\lambda(u)^2-P_0(u)^2=(n\lambda)^2\,k_u^\top
 A_\lambda^{-2}K^{-1}k_u ,
 \]
-so the nugget's cost in the certificate is a computable quantity that
+so the nugget's cost in the worst-case constant is a computable quantity that
 vanishes as $\lambda\to0$.
 \end{theorem}
 
@@ -432,10 +466,12 @@ The lower bound is the classical optimal-recovery argument
 design and take opposite values at $u$ are indistinguishable from the data,
 so any rule errs by at least $\rho P_0(u)$ on one of them. What the theorem
 adds for the pipeline is a reading of the reported quantity: at $\lambda=0$
-the certificate $\|G-m\|_K\,P_0(u)$ is not merely valid but the smallest
-constant any method could certify from these data, and at the validated
+the worst-case constant $\|G-m\|_K\,P_0(u)$ over the native-space ball is
+the smallest any rule can attain from these data, and at the validated
 nugget the gap to it is the displayed correction term, evaluable from the
-Gram matrix alone.
+Gram matrix alone. The statement is about the worst case over a ball whose
+radius is not known; it is not an operational error bar for the shipped
+surrogate, which is the split-conformal set of the next subsection.
 
 \subsection{Distribution-free coverage for the reported band}
 \label{sec:theory-conf}

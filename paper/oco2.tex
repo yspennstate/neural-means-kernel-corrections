@@ -124,7 +124,31 @@ every seed, while the kernel head is better than both at every seed on
 every band, by $0.60\pm0.07$ points on O2 and about a quarter of a point on
 the other two; admitting the ridge readouts as candidates in the
 per-coordinate selection moves the combination by at most $0.002$ points on
-any band. Learning the metric rather than
+any band.
+
+Three statements of scope belong next to these numbers. The combination
+row is produced by the unweighted selector, which takes each reduced
+coordinate from the model with the smallest validation root-mean-square
+error on that coordinate; the campaign script also runs a selector
+weighted by the inverse squared norm of each validation state, the exact
+optimizer of the squared relative error that Proposition~S2.2 covers, and
+it chooses different winners at three seeds on O2 and four on WCO2 yet
+lands on the same reduced and radiance means to the printed precision on
+every band (both records are in the release). The uncertainty of the
+comparison against the emulator is paired: on the same $2000$ test states,
+a case-resampling bootstrap of the difference between the combination and
+the emulator excludes zero at ten of ten seeds on both metrics on O2 and
+SCO2, and at ten of ten on WCO2's reduced metric and nine of ten on its
+radiance metric, the exception being the seed that loses by $0.0015$ points;
+the seed standard deviations in Table~\ref{tab:oco2} describe retraining
+variability, not that comparison. And the claim is confined to what is
+rescored: the two criteria of \citet{susiluoto2025radiative} on the reduced
+coefficients and on the reconstructed monochromatic radiance, at a
+$250$-epoch budget the networks have not converged at, with the emulator
+fitted on $20000$ states against our $18000$ plus a $2000$-state validation
+carve. Instrument response, Jacobians and the retrieval itself are not
+evaluated, so nothing here says the pipeline is a better OCO-2 emulator
+end to end. Learning the metric rather than
 setting it by hand does not change this reading. A per-dimension metric fit by
 the kernel-flows cross-validation loss of \citet{owhadi2019kernel} reaches the
 same $30\%$ on the raw state, and a low-rank Mahalanobis metric with a thousand
@@ -140,7 +164,7 @@ $\sigma_1^{\,s}$ always, a rate only under an approximate-rank gap
 --- is scored directly by refitting both raw-input kernel rows at five
 nested training sizes, ten seeds per band, with the sensitivity map
 estimated causally at each size. The sweep, reported in full in the
-online supplement (Section~S4), finds the constant and not the rate:
+online supplement (Section~S7), finds the constant and not the rate:
 the measured exponent difference is small on all three bands and
 consistent with zero on one, so a reader should take from the
 proposition only the part the measurement supports, and the
@@ -188,11 +212,14 @@ fixed pair, which is $0.010$: replication across seeds is not what limits the
 rule, and a study that varied only the seed would have missed this. Because
 the pairs are binned by the margin the decision actually sees, it is
 part~(ii) of Proposition~\ref{prop:margin} that speaks to the scoreboard,
-and it is a joint statement: with this $\sigma$, the probability that a
-decision is both wrong and taken at an observed margin of at least $0.25$ is
-at most $\exp(-0.25^2/2\sigma^2)$, about four percent of all decisions, and
-the corresponding bound at a margin of $0.10$ exceeds one half and says
-nothing. The proposition
+and it is a joint statement: if the estimation error were sub-Gaussian
+with variance proxy $\sigma^2$, the probability that a decision is both
+wrong and taken at an observed margin of at least $0.25$ would be at most
+$\exp(-0.25^2/2\sigma^2)$, about four percent of all decisions, and the
+corresponding bound at a margin of $0.10$ would exceed one half and say
+nothing. An empirical standard deviation over $840$ dependent pairs does
+not establish that proxy, so the four percent is an illustration of the
+proposition's scale and not a bound we claim. The proposition
 does not bound the error rate within a margin bin, which would require a
 lower bound on how often such margins occur, so the percentages above are an
 empirical calibration of the rule rather than a guarantee it carries. What
@@ -225,4 +252,4 @@ recommend it wherever this rule is used.
 The error on this problem is limited by data and yields to more of
 it; the measured scaling, and the surviving large-$n$ observation on
 ClimSim after the withdrawal of the leaked small-$n$ points, are in
-the online supplement (Section~S4).
+the online supplement (Section~S7).

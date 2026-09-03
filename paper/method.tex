@@ -16,8 +16,9 @@ penultimate features used by the feature-space kernel stage.
 \emph{Kernel-conditioned refiner.} The second mean is the same residual network
 given an extra input channel: the kernel method's predicted stress field for
 the same load, concatenated with the load. It therefore learns to correct the
-kernel predictor rather than to reproduce the map from scratch, and it is the
-strongest single model in our study. During training the refiner reads
+kernel predictor rather than to reproduce the map from scratch; on the
+metric it sits within two hundredths of a point of the best single members
+(the normalized-MSE network and the complete-schedule FNO, Table~\ref{tab:members}). During training the refiner reads
 \emph{out-of-fold} kernel predictions (four-fold, so the kernel channel is
 never fit on the target sample), and at test time the full-data kernel
 prediction, so the channel never sees its own target.

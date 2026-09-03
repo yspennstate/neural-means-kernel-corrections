@@ -116,6 +116,25 @@ so its flatness across sizes was by construction; \texttt{campaign/climsim\_seed
 now takes the budget as an argument, and Supplement~\ref{supp:oco2} reports
 the kernel's own ladder under the same protocol.
 
+\paragraph{End-to-end cost of the kernel stages.} The parameter counts of
+Table~\ref{tab:members} are the networks' weights alone. A deployed
+structural-mechanics pipeline also stores the coefficient matrix of the
+kernel member and that of the residual correction, each $19000\times1681$,
+about $\costCoefM$ million numbers apiece ($255$\,MB each in double
+precision), and evaluates a kernel row against the $19000$ training loads
+for every query. Measured at the campaign's shapes on the campaign host
+(\texttt{campaign/dgx\_checks/cost\_check.py}, eight threads, synthetic values
+so that only the arithmetic is timed): the block-filled Gram build takes
+$\costGramS$\,s and the in-place Cholesky $\costCholS$\,s, the triangular
+solves with $1681$ right-hand sides $\costSolveS$\,s, and the peak resident
+memory of that path is $\costPeakBlockGb$\,GB against $\costPeakNaiveGb$\,GB
+for the naive full-matrix build, which is why the released memory-safe path
+matters on a $31$\,GB host. At inference one kernel stage costs
+$\costQueryOneMs$\,ms for a single query and $\costQueryBatchMs$\,ms per
+query in batches of a thousand; the pipeline runs two such stages plus the
+six network members with reflection averaging, so a batched query of the
+complete surrogate is dominated by the networks, not by the kernels.
+
 \paragraph{What the two campaigns completed.} The first structural-mechanics
 chain was enqueued at ten seeds on four CPU instances. The kernel ridge, the
 metric-loss MLP, the normalized-MSE MLP and the refiner completed at all ten,
@@ -280,6 +299,7 @@ the two instance classes of the campaign, with the seed count behind each.}
 \label{tab:compute}
 \small
 \setlength{\tabcolsep}{3.5pt}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{llcc}
 \toprule
 Stage & Epochs: scheduled / kept & Standard instances (6 seeds) & Larger instance (4 seeds) \\
@@ -292,7 +312,7 @@ Kernel ridge, grid and refit & --- & 17.0--26.0 min & 6.1--7.4 min \\
 \ \ one factor-and-solve, $n=19000$ & --- & 42--113 s (90) & 20--35 s (60) \\
 \ \ out-of-fold fold, $n=14250$ & --- & 32--66 s (24) & 13--22 s (16) \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \paragraph{What the members cost.} Table~\ref{tab:memcost} is the second

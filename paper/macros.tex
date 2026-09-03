@@ -213,7 +213,6 @@
 \newcommand{\rmsBndEns}{8.87}        % boundary rms after averaging
 \newcommand{\rmsIntEns}{5.59}        % interior rms after averaging
 % Uncertainty
-\newcommand{\normRatio}{271}         % RKHS norm ratio direct/residual
 \newcommand{\uqCoverNom}{90}         % nominal conformal level (%)
 \newcommand{\uqCorrAbs}{0.08}        % corr(power fn, absolute error) -- weak
 \newcommand{\uqCorrNorm}{0.65}       % corr(power fn, output norm) -- the confound
@@ -250,3 +249,27 @@
 \newcommand{\csCapTwelve}{0.420}        % 12000 rows
 \newcommand{\csCapTwentyFour}{0.432}    % 24000 rows
 \newcommand{\csCapTwentyFourB}{0.446}   % 24000 rows at seed 1 (a different test-block draw, per the ClimSim seed protocol)
+
+% OCO-2 alignment diagnostic recomputed after review (campaign/dgx_checks/jpl_alignment_check.py, O2, seed 0,
+% n = 4000 subsample, nugget 1e-8, median length scale): record collected/dgx/jpl_alignment_o2_s0.json
+\newcommand{\alignDeffRaw}{3995}        % effective dimension, raw-input kernel
+\newcommand{\alignDeffFeat}{3993}       % effective dimension, feature kernel
+\newcommand{\alignRatioNorm}{38}        % ratio of fitted squared RKHS norms tr(alpha^T K alpha), raw over features
+\newcommand{\alignRatioP}{1.5}          % ratio of median test-point power functions, raw over features
+\newcommand{\alignRatioLo}{6}           % the norm ratio at half the median length scale
+\newcommand{\alignRatioHi}{154}         % the norm ratio at twice the median length scale
+% structural-mechanics fitted-norm diagnostic recomputed with the deployed correction kernel of seed 0
+% (campaign/dgx_checks/sm_norm_check.py; six-member stack; smult 2, nugget 1e-3): collected/dgx/sm_norm_check_hpix_s0.json
+\newcommand{\normRatio}{4900}           % raw over residual, fitted squared RKHS norms (was 271 at the original single-seed nugget)
+\newcommand{\normRatioNorm}{8.8}        % the same ratio per unit energy of what is regressed
+\newcommand{\normEnergyRatio}{560}      % energy of the raw targets over energy of the stack residuals
+% end-to-end cost of the kernel stage at the campaign's shapes (campaign/dgx_checks/cost_check.py, 8 threads,
+% Xeon E5-2698 v4): collected/dgx/cost_check.json
+\newcommand{\costCoefM}{31.9}           % stored coefficients per kernel stage, millions (19000 x 1681)
+\newcommand{\costGramS}{26}             % block-filled Gram build, seconds
+\newcommand{\costCholS}{26}             % in-place Cholesky, seconds
+\newcommand{\costSolveS}{12}            % triangular solves with 1681 right-hand sides, seconds
+\newcommand{\costPeakBlockGb}{6.0}      % peak resident memory of the block-filled path, GB
+\newcommand{\costPeakNaiveGb}{19.2}     % peak resident memory after the naive full-matrix build, GB
+\newcommand{\costQueryOneMs}{18}        % kernel-stage latency, single query, milliseconds
+\newcommand{\costQueryBatchMs}{1.9}     % kernel-stage latency per query at a batch of 1000, milliseconds

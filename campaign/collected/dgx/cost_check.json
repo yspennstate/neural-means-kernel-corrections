@@ -1,0 +1,22 @@
+{
+ "n": 19000,
+ "d": 41,
+ "q": 1681,
+ "threads": 8,
+ "coefficients_correction": 31939000,
+ "coefficients_kernel_member": 31939000,
+ "coefficient_bytes_float64": 511024000,
+ "baseline_rss_gb": 0.3800811767578125,
+ "gram_block_build_s": 26.334514141082764,
+ "cholesky_s": 25.783834218978882,
+ "solve_q_rhs_s": 11.840226411819458,
+ "peak_rss_gb_block_path": 5.969123840332031,
+ "query_batch1_s": 0.01843034029006958,
+ "query_batch1_ms_per_query": 18.43034029006958,
+ "query_batch100_s": 0.30115299224853515,
+ "query_batch100_ms_per_query": 3.0115299224853516,
+ "query_batch1000_s": 1.9235447883605956,
+ "query_batch1000_ms_per_query": 1.9235447883605956,
+ "gram_naive_build_s": 18.33659076690674,
+ "peak_rss_gb_after_naive_build": 19.211307525634766
+}

@@ -81,9 +81,24 @@ python campaign/uq_conformal_plam.py --seed 0 --tags hpix5,hpix        # seeds 0
 # rows ridge_<mode> and combined_plus_ridge (Table of Section 5), ten seeds per band
 python campaign/jpl_seeded.py --band o2 --seed 0                        # -> results/oco_o2_s0.json
 python campaign/gen_oco_ridge_table.py <results_dir>
-# the ClimSim kernel at larger budgets than the campaign's 6000 rows, same protocol (Supplement S5)
+# the ClimSim kernel at larger budgets than the campaign's 6000 rows, same protocol (Supplement S7)
 python campaign/climsim_seeded.py --data train --n 1000000 --seed 0 --kernel_only 1 --cap 24000
+# the OCO-2 alignment diagnostic with the fitted norm tr(alpha^T K alpha), its nugget and scale sensitivity, and
+# the test-point power functions of the raw and feature kernels (Section 6.3)
+python campaign/dgx_checks/jpl_alignment_check.py --band o2
+# the structural-mechanics fitted-norm diagnostic with the deployed correction kernel, normalized by energy (Table S6.2)
+python campaign/dgx_checks/sm_norm_check.py --seed 0
+# the kernel stage's storage, peak memory, factorization time and query latency at the campaign's shapes (Supplement S9)
+python campaign/dgx_checks/cost_check.py --threads 8
 ```
+
+The records of these checks, the locked Python environment of the campaign host
+(`requirements_lock_nmkc_venv.txt`), the SHA-256 checksums of the data files
+(`docs/reproduce.md`), the OCO-2 rerun's per-seed member records and per-sample errors
+(`campaign/collected/dgx/oco_ridge/`), and the split-conformal records are under
+`campaign/collected/dgx/`. The structural-mechanics residual archive (3.84 GB) and the
+OCO-2 member prediction arrays (250 MB) are retained and will be deposited with a
+persistent identifier at publication; they are available on request before that.
 
 ## Results
 

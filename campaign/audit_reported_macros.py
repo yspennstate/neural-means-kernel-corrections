@@ -254,6 +254,36 @@ if len(six) == 10:
             r = json.load(open(f, encoding="utf-8"))
             assert r["kernel_hyper"]["cap"] == cap, (f, r["kernel_hyper"]["cap"])
             chk(key, r["kernel_r2"], 3)
+    # after-review diagnostics: the fitted-norm ratios (seed 0, deployed correction kernel), the OCO-2 alignment
+    # check at the paper's setting (n = 4000, nugget 1e-8, median length scale), and the kernel-stage cost record
+    f = os.path.join(DGX, "sm_norm_check_hpix_s0.json")
+    if os.path.exists(f):
+        r = json.load(open(f, encoding="utf-8"))
+        chk("normRatio", round(r["ratio_aKa"], -2), 0)
+        chk("normRatioNorm", r["ratio_aKa_normalized"], 1)
+        chk("normEnergyRatio", round(r["energy_ratio"], -1), 0)
+    f = os.path.join(DGX, "jpl_alignment_o2_s0.json")
+    if os.path.exists(f):
+        r = json.load(open(f, encoding="utf-8"))
+        by = {(s["rows"], s["nugget"], s["scale"]): s for s in r["settings"]}
+        s0 = by[("n4000", 1e-08, 1.0)]
+        chk("alignDeffRaw", s0["raw"]["deff"], 0)
+        chk("alignDeffFeat", s0["feature"]["deff"], 0)
+        chk("alignRatioNorm", s0["ratio_aKa"], 0)
+        chk("alignRatioP", s0["ratio_P_median"], 1)
+        chk("alignRatioLo", by[("n4000", 1e-08, 0.5)]["ratio_aKa"], 0)
+        chk("alignRatioHi", by[("n4000", 1e-08, 2.0)]["ratio_aKa"], 0)
+    f = os.path.join(DGX, "cost_check.json")
+    if os.path.exists(f):
+        r = json.load(open(f, encoding="utf-8"))
+        chk("costCoefM", r["coefficients_correction"] / 1e6, 1)
+        chk("costGramS", r["gram_block_build_s"], 0)
+        chk("costCholS", r["cholesky_s"], 0)
+        chk("costSolveS", r["solve_q_rhs_s"], 0)
+        chk("costPeakBlockGb", r["peak_rss_gb_block_path"], 1)
+        chk("costPeakNaiveGb", r["peak_rss_gb_after_naive_build"], 1)
+        chk("costQueryOneMs", r["query_batch1_ms_per_query"], 0)
+        chk("costQueryBatchMs", r["query_batch1000_ms_per_query"], 1)
     plam_f = os.path.join(DGX, "uq_plam_seeded.json")
     if os.path.exists(plam_f):
         plam = json.load(open(plam_f, encoding="utf-8"))

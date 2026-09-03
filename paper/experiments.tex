@@ -72,15 +72,19 @@ being the spread over seeds, and the six-member pipeline of the second
 campaign $\errSix\pm\errSixSd\%$; the two are paired within seed, and the
 second is lower at every one of the ten, by $\sixGain\pm\sixGainSd$ points.
 Both are below every published method except PARA-Net, and neither is
-separable from PARA-Net: the differences are $0.022$ and $0.004$ points
-against an unpaired standard error of $\seUnpaired$
-(Section~\ref{sec:uncertainty-budget}). We claim a tie there and nothing
-more. Against PCA-Net (4.67\%) the separations are $0.098$ and $0.124$
-points, five and six standard errors, and the margins over the FNO (4.76\%),
-DeepONet (5.20\%) and the optimal-recovery kernel (5.18\%) are larger still.
-Without the spectral member the pipeline gives
-$\errPipeFour\pm\errPipeFourSd\%$, three standard errors above PARA-Net, so
-the tie belongs to the configurations that carry that member.
+separable from PARA-Net: the differences are $0.022$ and $0.004$ points,
+against a test-block sampling term of $\seUnpaired$ points computed from our
+own per-case errors (Section~\ref{sec:uncertainty-budget}). We claim a tie
+there and nothing more. Against PCA-Net (4.67\%) the differences are
+$0.098$ and $0.124$ points, and the margins over the FNO (4.76\%), DeepONet
+(5.20\%) and the optimal-recovery kernel (5.18\%) are larger still; these
+are benchmark-score comparisons, not significance tests, because the
+published figures are single runs whose training variability and per-case
+errors are not available, so no paired or unpaired standard error for the
+difference can be formed. Without the spectral member the pipeline gives
+$\errPipeFour\pm\errPipeFourSd\%$, above PARA-Net by three times our own
+sampling term, so the tie belongs to the configurations that carry that
+member.
 Section~\ref{sec:diversity} presents evidence, consistent with a floor in the
 benchmark data rather than a coincidence of tuning, for why the published
 cluster sits where it does, and says what would settle it.
@@ -295,10 +299,14 @@ and stops has measured the smaller half.
 This decides what the table can support. Comparisons against a published
 number are unpaired, because we do not hold those methods' per-sample
 predictions, and so carry the test-block error twice: about $\seUnpaired$
-points in quadrature. The separation from PCA-Net, $0.098$ points, is five
-of those and real; the separation from PARA-Net, $0.022$ points for the
-five-member pipeline and $0.004$ for the six-member one, is at most one, and
-is therefore not a separation at all. Comparisons inside the
+points in quadrature, and that figure imputes our own per-case variance to
+methods whose predictions, training variability and covariance with ours
+we do not know, so it is a sensitivity calculation and not a standard error
+of the difference. On it, the separation from PCA-Net, $0.098$ points, is
+five times the sampling term, and the separation from PARA-Net, $0.022$
+points for the five-member pipeline and $0.004$ for the six-member one, is
+at most one, and is therefore not a separation at all; we report the first
+as a benchmark ordering and the second as a tie. Comparisons inside the
 pipeline are paired, and pairing is worth far more here than seeds are:
 the end-to-end gain of $\errEndToEnd$ points is resolved at roughly a
 hundred standard errors at every seed, and the second campaign's
@@ -427,7 +435,7 @@ pattern a floor in the data would produce.
 
 The spatial structure of the remaining error --- its concentration at
 the corners of the loaded edge, at every seed and in every member ---
-is quantified in the online supplement (Section~S3), together with
+is quantified in the online supplement (Section~S6), together with
 the ablation of the pipeline's stages, the error spectra, and the
 cost accounting.
 
@@ -562,12 +570,17 @@ Deployed six-member pipeline, one seed & $\saDeployedEv\pm\saDeployedEvSd$ & -- 
 \subsection{Uncertainty quantification}
 \label{sec:uq}
 Theorem~\ref{thm:or} bounds the corrected surrogate's error by
-$\|G-m\|_K\,P_\lambda(u)$, and the operator factor behaves as the theory
-predicts: the fitted correction's computable squared RKHS norm is about
-\normRatio$\times$ smaller when the kernel regresses ensemble residuals
-than when it regresses raw stress fields, so an accurate mean genuinely
-leaves a smoother remainder. The design factor $P_\lambda$ is nonetheless a
-poor pointwise indicator here. It correlates \uqCorrAbs{} with the
+$\|G-m\|_K\,P_\lambda(u)$, and the finite-design diagnostic of the operator
+factor moves in the direction the theory suggests: with the deployed
+correction kernel, the fitted correction's squared RKHS norm is about
+\normRatio$\times$ smaller when the kernel regresses ensemble residuals than
+when it regresses raw stress fields, and about \normRatioNorm$\times$
+smaller per unit energy of what is regressed (Table~\ref{tab:norms} in the
+supplement), the difference being the residual's smaller amplitude. Both
+numbers compare lower bounds on unknown norms at one nugget, so they
+describe the fitted objects rather than the smoothness of the residual
+operator. The design factor $P_\lambda$ is nonetheless a poor pointwise
+indicator here. It correlates \uqCorrAbs{} with the
 corrected surrogate's absolute error and negatively with the benchmark's
 relative error, because it tracks the output norm (\uqCorrNorm) rather
 than the neural mean's mistakes, which are not a function of the

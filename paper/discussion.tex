@@ -39,14 +39,17 @@ ratio, which the second-moment identity turns into a keep-or-drop verdict for
 each candidate.
 
 Against PARA-Net the five-member pipeline is level, $0.022$ points or about
-one standard error, and the six-member pipeline of the second campaign is
-level too, $0.004$ points the other way; we read both as a tie. Without the
-spectral member the pipeline trails by $0.061$ points, about three standard
-errors, so the tie belongs to the configurations that carry that member. The
-margin over the other published methods survives both error bars of
-Section~\ref{sec:uncertainty-budget}. These are the last few learnable
-hundredths above what Section~\ref{sec:diversity} reads as evidence of a
-floor in the benchmark data, not a step on the way to zero: a sixth
+one test-block sampling term, and the six-member pipeline of the second
+campaign is level too, $0.004$ points the other way; we read both as a tie.
+Without the spectral member the pipeline trails by $0.061$ points, about
+three such terms, so the tie belongs to the configurations that carry that
+member. The margin over the other published methods is a benchmark
+ordering rather than a tested difference, for the reason
+Section~\ref{sec:uncertainty-budget} gives. These are the last few
+learnable hundredths above the shared-residual plateau that
+Section~\ref{sec:diversity} measures for the predictor pool we trained ---
+a plateau consistent with a floor in the benchmark data, and not shown to
+be one --- not a step on the way to zero: a sixth
 architecture moves the pipeline by $\unetGain$ points, training the FNO to
 the end of its schedule moves the member by $\fnoCompleteGain$ points and
 the pipeline not at all, and the residual correlations that set the floor do

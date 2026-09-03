@@ -77,9 +77,14 @@ selection argument needed. It is
 agnostic to everything the earlier results leave uncertain: the neural mean may
 be biased, $P_\lambda$ may correlate with the error weakly or with the wrong
 sign, and the bound of Theorem~\ref{thm:or} may be loose, yet the band still
-covers at the stated rate. And it is where the uncertainty analysis ends: among
-the candidate uncertainty signals we examine, the conformally rescaled
-$P_\lambda$ is the only one that carries a guarantee, so it is the one the
-surrogate reports.
+covers at the stated rate. And it is where the uncertainty analysis ends.
+Every conformalized score carries the same marginal guarantee --- the
+$P_\lambda$-scaled, the constant-width and the disagreement-scaled bands of
+Section~\ref{sec:uq} all cover at their nominal rate --- so what
+distinguishes them is efficiency and shape, not validity; on this benchmark
+the constant-width set is the narrowest, and the $P_\lambda$ set is reported
+because it is the one the theory names. The set is a Euclidean ball in the
+output space with marginal coverage over new inputs, not a coordinatewise
+band and not conditional coverage at a given input.
 
 

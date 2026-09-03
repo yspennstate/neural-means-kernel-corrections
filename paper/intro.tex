@@ -90,13 +90,14 @@ network $4.4\%$; the same regression on the trained network's features
 reaches $4.1\%$, past the network it feeds on, at ten of ten seeds on each
 band. The comparison is controlled --- the same kernel, tuning routine and
 budget on both inputs --- and it locates the difference: the effective
-dimension of the two Gram matrices, a one-number summary of the design
-factor rather than its value at each test point, is essentially the same, while the
-squared native-space norm of the kernel interpolant of the targets --- the
+dimension of the two Gram matrices is essentially the same, the design
+factor measured at the test points falls by about half, and the squared
+native-space norm of the kernel interpolant of the targets --- the
 computable lower bound on the target's own norm --- falls by a factor of
-about forty, which is what the pullback identity of
-Proposition~\ref{prop:pullback} says a learned feature map can do and a
-rescaling of the input cannot. Combined per
+about forty at the matched setting. Read as finite-design diagnostics, and
+with their dependence on the kernel scale reported, these are the
+direction the pullback identity of Proposition~\ref{prop:pullback} predicts
+for a learned feature map and a rescaling of the input cannot produce. Combined per
 output coordinate, across networks trained in the flat and in
 metric-weighted losses and the kernel heads on their features, the surrogate
 improves on the emulator on both of that problem's error metrics on all
@@ -112,17 +113,19 @@ by coordinate and had been won by different models; the residual-correlation
 diagnosis of why ensembles saturate on the structural-mechanics benchmark,
 carried to a pool of sixty predictors; and a replicated audit, at ten seeds,
 of every stage. The theory of
-Section~\ref{sec:theory} supports the deployed estimators rather than
-idealizations of them, and is kept in proportion: a symmetrization
+Section~\ref{sec:theory} is a toolkit for reading those measurements, kept
+in proportion and stated with its conditions: a symmetrization
 inequality behind the reflection averaging; a second-moment identity that
 predicts the stacked risk from measured residual correlations, brackets how
 close any convex ensemble sits to its floor, and, for pools of seeds and
 architectures, separates what reseeding can buy from what a new
 architecture can (Theorem~\ref{thm:blockfloor}); capacity bounds for the
 fitted stacks and the grid-tuned correction, with constants measured on the
-runs; the residual-norm bound of Theorem~\ref{thm:or}, sharp and, by
-Theorem~\ref{thm:minimax}, the smallest any method can certify from the
-same data, and the pullback identity; an informal rate
+runs, read as conditional capacity calculations rather than guarantees for
+the shipped estimator, since its selections reuse the validation split; the
+conditional power-function bound of Theorem~\ref{thm:or}, sharp over the
+native-space ball and, by Theorem~\ref{thm:minimax}, minimax there, and the
+pullback identity; an informal rate
 calculation (Proposition~\ref{prop:aniso}) for what an input metric can buy
 a kernel, whose rate half the OCO-2 sweep does not bear out; and a
 distribution-free coverage statement whose hypotheses the calibration

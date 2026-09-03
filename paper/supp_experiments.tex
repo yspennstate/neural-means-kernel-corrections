@@ -194,14 +194,17 @@ not distributed, so regenerating a row means retraining it.
 Theorem~\ref{thm:or} certifies the corrected surrogate's error by
 $\|G-m\|_K\,P_\lambda(u)$, and it is tempting to read the design factor
 $P_\lambda$ as a pointwise error bar. On this benchmark that reading fails, in
-an instructive way. Table~\ref{tab:norms} shows the operator factor moving in
-the direction the theory suggests: the squared RKHS norm of the fitted
+an instructive way. Table~\ref{tab:norms} shows the finite-design diagnostic
+of the operator factor moving in the direction the theory suggests: with the
+deployed correction kernel of seed $0$, the squared RKHS norm of the fitted
 correction is about \normRatio$\times$ smaller when the kernel regresses
-ensemble residuals than when it regresses raw stress fields. The norm of a
-fitted interpolant is a lower bound on the norm of the target it interpolates,
-so the ratio compares two lower bounds and is read as a diagnostic of the
-fitted objects rather than as a bound on the constant of
-Theorem~\ref{thm:or}. The design factor
+ensemble residuals than when it regresses raw stress fields, and about
+\normRatioNorm$\times$ smaller per unit energy of what is regressed, the
+rest of the raw ratio being the residual's smaller amplitude. The norm of a
+fitted ridge function is a lower bound on the norm of the target it fits, the
+ratio depends on the nugget, and it compares two lower bounds, so it is read
+as a diagnostic of the fitted objects rather than as a bound on the constant
+of Theorem~\ref{thm:or} or as evidence about the residual's smoothness. The design factor
 $P_\lambda$ correlates only weakly with the corrected surrogate's absolute
 error (Pearson \uqCorrAbs), and \emph{negatively} with the benchmark's
 relative error. The cause is measurable: $P_\lambda$ is large for loads far
@@ -271,18 +274,27 @@ posterior standard deviation means what it appears to.
 
 \begin{table}[t]
 \centering
-\caption{Squared RKHS norm of the fitted kernel interpolant,
-$\operatorname{tr}(\alpha^\top K\alpha)$, when the same validated kernel and
-design regress raw stress fields versus ensemble residuals.}
+\caption{Fitted-norm diagnostic of the residual correction at seed $0$ of the
+complete-schedule campaign: the same validated correction kernel (scale
+multiplier $2$, nugget $10^{-3}$, median length scale) ridge-fitted to the
+raw stress fields and to the six-member stack residuals on the training
+split. $\|\widehat r\|_K^2=\operatorname{tr}(\alpha^\top K\alpha)$ is the
+squared RKHS norm of the fitted function, a lower bound on the norm of the
+target it fits and not an estimate of it; the last column divides it by the
+energy of what is regressed. The ratios depend on the nugget (an earlier
+draft quoted $271$ at a different one), and most of the raw ratio is
+amplitude: per unit energy the residual's fitted norm is
+\normRatioNorm{} times smaller, not \normRatio{}. Record
+\texttt{collected/dgx/sm\_norm\_check\_hpix\_s0.json}.}
 \label{tab:norms}
-\begin{tabular}{lc}
+\begin{tabular}{lccc}
 \toprule
-Kernel regresses & $\|\widehat r\|_K^2$ \\
+Kernel regresses & $\|\widehat r\|_K^2$ & energy $\|T\|_F^2$ & $\|\widehat r\|_K^2/\|T\|_F^2$ \\
 \midrule
-Raw stress fields ($m=0$) & $1.39\times10^{10}$ \\
-Ensemble residuals & $5.14\times10^{7}$ \\
+Raw stress fields ($m=0$) & $7.12\times10^{8}$ & $6.77\times10^{11}$ & $1.05\times10^{-3}$ \\
+Ensemble residuals & $1.45\times10^{5}$ & $1.21\times10^{9}$ & $1.20\times10^{-4}$ \\
 \midrule
-Ratio & \normRatio$\times$ \\
+Ratio & \normRatio$\times$ & \normEnergyRatio$\times$ & \normRatioNorm$\times$ \\
 \bottomrule
 \end{tabular}
 \end{table}

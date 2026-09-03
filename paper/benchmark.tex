@@ -1,17 +1,25 @@
 \subsection{Problem and data}
 The dataset originates in the cost-accuracy study of \citet{dehoop2022cost}
 and is the one distributed with \citet{batlle2024kernel} and
-\citet{mora2025operator}. An isotropic elastic plate occupies
-$D=(0,1)^2$; the displacement field $w$ satisfies
-$\nabla\cdot\sigma=0$ with a fixed constitutive law, displacement conditions
-on the bottom and lateral parts of the boundary, and a prescribed normal
-traction $\bar t$ on the top edge $\Gamma_t=[0,1]\times\{1\}$. The quantity of
-interest is the von Mises stress field $\sigma_v$ on $D$. The learning task is
+\citet{mora2025operator}. The domain $D=(0,1)^2$ is the unit cell of a
+fibre-reinforced composite: a cylindrical fibre of linear elastic material at
+the centre, embedded in an incompressible Rivlin--Saunders (hyperelastic)
+matrix, so the constitutive law is heterogeneous, with a material interface
+across which the stress jumps. The displacement field $w$ satisfies
+$\nabla\cdot\sigma=0$ under that law, with the bottom edge clamped and a
+prescribed tension traction $\bar t$ on the top edge
+$\Gamma_t=[0,1]\times\{1\}$. The quantity of interest is the von Mises
+stress field $\sigma_v$ on $D$. The learning task is
 the map $G:\bar t\mapsto\sigma_v$. Loads are drawn from the Gaussian field
 $\mathcal{GP}\big(100,\,400^2(-\Delta+3^2 I)^{-1}\big)$ with homogeneous
-Neumann boundary conditions for the Laplacian; outputs are finite element
-solutions interpolated to a regular $41\times41$ grid, and the load is sampled
-at $41$ points. The distributed file contains 40000 input/output pairs; the
+Neumann boundary conditions for the Laplacian. In the source study the
+solver is a mesh of $189$ quadratic quadrilateral elements (the NNFEM
+library) with the stress evaluated at its Gaussian quadrature points and
+transferred to a regular $41\times41$ grid by radial basis function
+interpolation; the distributed arrays are those grid values, with the load
+sampled at $41$ points. The interface, the quadrature-to-grid transfer and the
+finite element discretization are all part of what a surrogate is asked to
+reproduce. The distributed file contains 40000 input/output pairs; the
 input array stores the load broadcast along the second grid coordinate, which
 we verified is an exact copy (maximal deviation $0$ across all 40000
 samples), so all our methods consume the load as a vector in $\mathbb R^{41}$.

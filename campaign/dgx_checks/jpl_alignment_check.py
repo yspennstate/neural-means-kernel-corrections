@@ -7,7 +7,8 @@ the same ratio after normalizing by the target energy ||Y||_F^2, the sensitivity
 the length-scale multiplier, the effective dimensions, and - the quantity the review asked for directly - the
 distribution of the test-point power function P_lambda(u) under the two kernels at matched nugget and median
 length scale. Everything is at the paper's setting (4000-row subsample, seed 0) and again on the full 18000-row
-training block. Network and split exactly as in jpl_diagnostics.py.
+training block. Both designs are standardized by training moments before any kernel is formed, as the campaign's
+matern_head() does, and the scale grid includes the multiplier 4 that the campaign selected for every feature head. Network and split exactly as in jpl_diagnostics.py.
 
     NMKC_JPL_DATA=... python jpl_alignment_check.py --band o2 [--out results/jpl_alignment_o2.json]
 """
@@ -126,14 +127,18 @@ with torch.no_grad():
 print(f"network test error {100 * rel(net_te, sp['Yte']):.3f}% [{(time.time() - t0) / 60:.1f} min]", flush=True)
 
 Xtr, Xte, Ytr = sp["Xtr"].astype(np.float64), sp["Xte"].astype(np.float64), sp["Ytr"].astype(np.float64)
+# both designs standardized by their training moments, exactly as matern_head() in jpl_seeded.py does before
+# any kernel is formed (the first release of this check passed the raw states unstandardized; corrected after review)
+mx, sx = Xtr.mean(0), Xtr.std(0) + 1e-9
+Xtr, Xte = (Xtr - mx) / sx, (Xte - mx) / sx
 mu, sd = Ftr.mean(0), Ftr.std(0) + 1e-9
 Ftr_s, Fte_s = (Ftr - mu) / sd, (Fte - mu) / sd
 out = dict(band=args.band, seed=args.seed, epochs=args.epochs, settings=[])
 sub = np.random.default_rng(0).choice(len(Xtr), 4000, replace=False)
 for label, rows in (("n4000", sub), ("full", np.arange(len(Xtr)))):
     for lam in (1e-8, 1e-6, 1e-4):
-        for sc in (0.5, 1.0, 2.0):
-            if label == "full" and not (lam == 1e-8 and sc == 1.0):
+        for sc in (0.5, 1.0, 2.0, 4.0):   # 4.0 is the multiplier the campaign selected for every feature head
+            if label == "full" and not (lam == 1e-8 and sc in (1.0, 4.0)):
                 continue
             raw = diagnostics(Xtr[rows], Ytr[rows], Xte, lam, sc, args.seed)
             fea = diagnostics(Ftr_s[rows], Ytr[rows], Fte_s, lam, sc, args.seed)

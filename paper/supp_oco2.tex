@@ -58,11 +58,13 @@ and nothing more: both call the same tuning routine on the same standardized
 inputs, so the agreement is a re-execution of one deterministic computation
 rather than corroboration by an independent measurement. One
 protocol note: the table's matched $250$-epoch budget is short of
-convergence for the network rows. A $750$-epoch run of the same code reaches
-$3.82\%$ (flat network) and $3.71\%$ (feature head) on this band, with the
-combination at $3.71\%$ reduced and $0.0174\%$ radiance. The budget moves
-the levels of the trained rows together and reverses none of the orderings
-discussed below.
+convergence for the network rows. A separate single-seed $750$-epoch run of
+the same code --- not a row of Table~\ref{tab:oco2}, all of whose numbers are
+at $250$ epochs --- reaches $3.82\%$ (flat network) and $3.71\%$ (feature
+head) on this band, with the combination at $3.71\%$ reduced and $0.0174\%$
+radiance. At that one seed the budget moves the levels of the trained rows
+together and reverses none of the orderings discussed below; a ten-seed,
+three-band campaign at a converged budget is not part of this version.
 
 Second, the training metric behaves as a budget, and the campaign measures
 which part of the metric carries it. The second network in
@@ -172,10 +174,12 @@ inaccurate, so none lands there with room to spare.}
 
 Fourth, the regimes of Section~\ref{sec:theory-secmom} are decided by these
 numbers before any stack is fit. Against the flat network the raw-input
-kernel has $\varrho=0.14$ and $e_n/e_k=0.109$ (the network's $4.43\%$ over the
-kernel's $40.57\%$): the condition of
-Proposition~\ref{prop:secmom} fails, by a margin that ten seeds do not put in
-doubt, and the kernel is dropped --- in contrast to
+kernel has, in the proposition's quantities on the validation split,
+$\varrho=0.156$ against $e_n/e_k=0.157$ (root-mean-square relative errors of
+$8.41\%$ and $53.5\%$; on the test block the mean relative errors are $4.43\%$
+and $40.57\%$): the condition of Proposition~\ref{prop:secmom} sits on its
+threshold, the sign changing with the seed, and the kernel is dropped on the
+size of the available gain, a few ten-thousandths of a point --- in contrast to
 structural mechanics where the same test keeps it. Because the radiance
 metric is diagonal in the reduced coordinates, the per-coordinate
 combination of Proposition~\ref{prop:percoord} is optimal for either metric

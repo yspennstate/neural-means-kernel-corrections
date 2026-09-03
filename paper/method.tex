@@ -82,7 +82,11 @@ stage repeats the construction with the kernel evaluated on deep features,
 the concatenated penultimate activations of the ensemble members
 (reflection-averaged, standardized), fitted to the residuals of $m+\widehat
 r$; it contributes a smaller improvement and is included when it helps on
-validation. At $n=19000$ the exact solve is a single Cholesky factorization
+validation. On OCO-2 (Section~\ref{sec:oco2}) the kernel stage takes a
+different form: a direct-target kernel ridge regression on the network's
+frozen last-layer features, tuned and refit by the same routine, in place of
+a residual correction of the network; the two uses are named separately
+where they appear. At $n=19000$ the exact solve is a single Cholesky factorization
 of a $19000\times19000$ matrix, under half a minute in double precision on a
 laptop CPU (measured in Section~\ref{sec:cost}), and prediction is two matrix
 products; no inducing points, preconditioners, or stochastic solvers are

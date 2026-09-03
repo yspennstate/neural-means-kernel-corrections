@@ -15,11 +15,16 @@ enter no optimizer and are evaluated once per run, for the final numbers.
 The comparison is therefore computed on identical test points against the
 published emulator itself rather than against our reimplementation of it.
 
-Two error metrics matter, and they disagree in an instructive way. The
+Two error criteria matter, and they disagree in an instructive way. Both
+are defined here, on the released reduced representation, and neither is the
+acceptance test of the source paper, which scores full reconstructed spectra
+against an instrument-noise criterion. The
 \emph{reduced} metric is the relative $L^2$ error on the $40$ standardized
 coefficients. The \emph{radiance} metric maps predictions back to the
 monochromatic spectrum through the stored PCA projection and norms before
-comparing; because the projection is orthogonal, the error \emph{numerator} on
+comparing --- a reconstruction on the retained forty components, so the PCA
+truncation error, the instrument line shape and the noise model lie outside
+it; because the projection is orthogonal, the error \emph{numerator} on
 the reduced side is exactly the diagonally weighted norm
 $\|s_z\odot(\hat z-z)\|$, whose weights concentrate almost entirely on the
 first few coefficients (the denominator is the full reconstructed-radiance
@@ -40,8 +45,13 @@ Mat\'ern solve as everywhere else in this paper, and the two raw-input rows
 are fit by that same routine under the same budget as the feature heads:
 the same scale grid $\{0.5,1,2,4\}$ times the median distance, the same
 nugget grid $\{10^{-8},10^{-6},10^{-4}\}$, the same $6000$-sample tuning
-subsample, and the winner refit on all $18000$ training points, which is why
-the selected hyperparameters vary from seed to seed. The ARD radiance cell is left empty because validation,
+subsample, and the winner refit on all $18000$ training points. The
+raw-input rows' selected settings vary from seed to seed; every feature head,
+by contrast, selected the largest multiplier ($4$) and the smallest nugget
+($10^{-8}$) of that grid at all thirty band-seeds, so the feature-head
+numbers sit at a boundary of the search, and a wider grid (multipliers to
+$32$, nuggets to $10^{-12}$) at ten seeds per band is being run; its results
+are not part of this version. The ARD radiance cell is left empty because validation,
 which scores the reduced metric, ties between two hyperparameter
 configurations whose radiance differs by a factor of $2.2$ ($0.150\%$ at seven
 seeds, $0.329\%$ at three); a mean over that mixture would describe the
@@ -69,7 +79,8 @@ per-coordinate combination & $\mathbf{4.12\pm0.05}$\% & $\mathbf{0.0294\pm0.0020
 \begin{table}[t]
 \centering
 \caption{Readout control for the kernel heads, ten seeds per band, mean
-$\pm$ standard deviation over seeds. For each trained network the same
+$\pm$ standard deviation over seeds. For the flat and weighted-coefficient
+networks the same
 frozen last-layer features are read out three ways: by the network's own
 trained output layer, by a ridge regression refit on those features with
 the penalty chosen on validation, and by the exact Mat\'ern head. The rows
@@ -142,8 +153,10 @@ SCO2, and at ten of ten on WCO2's reduced metric and nine of ten on its
 radiance metric, the exception being the seed that loses by $0.0015$ points;
 the seed standard deviations in Table~\ref{tab:oco2} describe retraining
 variability, not that comparison. And the claim is confined to what is
-rescored: the two criteria of \citet{susiluoto2025radiative} on the reduced
-coefficients and on the reconstructed monochromatic radiance, at a
+rescored: two criteria defined here on the released reduced representation
+(the coefficients, and the radiance reconstructed from the retained forty
+components), not the full-spectrum acceptance test of
+\citet{susiluoto2025radiative}, at a
 $250$-epoch budget the networks have not converged at, with the emulator
 fitted on $20000$ states against our $18000$ plus a $2000$-state validation
 carve. Instrument response, Jacobians and the retrieval itself are not
@@ -191,13 +204,25 @@ form of that check, and it locates the difficulty elsewhere.
 
 The second is whether the rule survives being used, which requires
 $\varrho$ and $e_1/e_2$ to be estimated on data the decision does not see.
-Decided on validation and checked on test, the rule is correct on $62.7\%$ of
-the $840$ pairs. The average is the wrong summary: sorted by the margin
+Decided on validation and checked on test --- the test-side outcome being
+whether the optimal convex two-member mix beats the better of the two members
+\emph{on test}, whichever that is (the order of a pair flips between the
+splits in $40$ of the $840$) --- the rule is correct on $62.4\%$ of the $840$
+pairs. The average is the wrong summary: sorted by the margin
 $|\varrho-e_1/e_2|$ that the rule must resolve, the outcome is
-$105$ of $255$ below $0.02$, $94$ of $217$ from $0.02$ to $0.05$, $79$ of
-$86$ from $0.05$ to $0.10$, $217$ of $250$ from $0.10$ to $0.25$, and $32$
-of $32$ above $0.25$ --- that is $41\%$, $43\%$, $92\%$, $87\%$ and
-$100\%$. These counts are not independent observations: the $28$ pairs of a
+$101$ of $257$ below $0.02$, $95$ of $215$ from $0.02$ to $0.05$, $81$ of
+$88$ from $0.05$ to $0.10$, $215$ of $248$ from $0.10$ to $0.25$, and $32$
+of $32$ above $0.25$ --- that is $39\%$, $44\%$, $92\%$, $87\%$ and
+$100\%$. That scores the existence of a helpful mix. Scoring what the rule
+would ship --- the mix at the weight fitted on validation, against the better
+test member --- the counts are $142$ of $257$, $107$ of $215$, $76$ of $88$,
+$125$ of $248$ and $31$ of $32$ ($57.3\%$ overall): the prediction that a
+helpful mix exists is as reliable as before, but the weight carried over from
+validation realizes the gain in only half of the mid-margin pairs, because a
+gain of a few thousandths of a point is smaller than the transfer error of
+the weight. Every quantity here is the root-mean-square relative error and
+the uncentered alignment the proposition is stated in
+(\texttt{oco\_ensemble\_recheck.json} in the release). These counts are not independent observations: the $28$ pairs of a
 band-seed share members, and the ten seeds of a band share one test block,
 so the bins should be read as describing a trend across margin and not as
 binomial samples. Nothing about
@@ -206,7 +231,7 @@ transfer of two estimates from one block to another.
 
 That transfer is measurable, and it is what sets the band.  The signed gap
 $D=\varrho-e_1/e_2$ moves between validation and test with standard deviation
-$0.099$ across the $840$ pairs, essentially unbiased (mean $-0.0005$). This
+$0.099$ across the $840$ pairs, essentially unbiased (mean $0.0004$). This
 is an order of magnitude larger than the seed-to-seed scatter of $D$ within a
 fixed pair, which is $0.010$: replication across seeds is not what limits the
 rule, and a study that varied only the seed would have missed this. Because
@@ -232,18 +257,24 @@ The practical reading, from the scoreboard rather than from the bound: on
 these problems the rule is dependable when the two quantities are separated
 by more than about $0.25$, suggestive between $0.05$ and $0.25$, and
 uninformative below that. This applies to our own use of it. The
-kernel-versus-network decision earlier in this section has $\varrho=0.14$
-against $e_n/e_k=0.109$, a margin of $0.031$, which falls in the band the
-scoreboard says not to trust, and we therefore do not rest the exclusion of
-the raw kernel on that comparison. What does settle it is the same
-proposition read for magnitude rather than for sign: with these two errors
-and this correlation, part~(i) puts the unconstrained two-member optimum at
-$4.4299\%$ against the network's own $4.4320\%$, and the optimizing weight
-falls just outside the simplex, so no convex mix reaches even that value.
-Whichever side of the
-threshold the pair truly falls, the entire quantity in dispute is two
-thousandths of a point, so the member is dropped on the size of the available
-gain and not on a threshold the data cannot resolve. Reporting the margin
+kernel-versus-network decision earlier in this section, taken in the
+proposition's own quantities --- root-mean-square relative errors and the
+uncentered alignment $S_{12}/(e_1e_2)$ on the validation split, ten-seed
+means, from the release's \texttt{oco\_ensemble\_recheck.json} --- has
+$\varrho=0.156$ against $e_n/e_k=0.157$: a margin of $0.001$, the sign of
+the difference changing from seed to seed (the kernel is admitted at five
+seeds of ten). That is inside the band the scoreboard says not to trust, and
+we therefore do not rest the exclusion of the raw kernel on that comparison.
+What does settle it is the same proposition read for magnitude rather than
+for sign: with these two errors and this alignment, part~(i) puts the
+two-member optimum at $8.4079\%$ against the network's own $8.4081\%$ on the
+validation split (the validation carve is harder than the public test block,
+where the same network's mean relative error is $4.43\%$), at a weight of
+$0.9999$ on the network; on the test block the optimal convex mix and the
+network differ by $0.0004$ points. Whichever side of the threshold the pair
+truly falls, the entire quantity in dispute is a few ten-thousandths of a
+point, so the member is dropped on the size of the available gain and not on
+a threshold the data cannot resolve. Reporting the margin
 alongside the verdict is what makes that distinction visible, and we
 recommend it wherever this rule is used.
 

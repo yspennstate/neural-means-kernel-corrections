@@ -305,14 +305,21 @@ Ratio & \normRatio$\times$ & \normEnergyRatio$\times$ & \normRatioNorm$\times$ \
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figs/uq.pdf}
-\caption{Both panels are one seed. Left: the Gaussian process posterior
-standard deviation $P_\lambda$ against the corrected surrogate's relative error
-on the test set; the association is weak and, because of the output-amplitude
-confound, slightly negative. Right: decile calibration of $P_\lambda$ against
-absolute error, the theory-consistent quantity. Across all ten seeds of the
-six-member pipeline the $P_\lambda$-scaled conformal band attains
-$\uqPlamSix\pm\uqPlamSixSd\%$ coverage at the nominal \uqCoverNom\% level,
-inside the exact finite-sample interval at ten seeds out of ten.}
+\caption{One seed (seed 0), the deployed six-member correction, on the
+evaluation half of the test block ($19000$ cases) with the band calibrated on
+the other $1000$ as in Section~\ref{sec:uq}. Left: the Gaussian process
+posterior standard deviation $P_\lambda$ against relative error; the
+association is negative (Pearson $-0.33$) because large-amplitude outputs have
+small relative error. Middle: decile calibration of $P_\lambda$ against
+absolute error $\|e(u)\|_2$, the quantity Theorem~\ref{thm:or} bounds; the
+association is weak (Pearson $0.05$). Right: coverage of the
+$P_\lambda$-scaled $90\%$ band within each decile of $P_\lambda$: $91.4\%$
+overall, but from $69\%$ in the lowest decile to $99.9\%$ in the highest,
+so the marginal guarantee is met by over-covering where $P_\lambda$ is large
+and under-covering where it is small. Across the ten seeds the same band
+attains $\uqPlamSix\pm\uqPlamSixSd\%$ at the nominal \uqCoverNom\% level,
+inside the Beta--binomial band at ten seeds of ten; the constant-width band
+is the narrower of the two (Section~\ref{sec:uq}).}
 \label{fig:uq}
 \end{figure}
 

@@ -16,7 +16,7 @@ per-coordinate combination of members selected on a validation split.
 
 `paper/main.pdf` is the manuscript on the two problems, the method, and the
 results, in JMLR format. `paper/supplement.pdf` is the online supplement it
-refers to as S1–S8 (direct link:
+refers to as S1–S10 (direct link:
 https://github.com/yspennstate/neural-means-kernel-corrections/blob/main/paper/supplement.pdf),
 and holds the material a reader needs only
 if they want to check something: the finite-sample bounds behind every fitted
@@ -90,6 +90,12 @@ python campaign/dgx_checks/jpl_alignment_check.py --band o2
 python campaign/dgx_checks/sm_norm_check.py --seed 0
 # the kernel stage's storage, peak memory, factorization time and query latency at the campaign's shapes (Supplement S9)
 python campaign/dgx_checks/cost_check.py --threads 8
+# after the second review (3 September 2026):
+# the OCO-2 ensemble quantities in the terms of Proposition 6.1 - RMS relative errors, uncentered alignments, the
+# two-member admission example and the 840-pair scoreboard scored against the better test member (Section 5.2)
+python campaign/dgx_checks/oco_ensemble_recheck.py --root <dir with oco_<band>_s<seed>/member_preds.npz>
+# the arrays behind Figure S6.4 from the seeded test-block calibration path, and the figure itself
+python campaign/dgx_checks/uq_fig_dump.py 0 && python campaign/fig_uq_seeded.py
 ```
 
 The records of these checks, the locked Python environment of the campaign host

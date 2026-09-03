@@ -186,11 +186,15 @@ is at most the convex minimum, with equality exactly when $w^\star$ has no
 negative coordinate.
 \end{corollary}
 
-On the measured $S$ the two coincide at every seed and for both member sets:
-the unconstrained minimizer has no negative coordinate, so allowing signed
-global weights buys nothing here, and what the deployed per-pixel stack
-gains over the convex one ($0.032$ and $0.035$ points in the two campaigns)
-is the variation of the weights over the grid, not their sign.
+On the measured $S$ the two minima agree to within $0.0005$ points at every
+seed and for both member sets, but not because the constraint is slack: the
+unconstrained minimizer carries a small negative coordinate at seven seeds of
+ten for the six members and at one seed for the five (the stored
+\texttt{signed} records), and removing it costs at most those five
+ten-thousandths. Allowing signed global weights therefore buys nothing
+measurable here, and what the deployed per-pixel stack gains over the convex
+one ($0.032$ and $0.035$ points in the two campaigns) is the variation of the
+weights over the grid, not their sign.
 
 The members of a pool are usually of two kinds at once, architectures and
 seeds of each architecture, and the floor separates the two.
@@ -310,20 +314,26 @@ identical on the raw input and on the learned features (at $n=4000$ and a
 matched median length scale, $\alignDeffRaw$ against $\alignDeffFeat$ at a
 $10^{-8}$ nugget); the design factor itself is not fixed by that trace, and
 measured directly at the $2000$ test inputs the feature kernel's power
-function is smaller, its median $\alignRatioP$ times below the raw kernel's.
-The fitted-norm diagnostic moves far more: regressing the same outputs
-through the two kernels at that setting, the squared native-space norm of
-the fitted interpolant, $\operatorname{tr}(\alpha^\top K\alpha)$, is
-$\alignRatioNorm$ times smaller on the features than on the raw input
-($\alignRatioFull$ times on the full $18000$-row block). (An
-earlier draft quoted $42$ from $\alpha^\top Y$, which adds the term
+function is smaller at the median scale, its median $\alignRatioP$ times
+below the raw kernel's, and equal to it ($\alignRatioPSel$) at the
+multiplier $4$ that the campaign selected for every feature head. The
+fitted-norm diagnostic moves far more: regressing the same outputs through
+the two kernels, the squared native-space norm of the fitted interpolant,
+$\operatorname{tr}(\alpha^\top K\alpha)$, is $\alignRatioNorm$ times
+smaller on the features than on the raw input at the median scale
+($\alignRatioFull$ times on the full $18000$-row block) and
+$\alignRatioSel$ times smaller at the selected multiplier. (An earlier
+draft quoted $42$ from $\alpha^\top Y$, which adds the term
 $n\lambda\|\alpha\|^2$; at this nugget the two agree to three digits, and
 the network retrained for the check lands at $38$.) Both numbers are
-finite-design diagnostics: the fitted norm is a lower bound on the unknown
-target norm, and the ratio depends on the kernel scale --- $\alignRatioLo$
-at half the median length scale, $\alignRatioHi$ at twice it --- and
-collapses toward one at a $10^{-4}$ nugget, where the ridge no longer
-interpolates. Read as diagnostics, they say that the learned features hand
+finite-design diagnostics of the interpolating regime: the fitted norm is a
+lower bound on the unknown target norm, the ratio grows with the kernel
+scale --- $\alignRatioLo$ at half the median length scale, $\alignRatioHi$
+at twice it --- and at a $10^{-4}$ nugget, where the ridge no longer
+interpolates, it collapses and at the selected multiplier inverts
+($\alignRatioHeavy$). Both designs are standardized by their training
+moments before the kernel is formed, as the campaign's heads are, and the
+check is at one seed. Read as diagnostics, they say that the learned features hand
 the same kernel a target it interpolates with a much smaller coefficient
 norm, and a somewhat smaller pointwise design factor, which is the direction
 Proposition~\ref{prop:pullback} predicts; they do not identify a causal
@@ -345,6 +355,10 @@ optimal-recovery bound of Theorem~\ref{thm:or} for the feature-kernel
 regression is governed by $\|h\|_{\mathcal H_k}$ rather than by the norm of
 $G$ in the raw-input space.
 \end{proposition}
+
+The statement is for scalar $f$; for the vector-valued targets of the
+campaigns it is applied coordinatewise, with the norm the root sum of squares
+over output coordinates, which is the norm Theorem~\ref{thm:or} uses.
 
 The proof (Supplement~\ref{app:proofs}) is the standard pullback identity for
 reproducing kernels \citep{saitoh1997integral,paulsen2016introduction}. Its content here is the reading: a fixed kernel on the
@@ -384,7 +398,8 @@ denote the Gaussian process posterior variance with the same nugget (for
 $\lambda=0$ this is the classical power function of the point set $X$).
 
 \begin{theorem}[conditional power-function bound]\label{thm:or}
-For every $u\in\mathcal U$ and every $\lambda\ge0$,
+For every $u\in\mathcal U$ and every $\lambda\ge0$ (for $\lambda=0$ take $K$
+positive definite, or read $K^{-1}$ as the pseudoinverse),
 \[
 \big\|G(u)-m(u)-\widehat r_\lambda(u)\big\|_2\;\le\;\|G-m\|_K\;
 \widetilde P_\lambda(u)\;\le\;\|G-m\|_K\;P_\lambda(u),

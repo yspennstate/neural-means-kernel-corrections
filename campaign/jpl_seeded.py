@@ -33,6 +33,8 @@ p = argparse.ArgumentParser()
 p.add_argument("--band", default="o2")
 p.add_argument("--seed", type=int, default=0)
 p.add_argument("--epochs", type=int, default=250)
+p.add_argument("--scales", default="0.5,1,2,4", help="length-scale multipliers of the median distance (kernel heads)")
+p.add_argument("--nuggets", default="1e-8,1e-6,1e-4", help="nugget grid of the kernel heads")
 p.add_argument("--width", type=int, default=384)
 args = p.parse_args()
 
@@ -138,8 +140,8 @@ def m52(D2, ls):
 
 def matern_head(Ztr, Zva, Zte, err_fn, label, w=None):
     """Exact Matern-5/2 kernel ridge, the single protocol used everywhere:
-    inputs standardized by train moments, scale grid {0.5,1,2,4} x median
-    pairwise distance (6000-point estimate), nugget grid {1e-8,1e-6,1e-4},
+    inputs standardized by train moments, scale grid --scales (default {0.5,1,2,4}) x median
+    pairwise distance (6000-point estimate), nugget grid --nuggets (default {1e-8,1e-6,1e-4}),
     tuned on validation by err_fn over a 6000-sample training subsample,
     winner refit on the full training set. A diagonal metric w is applied
     AFTER standardization: standardization divides by the per-dimension std,
@@ -155,9 +157,9 @@ def matern_head(Ztr, Zva, Zte, err_fn, label, w=None):
     med = np.sqrt(np.median(sqd(Ftr[sub], Ftr[sub])[np.triu_indices(len(sub), 1)]))
     best = (np.inf, None)
     D2s, D2vs = sqd(Ftr[sub], Ftr[sub]), sqd(Fval, Ftr[sub])
-    for scale in (0.5, 1.0, 2.0, 4.0):
+    for scale in [float(x) for x in args.scales.split(",")]:
         Ks, Kvs = m52(D2s, scale * med), m52(D2vs, scale * med)
-        for nug in (1e-8, 1e-6, 1e-4):
+        for nug in [float(x) for x in args.nuggets.split(",")]:
             Kr = Ks.copy(); Kr.flat[::len(sub) + 1] += nug * len(sub)
             try:
                 c = cho_factor(Kr, lower=True, check_finite=False, overwrite_a=True)

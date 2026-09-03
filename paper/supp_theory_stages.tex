@@ -278,11 +278,15 @@ $\kappa_{\mathrm{an}}$, so that evaluating the display at the probe value
 would shrink it by a factor of about two hundred and forty. But a supremum
 over a finite probe is a lower bound on the constant the corollary needs,
 not the constant, and we do not use it as one. What the corollary
-establishes is structural: the object the pipeline ships --- fitted stack,
-grid-tuned correction, validated final choice --- is covered by an oracle
-inequality of the ordinary $m^{-1/2}$ form, in the coordinatewise
-mean-squared metric, whose every constant is either measured or given in
-closed form. Two cautions apply to every statement in this section and are
+establishes is conditional: for candidates fixed independently of the
+validation sample, in the coordinatewise mean-squared metric, an oracle
+inequality of the ordinary $m^{-1/2}$ form holds with constants that are
+either measured or given in closed form. It is not a bound on the estimator
+the pipeline ships: that estimator is selected by mean relative $L^2$ error
+rather than by squared coordinate risk, its kernel stages are tuned on an
+$8000$-row subsample and the winner is refit on all $19000$ rows, and the
+same validation split selects checkpoints and members --- none of which the
+statement covers. Two cautions apply to every statement in this section and are
 repeated in the main text: the candidates are assumed fixed independently
 of the validation sample, which the deployed pipeline does not satisfy,
 since the same split selects checkpoints, members and, on OCO-2,

@@ -242,7 +242,10 @@ symmetrization already applied. ``Fitted'' weights are solved on the validation
 split and read out once on test; equal weights involve no fitting. The lower
 block is the second campaign of Section~\ref{sec:seeds}; its kernel ridge and
 MLP-family members coincide with the upper block's to the printed precision
-and are not repeated.}
+and are not repeated. The kernel ridge member and the correction each store
+a $19000\times1681$ coefficient matrix ($31.9$ million numbers, $256$\,MB in
+double precision) beside the networks' weights; the accuracy--cost--storage
+record is in Section~\ref{sec:cost}.}
 \label{tab:members}
 \begin{tabular}{llc}
 \toprule
@@ -395,10 +398,10 @@ accurate and where interpolation to the $41\times41$ grid is most strained.
 Spectrally, it is enriched in high radial frequencies relative to the stress
 fields themselves: the fields put $97.5\%$ of their energy below radial
 wavenumber 4, the shared residual only $69\%$. And its magnitude is
-statistically independent of everything we can compute from the input: the
+approximately uncorrelated with the three input summaries we examined: the
 correlation of $\|c\|$ with the output norm is $0.01$, with the load norm
 $0.01$, with the load's total variation $0.01$. A component that no
-architecture avoids, that no input statistic predicts, that lives at the
+architecture in the pool avoids, that none of these summaries predicts, that lives at the
 stress concentrations, and that fixed-scale additive noise would reproduce is
 consistent with noise of the data-generating process itself --- finite
 element and grid-interpolation error at the singular corners --- and harder to
@@ -613,16 +616,22 @@ score and error --- which is as well, since the rank correlation between
 $P_\lambda$ and the error is \uqSpearman. For the six-member pipeline the
 observed coverage at the nominal \uqCoverNom\% level is
 $\uqPlamSix\pm\uqPlamSixSd\%$, and the right comparison is with the exact
-finite-sample law rather than with $90\%$: the coverage of such a band is
-$\mathrm{Beta}(901,100)$ distributed, whose central $95\%$ interval is
-$[88.1\%,91.8\%]$, and all ten seeds fall inside it; at the $95\%$ level
-the interval is $[93.6\%,96.3\%]$ and the observed coverage
-$\uqPlamSixHi\pm\uqPlamSixHiSd\%$, again ten of ten. A constant-width band
+finite-sample law rather than with $90\%$: the latent coverage of such a
+band is $\mathrm{Beta}(901,100)$ distributed and the fraction observed on
+$19000$ evaluation cases is Beta--binomial, whose central $95\%$ interval is
+$[88.0\%,91.8\%]$, and all ten seeds fall inside it; at the $95\%$ level
+the interval is $[93.5\%,96.3\%]$ and the observed coverage
+$\uqPlamSixHi\pm\uqPlamSixHiSd\%$, again ten of ten. The guarantee is
+marginal: within deciles of $P_\lambda$ the same band covers from $69\%$ of
+the cases in the lowest decile to $99.9\%$ in the highest at seed 0
+(Figure~\ref{fig:uq}), meeting its average by over-covering where
+$P_\lambda$ is large. A constant-width band
 calibrated the same way from the raw scores $\|e\|_2$ covers
 $\uqRawSix\pm\uqRawSixSd\%$ and $\uqRawSixHi\pm\uqRawSixHiSd\%$, also ten
 of ten at both levels, and the $P_\lambda$ band is on average
 \uqWidthRatio{} times as wide as it: a scale factor that does not rank the
-error buys validity and nothing else. Rescaling the score by ensemble
+error buys validity and nothing else, and the constant-width band is the more
+efficient of the two here. Rescaling the score by ensemble
 disagreement, which the correlations say should not help, indeed does not:
 $\uqDisSix\pm\uqDisSixSd\%$ and $\uqDisSixHi\pm\uqDisSixHiSd\%$, with nine
 seeds inside at the $95\%$ level and the tenth on the band's upper edge,

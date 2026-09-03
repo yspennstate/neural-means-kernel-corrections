@@ -64,11 +64,11 @@
 \newcommand{\predRMSSixSd}{0.057}
 \newcommand{\dispFacSix}{0.938}      % realized mean / predicted RMS, six members
 \newcommand{\dispFacSixSd}{0.003}
-\newcommand{\corrBarSix}{0.919}      % mean pairwise residual correlation, six members
+\newcommand{\corrBarSix}{0.918}      % mean pairwise residual correlation, six members
 \newcommand{\corrBarSixSd}{0.005}
 \newcommand{\corrNetLoSix}{0.82}     % min pairwise residual corr over seeds, six members
 \newcommand{\corrNetHiSix}{0.98}
-\newcommand{\ensFloorSix}{4.910}     % equicorrelated floor, six members
+\newcommand{\ensFloorSix}{4.908}     % equicorrelated floor, six members
 \newcommand{\ensFloorSixSd}{0.057}
 % Split-conformal coverage on the complete-schedule campaign (ten seeds, 1000 calibration / 19000
 % evaluation cases of the test block). Three scores on the same split: ||e||/P_lambda (the band of
@@ -257,6 +257,9 @@
 \newcommand{\alignRatioNorm}{38}        % ratio of fitted squared RKHS norms tr(alpha^T K alpha), raw over features
 \newcommand{\alignRatioP}{1.5}          % ratio of median test-point power functions, raw over features
 \newcommand{\alignRatioLo}{6}           % the norm ratio at half the median length scale
+\newcommand{\alignRatioSel}{273}     % fitted-norm ratio raw/feature at the selected multiplier 4, nugget 1e-8, n=4000
+\newcommand{\alignRatioPSel}{0.98}   % median power-function ratio raw/feature at the selected multiplier 4
+\newcommand{\alignRatioHeavy}{0.2}   % fitted-norm ratio at nugget 1e-4, multiplier 4 (the ridge no longer interpolates)
 \newcommand{\alignRatioHi}{154}         % the norm ratio at twice the median length scale
 \newcommand{\alignRatioFull}{77}        % the norm ratio on the full 18000-row training block (nugget 1e-8, median scale)
 \newcommand{\normRatioLo}{1800}         % the raw fitted-norm ratio at the seed whose correction chose scale multiplier 1 (seed 1); seeds 0 and 2 (multiplier 2): 4900 and 4300
@@ -275,10 +278,10 @@
 % end-to-end cost of the kernel stage at the campaign's shapes (campaign/dgx_checks/cost_check.py, 8 threads,
 % Xeon E5-2698 v4): collected/dgx/cost_check.json
 \newcommand{\costCoefM}{31.9}           % stored coefficients per kernel stage, millions (19000 x 1681)
-\newcommand{\costGramS}{26}             % block-filled Gram build, seconds
-\newcommand{\costCholS}{26}             % in-place Cholesky, seconds
-\newcommand{\costSolveS}{12}            % triangular solves with 1681 right-hand sides, seconds
+\newcommand{\costGramS}{27}             % block-filled Gram build, seconds
+\newcommand{\costCholS}{22}             % in-place Cholesky, seconds
+\newcommand{\costSolveS}{11}            % triangular solves with 1681 right-hand sides, seconds
 \newcommand{\costPeakBlockGb}{6.0}      % peak resident memory of the block-filled path, GB
 \newcommand{\costPeakNaiveGb}{19.2}     % peak resident memory after the naive full-matrix build, GB
-\newcommand{\costQueryOneMs}{18}        % kernel-stage latency, single query, milliseconds
-\newcommand{\costQueryBatchMs}{1.9}     % kernel-stage latency per query at a batch of 1000, milliseconds
+\newcommand{\costQueryOneMs}{14}        % kernel-stage latency, single query, milliseconds
+\newcommand{\costQueryBatchMs}{1.7}     % kernel-stage latency per query at a batch of 1000, milliseconds

@@ -4,7 +4,7 @@ Parses \newcommand values out of main.tex and recomputes each from the collected
 JSON, so a hand-typed digit cannot survive. Anything that disagrees is printed as FAIL.
 """
 import glob
-import json
+import json, sys
 import os
 import re
 import statistics as st
@@ -16,6 +16,32 @@ MAIN = os.path.join(PAPER, "macros.tex")
 
 src = open(MAIN, encoding="utf-8").read()
 mac = dict(re.findall(r"\\newcommand\{\\([A-Za-z]+)\}\{([^}]*)\}", src))
+
+
+MISSING = []
+
+
+
+def unc(r):
+    """Uncentered alignments of Proposition 6.1 from the stored second-moment matrix S (the records also carry the
+    centered correlation C, which the first release quoted; the two differ by at most 0.006 on these pools)."""
+    import math
+    S_ = r["S"]; M = len(S_); e = [math.sqrt(S_[i][i]) for i in range(M)]
+    off = [S_[i][j] / (e[i] * e[j]) for i in range(M) for j in range(i + 1, M)]
+    rbar = sum(off) / len(off)
+    return dict(rbar=rbar, rmin=min(off), rmax=max(off), floor=(sum(e) / M) * math.sqrt(max(rbar, 0.0)),
+                rho=lambda i, j: S_[i][j] / (e[i] * e[j]))
+
+
+def present(path, optional=False):
+    """Fail closed: a record the audit reads is REQUIRED unless declared optional. The first release skipped a
+    missing record silently and still reported zero disagreements (the OCO-2 alignment record was absent from
+    the reviewed commit); now every absent required record is a failure."""
+    if os.path.exists(path):
+        return True
+    if not optional:
+        MISSING.append(path)
+    return False
 
 
 def load(d, tag):
@@ -132,7 +158,7 @@ if len(six) == 10:
         chk("fnoScheduleWashSd", st.stdev(wash), 3)
         sm5c = os.path.join(HERE, "collected", "secmom5c_seeded.json")
         smA = os.path.join(HERE, "collected", "secmom_seeded5.json")
-        if os.path.exists(sm5c) and os.path.exists(smA):
+        if present(sm5c) and os.path.exists(smA):
             rec5 = json.load(open(sm5c, encoding="utf-8"))
             recA = json.load(open(smA, encoding="utf-8"))
             chk("predRMSFiveC", 100 * st.mean(r["pred_rms"] for r in rec5), 3)
@@ -149,13 +175,13 @@ if len(six) == 10:
             chk("fnoRmsB", 100 * eB2, 3)
             chk("fnoImprove", 100 * (eA2 - eB2) / eA2, 1)
             chk("tRatioB", st.mean(r["member_err"]["fno"] / r["member_err"]["mlpMSE"] for r in rec5), 3)
-            chk("rhoFnoB", st.mean(r["C"][i1][i2] for r in rec5), 3)
-            chk("vTwoB", 100 * st.mean(V(r["member_err"]["mlpMSE"], r["member_err"]["fno"], r["C"][i1][i2]) ** 0.5 for r in rec5), 2)
-            chk("exchRateB", st.mean((1 - r["C"][i1][i2] ** 2) / (r["member_err"]["fno"] / r["member_err"]["mlpMSE"] - r["C"][i1][i2]) for r in rec5), 1)
+            chk("rhoFnoB", st.mean(unc(r)["rho"](i1, i2) for r in rec5), 3)
+            chk("vTwoB", 100 * st.mean(V(r["member_err"]["mlpMSE"], r["member_err"]["fno"], unc(r)["rho"](i1, i2)) ** 0.5 for r in rec5), 2)
+            chk("exchRateB", st.mean((1 - unc(r)["rho"](i1, i2) ** 2) / (r["member_err"]["fno"] / r["member_err"]["mlpMSE"] - unc(r)["rho"](i1, i2)) for r in rec5), 1)
     else:
         print("  unetGain: %d of 10 seeds present, not checked" % len(five))
     sa_path = os.path.join(DGX, "seedarch.json")
-    if os.path.exists(sa_path):
+    if present(sa_path):
         import itertools
         sa = json.load(open(sa_path, encoding="utf-8"))
         A_ = sa["arch"]; nm_ = sa["names"]
@@ -196,17 +222,17 @@ if len(six) == 10:
         rw, rb = min(win) / e2min, min(bet) / e2min
         chk("saBound", 100 * (e2min * (rb + (rw - rb) / len(A_) + (1 - rw) / N_)) ** 0.5, 3)
         dep = os.path.join(DGX, "deployed_on_ev.json")
-        if os.path.exists(dep):
+        if present(dep):
             dv = json.load(open(dep, encoding="utf-8"))["hpix_corr_pred_test.npy"]
             chk("saDeployedEv", 100 * st.mean(dv), 3)
             chk("saDeployedEvSd", 100 * st.stdev(dv), 3)
         pp_path = os.path.join(DGX, "pool_pipeline.json")
-        if os.path.exists(pp_path):
+        if present(pp_path):
             pp = json.load(open(pp_path, encoding="utf-8"))
             chk("saPoolPipeline", 100 * pp["final_ev"], 3)
             chk("saPerpixMeans", 100 * pp["stack_ev"], 3)
         do_path = os.path.join(DGX, "dropone.json")
-        if os.path.exists(do_path):
+        if present(do_path):
             do = json.load(open(do_path, encoding="utf-8"))
             for a, key in (("mlpR", "saDropMlpR"), ("unet", "saDropUnet"), ("fno", "saDropFno"), ("krr", "saDropKrr")):
                 chk(key, 100 * do["drop_" + a]["d_oracle_rms"], 3)
@@ -218,7 +244,7 @@ if len(six) == 10:
     else:
         print("  seedarch.json absent, sixty-predictor macros not checked")
     lc_path = os.path.join(DGX, "learning_curve.json")
-    if os.path.exists(lc_path):
+    if present(lc_path):
         lc = json.load(open(lc_path, encoding="utf-8"))
         rows = {r["N"]: r for r in lc["rows"]}
         for N, key in ((1000, "lcMlpOneK"), (2000, "lcMlpTwoK"), (4000, "lcMlpFourK"), (8000, "lcMlpEightK"), (12000, "lcMlpTwelveK"), (16000, "lcMlpSixteenK"), (19000, "lcMlpNineteenK")):
@@ -250,20 +276,20 @@ if len(six) == 10:
     for cap, key, seed in ((6000, "csCapSix", 0), (12000, "csCapTwelve", 0), (24000, "csCapTwentyFour", 0),
                            (24000, "csCapTwentyFourB", 1), (48000, "csCapFortyEight", 0)):
         f = os.path.join(DGX, "climsim_cap", f"climsim_train_n1000000_s{seed}_cap{cap}.json")
-        if os.path.exists(f) and key in mac:
+        if key in mac and present(f):
             r = json.load(open(f, encoding="utf-8"))
             assert r["kernel_hyper"]["cap"] == cap, (f, r["kernel_hyper"]["cap"])
             chk(key, r["kernel_r2"], 3)
     # after-review diagnostics: the fitted-norm ratios (seed 0, deployed correction kernel), the OCO-2 alignment
     # check at the paper's setting (n = 4000, nugget 1e-8, median length scale), and the kernel-stage cost record
     f = os.path.join(DGX, "sm_norm_check_hpix_s0.json")
-    if os.path.exists(f):
+    if present(f):
         r = json.load(open(f, encoding="utf-8"))
         chk("normRatio", round(r["ratio_aKa"], -2), 0)
         chk("normRatioNorm", r["ratio_aKa_normalized"], 1)
         chk("normEnergyRatio", round(r["energy_ratio"], -1), 0)
     f = os.path.join(DGX, "jpl_alignment_o2_s0.json")
-    if os.path.exists(f):
+    if present(f):
         r = json.load(open(f, encoding="utf-8"))
         by = {(s["rows"], s["nugget"], s["scale"]): s for s in r["settings"]}
         s0 = by[("n4000", 1e-08, 1.0)]
@@ -273,10 +299,14 @@ if len(six) == 10:
         chk("alignRatioP", s0["ratio_P_median"], 1)
         chk("alignRatioLo", by[("n4000", 1e-08, 0.5)]["ratio_aKa"], 0)
         chk("alignRatioHi", by[("n4000", 1e-08, 2.0)]["ratio_aKa"], 0)
+        if ("n4000", 1e-08, 4.0) in by:   # the multiplier the campaign selected for every feature head (added after review)
+            chk("alignRatioSel", by[("n4000", 1e-08, 4.0)]["ratio_aKa"], 0)
+            chk("alignRatioPSel", by[("n4000", 1e-08, 4.0)]["ratio_P_median"], 2)
+            chk("alignRatioHeavy", by[("n4000", 0.0001, 4.0)]["ratio_aKa"], 1)
         if ("full", 1e-08, 1.0) in by:
             chk("alignRatioFull", by[("full", 1e-08, 1.0)]["ratio_aKa"], 0)
     f = os.path.join(DGX, "exp", "residual_spectrum_s0.json")
-    if os.path.exists(f):
+    if present(f):
         r = json.load(open(f, encoding="utf-8"))
         recs = list(r["members"].values()) + [r["corrected_pipeline"]]
         chk("specSharedEnergy", st.mean(x["energy_above_edge"] for x in r["members"].values()), 2)
@@ -284,12 +314,12 @@ if len(six) == 10:
         chk("specCompsHi", max(x["n_above_edge"] for x in recs), 0)
         chk("specEffRank", st.median(x["eff_rank"] for x in r["members"].values()), 0)
     f = os.path.join(DGX, "sm_norm_check_hpix_s1.json")
-    if os.path.exists(f):
+    if present(f):
         r = json.load(open(f, encoding="utf-8"))
         chk("normRatioLo", round(r["ratio_aKa"], -2), 0)
         chk("normRatioNormLo", r["ratio_aKa_normalized"], 1)
     f = os.path.join(DGX, "cost_check.json")
-    if os.path.exists(f):
+    if present(f):
         r = json.load(open(f, encoding="utf-8"))
         chk("costCoefM", r["coefficients_correction"] / 1e6, 1)
         chk("costGramS", r["gram_block_build_s"], 0)
@@ -300,7 +330,7 @@ if len(six) == 10:
         chk("costQueryOneMs", r["query_batch1_ms_per_query"], 0)
         chk("costQueryBatchMs", r["query_batch1000_ms_per_query"], 1)
     plam_f = os.path.join(DGX, "uq_plam_seeded.json")
-    if os.path.exists(plam_f):
+    if present(plam_f):
         plam = json.load(open(plam_f, encoding="utf-8"))
         for tag, T in (("hpix", "Six"), ("hpix5", "Five")):
             for a, L in (("a0.1", ""), ("a0.05", "Hi")):
@@ -315,20 +345,20 @@ if len(six) == 10:
                                     / plam[f"hpix_s{s}"]["a0.1"]["raw"]["mean_width"] for s in S), 2)
         chk("uqSpearman", st.mean(plam[f"hpix_s{s}"]["spearman_P_err"] for s in S), 2)
     sm6 = os.path.join(HERE, "collected", "secmom6_seeded.json")
-    if os.path.exists(sm6):
+    if present(sm6):
         rec = json.load(open(sm6, encoding="utf-8"))
         chk("predRMSSix", 100 * st.mean(r["pred_rms"] for r in rec), 3)
         chk("predRMSSixSd", 100 * st.stdev(r["pred_rms"] for r in rec), 3)
         chk("dispFacSix", st.mean(r["disp_factor"] for r in rec), 3)
         chk("dispFacSixSd", st.stdev(r["disp_factor"] for r in rec), 3)
-        chk("corrBarSix", st.mean(r["rho_mean"] for r in rec), 3)
-        chk("corrBarSixSd", st.stdev(r["rho_mean"] for r in rec), 3)
-        chk("ensFloorSix", 100 * st.mean(r["floor"] for r in rec), 3)
-        chk("ensFloorSixSd", 100 * st.stdev(r["floor"] for r in rec), 3)
+        chk("corrBarSix", st.mean(unc(r)["rbar"] for r in rec), 3)
+        chk("corrBarSixSd", st.stdev(unc(r)["rbar"] for r in rec), 3)
+        chk("ensFloorSix", 100 * st.mean(unc(r)["floor"] for r in rec), 3)
+        chk("ensFloorSixSd", 100 * st.stdev(unc(r)["floor"] for r in rec), 3)
         chk("errSixEq", 100 * st.mean(r["equal_weight"]["test"] for r in rec), 3)
         chk("errSixEqSd", 100 * st.stdev(r["equal_weight"]["test"] for r in rec), 3)
-        chk("corrNetLoSix", min(r["rho_min"] for r in rec), 2)
-        chk("corrNetHiSix", max(r["rho_max"] for r in rec), 2)
+        chk("corrNetLoSix", min(unc(r)["rmin"] for r in rec), 2)
+        chk("corrNetHiSix", max(unc(r)["rmax"] for r in rec), 2)
     kap = {}
     for f in glob.glob(os.path.join(HERE, "collected", "*", "a5_kappa_s*.json")):
         r = json.load(open(f, encoding="utf-8"))
@@ -390,3 +420,8 @@ if band_files:
                                                  "" if here else "<== not found in oco2.tex"))
 
 print("\n%d macro(s) disagree with the artifacts" % fails)
+if MISSING:
+    print("%d REQUIRED record(s) missing - the audit fails closed:" % len(MISSING))
+    for m in MISSING:
+        print("  ", m)
+sys.exit(1 if (fails or MISSING) else 0)

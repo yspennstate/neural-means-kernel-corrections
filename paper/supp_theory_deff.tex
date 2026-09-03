@@ -66,9 +66,10 @@ $\lambda$, out of $n=19000$; Figure~\ref{fig:spectra}). This gives a
 post-hoc reading of the cross-validated nugget: $\lambda$ lands where
 $d_{\mathrm{eff}}(\lambda)$ has absorbed the outlying eigenvalues and the
 leading bulk, and further decreasing $\lambda$ buys capacity precisely where
-the spectrum carries little signal. It also explains why the exact solve is
-affordable: the correction is numerically a problem of dimension
-$d_{\mathrm{eff}}$, not $n$.
+the spectrum carries little signal. It does not make the exact solve cheaper --- the
+Cholesky factorization costs $n^3/3$ flops whatever the spectrum --- but it
+says what that arithmetic buys: a correction whose statistical capacity is
+$d_{\mathrm{eff}}$ degrees of freedom, not $n$.
 
 The effective dimension is also exactly the total budget of the design
 factor from Theorem~\ref{thm:or}. Writing $A=K+n\lambda I$, the posterior

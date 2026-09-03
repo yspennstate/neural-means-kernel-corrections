@@ -110,7 +110,11 @@ used; we use the first $1250$ of the training block and the same
 
 
 The reading of the structural-mechanics plateau as a data floor is an
-inference from surrogates alone. The experiment that would decide it is to
+inference from surrogates alone: what is measured is a residual shared by
+every member of one pool of architectures, which a common approximation bias
+would produce as readily as a property of the data, and the material
+interface, the quadrature-to-grid transfer and the mesh of
+Section~\ref{sec:benchmark} are all candidates. The experiment that would decide it is to
 re-solve a set of the hardest cases on a refined mesh or with higher-order
 elements and compare the solver discrepancy with the shared residual of
 Section~\ref{sec:diversity}; we have not run it. Proposition~\ref{prop:aniso}

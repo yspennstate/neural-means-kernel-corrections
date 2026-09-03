@@ -18,6 +18,7 @@
 \firstpageno{1}
 
 \input{macros}
+\pdfinfo{/Title (Neural means and kernel corrections for operator learning) /Author (Yitzchak Shmalo) /Subject (operator learning, kernel ridge regression, ensembles, conformal prediction)}
 
 \begin{document}
 
@@ -43,12 +44,13 @@ the 1250-sample protocol against a published \pubBestLo\%. On the OCO-2
 radiative-transfer problem of Lamminp\"a\"a et al., where the same kernel on
 the raw state trails the network tenfold, it belongs on the network's
 learned features, and a per-coordinate combination improves on the
-published Gaussian-process emulator on that paper's two rescored error
-metrics on all three bands. The replicates show why ensembles saturate on
+published Gaussian-process emulator on two rescoring criteria defined on
+the released reduced representation, on all three bands. The replicates show why ensembles saturate on
 structural mechanics: every architecture's residuals align above
-\corrNetLoSix{} at every seed, sixty predictors reach $\saSixtyOracle$\% at
-hindsight-optimal convex weights, and a floor theorem for pools of seeds
-and architectures places that number, for the pool trained, from three
+\corrNetLoSix{} at every seed, sixty predictors reach a root-mean-square
+relative error of $\saSixtyOracleRms$\% at hindsight-optimal convex weights,
+and a floor theorem for pools of seeds and architectures places that number
+within a tenth of a point ($\saBound$\%), for the pool trained, from three
 measured alignments. The supporting bounds are stated with their
 conditions and checked numerically.
 \end{abstract}
@@ -102,7 +104,8 @@ The author declares no competing interests.
 manuscript preparation process}
 During the preparation of this work the author made substantial use of
 generative AI tools, and describes their role here. A large part of the
-software was written with Fable~5 (Anthropic): the implementation of the
+software was written with Fable~5 and Fable~5.1 (Anthropic, through the
+Claude Code agent, May to September 2026): the implementation of the
 experiments and diagnostics, the downloading, assembly and preparation of the
 benchmark and OCO-2 datasets, and the adaptation of the publicly released
 emulator code of Lamminp\"a\"a et al.\ --- originally split between Julia and a
@@ -112,7 +115,7 @@ residual coupling of neural means and exact kernel corrections, the
 two-regime framing that organizes the paper, and the supporting theory, all
 developed with AI assistance in calculation, drafting, and exposition. Each
 theorem and its proof was checked independently and more than once --- by
-Fable~5, by ChatGPT Pro (OpenAI), and by the author --- and the reported
+Fable~5, by ChatGPT Pro (OpenAI, 2026), and by the author --- and the reported
 numbers were verified against the released per-run data. The author reviewed
 all of the above and takes full responsibility for the content of the
 manuscript.

@@ -9,7 +9,12 @@ synthetic, so timings measure the arithmetic, not the data.
 
     python cost_check.py [--n 19000] [--d 41] [--q 1681] [--threads 8]
 """
-import argparse, json, os, resource, time
+import argparse, json, os, resource, sys, time
+# the BLAS thread cap must be in the environment before numpy is imported (a later setdefault is ignored by
+# an already-initialized OpenBLAS); the first release set it after the import, which is why the timings are re-measured
+_t = next((sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--threads" and i + 1 < len(sys.argv)), "8")
+for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
+    os.environ[_v] = _t
 import numpy as np
 from scipy.linalg import cho_factor, cho_solve
 

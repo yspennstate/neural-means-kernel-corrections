@@ -74,6 +74,20 @@ kept. The ensemble's diversity comes from the architectures and losses rather
 than from reseeding; the correlation analysis of Section~\ref{sec:diversity}
 indicates same-architecture reseeds would be more correlated still.
 
+\paragraph{Test-block access.} The structural-mechanics test block is the
+benchmark's fixed public split, and it has been read more than once in the
+course of this work: by the first-campaign tables, by the six-member
+campaign, by the ablations, the hard-case study, the learning curves, the
+sixty-predictor analysis, the conformal calibration (which draws its $1000$
+calibration cases from it) and by the post-review controls. Every number is
+evaluated once per run and no test quantity enters an optimizer, but the
+study as a whole has looked at the same $20000$ cases repeatedly, so its
+comparisons describe this block rather than confirm on untouched data; a
+frozen final evaluation on newly generated cases is the experiment that would
+make them confirmatory. The $2000$ public OCO-2 test states are in the same
+position across the ten-seed campaign, the readout control and the ensemble
+scoreboard.
+
 \paragraph{Seed protocol.} One seed value enters every stochastic component at
 once: the permutation that draws the validation split from the training pool,
 each member's initialization and batch order, the half-split of the stacking

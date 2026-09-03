@@ -90,11 +90,13 @@ every per-configuration probe value respects the lemma's bound
 $\tfrac12\lambda^{-1/2}$ at its own nugget, the closest approach being
 $0.27$ of the bound, at $\lambda=10^{-3}$. The
 coverage of Proposition~\ref{prop:conf} is computed at every seed and each
-observed value placed against the exact Beta law of Remark~\ref{rem:covlaw}:
-at the $90\%$ level ten of ten fall inside the central band $[88.1\%,91.8\%]$,
-and at the $95\%$ level ten of ten inside $[93.6\%,96.3\%]$; on the
-six-member pipeline the counts are ten of ten and nine of ten, the tenth
-sitting on the upper edge of the $95\%$ band. Finally the
+observed value placed against the Beta--binomial law of the evaluation
+fraction in Remark~\ref{rem:covlaw} ($m=1000$ calibration cases, $N=19000$
+evaluation cases): the central $95\%$ band is $[88.0\%,91.8\%]$ at the $90\%$
+level and $[93.5\%,96.3\%]$ at the $95\%$ level. On the six-member pipeline
+ten of ten seeds fall inside at both levels; on the five-member pipeline ten
+of ten at $90\%$ and nine of ten at $95\%$, the tenth ($93.35\%$) falling two
+tenths of a point below the lower edge. Finally the
 data-scaling sweep of the two raw-input kernel rows is refit at nested training
 sizes and at ten seeds per band. The approximate rank of the sensitivity map
 is $12$ of $20$ on O2 and $13$--$14$ of $24$ on the two CO$_2$ bands, a rank

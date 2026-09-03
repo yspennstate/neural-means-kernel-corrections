@@ -273,6 +273,13 @@ if len(six) == 10:
         chk("alignRatioP", s0["ratio_P_median"], 1)
         chk("alignRatioLo", by[("n4000", 1e-08, 0.5)]["ratio_aKa"], 0)
         chk("alignRatioHi", by[("n4000", 1e-08, 2.0)]["ratio_aKa"], 0)
+        if ("full", 1e-08, 1.0) in by:
+            chk("alignRatioFull", by[("full", 1e-08, 1.0)]["ratio_aKa"], 0)
+    f = os.path.join(DGX, "sm_norm_check_hpix_s1.json")
+    if os.path.exists(f):
+        r = json.load(open(f, encoding="utf-8"))
+        chk("normRatioLo", round(r["ratio_aKa"], -2), 0)
+        chk("normRatioNormLo", r["ratio_aKa_normalized"], 1)
     f = os.path.join(DGX, "cost_check.json")
     if os.path.exists(f):
         r = json.load(open(f, encoding="utf-8"))

@@ -574,12 +574,12 @@ $\|G-m\|_K\,P_\lambda(u)$, and the finite-design diagnostic of the operator
 factor moves in the direction the theory suggests: with the deployed
 correction kernel, the fitted correction's squared RKHS norm is about
 \normRatio$\times$ smaller when the kernel regresses ensemble residuals than
-when it regresses raw stress fields, and about \normRatioNorm$\times$
-smaller per unit energy of what is regressed (Table~\ref{tab:norms} in the
-supplement), the difference being the residual's smaller amplitude. Both
-numbers compare lower bounds on unknown norms at one nugget, so they
-describe the fitted objects rather than the smoothness of the residual
-operator. The design factor $P_\lambda$ is nonetheless a poor pointwise
+when it regresses raw stress fields, and between \normRatioNormLo{} and
+\normRatioNorm$\times$ smaller per unit energy of what is regressed across
+three seeds (Table~\ref{tab:norms} in the supplement), the difference being
+the residual's smaller amplitude. Both numbers compare lower bounds on
+unknown norms at the selected nugget and scale, so they describe the fitted
+objects rather than the smoothness of the residual operator. The design factor $P_\lambda$ is nonetheless a poor pointwise
 indicator here. It correlates \uqCorrAbs{} with the
 corrected surrogate's absolute error and negatively with the benchmark's
 relative error, because it tracks the output norm (\uqCorrNorm) rather

@@ -258,6 +258,9 @@
 \newcommand{\alignRatioP}{1.5}          % ratio of median test-point power functions, raw over features
 \newcommand{\alignRatioLo}{6}           % the norm ratio at half the median length scale
 \newcommand{\alignRatioHi}{154}         % the norm ratio at twice the median length scale
+\newcommand{\alignRatioFull}{77}        % the norm ratio on the full 18000-row training block (nugget 1e-8, median scale)
+\newcommand{\normRatioLo}{1800}         % the raw fitted-norm ratio at the seed whose correction chose scale multiplier 1 (seed 1); seeds 0 and 2 (multiplier 2): 4900 and 4300
+\newcommand{\normRatioNormLo}{3.2}      % the energy-normalized ratio at seed 1; seeds 0 and 2: 8.8 and 7.6
 % structural-mechanics fitted-norm diagnostic recomputed with the deployed correction kernel of seed 0
 % (campaign/dgx_checks/sm_norm_check.py; six-member stack; smult 2, nugget 1e-3): collected/dgx/sm_norm_check_hpix_s0.json
 \newcommand{\normRatio}{4900}           % raw over residual, fitted squared RKHS norms (was 271 at the original single-seed nugget)

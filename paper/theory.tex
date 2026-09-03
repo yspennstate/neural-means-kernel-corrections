@@ -314,7 +314,8 @@ function is smaller, its median $\alignRatioP$ times below the raw kernel's.
 The fitted-norm diagnostic moves far more: regressing the same outputs
 through the two kernels at that setting, the squared native-space norm of
 the fitted interpolant, $\operatorname{tr}(\alpha^\top K\alpha)$, is
-$\alignRatioNorm$ times smaller on the features than on the raw input. (An
+$\alignRatioNorm$ times smaller on the features than on the raw input
+($\alignRatioFull$ times on the full $18000$-row block). (An
 earlier draft quoted $42$ from $\alpha^\top Y$, which adds the term
 $n\lambda\|\alpha\|^2$; at this nugget the two agree to three digits, and
 the network retrained for the check lands at $38$.) Both numbers are

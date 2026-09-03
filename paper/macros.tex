@@ -70,10 +70,32 @@
 \newcommand{\corrNetHiSix}{0.98}
 \newcommand{\ensFloorSix}{4.910}     % equicorrelated floor, six members
 \newcommand{\ensFloorSixSd}{0.057}
-\newcommand{\uqCoverSix}{90.1}       % six-member conformal coverage at the 90% level
-\newcommand{\uqCoverSixSd}{0.4}
-\newcommand{\uqCoverSixHi}{95.0}     % at the 95% level
-\newcommand{\uqCoverSixHiSd}{0.8}
+% Split-conformal coverage on the complete-schedule campaign (ten seeds, 1000 calibration / 19000
+% evaluation cases of the test block). Three scores on the same split: ||e||/P_lambda (the band of
+% Section S3, P_lambda rebuilt from each seed's correction kernel; campaign/uq_conformal_plam.py),
+% the raw ||e|| (constant width) and ||e||/disagreement (campaign/conformal_seeded.py).
+\newcommand{\uqPlamSix}{89.9}        % six-member pipeline, P_lambda-scaled band, 90% level
+\newcommand{\uqPlamSixSd}{0.8}
+\newcommand{\uqPlamSixHi}{95.0}      % 95% level
+\newcommand{\uqPlamSixHiSd}{0.6}
+\newcommand{\uqRawSix}{90.4}         % six-member, constant-width band
+\newcommand{\uqRawSixSd}{0.8}
+\newcommand{\uqRawSixHi}{95.4}
+\newcommand{\uqRawSixHiSd}{0.5}
+\newcommand{\uqDisSix}{90.1}         % six-member, disagreement-scaled band
+\newcommand{\uqDisSixSd}{0.4}
+\newcommand{\uqDisSixHi}{95.0}
+\newcommand{\uqDisSixHiSd}{0.8}
+\newcommand{\uqPlamFive}{90.1}       % five-member pipeline of the same campaign, P_lambda band
+\newcommand{\uqPlamFiveSd}{0.9}
+\newcommand{\uqPlamFiveHi}{95.1}
+\newcommand{\uqPlamFiveHiSd}{0.8}
+\newcommand{\uqRawFive}{90.6}        % five-member, constant-width band
+\newcommand{\uqRawFiveSd}{0.4}
+\newcommand{\uqRawFiveHi}{95.4}
+\newcommand{\uqRawFiveHiSd}{0.6}
+\newcommand{\uqWidthRatio}{1.11}     % mean width of the P_lambda band over the constant-width band, 90% level, six-member
+\newcommand{\uqSpearman}{0.03}       % Spearman correlation of P_lambda with the corrected error on the test set, ten-seed mean
 % The two-member optimum of the MSE network and the FNO (Proposition exchange), RMS metric on validation
 \newcommand{\fnoRmsA}{5.047}         % FNO member RMS error, early-stopped checkpoints, ten-seed mean
 \newcommand{\fnoRmsB}{4.991}         % the same, annealed
@@ -193,8 +215,6 @@
 % Uncertainty
 \newcommand{\normRatio}{271}         % RKHS norm ratio direct/residual
 \newcommand{\uqCoverNom}{90}         % nominal conformal level (%)
-\newcommand{\uqCover}{90.2}          % empirical conformal coverage, ten-seed mean (%)
-\newcommand{\uqCoverSd}{0.6}
 \newcommand{\uqCorrAbs}{0.08}        % corr(power fn, absolute error) -- weak
 \newcommand{\uqCorrNorm}{0.65}       % corr(power fn, output norm) -- the confound
 \newcommand{\uqDisAbs}{0.074}        % corr(disagreement, abs err), five members, ten seeds
@@ -222,3 +242,10 @@
 \newcommand{\saKfMlpThree}{4.99}        % the same with the kernel-flow regularizer at weight 0.3, ten seeds
 \newcommand{\saKfMlpOne}{5.05}          % weight 1.0, five seeds
 \newcommand{\saSelAgree}{5.473}         % kernel member at 8,000-row fits: validation, GCV, LOO and KARE choose the same ridge at all ten seeds
+
+% ClimSim kernel budget ladder (added after review): the exact Matern kernel of the campaign's protocol
+% (selection on the pool validation block, test block scored once) fitted on more rows of the one-million
+% training slice, seed 0; the campaign's own rows used 6000. Records: collected/dgx/climsim_cap/.
+\newcommand{\csCapSix}{0.389}           % test R^2 at 6000 rows (the campaign's budget; campaign mean 0.390 +- 0.007)
+\newcommand{\csCapTwelve}{0.420}        % 12000 rows
+\newcommand{\csCapTwentyFour}{0.432}    % 24000 rows

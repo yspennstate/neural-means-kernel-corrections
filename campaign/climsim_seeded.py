@@ -13,6 +13,8 @@ Data: NMKC_CLIMSIM directory with {train,val}_{input,target}.npy (LEAP
 subsampled low-res arrays). Writes <root>/results/<TASK_ID>.json.
 
     python campaign/climsim_seeded.py --data train --n 100000 --seed 0 --kernel 1
+The kernel budget ladder (added after the campaign): --kernel_only 1 --cap 12000 etc.
+fits the same kernel on more rows of the same training slice; the campaign rows used cap 6000.
 """
 import argparse, json, os, pathlib, time
 import numpy as np
@@ -25,14 +27,17 @@ p.add_argument("--n", type=int, required=True)
 p.add_argument("--seed", type=int, default=0)
 p.add_argument("--kernel", type=int, default=0)
 p.add_argument("--epochs", type=int, default=60)
+p.add_argument("--cap", type=int, default=6000, help="rows the exact kernel is fitted on (the campaign used 6000)")
+p.add_argument("--kernel_only", type=int, default=0, help="1 = skip the neural mean; the kernel budget ladder")
 args = p.parse_args()
 
 THREADS = int(os.environ.get("NMKC_THREADS", "5"))
 torch.set_num_threads(THREADS)
 ROOT = pathlib.Path(os.environ.get("NMKC_ROOT", "."))
-TASK_ID = os.environ.get("TASK_ID", f"climsim_{args.data}_n{args.n}_s{args.seed}")
+TASK_ID = os.environ.get("TASK_ID", f"climsim_{args.data}_n{args.n}_s{args.seed}"
+                         + (f"_cap{args.cap}" if args.cap != 6000 or args.kernel_only else ""))
 CS = pathlib.Path(os.environ.get("NMKC_CLIMSIM", ROOT / "climsim"))
-OUT = ROOT / "seeds" / f"climsim_{args.data}_n{args.n}_s{args.seed}"
+OUT = ROOT / "seeds" / TASK_ID
 OUT.mkdir(parents=True, exist_ok=True)
 
 Xin = np.load(CS / f"{args.data}_input.npy", mmap_mode="r")
@@ -82,19 +87,29 @@ def m52(D2, ls):
     return (1 + np.sqrt(5) * r + 5 * D2 / (3 * ls ** 2)) * np.exp(-np.sqrt(5) * r)
 
 
-def kernel_point(cap=6000):
+def kernel_point(cap=None):
     """Matern-5/2 on the raw state: tuned on the pool validation block, then
-    the winner's fit (same subsample) scores the full test set once."""
+    the winner's fit (same subsample) scores the full test set once. The Gram
+    is filled in row blocks into one preallocated array (a 48000-row kernel is
+    18 GB; the naive elementwise build would hold several copies)."""
+    cap = cap or args.cap
     sub = np.random.default_rng(args.seed + 1).choice(len(Xtr), min(cap, len(Xtr)), replace=False)
     Xs = Xtr[sub].astype(np.float64); Ys = Ytr[sub].astype(np.float64)
     m1500 = min(1500, len(Xs))
     med = float(np.sqrt(np.median(sqd(Xs[:m1500], Xs[:m1500])[np.triu_indices(m1500, 1)])) + 1e-9)
-    D2 = sqd(Xs, Xs); D2v = sqd(Xkv, Xs)
+    c_ = len(Xs); BLK = 2000
+    D2 = np.empty((c_, c_))
+    for k in range(0, c_, BLK):
+        D2[k:k + BLK] = sqd(Xs[k:k + BLK], Xs)
+    D2v = sqd(Xkv, Xs)
+    K = np.empty((c_, c_))
     best = (np.inf, None, None)
     for s in (0.5, 1.0, 2.0, 4.0):
         Kv = m52(D2v, s * med)
         for nug in (1e-8, 1e-6, 1e-4, 1e-2):
-            K = m52(D2, s * med); K.flat[::len(Xs) + 1] += nug * len(Xs)
+            for k in range(0, c_, BLK):
+                K[k:k + BLK] = m52(D2[k:k + BLK], s * med)
+            K.flat[::c_ + 1] += nug * c_
             try:
                 a = cho_solve(cho_factor(K, lower=True, check_finite=False, overwrite_a=True),
                               Ys, check_finite=False)
@@ -103,8 +118,9 @@ def kernel_point(cap=6000):
             e = ((Kv @ a - Ykv) ** 2).mean()
             if e < best[0]:
                 best = (e, (s, nug), a)
+    del D2, K
     (s, nug), a = best[1], best[2]
-    print(f"  kernel: scale {s} nugget {nug:g} (selected on pool block)", flush=True)
+    print(f"  kernel (cap {c_}): scale {s} nugget {nug:g} (selected on pool block)", flush=True)
     Pk = np.empty((len(Xte_n), do))
     for k in range(0, len(Xte_n), 4000):
         Pk[k:k + 4000] = m52(sqd(Xte_n[k:k + 4000], Xs), s * med) @ a
@@ -152,18 +168,20 @@ t0 = time.time()
 row = dict(task_id=TASK_ID, kind="climsim_point", data=args.data, n=int(args.n),
            seed=args.seed, epochs=args.epochs, ntest=int(len(te)),
            active_outputs=int(active.sum()))
-Pm = train_mean()
-row["mean_r2"] = round(r2(Pm, Yte, yvar), 4)
-row["mean_rel"] = round(100 * rel(Pm, Yte), 3)
-np.savez(OUT / "per_output.npz", mean_sqerr=((Pm - Yte) ** 2).mean(0), yvar=yvar, active=active)
-if args.kernel:
+row["cap"] = int(args.cap)
+if not args.kernel_only:
+    Pm = train_mean()
+    row["mean_r2"] = round(r2(Pm, Yte, yvar), 4)
+    row["mean_rel"] = round(100 * rel(Pm, Yte), 3)
+    np.savez(OUT / "per_output.npz", mean_sqerr=((Pm - Yte) ** 2).mean(0), yvar=yvar, active=active)
+if args.kernel or args.kernel_only:
     Pk, kh = kernel_point()
     row["kernel_r2"] = round(r2(Pk, Yte, yvar), 4)
     row["kernel_rel"] = round(100 * rel(Pk, Yte), 3)
     row["kernel_hyper"] = kh
 row["minutes"] = round((time.time() - t0) / 60, 1)
-print(f"  n={args.n}: mean R2 {row['mean_r2']}  rel {row['mean_rel']}%"
-      + (f"  kernel R2 {row.get('kernel_r2')}" if args.kernel else "")
+print(f"  n={args.n}: mean R2 {row.get('mean_r2')}  rel {row.get('mean_rel')}%"
+      + (f"  kernel R2 {row.get('kernel_r2')} (cap {row['cap']})" if (args.kernel or args.kernel_only) else "")
       + f"  [{row['minutes']} min]", flush=True)
 
 res = ROOT / "results" / f"{TASK_ID}.json"

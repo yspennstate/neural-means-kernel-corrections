@@ -90,12 +90,17 @@ kernel after, tune by cross-validation rather than marginal likelihood, and
 solve the correction exactly at nineteen thousand points. Kernels on learned
 representations are likewise established: deep kernel learning
 \citep{wilson2016deep,calandra2016manifold} places a Gaussian process on the
-features of a network and trains through it. Our feature-space stage is the
-post-hoc form of that construction, with the exact solve and validation
-tuning used everywhere else in the pipeline, and what we add is not the
-construction but the controlled comparison of the same kernel on the raw
-input and on the learned features under one tuning routine and budget
-(Section~\ref{sec:oco2}).
+features of a network and trains through it, and the recent REEF-GP of
+\citet{vendrell2026geometry} places a Gaussian process on the residuals of a
+trained neural operator in its learned feature space, post hoc, for
+uncertainty quantification. Our feature-space stage is the post-hoc form of
+the same construction, with the exact solve and validation tuning used
+everywhere else in the pipeline; it differs from REEF-GP in what it is used
+for and how it is judged --- as a predictor, scored against the same kernel
+on the raw input under one tuning routine and budget
+(Section~\ref{sec:oco2}), with coverage supplied by split-conformal
+calibration rather than by the posterior --- and what we add is not the
+construction but that controlled comparison.
 
 Two further threads inform the design. The kernel-flow method
 \citep{owhadi2019kernel} learns a kernel from data by minimizing a

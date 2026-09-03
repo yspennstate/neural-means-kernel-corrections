@@ -54,9 +54,12 @@ method of \citet{batlle2024kernel} sit within $0.65$ points of one another,
 and our own kernel ridge reproduces the published kernel number. There the
 kernel's role is to correct the residual of a stacked neural mean, and the
 corrected pipeline reaches $\errSix\pm\errSixSd\%$ under the 20000-sample
-protocol, replicated at ten independently seeded runs: level with the best
-published number, PARA-Net's \pubBestHi\%, once the test block's own
-sampling error is counted, which we read as a tie, and below every other.
+protocol, replicated at ten independently seeded runs: within the test
+block's own sampling error of the best published number, PARA-Net's
+\pubBestHi\%, which is a single run reported without an uncertainty and
+whose predictions are not available for a paired comparison, and below
+every other. We call that a tie, and Section~\ref{sec:uncertainty-budget}
+says exactly what the word covers.
 Under the 1250-sample protocol of \citet{mora2025operator} it reaches
 $\errBestLow\pm\errBestLowSd\%$ against a published best of \pubBestLo\%.
 The published numbers on this benchmark carry no uncertainties, and
@@ -87,10 +90,13 @@ network $4.4\%$; the same regression on the trained network's features
 reaches $4.1\%$, past the network it feeds on, at ten of ten seeds on each
 band. The comparison is controlled --- the same kernel, tuning routine and
 budget on both inputs --- and it locates the difference: the effective
-dimension of the two Gram matrices is essentially the same, while the
-target's squared native-space norm falls by a factor of about forty, which
-is what the pullback identity of Proposition~\ref{prop:pullback} says a
-learned feature map can do and a rescaling of the input cannot. Combined per
+dimension of the two Gram matrices, a one-number summary of the design
+factor rather than its value at each test point, is essentially the same, while the
+squared native-space norm of the kernel interpolant of the targets --- the
+computable lower bound on the target's own norm --- falls by a factor of
+about forty, which is what the pullback identity of
+Proposition~\ref{prop:pullback} says a learned feature map can do and a
+rescaling of the input cannot. Combined per
 output coordinate, across networks trained in the flat and in
 metric-weighted losses and the kernel heads on their features, the surrogate
 improves on the emulator on both of that problem's error metrics on all
@@ -122,8 +128,10 @@ a kernel, whose rate half the OCO-2 sweep does not bear out; and a
 distribution-free coverage statement whose hypotheses the calibration
 protocol satisfies. The last matters because the design factor in
 Theorem~\ref{thm:or}, though a valid bound, ranks the pointwise error poorly
-on the benchmark, and its split-conformal rescaling is the one uncertainty
-signal that survives our tests (Section~\ref{sec:uq}). Each statement is
+on the benchmark; its split-conformal rescaling holds its nominal coverage
+at every seed, and so does a constant-width band calibrated the same way,
+so what the design factor contributes on this benchmark is the guarantee
+rather than the ranking (Section~\ref{sec:uq}). Each statement is
 checked numerically (Supplement~\ref{app:verification}); the two-member
 stacking rule is scored prospectively on every member pair of every seed and
 reported as it came out, reliable outside a margin band set by its own

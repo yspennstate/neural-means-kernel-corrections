@@ -13,6 +13,8 @@ Differences from jpl_pipeline.py:
 
 Environment: NMKC_ROOT, TASK_ID, NMKC_THREADS. Data under <root>/data/jpl_oco2
 via NMKC_JPL_DATA (defaults to the repo layout otherwise).
+Rows ridge_<mode> and combined_plus_ridge (added after the campaign) are the
+frozen-feature linear-readout control for the kernel heads.
 
     python campaign/jpl_seeded.py --band o2 --seed 3
 """
@@ -189,6 +191,27 @@ def matern_head(Ztr, Zva, Zte, err_fn, label, w=None):
     return out, dict(scale=scale, nugget=nug, med=float(med))
 
 
+def ridge_head(Ztr, Zva, Zte, err_fn, label):
+    """Control for the kernel heads: a linear readout refit on the same frozen features.
+    Ridge regression with intercept from the standardized last-layer features to the
+    targets, the penalty chosen on validation by err_fn from a fixed grid. If this row
+    matched the kernel head, the head's gain over the network would be readout refitting;
+    if it matches the network, the gain is the kernel."""
+    mu, sd = Ztr.mean(0), Ztr.std(0) + 1e-9
+    Ftr, Fval, Fte = (Ztr - mu) / sd, (Zva - mu) / sd, (Zte - mu) / sd
+    ym = Ytr.mean(0)
+    G = Ftr.T @ Ftr; Bm = Ftr.T @ (Ytr - ym); n = len(Ftr); d = Ftr.shape[1]
+    best = (np.inf, None)
+    for lam in (1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1e0):
+        W = np.linalg.solve(G + lam * n * np.eye(d), Bm)
+        e = err_fn(Fval @ W + ym)
+        if e < best[0]:
+            best = (e, (lam, W))
+    lam, W = best[1]
+    print(f"  {label}: ridge {lam:g}", flush=True)
+    return [Ftr @ W + ym, Fval @ W + ym, Fte @ W + ym], dict(ridge=lam)
+
+
 t_all = time.time()
 results, val_preds, te_preds, hyper = {}, {}, {}, {}
 
@@ -216,6 +239,7 @@ hyper["kernel_ard"] = h
 val_preds["kernel_ard"], te_preds["kernel_ard"] = ard[1], ard[2]
 
 members_val, members_te = [], []
+ridge_val, ridge_te = [], []
 for mode, mname in (("flat", "mean_flat"), ("wnum", "mean_wnum"), ("radx", "mean_radx")):
     t0 = time.time()
     Pm, Fm = train(mode)
@@ -232,7 +256,14 @@ for mode, mname in (("flat", "mean_flat"), ("wnum", "mean_wnum"), ("radx", "mean
     hyper[dname] = h
     members_val.append(D[1]); members_te.append(D[2])
     val_preds[dname], te_preds[dname] = D[1], D[2]
-    print(f"{mname}/{dname} done [{(time.time()-t0)/60:.1f} min]", flush=True)
+    # readout control: the same frozen features under a linear (ridge) readout
+    Rg, hr = ridge_head(Fm[0], Fm[1], Fm[2], err_fn, f"ridge_{mode}")
+    rname = f"ridge_{mode}"
+    results[rname] = dict(reduced=rel(Rg[2], Yte), radiance=rad(Rg[2], Yte))
+    hyper[rname] = hr
+    ridge_val.append(Rg[1]); ridge_te.append(Rg[2])
+    val_preds[rname], te_preds[rname] = Rg[1], Rg[2]
+    print(f"{mname}/{dname}/{rname} done [{(time.time()-t0)/60:.1f} min]", flush=True)
 
 # per-coordinate selection on validation (optimal for any diagonal metric)
 C_te = np.empty_like(Yte)
@@ -244,6 +275,14 @@ for j in range(Yte.shape[1]):
     C_te[:, j] = members_te[w][:, j]
 results["combined"] = dict(reduced=rel(C_te, Yte), radiance=rad(C_te, Yte))
 te_preds["combined"] = C_te
+
+# the same selection with the ridge readouts admitted as candidates (control)
+Cr_te = np.empty_like(Yte)
+for j in range(Yte.shape[1]):
+    errs = [np.sqrt(((m[:, j] - Yval[:, j]) ** 2).mean()) for m in members_val + ridge_val]
+    Cr_te[:, j] = (members_te + ridge_te)[int(np.argmin(errs))][:, j]
+results["combined_plus_ridge"] = dict(reduced=rel(Cr_te, Yte), radiance=rad(Cr_te, Yte))
+te_preds["combined_plus_ridge"] = Cr_te
 
 # weighted variant: per-sample weights 1/||z||^2 make the selection exactly
 # optimal for the squared relative error (the metric the proposition covers)
@@ -288,6 +327,10 @@ for name, (er, ea) in per.items():
 # paired contrasts behind the claims in the text
 boot["dkr_flat_minus_mean_flat"] = dict(
     reduced=ci(per["dkr_flat"][0][bidx].mean(1) - per["mean_flat"][0][bidx].mean(1)))
+boot["dkr_flat_minus_ridge_flat"] = dict(
+    reduced=ci(per["dkr_flat"][0][bidx].mean(1) - per["ridge_flat"][0][bidx].mean(1)))
+boot["ridge_flat_minus_mean_flat"] = dict(
+    reduced=ci(per["ridge_flat"][0][bidx].mean(1) - per["mean_flat"][0][bidx].mean(1)))
 boot["combined_minus_kernel_flow"] = dict(
     reduced=ci(per["combined"][0][bidx].mean(1) - per["kernel_flow"][0][bidx].mean(1)),
     radiance=ci(per["combined"][1][bidx].mean(1) - per["kernel_flow"][1][bidx].mean(1)))

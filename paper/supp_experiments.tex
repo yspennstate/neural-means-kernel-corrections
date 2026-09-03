@@ -232,27 +232,38 @@ invisible to any within-ensemble statistic, because the members agree precisely
 where they are jointly wrong. Section~\ref{sec:errors} is the same fact seen on
 the hard tail.
 
-What does hold is coverage, and it holds at every seed. We take the exact
-split-conformal quantile of the corrected surrogate's error score on a
-calibration subset drawn from the test block --- $1000$ calibration cases
-against $19000$ evaluation cases, neither used for training, checkpointing,
-stacking, or kernel tuning --- and evaluate coverage on the disjoint remainder.
-Conformal validity needs no correlation between the score and the error, only
-exchangeability, which this protocol supplies exactly
-(Section~\ref{sec:theory-conf}). At the nominal \uqCoverNom\% level the observed
-coverage is $\uqCover\pm\uqCoverSd\%$, and the right comparison is not with
+What does hold is coverage, and it holds at every seed. Three bands are
+calibrated on the same split --- $1000$ calibration cases drawn from the
+test block against the $19000$ evaluation cases, neither used for training,
+checkpointing, stacking, or kernel tuning --- from three nonconformity
+scores: $\|e\|_2/P_\lambda$, the score of Section~\ref{sec:theory-conf}, with
+$P_\lambda$ the power function of each seed's own correction kernel (its
+selected scale multiplier and nugget, its median length scale, the training
+design of that seed) evaluated at every test input; the raw score $\|e\|_2$,
+which gives a constant-width band; and $\|e\|_2$ divided by the ensemble
+disagreement. Conformal validity needs no correlation between the score and
+the error, only exchangeability, which this protocol supplies exactly, so
+all three are valid; what differs is their width and their shape. For the
+six-member pipeline the $P_\lambda$ band covers $\uqPlamSix\pm\uqPlamSixSd\%$
+at the nominal \uqCoverNom\% level, and the right comparison is not with
 $90\%$ but with the exact finite-sample law: with $m=1000$ calibration points
-the coverage of a split-conformal band is $\mathrm{Beta}(901,100)$ distributed,
-whose central $95\%$ interval is $[88.1\%, 91.8\%]$. All ten seeds fall inside
-it. At the $95\%$ level the band is $[93.6\%, 96.3\%]$ and the observed
-coverage is $95.0\pm0.6\%$, again with all ten inside. The six-member
-pipeline gives $\uqCoverSix\pm\uqCoverSixSd\%$ and
-$\uqCoverSixHi\pm\uqCoverSixHiSd\%$, with all ten seeds inside at the $90\%$
-level and nine at the $95\%$ level, the tenth on the band's upper edge.
-Scaling the score by
-ensemble disagreement, which the correlations above say should not help, indeed
-does not: it changes mean coverage by three tenths of a point and leaves every
-seed inside the same band. The lesson is narrow but real: a valid pointwise bound
+the coverage of a split-conformal band is $\mathrm{Beta}(901,100)$
+distributed, whose central $95\%$ interval is $[88.1\%, 91.8\%]$, and all ten
+seeds fall inside it; at the $95\%$ level the band is $[93.6\%, 96.3\%]$ and
+the observed coverage is $\uqPlamSixHi\pm\uqPlamSixHiSd\%$, again ten of ten.
+The constant-width band covers $\uqRawSix\pm\uqRawSixSd\%$ and
+$\uqRawSixHi\pm\uqRawSixHiSd\%$, ten of ten at both levels, with a mean
+width \uqWidthRatio{} times smaller than the $P_\lambda$ band's; the
+disagreement-scaled band covers $\uqDisSix\pm\uqDisSixSd\%$ and
+$\uqDisSixHi\pm\uqDisSixHiSd\%$, with the tenth seed on the upper edge of the
+$95\%$ band. The five-member pipeline of the same campaign gives
+$\uqPlamFive\pm\uqPlamFiveSd\%$ and $\uqPlamFiveHi\pm\uqPlamFiveHiSd\%$ for
+the $P_\lambda$ band (ten of ten and nine of ten inside) and
+$\uqRawFive\pm\uqRawFiveSd\%$ and $\uqRawFiveHi\pm\uqRawFiveHiSd\%$ for the
+constant-width band (ten of ten at both levels). The records are
+\texttt{collected/dgx/uq\_plam\_seeded.json} and the \texttt{uq} field of
+each seed's pipeline record, written by \texttt{campaign/uq\_conformal\_plam.py}
+and \texttt{campaign/conformal\_seeded.py}. The lesson is narrow but real: a valid pointwise bound
 (Theorem~\ref{thm:or}) is not automatically a useful pointwise indicator, the
 standard uncertainty signals can both fail on the same problem, and a
 relative-error metric has to have its normalization accounted for before a
@@ -283,10 +294,10 @@ Ratio & \normRatio$\times$ \\
 standard deviation $P_\lambda$ against the corrected surrogate's relative error
 on the test set; the association is weak and, because of the output-amplitude
 confound, slightly negative. Right: decile calibration of $P_\lambda$ against
-absolute error, the theory-consistent quantity. Across all ten seeds the
-distribution-free conformal band attains $\uqCover\pm\uqCoverSd\%$ coverage at
-the nominal \uqCoverNom\% level, inside the exact finite-sample interval at ten
-seeds out of ten.}
+absolute error, the theory-consistent quantity. Across all ten seeds of the
+six-member pipeline the $P_\lambda$-scaled conformal band attains
+$\uqPlamSix\pm\uqPlamSixSd\%$ coverage at the nominal \uqCoverNom\% level,
+inside the exact finite-sample interval at ten seeds out of ten.}
 \label{fig:uq}
 \end{figure}
 

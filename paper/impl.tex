@@ -98,6 +98,24 @@ records, rescore a new combination rule on the stored residuals, and rerun the
 pipeline from the code. Where a statement below turns on an array rather than
 on a record, it is marked.
 
+\paragraph{Additions after review.} Three computations were added after a
+review of the manuscript, each from the stored campaign arrays or the
+campaign's own scripts, and each is recorded under \texttt{collected/dgx}.
+First, the conformal band of Section~\ref{sec:theory-conf}: the released
+scripts had computed the constant-width and the disagreement-scaled bands,
+and the text had described the reported band as the $P_\lambda$-scaled one;
+\texttt{campaign/uq\_conformal\_plam.py} now computes that band at every
+seed, rebuilding $P_\lambda$ from each seed's own correction kernel and using
+the same calibration split, and Section~\ref{sec:uq} reports all three.
+Second, the frozen-feature readout control for the OCO-2 kernel heads:
+\texttt{campaign/jpl\_seeded.py} was rerun at ten seeds per band with a ridge
+readout on the same frozen features added as a row
+(Table~\ref{tab:oco2ridge}). Third, the ClimSim kernel at larger budgets:
+the campaign fitted the exact kernel on $6000$ rows at every training size,
+so its flatness across sizes was by construction; \texttt{campaign/climsim\_seeded.py}
+now takes the budget as an argument, and Supplement~\ref{supp:oco2} reports
+the kernel's own ladder under the same protocol.
+
 \paragraph{What the two campaigns completed.} The first structural-mechanics
 chain was enqueued at ten seeds on four CPU instances. The kernel ridge, the
 metric-loss MLP, the normalized-MSE MLP and the refiner completed at all ten,

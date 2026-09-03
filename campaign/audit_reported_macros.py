@@ -239,12 +239,35 @@ if len(six) == 10:
         if "last_two_steps" in lc and "lcLastTwoGain" in mac:
             chk("lcLastTwoGain", lc["last_two_steps"]["gain_mean"], 3)
             chk("lcLastTwoGainSd", lc["last_two_steps"]["gain_sd"], 3)
-    cov90 = [100 * six[s]["uq"]["a0.1"]["scaled"]["coverage"] for s in S]
-    cov95 = [100 * six[s]["uq"]["a0.05"]["scaled"]["coverage"] for s in S]
-    chk("uqCoverSix", st.mean(cov90), 1)
-    chk("uqCoverSixSd", st.stdev(cov90), 1)
-    chk("uqCoverSixHi", st.mean(cov95), 1)
-    chk("uqCoverSixHiSd", st.stdev(cov95), 1)
+    # conformal coverage, three scores on one calibration split: the disagreement-scaled and raw
+    # bands are in each seed's pipeline record (conformal_seeded.py); the P_lambda-scaled band is
+    # in collected/dgx/uq_plam_seeded.json (uq_conformal_plam.py), keyed <tag>_s<seed>
+    for a, L in (("a0.1", ""), ("a0.05", "Hi")):
+        dis = [100 * six[s]["uq"][a]["scaled"]["coverage"] for s in S]
+        chk("uqDisSix" + L, st.mean(dis), 1)
+        chk("uqDisSix" + L + "Sd", st.stdev(dis), 1)
+    # the ClimSim kernel budget ladder (added after review): one record per budget, seed 0, n = 1,000,000
+    for cap, key in ((6000, "csCapSix"), (12000, "csCapTwelve"), (24000, "csCapTwentyFour"), (48000, "csCapFortyEight")):
+        f = os.path.join(DGX, "climsim_cap", f"climsim_train_n1000000_s0_cap{cap}.json")
+        if os.path.exists(f) and key in mac:
+            r = json.load(open(f, encoding="utf-8"))
+            assert r["kernel_hyper"]["cap"] == cap, (f, r["kernel_hyper"]["cap"])
+            chk(key, r["kernel_r2"], 3)
+    plam_f = os.path.join(DGX, "uq_plam_seeded.json")
+    if os.path.exists(plam_f):
+        plam = json.load(open(plam_f, encoding="utf-8"))
+        for tag, T in (("hpix", "Six"), ("hpix5", "Five")):
+            for a, L in (("a0.1", ""), ("a0.05", "Hi")):
+                for band, B in (("plam", "Plam"), ("raw", "Raw")):
+                    v = [100 * plam[f"{tag}_s{s}"][a][band]["coverage"] for s in S]
+                    chk(f"uq{B}{T}{L}", st.mean(v), 1)
+                    chk(f"uq{B}{T}{L}Sd", st.stdev(v), 1)
+        # the raw band is computed by both scripts on the same split: they must agree exactly
+        for s in S:
+            assert abs(plam[f"hpix_s{s}"]["a0.1"]["raw"]["coverage"] - six[s]["uq"]["a0.1"]["raw"]["coverage"]) < 1e-12, s
+        chk("uqWidthRatio", st.mean(plam[f"hpix_s{s}"]["a0.1"]["plam"]["mean_width"]
+                                    / plam[f"hpix_s{s}"]["a0.1"]["raw"]["mean_width"] for s in S), 2)
+        chk("uqSpearman", st.mean(plam[f"hpix_s{s}"]["spearman_P_err"] for s in S), 2)
     sm6 = os.path.join(HERE, "collected", "secmom6_seeded.json")
     if os.path.exists(sm6):
         rec = json.load(open(sm6, encoding="utf-8"))

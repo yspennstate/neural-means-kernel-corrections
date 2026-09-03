@@ -69,6 +69,22 @@ python ens_rmt_dgx.py
 python p1_members_eval.py
 ```
 
+Three further computations were added after a review of the manuscript, each
+from the stored campaign arrays or the campaign's own scripts; their records
+are under `campaign/collected/dgx/`.
+
+```
+# the conformal band the theory names, ||e||/P_lambda with P_lambda rebuilt from each seed's correction
+# kernel, on the same calibration split as the constant-width and disagreement-scaled bands (Section 4.6)
+python campaign/uq_conformal_plam.py --seed 0 --tags hpix5,hpix        # seeds 0..9 -> uq_plam_seeded.json
+# the frozen-feature ridge-readout control for the OCO-2 kernel heads: the campaign script rerun with the
+# rows ridge_<mode> and combined_plus_ridge (Table of Section 5), ten seeds per band
+python campaign/jpl_seeded.py --band o2 --seed 0                        # -> results/oco_o2_s0.json
+python campaign/gen_oco_ridge_table.py <results_dir>
+# the ClimSim kernel at larger budgets than the campaign's 6000 rows, same protocol (Supplement S5)
+python campaign/climsim_seeded.py --data train --n 1000000 --seed 0 --kernel_only 1 --cap 24000
+```
+
 ## Results
 
 **OCO-2 radiative-transfer emulation** (Lamminpää et al., AMT 2025; reduced
@@ -94,9 +110,9 @@ of ten seeds, the exception missing by 0.0015 points. The same kernel scores
 von Mises stress field). The pipeline reaches **4.572% +- 0.010%** relative
 test error over ten seeds with five members, and **4.546% +- 0.003%** with
 the FNO trained to a complete schedule and a UNet added (a second ten-seed
-campaign on one 40-core host), level with the best published architecture
-(PARA-Net, 4.55%) rather than beating it -- the differences are at most one
-standard error -- and below FNO (4.76%), PCA-Net (4.67%), DeepONet (5.20%)
+campaign on one 40-core host), within the test block's sampling error of the
+best published architecture (PARA-Net, 4.55%, a single run reported without
+an uncertainty) rather than beating it, and below FNO (4.76%), PCA-Net (4.67%), DeepONet (5.20%)
 and the optimal-recovery kernel (5.18%); in the 1250-sample regime it reaches
 **5.433% +- 0.093%** over ten seeds against a published best of 6.49%. Sixty
 predictors, ten seeds of six architectures, reach 4.61% at equal weights and

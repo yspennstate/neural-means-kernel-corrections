@@ -18,8 +18,14 @@ Supplement~\ref{app:proofs}.
 \label{sec:theory-stages-summary}
 
 Every fitted stage of the pipeline carries an elementary finite-sample
-bound, stated and proved in the online supplement
-(Section~S1): a symmetrization inequality behind the reflection
+bound, stated and proved in the online supplement (Section~S1). The
+bounds are stated for the pipeline as deployed: every selection --- the
+member set, the stack weights, the kernel scale and nugget, and the choice
+between the stacked and the corrected surrogate --- is made on the
+validation split, the test block is read once, and the conformal
+calibration split is drawn from the test block after all selections are
+fixed, so the independence that the coverage statement needs holds by
+construction rather than by assumption. The bounds are: a symmetrization inequality behind the reflection
 averaging (Proposition~\ref{prop:sym}), the leave-half-out reading of
 the kernel-flow regularizer (Proposition~\ref{prop:kf}), capacity
 bounds for the validated stack, the honesty comparison, the
@@ -438,14 +444,19 @@ the constant $\|G-m\|_K$ is not known a priori and
 Section~\ref{sec:uq} shows that $P_\lambda$ alone ranks the error weakly.
 What the surrogate reports as uncertainty is therefore a rescaling
 $q\,P_\lambda(u)$, whose multiplier is the split-conformal quantile of the
-validation scores $\|e(\tilde u_i)\|_2/P_\lambda(\tilde u_i)$. Its coverage
-needs neither the bound to be tight nor $P_\lambda$ to rank the error: it
-needs exchangeability alone, which the fixed splits provide, and it then
-holds in finite samples, $1-\alpha\le\mathbb P(G(u^\star)\in C(u^\star))\le
-1-\alpha+1/(m+1)$ (Proposition~\ref{prop:conf}). The realized coverage has
+scores $\|e(\tilde u_i)\|_2/P_\lambda(\tilde u_i)$ on a calibration split of
+the test block, drawn after every selection in the pipeline has been made
+on the validation split; Section~\ref{sec:uq} reports this band beside a
+constant-width band calibrated the same way from the raw scores
+$\|e(\tilde u_i)\|_2$. Coverage needs neither the bound to be tight nor
+$P_\lambda$ to rank the error: it needs exchangeability alone, which the
+protocol provides, and it then holds in finite samples,
+$1-\alpha\le\mathbb P(G(u^\star)\in C(u^\star))\le 1-\alpha+1/(m+1)$
+(Proposition~\ref{prop:conf}). The realized coverage has
 an exact law as well --- $\mathrm{Beta}(k,m+1-k)$ at
 $k=\lceil(1-\alpha)(m+1)\rceil$, whence the
 $[88.1\%,91.8\%]$ band against which Section~\ref{sec:uq} places the ten
 seeds (Remark~\ref{rem:covlaw}). Both statements, with their proofs and
-the reason this is the one uncertainty signal on this benchmark that
-survives testing, are in Supplement~\ref{supp:conf}.
+the comparison of this band with the constant-width and
+disagreement-scaled bands calibrated on the same split, are in
+Supplement~\ref{supp:conf}.

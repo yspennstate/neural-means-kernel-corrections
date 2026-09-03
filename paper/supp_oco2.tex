@@ -244,18 +244,28 @@ right panel of Figure~\ref{fig:ocoscaling} plots those points. ClimSim
 publishes no canonical test split, so each seed there draws its own
 $20000$-row test block and the spreads below include that variation.
 
-What the points establish is the high-data half of the picture, and they
-establish it cleanly. The exact kernel on the state is flat:
-$0.390\pm0.007$, $0.391\pm0.006$ and $0.387\pm0.007$ at one, two and three and
-a half million samples, unmoved across a factor of three and a half in data.
-The neural mean over the same range is both far above it and still climbing:
-$0.544\pm0.005$ at one million (five seeds), $0.563\pm0.004$ at two million
-and $0.575\pm0.004$ at three and a half million (three seeds each), closing on
-the published multilayer-perceptron baseline near $0.6$. The separation is
-some twenty times the seed scatter at every size, so the ordering at these
-sizes is not a matter of which run one looks at, and the contrast between a
-data-limited mean and a saturated kernel is exactly the one the OCO-2 sweep
-shows on its own scale.
+What the points establish is the high-data half of the picture. The neural
+mean is far above the kernel and still climbing: $0.544\pm0.005$ at one
+million (five seeds), $0.563\pm0.004$ at two million and $0.575\pm0.004$ at
+three and a half million (three seeds each), closing on the published
+multilayer-perceptron baseline near $0.6$. The kernel rows of the campaign
+read $0.390\pm0.007$, $0.391\pm0.006$ and $0.387\pm0.007$ at the three
+sizes, but that flatness is by construction and says nothing about the
+kernel: the exact solve was fitted on a $6000$-row subsample of the
+training slice at every size, a budget rather than a data point. What the
+kernel does with more rows was measured afterwards under the same protocol
+(selection on the pool validation block, the test block scored once, seed
+$0$, the one-million slice): $\csCapSix$ at $6000$ rows, $\csCapTwelve$ at
+$12000$ and $\csCapTwentyFour$ at $24000$. It improves with budget, by about
+three hundredths for the first doubling and one for the second, and at
+$24000$ rows --- four times the campaign's budget, and the largest exact
+solve we ran --- it remains eleven hundredths of $R^2$ below the network at
+one million samples. The separation at the campaign's sizes is some twenty
+times the seed scatter, so the ordering is not a matter of which run one
+looks at; the contrast is between a data-limited mean and a
+budget-limited exact kernel whose diminishing returns per doubling do not
+reach the network within any budget a dense solve affords, which is the
+OCO-2 picture on a larger scale.
 
 Where the two families cross is not something this range can locate: the
 sweep begins above any plausible crossing. The regimes of
@@ -278,9 +288,12 @@ ClimSim, test $R^2$ over the outputs with non-negligible variance, at one,
 two and three and a half million training samples under the held-out
 selection protocol --- five seeds at one million and three at each of the
 larger sizes, error bars over seeds. The range begins above any plausible
-crossing between the two families, so none is shown; over it the kernel is
-flat and the neural mean is far above it and still rising toward the
-published baseline (dotted).}
+crossing between the two families, so none is shown. The kernel points are
+the campaign's, fitted on $6000$ rows at every training size, so their
+flatness across sizes is by construction; the kernel's own budget ladder,
+measured afterwards under the same protocol, is in the text. The neural
+mean is far above it and still rising toward the published baseline
+(dotted).}
 \label{fig:ocoscaling}
 \end{figure}
 

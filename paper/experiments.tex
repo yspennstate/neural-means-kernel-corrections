@@ -581,26 +581,35 @@ while the shared component is invisible to any within-ensemble statistic
 because the members agree precisely where they are jointly wrong
 (Section~\ref{sec:diversity}).
 
-What holds is coverage, at every seed. The exact split-conformal band is
-built on $1000$ calibration cases drawn from the test block and evaluated
-on the disjoint $19000$, neither used for training, checkpointing,
-stacking or kernel tuning, so exchangeability holds exactly
+What holds is coverage, at every seed. The band the theory names,
+$q\,P_\lambda(u)$ with $P_\lambda$ rebuilt from each seed's own correction
+kernel, is calibrated on $1000$ cases drawn from the test block and
+evaluated on the disjoint $19000$, neither used for training,
+checkpointing, stacking or kernel tuning, so exchangeability holds exactly
 (Section~\ref{sec:theory-conf}) and validity needs no correlation between
-score and error. Observed coverage at the nominal \uqCoverNom\% level is
-$\uqCover\pm\uqCoverSd\%$, and the right comparison is with the exact
+score and error --- which is as well, since the rank correlation between
+$P_\lambda$ and the error is \uqSpearman. For the six-member pipeline the
+observed coverage at the nominal \uqCoverNom\% level is
+$\uqPlamSix\pm\uqPlamSixSd\%$, and the right comparison is with the exact
 finite-sample law rather than with $90\%$: the coverage of such a band is
 $\mathrm{Beta}(901,100)$ distributed, whose central $95\%$ interval is
 $[88.1\%,91.8\%]$, and all ten seeds fall inside it; at the $95\%$ level
 the interval is $[93.6\%,96.3\%]$ and the observed coverage
-$95.0\pm0.6\%$, again ten of ten. The six-member pipeline repeats the check:
-$\uqCoverSix\pm\uqCoverSixSd\%$ at the $90\%$ level with all ten seeds
-inside the band, and $\uqCoverSixHi\pm\uqCoverSixHiSd\%$ at the $95\%$
-level with nine inside and the tenth on the band's upper edge --- one
-excursion in twenty checks against central $95\%$ bands, which is the rate
-the law itself predicts. Rescaling the score by ensemble disagreement, which
-the correlations say should not help, indeed does not.
-Supplement~\ref{supp:experiments} carries the measurements behind each of
-these statements. The lesson is narrow but real: a valid pointwise bound is
+$\uqPlamSixHi\pm\uqPlamSixHiSd\%$, again ten of ten. A constant-width band
+calibrated the same way from the raw scores $\|e\|_2$ covers
+$\uqRawSix\pm\uqRawSixSd\%$ and $\uqRawSixHi\pm\uqRawSixHiSd\%$, also ten
+of ten at both levels, and the $P_\lambda$ band is on average
+\uqWidthRatio{} times as wide as it: a scale factor that does not rank the
+error buys validity and nothing else. Rescaling the score by ensemble
+disagreement, which the correlations say should not help, indeed does not:
+$\uqDisSix\pm\uqDisSixSd\%$ and $\uqDisSixHi\pm\uqDisSixHiSd\%$, with nine
+seeds inside at the $95\%$ level and the tenth on the band's upper edge,
+one excursion in the checks against central $95\%$ bands, which is the rate
+the law itself predicts. The five-member pipeline of the same campaign
+repeats the pattern ($\uqPlamFive\pm\uqPlamFiveSd\%$ and
+$\uqPlamFiveHi\pm\uqPlamFiveHiSd\%$ for the $P_\lambda$ band, ten of ten
+and nine of ten inside). Supplement~\ref{supp:experiments} carries the
+measurements behind each of these statements. The lesson is narrow but real: a valid pointwise bound is
 not automatically a useful pointwise indicator, two uncertainty signals of
 quite different provenance can both fail on the same problem, and a
 relative-error metric has to have its normalization accounted for before a

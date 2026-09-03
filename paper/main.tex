@@ -31,33 +31,30 @@
 \maketitle
 
 \begin{abstract}%
-A neural network mean followed by an exact Mat\'ern kernel regression has,
-on two public emulation problems with published baselines, two distinct
-uses. On the structural-mechanics benchmark of de Hoop et al., where kernel
-methods and neural operators are competitive, the kernel corrects the
-residual of a stacked neural mean: the pipeline reaches
-$\errSix\pm\errSixSd$\% test error over ten seeded replicates, level with
-the best published method, PARA-Net at \pubBestHi\%, within the test block's
-sampling error and below every other, and $\errBestLow\pm\errBestLowSd$\% in
+Where should an exact kernel regression sit relative to a trained neural
+network? We study the question on two operator-learning problems,
+replicating every stage at ten seeds. On the
+structural-mechanics benchmark of de Hoop et al., where kernels and neural
+operators are competitive, the kernel corrects the residual of a stacked
+neural mean: the pipeline reaches $\errSix\pm\errSixSd$\% test error, within
+the test block's sampling error of the best published method (PARA-Net,
+\pubBestHi\%) and below every other, and $\errBestLow\pm\errBestLowSd$\% in
 the 1250-sample protocol against a published \pubBestLo\%. On the OCO-2
 radiative-transfer problem of Lamminp\"a\"a et al., where the same kernel on
-the raw atmospheric state trails the network tenfold, the kernel belongs on
-the network's learned features: there it overtakes the network, and a
-per-coordinate combination improves on the published Gaussian-process
-emulator on both of that problem's error metrics on all three spectral
-bands, at ten seeds per band. The replicates also show why ensembles
-saturate on structural mechanics: the residuals of every architecture we
-train correlate above \corrNetLoSix{} at every seed, sixty predictors, ten
-seeds of six architectures, reach $\saSixtyOracle$\% at the best convex
-weights chosen in hindsight, and the shared component is flat in diversity
-and sample size, consistent with a floor set by the benchmark data. A floor
-theorem for pools of seeds and architectures places that number from three
-measured correlations; the supporting bounds are checked numerically.
+the raw state trails the network tenfold, it belongs on the network's
+learned features, and a per-coordinate combination improves on the
+published Gaussian-process emulator on both error metrics on all three
+bands. The replicates show why ensembles saturate on structural mechanics:
+every architecture's residuals correlate above \corrNetLoSix{} at every
+seed, sixty predictors reach $\saSixtyOracle$\% at hindsight-optimal convex
+weights, and a floor theorem for pools of seeds and architectures places
+that number from three measured correlations. Finite-sample bounds for
+each stage are checked numerically.
 \end{abstract}
 
 \begin{keywords}
-operator learning, kernel ridge regression, deep kernel learning, ensembles,
-conformal prediction, emulation
+operator learning, kernel ridge regression, residual correction, ensembles,
+conformal prediction
 \end{keywords}
 
 \section{Introduction}

@@ -247,8 +247,9 @@ if len(six) == 10:
         chk("uqDisSix" + L, st.mean(dis), 1)
         chk("uqDisSix" + L + "Sd", st.stdev(dis), 1)
     # the ClimSim kernel budget ladder (added after review): one record per budget, seed 0, n = 1,000,000
-    for cap, key in ((6000, "csCapSix"), (12000, "csCapTwelve"), (24000, "csCapTwentyFour"), (48000, "csCapFortyEight")):
-        f = os.path.join(DGX, "climsim_cap", f"climsim_train_n1000000_s0_cap{cap}.json")
+    for cap, key, seed in ((6000, "csCapSix", 0), (12000, "csCapTwelve", 0), (24000, "csCapTwentyFour", 0),
+                           (24000, "csCapTwentyFourB", 1), (48000, "csCapFortyEight", 0)):
+        f = os.path.join(DGX, "climsim_cap", f"climsim_train_n1000000_s{seed}_cap{cap}.json")
         if os.path.exists(f) and key in mac:
             r = json.load(open(f, encoding="utf-8"))
             assert r["kernel_hyper"]["cap"] == cap, (f, r["kernel_hyper"]["cap"])

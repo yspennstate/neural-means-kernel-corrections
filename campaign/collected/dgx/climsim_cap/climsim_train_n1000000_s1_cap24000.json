@@ -1,0 +1,20 @@
+{
+ "task_id": "climsim_train_n1000000_s1_cap24000",
+ "kind": "climsim_point",
+ "data": "train",
+ "n": 1000000,
+ "seed": 1,
+ "epochs": 60,
+ "ntest": 20000,
+ "active_outputs": 107,
+ "cap": 24000,
+ "kernel_r2": 0.4458,
+ "kernel_rel": 26.985,
+ "kernel_hyper": {
+  "scale": 4.0,
+  "nugget": 1e-08,
+  "med": 13.445812205148695,
+  "cap": 24000
+ },
+ "minutes": 17.4
+}

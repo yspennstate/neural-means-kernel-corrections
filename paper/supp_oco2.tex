@@ -256,7 +256,8 @@ training slice at every size, a budget rather than a data point. What the
 kernel does with more rows was measured afterwards under the same protocol
 (selection on the pool validation block, the test block scored once, seed
 $0$, the one-million slice): $\csCapSix$ at $6000$ rows, $\csCapTwelve$ at
-$12000$ and $\csCapTwentyFour$ at $24000$. It improves with budget, by about
+$12000$ and $\csCapTwentyFour$ at $24000$ ($\csCapTwentyFourB$ at a second
+seed, whose test block is a different draw). It improves with budget, by about
 three hundredths for the first doubling and one for the second, and at
 $24000$ rows --- four times the campaign's budget, and the largest exact
 solve we ran --- it remains eleven hundredths of $R^2$ below the network at

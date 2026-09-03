@@ -120,9 +120,11 @@ still lean on the ladder's order of magnitude rather than on that gap. The
 gain is the kernel's and not a refitting of the readout: a ridge regression
 refit on the same frozen features (Table~\ref{tab:oco2ridge}) is worse than
 the network's own trained output layer on the flat loss on every band at
-every seed, while the kernel head is better than both at every seed, and
-admitting the ridge readouts to the per-coordinate selection changes
-nothing, because they never win a coordinate on validation. Learning the metric rather than
+every seed, while the kernel head is better than both at every seed on
+every band, by $0.60\pm0.07$ points on O2 and about a quarter of a point on
+the other two; admitting the ridge readouts as candidates in the
+per-coordinate selection moves the combination by at most $0.002$ points on
+any band. Learning the metric rather than
 setting it by hand does not change this reading. A per-dimension metric fit by
 the kernel-flows cross-validation loss of \citet{owhadi2019kernel} reaches the
 same $30\%$ on the raw state, and a low-rank Mahalanobis metric with a thousand

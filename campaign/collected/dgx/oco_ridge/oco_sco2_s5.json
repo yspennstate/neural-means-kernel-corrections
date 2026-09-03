@@ -1,0 +1,397 @@
+{
+ "task_id": "oco_sco2_s5",
+ "kind": "oco_seed",
+ "band": "sco2",
+ "seed": 5,
+ "epochs": 250,
+ "width": 384,
+ "results": {
+  "kernel_flow": {
+   "reduced": 16.1448,
+   "radiance": 0.1147
+  },
+  "kernel_raw": {
+   "reduced": 40.8107,
+   "radiance": 0.5117
+  },
+  "kernel_ard": {
+   "reduced": 28.6912,
+   "radiance": 0.5905
+  },
+  "mean_flat": {
+   "reduced": 8.244,
+   "radiance": 0.1814
+  },
+  "dkr_flat": {
+   "reduced": 8.0905,
+   "radiance": 0.1188
+  },
+  "ridge_flat": {
+   "reduced": 8.3552,
+   "radiance": 0.2124
+  },
+  "mean_wnum": {
+   "reduced": 35.9871,
+   "radiance": 0.0807
+  },
+  "dkr_wnum": {
+   "reduced": 15.2739,
+   "radiance": 0.0688
+  },
+  "ridge_wnum": {
+   "reduced": 39.1107,
+   "radiance": 0.0938
+  },
+  "mean_radx": {
+   "reduced": 47.0106,
+   "radiance": 0.0869
+  },
+  "dkr_radx": {
+   "reduced": 15.9849,
+   "radiance": 0.0768
+  },
+  "ridge_radx": {
+   "reduced": 39.1741,
+   "radiance": 0.0923
+  },
+  "combined": {
+   "reduced": 8.0899,
+   "radiance": 0.0649
+  },
+  "combined_plus_ridge": {
+   "reduced": 8.0899,
+   "radiance": 0.0649
+  },
+  "combined_w": {
+   "reduced": 8.0899,
+   "radiance": 0.0649
+  }
+ },
+ "hyper": {
+  "kernel_raw": {
+   "scale": 4.0,
+   "nugget": 1e-08,
+   "med": 6.887972906546913
+  },
+  "kernel_ard": {
+   "scale": 4.0,
+   "nugget": 1e-08,
+   "med": 8.59855039143764,
+   "w": [
+    0.31908,
+    0.64676,
+    1.85857,
+    2.04982,
+    2.10645,
+    1.88199,
+    2.10984,
+    1.40797,
+    0.87577,
+    0.04251,
+    0.34088,
+    0.22279,
+    0.03869,
+    0.89887,
+    0.74562,
+    0.03888,
+    1.75265,
+    1.17791,
+    0.04723,
+    1.18654,
+    1.67458,
+    2.11339,
+    0.06484,
+    0.39838
+   ]
+  },
+  "dkr_flat": {
+   "scale": 4.0,
+   "nugget": 1e-08,
+   "med": 25.556972444207346
+  },
+  "ridge_flat": {
+   "ridge": 0.0001
+  },
+  "dkr_wnum": {
+   "scale": 4.0,
+   "nugget": 1e-08,
+   "med": 26.314541712873794
+  },
+  "ridge_wnum": {
+   "ridge": 0.0001
+  },
+  "dkr_radx": {
+   "scale": 4.0,
+   "nugget": 1e-08,
+   "med": 26.957123287349155
+  },
+  "ridge_radx": {
+   "ridge": 1e-10
+  }
+ },
+ "winners": [
+  3,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1
+ ],
+ "winners_w": [
+  3,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1
+ ],
+ "boot_ci_pct": {
+  "kernel_flow": {
+   "reduced": [
+    15.94,
+    16.3558
+   ],
+   "radiance": [
+    0.1112,
+    0.1183
+   ]
+  },
+  "kernel_raw": {
+   "reduced": [
+    40.4615,
+    41.1492
+   ],
+   "radiance": [
+    0.4953,
+    0.5293
+   ]
+  },
+  "kernel_ard": {
+   "reduced": [
+    28.3729,
+    29.0085
+   ],
+   "radiance": [
+    0.5709,
+    0.6124
+   ]
+  },
+  "mean_flat": {
+   "reduced": [
+    8.0371,
+    8.4517
+   ],
+   "radiance": [
+    0.1742,
+    0.1884
+   ]
+  },
+  "dkr_flat": {
+   "reduced": [
+    7.8838,
+    8.3024
+   ],
+   "radiance": [
+    0.1149,
+    0.1228
+   ]
+  },
+  "ridge_flat": {
+   "reduced": [
+    8.1496,
+    8.5615
+   ],
+   "radiance": [
+    0.2043,
+    0.2205
+   ]
+  },
+  "mean_wnum": {
+   "reduced": [
+    35.6139,
+    36.3568
+   ],
+   "radiance": [
+    0.0782,
+    0.0831
+   ]
+  },
+  "dkr_wnum": {
+   "reduced": [
+    15.0146,
+    15.529
+   ],
+   "radiance": [
+    0.0667,
+    0.071
+   ]
+  },
+  "ridge_wnum": {
+   "reduced": [
+    38.7944,
+    39.4261
+   ],
+   "radiance": [
+    0.091,
+    0.0969
+   ]
+  },
+  "mean_radx": {
+   "reduced": [
+    46.6212,
+    47.3999
+   ],
+   "radiance": [
+    0.0849,
+    0.0888
+   ]
+  },
+  "dkr_radx": {
+   "reduced": [
+    15.7178,
+    16.2564
+   ],
+   "radiance": [
+    0.0745,
+    0.0792
+   ]
+  },
+  "ridge_radx": {
+   "reduced": [
+    38.8521,
+    39.5078
+   ],
+   "radiance": [
+    0.0901,
+    0.0945
+   ]
+  },
+  "combined": {
+   "reduced": [
+    7.8831,
+    8.3017
+   ],
+   "radiance": [
+    0.0627,
+    0.0672
+   ]
+  },
+  "combined_plus_ridge": {
+   "reduced": [
+    7.8831,
+    8.3017
+   ],
+   "radiance": [
+    0.0627,
+    0.0672
+   ]
+  },
+  "combined_w": {
+   "reduced": [
+    7.8831,
+    8.3017
+   ],
+   "radiance": [
+    0.0627,
+    0.0672
+   ]
+  },
+  "dkr_flat_minus_mean_flat": {
+   "reduced": [
+    -0.1636,
+    -0.1434
+   ]
+  },
+  "dkr_flat_minus_ridge_flat": {
+   "reduced": [
+    -0.2792,
+    -0.249
+   ]
+  },
+  "ridge_flat_minus_mean_flat": {
+   "reduced": [
+    0.1027,
+    0.1193
+   ]
+  },
+  "combined_minus_kernel_flow": {
+   "reduced": [
+    -8.234,
+    -7.8785
+   ],
+   "radiance": [
+    -0.0534,
+    -0.0464
+   ]
+  }
+ },
+ "minutes": 21.9
+}

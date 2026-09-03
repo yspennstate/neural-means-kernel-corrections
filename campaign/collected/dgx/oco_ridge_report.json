@@ -1,0 +1,290 @@
+{
+ "o2.mean_flat.reduced": [
+  4.432,
+  0.05
+ ],
+ "o2.mean_flat.radiance": [
+  0.1949,
+  0.0139
+ ],
+ "o2.ridge_flat.reduced": [
+  4.711,
+  0.066
+ ],
+ "o2.ridge_flat.radiance": [
+  0.2276,
+  0.0143
+ ],
+ "o2.dkr_flat.reduced": [
+  4.111,
+  0.05
+ ],
+ "o2.dkr_flat.radiance": [
+  0.0793,
+  0.0072
+ ],
+ "o2.mean_wnum.reduced": [
+  49.329,
+  0.402
+ ],
+ "o2.mean_wnum.radiance": [
+  0.0439,
+  0.0031
+ ],
+ "o2.ridge_wnum.reduced": [
+  45.708,
+  0.613
+ ],
+ "o2.ridge_wnum.radiance": [
+  0.0521,
+  0.0043
+ ],
+ "o2.dkr_wnum.reduced": [
+  21.724,
+  0.516
+ ],
+ "o2.dkr_wnum.radiance": [
+  0.0316,
+  0.0019
+ ],
+ "o2.flat.head_beats_ridge": [
+  10,
+  10
+ ],
+ "o2.flat.ridge_beats_network": [
+  0,
+  10
+ ],
+ "o2.flat.ridge_minus_head": [
+  0.6005,
+  0.0695
+ ],
+ "o2.wnum.head_beats_ridge": [
+  10,
+  10
+ ],
+ "o2.wnum.ridge_beats_network": [
+  10,
+  10
+ ],
+ "o2.wnum.ridge_minus_head": [
+  23.9836,
+  0.8564
+ ],
+ "o2.combined_plus_ridge.reduced": [
+  4.115,
+  0.048
+ ],
+ "wco2.mean_flat.reduced": [
+  16.442,
+  0.061
+ ],
+ "wco2.mean_flat.radiance": [
+  0.226,
+  0.012
+ ],
+ "wco2.ridge_flat.reduced": [
+  16.512,
+  0.059
+ ],
+ "wco2.ridge_flat.radiance": [
+  0.2523,
+  0.0167
+ ],
+ "wco2.dkr_flat.reduced": [
+  16.277,
+  0.056
+ ],
+ "wco2.dkr_flat.radiance": [
+  0.1159,
+  0.0065
+ ],
+ "wco2.mean_wnum.reduced": [
+  62.566,
+  0.564
+ ],
+ "wco2.mean_wnum.radiance": [
+  0.0738,
+  0.0057
+ ],
+ "wco2.ridge_wnum.reduced": [
+  61.321,
+  0.431
+ ],
+ "wco2.ridge_wnum.radiance": [
+  0.0842,
+  0.0067
+ ],
+ "wco2.dkr_wnum.reduced": [
+  48.666,
+  0.448
+ ],
+ "wco2.dkr_wnum.radiance": [
+  0.0533,
+  0.0054
+ ],
+ "wco2.flat.head_beats_ridge": [
+  10,
+  10
+ ],
+ "wco2.flat.ridge_beats_network": [
+  0,
+  10
+ ],
+ "wco2.flat.ridge_minus_head": [
+  0.2349,
+  0.0156
+ ],
+ "wco2.wnum.head_beats_ridge": [
+  10,
+  10
+ ],
+ "wco2.wnum.ridge_beats_network": [
+  10,
+  10
+ ],
+ "wco2.wnum.ridge_minus_head": [
+  12.6548,
+  0.4596
+ ],
+ "wco2.combined_plus_ridge.reduced": [
+  16.281,
+  0.058
+ ],
+ "sco2.mean_flat.reduced": [
+  8.23,
+  0.018
+ ],
+ "sco2.mean_flat.radiance": [
+  0.199,
+  0.0147
+ ],
+ "sco2.ridge_flat.reduced": [
+  8.332,
+  0.025
+ ],
+ "sco2.ridge_flat.radiance": [
+  0.2359,
+  0.0318
+ ],
+ "sco2.dkr_flat.reduced": [
+  8.084,
+  0.012
+ ],
+ "sco2.dkr_flat.radiance": [
+  0.1093,
+  0.0065
+ ],
+ "sco2.mean_wnum.reduced": [
+  36.458,
+  0.655
+ ],
+ "sco2.mean_wnum.radiance": [
+  0.0751,
+  0.0025
+ ],
+ "sco2.ridge_wnum.reduced": [
+  40.099,
+  0.909
+ ],
+ "sco2.ridge_wnum.radiance": [
+  0.0866,
+  0.0039
+ ],
+ "sco2.dkr_wnum.reduced": [
+  15.469,
+  0.468
+ ],
+ "sco2.dkr_wnum.radiance": [
+  0.0631,
+  0.0037
+ ],
+ "sco2.flat.head_beats_ridge": [
+  10,
+  10
+ ],
+ "sco2.flat.ridge_beats_network": [
+  0,
+  10
+ ],
+ "sco2.flat.ridge_minus_head": [
+  0.2475,
+  0.0181
+ ],
+ "sco2.wnum.head_beats_ridge": [
+  10,
+  10
+ ],
+ "sco2.wnum.ridge_beats_network": [
+  0,
+  10
+ ],
+ "sco2.wnum.ridge_minus_head": [
+  24.6299,
+  0.8318
+ ],
+ "sco2.combined_plus_ridge.reduced": [
+  8.084,
+  0.012
+ ],
+ "o2.mean_flat.rerun_vs_published": [
+  4.432,
+  4.376
+ ],
+ "o2.dkr_flat.rerun_vs_published": [
+  4.111,
+  4.074
+ ],
+ "o2.mean_wnum.rerun_vs_published": [
+  49.329,
+  48.773
+ ],
+ "o2.dkr_wnum.rerun_vs_published": [
+  21.724,
+  21.303
+ ],
+ "o2.combined.rerun_vs_published": [
+  4.115,
+  4.078
+ ],
+ "wco2.mean_flat.rerun_vs_published": [
+  16.442,
+  16.442
+ ],
+ "wco2.dkr_flat.rerun_vs_published": [
+  16.277,
+  16.277
+ ],
+ "wco2.mean_wnum.rerun_vs_published": [
+  62.566,
+  62.548
+ ],
+ "wco2.dkr_wnum.rerun_vs_published": [
+  48.666,
+  48.71
+ ],
+ "wco2.combined.rerun_vs_published": [
+  16.279,
+  16.279
+ ],
+ "sco2.mean_flat.rerun_vs_published": [
+  8.23,
+  8.23
+ ],
+ "sco2.dkr_flat.rerun_vs_published": [
+  8.084,
+  8.084
+ ],
+ "sco2.mean_wnum.rerun_vs_published": [
+  36.458,
+  36.569
+ ],
+ "sco2.dkr_wnum.rerun_vs_published": [
+  15.469,
+  15.406
+ ],
+ "sco2.combined.rerun_vs_published": [
+  8.084,
+  8.084
+ ]
+}

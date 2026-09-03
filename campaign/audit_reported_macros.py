@@ -303,6 +303,8 @@ if len(six) == 10:
             chk("alignRatioSel", by[("n4000", 1e-08, 4.0)]["ratio_aKa"], 0)
             chk("alignRatioPSel", by[("n4000", 1e-08, 4.0)]["ratio_P_median"], 2)
             chk("alignRatioHeavy", by[("n4000", 0.0001, 4.0)]["ratio_aKa"], 1)
+        if ("full", 1e-08, 4.0) in by:
+            chk("alignRatioFullSel", by[("full", 1e-08, 4.0)]["ratio_aKa"], 0)
         if ("full", 1e-08, 1.0) in by:
             chk("alignRatioFull", by[("full", 1e-08, 1.0)]["ratio_aKa"], 0)
     f = os.path.join(DGX, "exp", "residual_spectrum_s0.json")

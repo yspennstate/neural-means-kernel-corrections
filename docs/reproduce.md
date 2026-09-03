@@ -247,8 +247,8 @@ and the record behind each change:
   Beta-binomial bands of the observed fraction on 19000 evaluation cases.
 - `jpl_alignment_check.py` standardizes the raw states by training moments,
   as the campaign's kernel heads do, and probes the multiplier 4 the campaign
-  selected for every feature head; the record is replaced when the rerun
-  completes (its n=4000 grid is in the text).
+  selected for every feature head; the record is the rerun (34.5 minutes on the
+  host, both n=4000 and full-block rows).
 - `cost_check.py` sets the BLAS thread cap before importing NumPy; the cost
   record and its macros are from the capped rerun.
 - The audit fails closed: a record the paper's macros depend on must exist.

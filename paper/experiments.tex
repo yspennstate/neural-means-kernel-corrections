@@ -294,10 +294,11 @@ same fixed $20000$-sample test block, so the seed standard deviation
 measures training and selection variability and nothing else; the test
 block is itself a sample, and at a per-sample standard deviation of
 $0.0169$ its contribution is $\seTest$ points, slightly larger than the
-pipeline's seed spread of \errPipeSd. Treating the two as independent, the
-uncertainty on our reported \errPipe\% is about $\seOwn$ points, and the
-seeds contribute a little under half of it. A study that replicates seeds
-and stops has measured the smaller half.
+pipeline's seed spread of \errPipeSd. The two describe different things ---
+retraining variability at a fixed block, and the sampling of this block from
+its population --- so we report them side by side rather than as one
+combined figure; a study that replicates seeds and stops has measured the
+smaller of the two.
 
 This decides what the table can support. Comparisons against a published
 number are unpaired, because we do not hold those methods' per-sample
@@ -391,7 +392,7 @@ component that no amount of uniform averaging removes. Measured over the
 validation split, the shared component carries $90\%$ of the average residual
 energy (Figure~\ref{fig:shared}). Three of its properties matter. Spatially,
 its energy concentrates at the two corners of the loaded edge, where the
-traction boundary condition meets the lateral supports; relative to the local
+traction boundary condition meets the free lateral edges; relative to the local
 field scale it is three to four times larger there than the grid average, and
 these are precisely the locations where the finite element solution is least
 accurate and where interpolation to the $41\times41$ grid is most strained.
@@ -475,8 +476,10 @@ with equal weights, reach $\saSixEq\pm\saSixEqSd\%$: one seed of each
 architecture beats ten seeds of the best one. All sixty together, at equal
 weights, reach $\saSixtyEq\%$; with convex weights fitted on the calibration
 half, $\saSixtyConvex\%$; and the convex mixture chosen in hindsight on the
-evaluation half itself, which no rule can beat, reaches $\saSixtyOracle\%$,
-or $\saSixtyOracleRms\%$ in the root-mean-square metric. The bound of
+evaluation half itself for the root-mean-square objective reaches
+$\saSixtyOracleRms\%$ in that metric, its mean relative error being
+$\saSixtyOracle\%$ (the mixture minimizing the mean error directly was not
+solved for, so that value is not an optimum of its own metric). The bound of
 Theorem~\ref{thm:blockfloor}, evaluated with the smallest member error and
 the smallest within- and between-architecture second moments of the pool,
 is $\saBound\%$ in that metric: no convex combination of these sixty can pass

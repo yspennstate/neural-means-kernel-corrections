@@ -299,22 +299,25 @@ if len(six) == 10:
         chk("alignRatioP", s0["ratio_P_median"], 1)
         chk("alignRatioLo", by[("n4000", 1e-08, 0.5)]["ratio_aKa"], 0)
         chk("alignRatioHi", by[("n4000", 1e-08, 2.0)]["ratio_aKa"], 0)
-        if ("n4000", 1e-08, 4.0) in by:   # the multiplier the campaign selected for every feature head (added after review)
-            chk("alignRatioSel", by[("n4000", 1e-08, 4.0)]["ratio_aKa"], 0)
-            chk("alignRatioPSel", by[("n4000", 1e-08, 4.0)]["ratio_P_median"], 2)
-            chk("alignRatioHeavy", by[("n4000", 0.0001, 4.0)]["ratio_aKa"], 1)
-        if ("full", 1e-08, 4.0) in by:
-            chk("alignRatioFullSel", by[("full", 1e-08, 4.0)]["ratio_aKa"], 0)
+        # the multiplier the campaign selected for every feature head: required rows (second review)
+        chk("alignRatioSel", by[("n4000", 1e-08, 4.0)]["ratio_aKa"], 0)
+        chk("alignRatioPSel", by[("n4000", 1e-08, 4.0)]["ratio_P_median"], 2)
+        chk("alignRatioHeavy", by[("n4000", 0.0001, 4.0)]["ratio_aKa"], 1)
+        chk("alignRatioFullSel", by[("full", 1e-08, 4.0)]["ratio_aKa"], 0)
         if ("full", 1e-08, 1.0) in by:
             chk("alignRatioFull", by[("full", 1e-08, 1.0)]["ratio_aKa"], 0)
     f = os.path.join(DGX, "exp", "residual_spectrum_s0.json")
     if present(f):
         r = json.load(open(f, encoding="utf-8"))
-        recs = list(r["members"].values()) + [r["corrected_pipeline"]]
-        chk("specSharedEnergy", st.mean(x["energy_above_edge"] for x in r["members"].values()), 2)
+        # the six reported members and the corrected pipeline; the two pruned (mpprune) variants recorded in the
+        # same file are not members of the paper's pool and are excluded (second review, 2026-09-03)
+        mem = {k: v for k, v in r["members"].items() if "mpprune" not in k}
+        assert len(mem) == 6, sorted(mem)
+        recs = list(mem.values()) + [r["corrected_pipeline"]]
+        chk("specSharedEnergy", st.mean(x["energy_above_edge"] for x in mem.values()), 2)
         chk("specCompsLo", min(x["n_above_edge"] for x in recs), 0)
         chk("specCompsHi", max(x["n_above_edge"] for x in recs), 0)
-        chk("specEffRank", st.median(x["eff_rank"] for x in r["members"].values()), 0)
+        chk("specEffRank", st.median(x["eff_rank"] for x in mem.values()), 0)
     f = os.path.join(DGX, "sm_norm_check_hpix_s1.json")
     if present(f):
         r = json.load(open(f, encoding="utf-8"))
@@ -346,6 +349,7 @@ if len(six) == 10:
         chk("uqWidthRatio", st.mean(plam[f"hpix_s{s}"]["a0.1"]["plam"]["mean_width"]
                                     / plam[f"hpix_s{s}"]["a0.1"]["raw"]["mean_width"] for s in S), 2)
         chk("uqSpearman", st.mean(plam[f"hpix_s{s}"]["spearman_P_err"] for s in S), 2)
+        chk("uqCorrAbs", st.mean(plam[f"hpix_s{s}"]["pearson_P_err"] for s in S), 3)
     sm6 = os.path.join(HERE, "collected", "secmom6_seeded.json")
     if present(sm6):
         rec = json.load(open(sm6, encoding="utf-8"))

@@ -255,3 +255,23 @@ and the record behind each change:
 - The wider-grid OCO-2 campaign (multipliers 0.5 to 32, nuggets 1e-12 to
   1e-4, ten seeds per band, 250 and 750 epochs) is queued on the campaign
   host and is not part of this version.
+
+## Second review, same day: further corrections
+
+- The audit now requires the scale-4 rows of the alignment record (no
+  optional branch), checks the seeded UQ correlation, and computes the
+  residual-spectrum range over the six reported members and the corrected
+  pipeline only; the two pruned (`mpprune`) variants recorded in the same
+  file are not members of the paper's pool and are excluded (range 39 to 48).
+- `collect.py` reports the central 95 percent Beta-binomial band of the
+  observed evaluation fraction as `band95`, the band the paper quotes; the
+  earlier `band90` was a 5 to 95 percent interval.
+- `krr_oof.py` centers targets within the fitting folds. The released
+  out-of-fold fields were centered with the pooled training mean (a leak of
+  order 1/sqrt(n) per output); the rerun of the refiner and downstream stages
+  is queued and not in this version.
+- The deployed global stack is described as it is coded (uniform start,
+  random hill climb in logit space on half the validation split); the
+  second-moment simplex minimizer is used only in the pool analyses.
+- Competing-interest and funding statements corrected (equity and role
+  disclosure; Horizon Europe).

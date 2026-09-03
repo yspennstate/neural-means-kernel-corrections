@@ -250,9 +250,10 @@ all three are valid; what differs is their width and their shape. For the
 six-member pipeline the $P_\lambda$ band covers $\uqPlamSix\pm\uqPlamSixSd\%$
 at the nominal \uqCoverNom\% level, and the right comparison is not with
 $90\%$ but with the exact finite-sample law: with $m=1000$ calibration points
-the coverage of a split-conformal band is $\mathrm{Beta}(901,100)$
-distributed, whose central $95\%$ interval is $[88.1\%, 91.8\%]$, and all ten
-seeds fall inside it; at the $95\%$ level the band is $[93.6\%, 96.3\%]$ and
+the latent coverage of a split-conformal band is $\mathrm{Beta}(901,100)$
+distributed and the fraction observed on the $19000$ evaluation cases is
+Beta--binomial, whose central $95\%$ interval is $[88.0\%, 91.8\%]$, and all ten
+seeds fall inside it; at the $95\%$ level the band is $[93.5\%, 96.3\%]$ and
 the observed coverage is $\uqPlamSixHi\pm\uqPlamSixHiSd\%$, again ten of ten.
 The constant-width band covers $\uqRawSix\pm\uqRawSixSd\%$ and
 $\uqRawSixHi\pm\uqRawSixHiSd\%$, ten of ten at both levels, with a mean
@@ -346,11 +347,12 @@ $20000$-sample test block, so the seed standard deviation measures training and
 selection variability and nothing else. The test block is itself a sample. Its
 contribution is the standard error of the mean relative error over those $20000$
 cases, and at a per-sample standard deviation of $0.0169$ that is $\seTest$
-points, slightly larger than the pipeline's seed spread of \errPipeSd. Treating
-the two as independent, the uncertainty on our reported \errPipe\% is about
-$\seOwn$ points, and the seeds contribute a little under half of it. A study
-that replicates seeds and stops has measured the smaller half and is liable to
-quote it as though it were the whole.
+points, slightly larger than the pipeline's seed spread of \errPipeSd. The two
+describe different things --- retraining variability at a fixed block, and
+the sampling of this block from its population --- so they are reported side
+by side and not added into one figure. A study that replicates seeds and
+stops has measured the smaller of the two and is liable to quote it as though
+it were the whole.
 
 This decides what the table can and cannot support. Comparisons against a
 published number are unpaired, because we do not hold those methods'

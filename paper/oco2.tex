@@ -12,6 +12,11 @@ every choice in our pipeline --- the network checkpoints, the kernel head's
 length scale and nugget, and the per-coordinate winners of the combination
 below --- is made on that validation split; the $2000$ public test states
 enter no optimizer and are evaluated once per run, for the final numbers.
+The carve is taken from the source study's Sobol training design while the
+public test states are a separate draw, and the two differ: the flat
+network's mean relative error is $6.7\%$ on the carve against $4.4\%$ on the
+test block on O2, so every selection made on the carve is a selection under
+a shift between the two, not a same-distribution choice.
 The comparison is therefore computed on identical test points against the
 published emulator itself rather than against our reimplementation of it.
 
@@ -216,7 +221,10 @@ of $32$ above $0.25$ --- that is $39\%$, $44\%$, $92\%$, $87\%$ and
 $100\%$. That scores the existence of a helpful mix. Scoring what the rule
 would ship --- the mix at the weight fitted on validation, against the better
 test member --- the counts are $142$ of $257$, $107$ of $215$, $76$ of $88$,
-$125$ of $248$ and $31$ of $32$ ($57.3\%$ overall): the prediction that a
+$125$ of $248$ and $31$ of $32$ ($57.3\%$ overall). Those are rates at which
+the rule's yes-or-no prediction about the shipped outcome is right; in
+absolute terms $356$ of the $840$ transferred mixtures beat the better test
+member, all of them among the $715$ pairs the rule admitted. The prediction that a
 helpful mix exists is as reliable as before, but the weight carried over from
 validation realizes the gain in only half of the mid-margin pairs, because a
 gain of a few thousandths of a point is smaller than the transfer error of

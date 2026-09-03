@@ -88,6 +88,22 @@ make them confirmatory. The $2000$ public OCO-2 test states are in the same
 position across the ten-seed campaign, the readout control and the ensemble
 scoreboard.
 
+\paragraph{Cross-fitted labels and out-of-fold centering.} The kernel
+member's predictions on the training pool are out-of-fold (four folds,
+\texttt{krr\_oof.py}) so that the refiner and the correction are not
+trained on in-sample kernel fits; the correction's training labels are the
+residuals of that cross-fitted mean, while at query time the correction is
+added to the full-data mean (Section~\ref{sec:theory-or} states what the
+bound then covers). Two facts about the released fields belong here. The
+out-of-fold script centered the targets with the pooled mean over all
+$19000$ training rows before folding, so each held-out fold's targets
+entered the mean used to predict them --- a leak of order $1/\sqrt n$ per
+output coordinate, small but real; the script now centers within the
+fitting folds, and the rerun of the refiner and the stages downstream of it
+is queued and not in this version. And the disagreement between the
+cross-fitted and the full-data means on the training rows, the term the
+theorem's caveat names, has not been measured.
+
 \paragraph{Seed protocol.} One seed value enters every stochastic component at
 once: the permutation that draws the validation split from the training pool,
 each member's initialization and batch order, the half-split of the stacking
@@ -243,8 +259,10 @@ agree to within $5.4\times10^{-8}$ in the relative-error unit, and the largest
 residual in any array is $192$ against target norms of $3.7\times10^3$ to
 $1.7\times10^4$, so the rounding is far below the seed-to-seed spread of any
 quantity in the paper. At $384$\,MB per seed, $3.84$\,GB in all, the archives
-exceed what the code repository can carry; they are to be deposited with the
-published version, and the repository keeps the manifest
+exceed what the code repository can carry. They are not part of this
+release: they are retained on the campaign host, available on request, and
+are to be deposited under a persistent identifier with the published
+version; the repository keeps the manifest
 (\texttt{runs/residuals\_manifest.json}: per array the seed, the split seed,
 member, split, shape, dtype, the SHA-256 of its bytes, the largest residual
 and the three errors just described; per archive its size and SHA-256), so a
@@ -371,10 +389,12 @@ UNet & 4.38M & 100 & 573--689 & 5734--6892 & 4.683--4.793 \\
 \end{tabular}
 \end{table}
 
-\paragraph{Stacking.} Global weights: convex, initialized at the simplex
-minimizer of the measured second-moment matrix $S$
-(Proposition~\ref{prop:secmom}) and polished by a short random search on the
-validation metric. Per-pixel weights: affine in the members at each grid
+\paragraph{Stacking.} Global weights: convex, parametrized by logits, started
+uniform and optimized by a random hill climb on the validation metric
+(\texttt{stack\_correct\_seeded.py}: $600$ proposals, Gaussian step $0.3$
+decaying by $0.3\%$ per step, fitted on half of the validation split). The
+simplex minimizer of the second-moment matrix $S$
+(Proposition~\ref{prop:secmom}) appears only in the pool analyses. Per-pixel weights: affine in the members at each grid
 point, ridge parameter $10^{-3}$, fitted on half the validation split and
 accepted only if they beat the global weights on the held-out half, then
 refitted on the full split.

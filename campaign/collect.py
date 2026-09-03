@@ -145,7 +145,7 @@ def _betabinom(N, a, b):
                       - math.lgamma(N - k + 1) + logB(k + a, N - k + b) - den)
         cdf.append(min(c, 1.0))
     q = lambda t: next(i for i, cv in enumerate(cdf) if cv >= t)
-    return cdf, q(0.05), q(0.95)
+    return cdf, q(0.025), q(0.975)   # central 95 percent band of the observed evaluation fraction (the paper's band)
 
 
 if sm:
@@ -162,7 +162,7 @@ if sm:
         cdf, qlo, qhi = _betabinom(n_eval, k, n_cal + 1 - k)
         entry = dict(alpha=alpha, k=k, n_cal=n_cal, n_eval=n_eval,
                      beta_mean=k / (n_cal + 1),
-                     band90=[qlo / n_eval, qhi / n_eval], seeds=[])
+                     band95=[qlo / n_eval, qhi / n_eval], seeds=[])
         for s, uq in seeds_e:
             if uq["n_cal"] != n_cal or uq["n_eval"] != n_eval:
                 entry["seeds"].append(dict(seed=s, note="size mismatch, skipped"))
@@ -286,7 +286,7 @@ if "climsim" in summary:
               f"  kernel_r2 {fmt(v['kernel_r2'], scale=1, digits=4)}")
 if "coverage_law" in summary:
     for akey, e in summary["coverage_law"].items():
-        print(f"coverage law {akey}: band [{e['band90'][0]:.4f}, {e['band90'][1]:.4f}]"
+        print(f"coverage law {akey}: band95 [{e['band95'][0]:.4f}, {e['band95'][1]:.4f}]"
               f"  inside {e['n_inside']}/{e['n']}")
 if "bounds_sm" in summary:
     b = summary["bounds_sm"]

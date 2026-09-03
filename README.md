@@ -103,8 +103,11 @@ The records of these checks, the locked Python environment of the campaign host
 (`docs/reproduce.md`), the OCO-2 rerun's per-seed member records and per-sample errors
 (`campaign/collected/dgx/oco_ridge/`), and the split-conformal records are under
 `campaign/collected/dgx/`. The structural-mechanics residual archive (3.84 GB) and the
-OCO-2 member prediction arrays (250 MB) are retained and will be deposited with a
-persistent identifier at publication; they are available on request before that.
+OCO-2 member prediction arrays (250 MB) are not in this repository: they are retained on the
+campaign host and available on request, and are to be deposited under a persistent identifier
+with the published version. Until then the release reproduces every table from the per-run
+records it carries, and the array-level checks described in the supplement are reproducible only
+from the retained archives.
 
 ## Results
 

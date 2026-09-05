@@ -1,6 +1,50 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
-## Current checkpoint: September 6, 01:18 Jerusalem
+## Current checkpoint: September 6, 01:43 Jerusalem
+
+The two votes are still 01 YES and 06 YES. Reviewers 02 and 07 continue in
+their existing controllers; no duplicate panel has been launched. Root began
+integrating the two returned reviews into the WORKING source, while the
+immutable packet stays unchanged. After all ten original reviews, freeze one
+corrected packet and obtain independent revision assessments on that packet.
+
+Working manuscript changes: Table 4 now correctly says standalone KRR has
+no reflection augmentation or prediction averaging; the test-block paragraph
+distinguishes predictor fitting from hindsight optimization/calibration.
+Figure S6.3's internal title now says Lemma S5.1. Its original data arrays
+were not found in the bounded local/DGX search, so this was an editorial
+vector-PDF title repair, not recomputation. At 288 dpi, zero pixels outside
+the title changed, and every other text span is unchanged. The corrected
+figure was inspected at native resolution. Original PDF is preserved at
+.local-verification/spectra_reference_0140/spectra_original.pdf; the public
+repair helper and hash receipt document the exact change. Corrected figure
+SHA 570cb9121c0cf46e6d840fb8120fdc21e9154e62764e7ed1379774b612f0452d.
+
+seed_pipeline.py now explicitly defaults to historical pooled centering,
+passes that argument, separates fold-local directories, and verifies a
+configuration/code/data contract before reusing outputs. It checks the OOF
+mode, split, producer hash and actual field hash before refiner training.
+A per-seed lock serializes concurrent launches. Six bounded regression tests
+pass, including altered modes/settings/source/data, unreceipted historical
+outputs, a truncated contract and altered OOF provenance. All 17 named source
+dependencies exist. No revised training run has been launched or deployed.
+The changed TeX and figure still need a fresh paired build and page QA.
+
+Chapter 01 completed (return 0, 710.632 s render). All 316 input hashes,
+18 audio waveforms and exact media timing pass: 15,050 frames, 501.666667 s,
+480.936 spoken seconds, video SHA
+d06b68dbe4dc430db7e90c5e04886c26b8023b2f80627fef9699b377025dba26.
+All 18 decoded end frames were inspected at full resolution; no defect found.
+The visual receipt is in its author_check directory. Transition/pacing and
+auditory review remain pending. Chapter 02 is currently rendering in
+20260906T012559_chapter02_final, launcher PID 14788, actual Manim PID 52956,
+logs .local-verification/chapter02_0126_*. It has passed animation 80 of 105.
+Root must continue chapters 03 through 11 and rerender corrected chapter 12.
+
+Latest verified push before this update: 4042035d8edd7d9fce4da17f48fd73c6bd044cb6.
+Root mesh pulse at 01:41:33 renewed claims through 02:26:33 Jerusalem.
+
+## Historical checkpoint: September 6, 01:18 Jerusalem
 
 The overnight order continues through 12:55. Current independent votes are
 reviewer 01 YES and reviewer 06 YES, with no blocking findings. ROOT read both

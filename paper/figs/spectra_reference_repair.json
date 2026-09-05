@@ -1,0 +1,19 @@
+{
+  "kind": "editorial_vector_pdf_reference_repair",
+  "input_sha256": "d870b6b3aa0adff290a9acb9439e7a308dbd408a7da011fe5ab721320c51a339",
+  "output_sha256": "570cb9121c0cf46e6d840fb8120fdc21e9154e62764e7ed1379774b612f0452d",
+  "font_sha256": "3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22",
+  "old": "effective dimension (Lemma 4.4 identity)",
+  "new": "effective dimension (Lemma S5.1 identity)",
+  "changed_pixels": 10262,
+  "changed_pixels_outside_title": 0,
+  "compared_dpi": 288,
+  "title_rectangle": [
+    328.83062744140625,
+    2.306121826171875,
+    522.9447021484375,
+    19.57012176513672
+  ],
+  "all_other_text_spans_unchanged": true,
+  "scope": "One internal lemma reference; all scientific curves retained"
+}

@@ -43,9 +43,14 @@ integration. A clean MiKTeX build exposed a bibliography lookup issue in
 nested output directories; the portable helper now stages exact bibliography
 copies beside each child's auxiliary file.
 
-Ten independent publication reviews will inspect the completed manuscript
-and its pinned evidence. They have not started. The twenty older reviews in
-paper/reviews concern an earlier version and are not votes on this work.
+The completed 34-page article and 51-page supplement have been frozen with
+their evidence for ten fresh independent Codex CLI reviews. The panel is in
+progress; the twenty older reviews in paper/reviews are not votes on these
+bytes. The first returned comments are being integrated into the working
+source, which will receive a new paired build and revision review. The frozen
+panel packet remains unchanged. The corrections clarify reflection handling,
+retrospective test-block fitting and the internal effective-dimension reference,
+and make the campaign centering choice and resume provenance explicit.
 
 The new sensitivity sections and generated tables are included in both
 roots, with Supplement S11 giving the detailed protocols and full records.

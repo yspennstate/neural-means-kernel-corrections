@@ -78,9 +78,11 @@ benchmark's fixed public split, and it has been read more than once in the
 course of this work: by the first-campaign tables, by the six-member
 campaign, by the ablations, the hard-case study, the learning curves, the
 sixty-predictor analysis, the conformal calibration (which draws its $1000$
-calibration cases from it) and by the post-review controls. Every number is
-evaluated once per run and no test quantity enters an optimizer, but the
-study as a whole has looked at the same $20000$ cases repeatedly, so its
+calibration cases from it) and by the post-review controls. Original predictor
+fitting and model-level selection use the fitting and validation splits.
+The retrospective test-block analyses additionally fit the explicitly labelled
+hindsight ensemble optimum and choose calibration quantiles on a test subset.
+The study has therefore looked at the same $20000$ cases repeatedly, so its
 comparisons describe this block rather than confirm on untouched data; a
 frozen final evaluation on newly generated cases is the experiment that would
 make them confirmatory. The $2000$ public OCO-2 test states are in the same

@@ -86,7 +86,7 @@ ax.annotate("CV-chosen $\\lambda$", xy=(uqj["lam"], np.interp(np.log(uqj["lam"])
             xytext=(uqj["lam"] * 8, max(d_eff) * 0.55), fontsize=8,
             arrowprops=dict(arrowstyle="-", lw=0.7))
 ax.set_xlabel("nugget $\\lambda$"); ax.set_ylabel("$d_{\\mathrm{eff}}(\\lambda)$")
-ax.set_title("effective dimension (Lemma 4.4 identity)")
+ax.set_title("effective dimension (Lemma S5.1 identity)")
 fig.tight_layout(); fig.savefig(FIGS / "spectra.pdf"); plt.close(fig)
 print("spectra.pdf")
 

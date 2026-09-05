@@ -136,7 +136,25 @@ and `NMKC_DATA`, so many seeds share one code tree.
 One structural-mechanics seed, end to end (trains six members, stacks,
 corrects, calibrates):
 
-    NMKC_ROOT=<root> NMKC_SEED=<s> python campaign/seed_pipeline.py
+    NMKC_ROOT=<root> NMKC_SEED=<s> NMKC_TARGET_CENTERING=pooled python campaign/seed_pipeline.py
+
+`pooled` explicitly reproduces the historical target-mean convention. For the
+fold-local convention, set `NMKC_TARGET_CENTERING=fold-local`; the driver uses
+a separate `seeds/sm_fold_local_s<s>` directory and default result identifier.
+The standalone `krr_oof.py` defaults to fold-local, so the campaign always
+passes its centering argument explicitly. This driver is the full model chain;
+the archived paired sensitivity experiment has its own fixed controls and
+records described in [paired_sensitivity_campaign.md](paired_sensitivity_campaign.md).
+
+New full-chain runs save `pipeline_contract.json` before training. A resume
+requires identical centering, seed, epoch schedules, numerical package versions,
+source hashes and prepared input-array hashes. It also verifies the OOF field
+against its centering and split receipt before the refiner can run. Existing
+outputs without this contract are refused: preserve the historical directory
+and use an empty campaign root rather than assigning provenance retrospectively.
+The driver holds a per-seed lock, in addition to the box-wide full-Gram lock.
+These checks guard the recorded inputs; they do not certify deterministic
+training across hardware or independently validate historical predictions.
 
 The first campaign ran that command with its default 200-epoch schedule for
 the FNO and the UNet under a 36-hour task limit; the second campaign, on one

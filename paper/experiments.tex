@@ -80,9 +80,10 @@ The UNet ranks fourth of six by mean single-member test error, yet adding it red
 \begin{table}[t]
 \centering
 \caption{Members and stages under the high-data protocol, mean $\pm$ standard
-deviation over ten seeds. Member errors are reflection-averaged where the
-member has a reflection; the kernel ridge and the refiner train with the
-symmetrization already applied. ``Fitted'' weights are solved on the validation
+deviation over ten seeds. Neural-member errors use reflection averaging;
+the refiner also uses reflected training examples. The standalone kernel-ridge
+member uses neither reflection augmentation nor prediction averaging.
+``Fitted'' weights are solved on the validation
 split and read out once on test; equal weights involve no fitting. The lower
 block is the second campaign of Section~\ref{sec:seeds}; its kernel ridge and
 MLP-family members coincide with the upper block's to the printed precision

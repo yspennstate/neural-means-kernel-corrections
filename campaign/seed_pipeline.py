@@ -1,23 +1,30 @@
 """One full structural-mechanics pipeline at one campaign seed.
 
-Runs the exact published chain -- KRR, five neural members, prediction dumps,
+Runs the recorded model chain -- KRR, five neural members, prediction dumps,
 per-pixel affine stack, residual Matern correction, global convex stack, and
-split-conformal UQ -- with the campaign seed threaded through the validation
+retrospective split-conformal UQ -- with the campaign seed threaded through the validation
 split (NMKC_SPLIT_SEED), every member's training seed, the stack's half-split
-(NMKC_PIPE_SEED) and the correction's tuning subsamples. Every step is skipped
-if its outputs already exist, so a killed task resumes where it stopped.
+(NMKC_PIPE_SEED) and the correction's tuning subsamples. Existing outputs
+are reused only after a configuration/code/data contract matches.
 
 Environment: NMKC_ROOT (campaign root), NMKC_SEED (int), TASK_ID,
-NMKC_THREADS (default 6). Writes <root>/results/<TASK_ID>.json at the end.
+NMKC_THREADS (default 6), NMKC_TARGET_CENTERING (pooled, the historical
+convention, or fold-local). Writes <root>/results/<TASK_ID>.json at the end.
 """
 import contextlib
 import json, os, pathlib, subprocess, sys, time
 import fcntl
 import numpy as np
+from importlib.metadata import version
+from pipeline_contract import make_contract, require_contract, verify_oof
 
 ROOT = pathlib.Path(os.environ["NMKC_ROOT"])
 SEED = int(os.environ["NMKC_SEED"])
-TASK_ID = os.environ.get("TASK_ID", f"sm_seed_s{SEED}")
+TARGET_CENTERING = os.environ.get("NMKC_TARGET_CENTERING", "pooled")
+if TARGET_CENTERING not in ("pooled", "fold-local"):
+    raise ValueError("NMKC_TARGET_CENTERING must be pooled or fold-local")
+SUFFIX = "" if TARGET_CENTERING == "pooled" else "_fold_local"
+TASK_ID = os.environ.get("TASK_ID", f"sm_seed{SUFFIX}_s{SEED}")
 THREADS = int(os.environ.get("NMKC_THREADS", "6"))
 SMOKE = os.environ.get("NMKC_SMOKE", "") == "1"
 # smoke mode: two epochs everywhere, full data path -- exercises every stage
@@ -30,7 +37,7 @@ EP = dict(mlp=400, mlpMSE=120, mlpR=100,
      dict(mlp=2, mlpMSE=2, mlpR=2, fno=2, unet=2)
 CODE = ROOT / "code"
 DATA = ROOT / "data" / "structmech"
-SEED_DIR = ROOT / "seeds" / f"sm_s{SEED}"
+SEED_DIR = ROOT / "seeds" / f"sm{SUFFIX}_s{SEED}"
 RUNS = SEED_DIR / "runs"
 RUNS.mkdir(parents=True, exist_ok=True)
 PY = sys.executable
@@ -100,13 +107,34 @@ def step(outputs, argv, log):
 def main():
     t_start = time.time()
     prep_data_once()
+    source_names = ['common.py', 'models.py', 'prep_data.py', 'train_krr.py',
+                    'krr_oof.py', 'train_mlp.py', 'train_mlp_refine.py',
+                    'train_fno.py', 'train_unet.py', 'gen_preds.py',
+                    'stack_perpixel.py', 'stack_correct.py',
+                    'campaign/seed_pipeline.py', 'campaign/pipeline_contract.py',
+                    'campaign/correct_stack.py', 'campaign/uq_conformal.py',
+                    'campaign/conformal_utils.py']
+    files = {'code/' + name: CODE / name for name in source_names}
+    # Bind the orchestrator actually executing, even when called from a
+    # checkout outside ROOT/code. Child stages below execute ROOT/code files.
+    files['driver/seed_pipeline.py'] = pathlib.Path(__file__)
+    files['driver/pipeline_contract.py'] = pathlib.Path(__file__).with_name('pipeline_contract.py')
+    files.update({'data/' + name: DATA / name for name in
+                  ['loads.npy', 'stress.npy', 'idx_train.npy', 'idx_test.npy']})
+    contract = make_contract(dict(seed=SEED, target_centering=TARGET_CENTERING,
+        epochs=EP, smoke=SMOKE, threads=THREADS, python=sys.version,
+        packages={name: version(name) for name in ('numpy', 'scipy', 'torch')},
+        cuda_visible_devices=os.environ.get('CUDA_VISIBLE_DEVICES')), files)
+    require_contract(RUNS, contract)
 
     # 1. exact KRR member (tuned grid, full 19000 solve) + out-of-fold fields
     with gram_lock():
         step([f"krr_full_matern52_n19000.json", "krr_full_matern52_n19000_pred_val.npy",
               "krr_full_matern52_n19000_pred_test.npy"],
              [PY, CODE / "train_krr.py", "--tag", "krr_full"], "krr")
-        step(["krr_oof_train.npy"], [PY, CODE / "krr_oof.py"], "krr_oof")
+        step(["krr_oof_train.npy", "krr_oof_train.json"],
+             [PY, CODE / "krr_oof.py", "--target-centering", TARGET_CENTERING], "krr_oof")
+        verify_oof(RUNS, TARGET_CENTERING, SEED, contract['files']['code/krr_oof.py'])
 
     # 2. neural members, configurations of the published table
     step([NAMES["mlp"] + ".json"],
@@ -144,7 +172,7 @@ def main():
              [PY, CODE / "stack_correct.py", "--members", MEMBER_LIST, "--krr", 1,
               "--tag", "hstk"], "hstk")
 
-    # 6. split-conformal UQ with a calibration set never used for any selection
+    # 6. retrospective calibration on a subset of the reused public test block
     step(["hpix_uq.json"],
          [PY, CODE / "campaign" / "uq_conformal.py", "--tag", "hpix"], "uq")
 
@@ -171,6 +199,7 @@ def main():
     ci = lambda a: [float(np.percentile(a, 2.5)), float(np.percentile(a, 97.5))]
 
     out = dict(task_id=TASK_ID, kind="structmech_seed", seed=SEED,
+               target_centering=TARGET_CENTERING, pipeline_contract=contract,
                members={k: json.load(open(RUNS / (n_ + ".json")))["test"]
                         for k, n_ in NAMES.items()},
                krr=json.load(open(RUNS / "krr_full_matern52_n19000.json")).get("test"),
@@ -193,4 +222,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    with (SEED_DIR / '.pipeline.lock').open('a') as seed_lock:
+        fcntl.flock(seed_lock, fcntl.LOCK_EX)
+        main()

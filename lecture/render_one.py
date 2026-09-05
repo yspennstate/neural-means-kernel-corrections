@@ -60,21 +60,42 @@ def main():
     parser.add_argument("--board")
     parser.add_argument("--segment", type=int, default=0)
     parser.add_argument("--encoder", choices=("libx264", "h264_nvenc"), default="libx264")
+    parser.add_argument("--writer", choices=("pyav", "ffmpeg71"), default="pyav")
+    parser.add_argument("--cpus", default="4,5", help="Exactly two CPUs within the owner's background partition")
     parser.add_argument("--reuse-tex-from", type=Path, action='append',
                         help="Reuse exact TeX/SVG asset pairs from a completed owned build")
     parser.add_argument("--reuse-incomplete-tex", action="store_true",
                         help="Recover completed typesetting pairs from an interrupted owned build; does not certify its chapter")
     parser.add_argument("--quality", choices=("preview", "samples", "notation", "draft", "final"), required=True)
     args = parser.parse_args()
+    render_cpus = sorted({int(x) for x in args.cpus.split(',')})
+    if len(render_cpus) != 2 or not set(render_cpus).issubset(BACKGROUND):
+        raise ValueError('Choose two allowed background CPUs')
+    guard = json.loads(GUARD.read_text(encoding="utf-8-sig"))
+    if guard.get("background_cpus") != BACKGROUND or guard.get("reserved_cpus") != RESERVED:
+        raise RuntimeError("CPU partition changed")
+    # Pin the launcher before its first helper too. Starting every below-normal
+    # helper on saturated background P-cores can starve even a mesh assertion.
+    own = psutil.Process()
+    own.nice(psutil.BELOW_NORMAL_PRIORITY_CLASS)
+    own.cpu_affinity(render_cpus)
     if args.reuse_incomplete_tex and not args.reuse_tex_from:
         raise ValueError('Incomplete cache recovery requires an explicit owned donor')
     if args.encoder == 'h264_nvenc':
         if args.quality not in ('draft', 'final'):
             raise ValueError('Still frames have no video encoding stage')
         mesh = Path(r'C:\Users\owner\ai-memories-and-functionality\12_cognitive_architecture\agent_mesh\agent_mesh.py')
-        subprocess.run([r'C:\Python314\python.exe', '-B', str(mesh), 'assert', '--agent',
-                        'codex-nmkc-resume-20260905', '--resource', 'topic:gpu-workload/MATH-ROSS20/codex-nmkc-resume-20260905'],
-                       check=True, creationflags=0x08000000)
+        for attempt in range(3):
+            assertion = subprocess.run([r'C:\Python314\python.exe', '-B', str(mesh), 'assert', '--agent',
+                            'codex-nmkc-resume-20260905', '--resource', 'topic:gpu-workload/MATH-ROSS20/codex-nmkc-resume-20260905'],
+                           capture_output=True, text=True, encoding='utf-8',
+                           creationflags=0x08000000, timeout=150)
+            if assertion.returncode == 0:
+                break
+            print(assertion.stdout+assertion.stderr, flush=True)
+            if assertion.returncode != 2 or attempt == 2:
+                raise RuntimeError('Required GPU claim assertion failed')
+            time.sleep(5)
     if os.name != "nt":
         raise RuntimeError("This launcher implements the Windows environment only")
     kernel = ctypes.windll.kernel32
@@ -103,13 +124,14 @@ def main():
     # are checked before its first instruction below. This is not guard repair.
     admission['partition_record_age_seconds'] = time.time()-GUARD.stat().st_mtime
     admission['prior_admission_attempts'] = admissions[:-1]
-    mask = (1 << 4) | (1 << 5)
+    mask = sum(1 << c for c in render_cpus)
     # The observer stays on the background pool; the render child gets two
     # explicitly designated background CPUs. Lowest available is NOT safe:
     # a full inherited mask includes the owner's protected terminal CPUs.
     if not kernel.SetProcessAffinityMask(handle, ctypes.c_size_t(sum(1 << c for c in BACKGROUND))):
         raise ctypes.WinError()
     env = dict(os.environ, NMKC_CHAPTER=args.chapter, NMKC_SEGMENT=str(args.segment), NMKC_ENCODER=args.encoder,
+               NMKC_WRITER=args.writer,
                OMP_NUM_THREADS="1", OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1",
                NUMEXPR_NUM_THREADS="1", PYTHONIOENCODING="utf-8", PYTHONFAULTHANDLER="1", PYTHONUNBUFFERED="1")
     if args.board:
@@ -217,8 +239,8 @@ def main():
             resumed = False
             try:
                 child = psutil.Process(proc.pid)
-                child.cpu_affinity([4, 5])
-                if child.cpu_affinity() != [4, 5] or child.nice() != psutil.BELOW_NORMAL_PRIORITY_CLASS:
+                child.cpu_affinity(render_cpus)
+                if child.cpu_affinity() != render_cpus or child.nice() != psutil.BELOW_NORMAL_PRIORITY_CLASS:
                     raise RuntimeError("Pre-start affinity or priority verification failed")
                 child.resume()
                 resumed = True
@@ -230,7 +252,7 @@ def main():
     finally:
         stop.set(); watcher.join()
     intervals = samples[1:]
-    receipt = {"command": command, "encoder": args.encoder, "returncode": proc.returncode, "affinity_mask": mask,
+    receipt = {"command": command, "encoder": args.encoder, "writer": args.writer, "returncode": proc.returncode, "affinity_mask": mask,
                "build_directory": str(build), "input_manifest_sha256": hashlib.sha256(
                    (build/"input_manifest.json").read_bytes()).hexdigest(),
                "elapsed_seconds": time.perf_counter()-start, "visibility_samples": len(samples),

@@ -4,6 +4,7 @@ These are author production checks. They do not claim listening, human approval,
 or a successful <=50 ms console-window observation.
 """
 import argparse
+from fractions import Fraction
 import hashlib
 import json
 import os
@@ -32,11 +33,14 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument('--build',type=Path,required=True)
     ap.add_argument('--chapter',required=True)
+    ap.add_argument('--cpu',type=int,default=14)
     args=ap.parse_args()
     if os.name=='nt':
         process=psutil.Process()
         process.nice(psutil.BELOW_NORMAL_PRIORITY_CLASS)
-        process.cpu_affinity([6])
+        if args.cpu not in [4,5,6,7,8,9,14,15]:
+            raise ValueError('Choose an allowed background CPU')
+        process.cpu_affinity([args.cpu])
     root=args.build.resolve()
     chapter=json.loads((root/'chapters'/f'{args.chapter}.json').read_text(encoding='utf-8'))
     timing=json.loads((root/'timing'/f'chapter{args.chapter}.json').read_text(encoding='utf-8'))
@@ -50,22 +54,31 @@ def main():
         raise ValueError('Invalid input manifest')
     for rel,expected in inputs.items():
         if digest(root/rel)!=expected:raise ValueError(f'Changed frozen input: {rel}')
-    videos=list((root/'media/videos/scenes').glob(f'*/chapter{args.chapter}_*.mp4'))
+    selected=timing.get('selected_board')
+    pattern=f'*/{selected}.mp4' if selected else f'*/chapter{args.chapter}_*.mp4'
+    videos=list((root/'media/videos/scenes').glob(pattern))
     if len(videos)!=1:raise ValueError('Expected exactly one completed chapter video')
     video=videos[0]
-    probe=json.loads(run([shutil.which('ffprobe'),'-v','error','-show_format','-show_streams',
+    probe=json.loads(run([shutil.which('ffprobe'),'-v','error','-count_frames','-show_format','-show_streams',
                           '-of','json',str(video)]).stdout)
     vs=[s for s in probe['streams'] if s['codec_type']=='video']
     aus=[s for s in probe['streams'] if s['codec_type']=='audio']
     if len(vs)!=1 or len(aus)!=1:raise ValueError('Missing or duplicate media stream')
     duration=float(vs[0]['duration'])
+    exact_duration=Fraction(vs[0]['duration_ts'])*Fraction(vs[0]['time_base'])
+    frame_count=int(vs[0]['nb_read_frames'])
+    if Fraction(frame_count)/Fraction(vs[0]['avg_frame_rate'])!=exact_duration:
+        raise ValueError('Frame count and exact stream duration disagree')
+    if Fraction(vs[0]['avg_frame_rate'])!=Fraction(vs[0]['r_frame_rate']):
+        raise ValueError('Output is not constant-frame-rate')
     if abs(duration-timing['seconds'])>.1:raise ValueError('Rendered duration differs from timing')
-    entries=[(f'{b["key"]}_{i:02}',s['say']) for b in chapter['boards']
+    boards=[b for b in chapter['boards'] if selected is None or b['key']==selected]
+    entries=[(f'{b["key"]}_{i:02}',s['say']) for b in boards
              for i,s in enumerate(b['segments'],1)]
     if [k for k,_ in entries]!=[r['key'] for r in timing['segments']]:
         raise ValueError('Missing, reordered or duplicated narration segment')
-    out=HERE/'out'/f'chapter{args.chapter}_author_check'
-    out.mkdir(parents=True,exist_ok=True)
+    out=HERE/'out'/f'{root.name}_author_check'
+    out.mkdir(parents=True,exist_ok=False)
     rows=[]
     previous_end=0.
     for (key,say),row in zip(entries,timing['segments']):
@@ -84,6 +97,7 @@ def main():
     if float(aus[0]['duration'])+.05<last_voice_end:
         raise ValueError('Muxed audio ends before the final spoken segment')
     result=dict(kind='author_media_integrity_check',chapter=args.chapter,build_directory=str(root),
+                selected_board=selected,frame_count=frame_count,exact_duration=str(exact_duration),
                 video_sha256=digest(video),input_manifest_sha256=digest(root/'input_manifest.json'),
                 duration_seconds=duration,spoken_seconds=sum(r['voice_seconds'] for r in timing['segments']),
                 width=vs[0]['width'],height=vs[0]['height'],frozen_inputs_checked=len(inputs),

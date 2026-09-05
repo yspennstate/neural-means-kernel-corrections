@@ -1,6 +1,64 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
-## Current checkpoint: 23:58 Jerusalem
+## Current checkpoint: September 6, 00:50 Jerusalem
+
+Continue through 12:55 Jerusalem. The paper and full two-hour lecture are not
+finished. One current independent vote has returned: reviewer 01, YES with
+two nonblocking editorial observations. Its full report and evidence are in
+the canonical reviewer01 leaves. Its ten cited snapshot hashes were checked
+again by the parent. The reviewer finished, validated its report, and released
+its own claims. Formal Brain registration and human review remain PENDING.
+
+The two observations are an internal figure title in figures.py:89 still
+saying Lemma 4.4, and the overbroad optimizer sentence at paper/impl.tex:82.
+Do not edit the frozen packet. Integrate all panel findings together, then
+have the independent reviewers assess the new pinned revision as needed.
+
+Reviewer 02 is now active under controller PID 33120, native PID 41212,
+runtime `02_05_after01`. This controller will run 02 through 05. The previous
+01 controller exited on a mesh-claim timeout without killing its reader;
+do not restart it. Reviewer 06 is still the detached native PID 44992 in
+thread 01a07326-223d-7c03-9897-101e289417ca, runtime `06_10_resume3/reviewer06`.
+It is preparing its report. ROOT still must launch 07 through 10 after 06
+finishes, because that old controller was detached. No other votes yet.
+
+The corrected narrated-board integration test is COMPLETE:
+`lecture/builds/20260906T004304_c12_layers`, return 0, 96.2138 seconds of
+render time. Its output is 2190 frames / exactly 73 seconds at 1920x1080,
+30 fps. All three recordings fit their boundaries, all 315 frozen inputs
+match, and all three decoded end-of-segment frames were inspected at native
+resolution. Movie SHA c4427faa5001c2963f1c04e07ed39aee0085e11e0185d61a5db38378a4a1af78.
+Audio has not been listened to; waveform/content alignment is the next
+independent media check. No positive console-flash certification is claimed.
+
+Use the tested native writer with `--encoder h264_nvenc --writer ffmpeg71
+--cpus 14,15`. The required binary is in the owner's ffmpeg-7.1.1 directory
+but identifies as 7.1-essentials, SHA
+2ce797a0f88d7f067180338fb227f7b1928ea727bd9a4d7a1d022f7c52af71a3.
+The process-local adapter sends each still once and repeats it natively;
+animations retain every rendered frame. Constant-frame-rate output fixes a
+one-frame duration error. FFmpeg concatenation preserves H.264 decode times;
+the generic Manim combiner rejected these packets after discarding DTS.
+The failed 002317 board render and 0034 pre-launch database failure are
+preserved. Do not count either as completed media.
+
+Core pressure explained much of the earlier slowness: at 00:28, background
+cores 4 through 9 were at 100%, while allowed background 14 and 15 were idle.
+Only this render's birth-verified processes were moved. The next launch pins
+its helpers to the requested background CPUs before its first mesh call.
+The owner guard remains unchanged. Recheck current pressure before each job.
+
+Full chapter 12 started at 00:49:33, parent PID 56356, logs
+`.local-verification/chapter12_final0049_*`. It uses the successful board's
+complete TeX cache. Inspect its exact status before any restart. This is the
+only owned production render currently launched. After verification, produce
+the other eleven chapters through the same pipeline and assemble/measure the
+complete film. All 252 recordings and all 252 equation preflights remain valid.
+
+Latest verified remote commit before this update is
+4c51c5da8b73f93e66e465cd260db9c417641a51 on the completion branch.
+
+## Historical checkpoint: 23:58 Jerusalem
 
 The overnight order still runs through September 6 at 12:55 Jerusalem. No
 independent referee has returned a verdict. Scientific source and frozen packet

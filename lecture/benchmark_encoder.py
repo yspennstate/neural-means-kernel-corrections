@@ -21,6 +21,7 @@ def main():
     p.add_argument('--out', type=Path, required=True)
     p.add_argument('--encoder', choices=('libx264', 'h264_nvenc'), required=True)
     p.add_argument('--frames', type=int, default=600)
+    p.add_argument('--writer', choices=('pyav', 'ffmpeg71'), default='pyav')
     args = p.parse_args()
     if args.out.exists() or args.frames < 1:
         raise ValueError('Require a new output directory and positive frame count')
@@ -39,6 +40,7 @@ def main():
                         'assert', '--agent', 'codex-nmkc-resume-20260905', '--resource', 'topic:gpu-workload/MATH-ROSS20/codex-nmkc-resume-20260905'],
                        check=True, creationflags=0x08000000)
     os.environ['NMKC_ENCODER'] = args.encoder
+    os.environ['NMKC_WRITER'] = args.writer
     import av
     import numpy as np
     from PIL import Image
@@ -72,9 +74,13 @@ def main():
         encode_started_at=time.time()
         start = time.perf_counter()
         writer.open_partial_movie_stream(str(output))
-        job = writer._current_encode_job
-        job.put(args.frames, frame)
-        job.seal(); job.join()
+        if args.writer == 'ffmpeg71':
+            writer.write_frame(frame, num_frames=args.frames)
+            writer.close_partial_movie_stream()
+        else:
+            job = writer._current_encode_job
+            job.put(args.frames, frame)
+            job.seal(); job.join()
         elapsed = time.perf_counter()-start
         encode_ended_at=time.time()
     finally:

@@ -1035,17 +1035,21 @@ class BoardSamples(BoardMixin, Scene):
 
 class LectureChapter(BoardMixin, Scene):
     def construct(self):
+        selected_key = os.environ.get("NMKC_BOARD")
+        boards = [b for b in DATA["boards"] if selected_key is None or b["key"] == selected_key]
+        if not boards:
+            raise ValueError(f"Unknown board: {selected_key}")
         timing = []
         samples = HERE / "media" / "board_samples" / CHAPTER
         samples.mkdir(parents=True, exist_ok=True)
         sample_rows = []
         # Fail before spending render time if any recording is stale or missing.
         durations = {}
-        for board in DATA["boards"]:
+        for board in boards:
             for i, segment in enumerate(board["segments"], 1):
                 key = f'{board["key"]}_{i:02}'
                 durations[key] = validate(HERE / "audio" / CHAPTER / (key + ".wav"), segment["say"])
-        for board in DATA["boards"]:
+        for board in boards:
             self.clear()
             _, effects = self.frame(board)
             text = None
@@ -1082,9 +1086,10 @@ class LectureChapter(BoardMixin, Scene):
         out = HERE / "timing"
         out.mkdir(exist_ok=True)
         (out / f"chapter{CHAPTER}.json").write_text(json.dumps({
-            "chapter": CHAPTER, "script_sha256": hashlib.sha256(
+            "chapter": CHAPTER, "selected_board": selected_key, "script_sha256": hashlib.sha256(
                 (HERE/"chapters"/(CHAPTER+".json")).read_bytes()).hexdigest(),
             "segments": timing, "seconds": self.renderer.time}, indent=2), encoding="utf-8")
         (samples / "manifest.json").write_text(json.dumps({
             "kind": "frames_from_narrated_render", "chapter": CHAPTER,
+            "selected_board": selected_key,
             "human_visual_review": "PENDING", "rows": sample_rows}, indent=2), encoding="utf-8")

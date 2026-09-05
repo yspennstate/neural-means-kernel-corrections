@@ -66,6 +66,20 @@ mathematics and data labels. This comparison excludes scene construction;
 it does not establish full-chapter throughput. Settings and limitations are
 in `encoder_comparison_20260905.json`. Use `--encoder h264_nvenc` for an
 admitted movie render, under the current disjoint GPU workload claim.
+
+The September 6 native writer adds `--writer ffmpeg71`. It uses the exact
+owner-installed FFmpeg 7.1 executable, with a hash check; its directory name
+is `ffmpeg-7.1.1`, but the binary identifies as `7.1-essentials`. Frozen waits
+send one source frame to a native loop, while animations send every frame.
+Explicit constant-frame-rate output and FFmpeg concatenation retain exact
+frame counts and decode timestamps. A complete narrated-board check produced
+2,190 frames and exactly 73 seconds, including all three recordings and all
+15 animations; its three decoded end frames were inspected at full resolution.
+This checks the actual writer, concatenation and audio assembly together.
+It does not certify a full chapter or listening quality. `--cpus 14,15` selects
+two allowed background CPUs; choose only within the owner's current partition
+and recheck pressure. The shared Manim environment and owner guard are unchanged.
+
 Scientific assets retain their input hashes, case
 selection rules, units and reconstruction checks. OCO-2 spectra are benchmark
 simulator reconstructions; mechanics images and calibration deciles come from

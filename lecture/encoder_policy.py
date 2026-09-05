@@ -56,6 +56,9 @@ def install():
     codec = os.environ.get('NMKC_ENCODER', 'libx264')
     if codec not in ('libx264', 'h264_nvenc'):
         raise RuntimeError('Unsupported lecture encoder')
+    if os.environ.get('NMKC_WRITER', 'pyav') == 'ffmpeg71':
+        from ffmpeg_writer import install as install_native
+        return install_native(codec)
     source=Path(inspect.getfile(writer))
     source_hash=hashlib.sha256(source.read_bytes()).hexdigest()
     patch_hash=None

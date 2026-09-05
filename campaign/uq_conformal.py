@@ -1,11 +1,13 @@
-"""Split-conformal intervals with a calibration set no selection ever touched.
+"""Retrospective split-conformal measurements on the public test block.
 
 The published pipeline calibrated conformal scales on the model-selection
 validation split, which the exchangeability argument does not cover. Here the
 20000-sample test set is split at random (seeded) into 1000 calibration and
-19000 evaluation samples: neither was used for training, checkpointing,
-stacking, or kernel tuning, so calibration and evaluation scores are exactly
-exchangeable and the finite-sample guarantee applies as stated.
+19000 evaluation samples. Within a run these rows are separate from training,
+checkpointing, stacking, and kernel tuning. Repeated study-level access to
+the public block is not covered by that separation. A fresh-population
+guarantee additionally requires a fixed predictor and scale independent of
+exchangeable calibration and evaluation observations.
 
 Scores: per-sample L2 error of the corrected surrogate, either raw or scaled
 by the ensemble disagreement (mean across-member std). Quantile: the exact
@@ -15,6 +17,7 @@ Writes {tag}_uq.json and {tag}_uq.npz under NMKC_RUNS.
 """
 import argparse, json, math, os, sys
 import numpy as np
+from conformal_utils import conformal_quantile
 
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent.parent))
 from common import load_arrays, canonical_split, RUNS, save_run
@@ -46,6 +49,10 @@ disagree = mem.std(0).mean(1)                         # (n,)
 err = np.linalg.norm(pred - Yte, axis=1)              # (n,) absolute L2 error
 
 n = len(Yte)
+if not 0 < args.ncal < n:
+    raise ValueError("Calibration and evaluation sets must both be nonempty")
+if not np.isfinite(disagree).all() or np.any(disagree <= 0):
+    raise ValueError("Disagreement scales must be finite and strictly positive")
 rng = np.random.default_rng(SEED)
 perm = rng.permutation(n)
 cal, ev = perm[:args.ncal], perm[args.ncal:]
@@ -53,13 +60,12 @@ cal, ev = perm[:args.ncal], perm[args.ncal:]
 out = dict(kind="split_conformal", tag=args.tag, seed=SEED,
            n_cal=len(cal), n_eval=len(ev), members=names)
 for alpha in [float(a) for a in args.alphas.split(",")]:
-    k = math.ceil((1 - alpha) * (len(cal) + 1))       # exact split-conformal rank
     key = f"a{alpha:g}"
     # scaled scores: err / disagreement
-    q_s = np.sort(err[cal] / disagree[cal])[min(k, len(cal)) - 1]
+    q_s = conformal_quantile(err[cal] / disagree[cal], alpha)
     cov_s = float(np.mean(err[ev] <= q_s * disagree[ev]))
     # raw scores: constant-width bands
-    q_r = np.sort(err[cal])[min(k, len(cal)) - 1]
+    q_r = conformal_quantile(err[cal], alpha)
     cov_r = float(np.mean(err[ev] <= q_r))
     out[key] = dict(target=1 - alpha,
                     scaled=dict(q=float(q_s), coverage=cov_s,

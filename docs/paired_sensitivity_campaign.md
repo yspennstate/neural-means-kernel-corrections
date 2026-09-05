@@ -77,6 +77,16 @@ eight idle core equivalents, 32 GiB available memory, and 40 GiB free disk
 at admission. This does not reserve capacity against uncoordinated users of
 the host; live workload monitoring remains necessary.
 
+At 10:47 local time on September 5, additional idle capacity became available.
+The waiting follow-up controller was stopped before its first job, and
+`run_paper1_followups_parallel.py` started the identical nineteen-job list
+in a separate eight-thread lane. The original centering lane and its
+experiment sources were unchanged. The total cap became sixteen threads,
+with at most one job in each lane. Follow-up admission measures current CPU
+use, reserves eight threads for centering even between its stages, and leaves
+one core of headroom. The transition is recorded in `scheduling_amendment.json`;
+the new controller is retained under `tools/` in the evidence archive.
+
 ## Evidence and interpretation
 
 The campaign writes source and input hashes, stage receipts, immutable

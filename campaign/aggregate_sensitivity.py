@@ -79,6 +79,7 @@ def aggregate(root):
             raise ValueError("Centering seed identity failed")
         with np.load(sr / "paired_errors.npz", allow_pickle=False) as z:
             validate_indices(z["test_indices"], 20000, f"centering {seed}")
+            test_reference = z["test_indices"].copy()
             row = dict(seed=seed)
             for arm in ("historical", "pooled", "local"):
                 row[arm] = checked_mean(z[arm], rec["metrics"][arm]["mean_relative_l2"], arm)
@@ -97,6 +98,39 @@ def aggregate(root):
         if fold["seed"] != seed or len(fold["folds"]) != 4 or fold["ntrain"] != 19000:
             raise ValueError("Fold configuration mismatch")
         folds.extend(fold["folds"])
+        row["uq"] = {}
+        cal_reference = None
+        for arm, directory in (("pooled", "pooled"), ("local", "runs")):
+            uq = read(sr / directory / "hpix_uq.json")
+            if uq["seed"] != seed or (uq["n_cal"], uq["n_eval"]) != (1000, 19000):
+                raise ValueError("Unexpected conformal split")
+            with np.load(sr / directory / "hpix_uq.npz", allow_pickle=False) as z:
+                cal, ev = z["cal"], z["ev"]
+                validate_indices(cal, 1000, "calibration")
+                validate_indices(ev, 19000, "evaluation")
+                if not np.array_equal(np.sort(np.concatenate([cal, ev])), np.arange(20000)):
+                    raise ValueError("Conformal subsets overlap or omit cases")
+                if cal_reference is not None and not np.array_equal(cal, cal_reference):
+                    raise ValueError("Paired arms used different calibration cases")
+                cal_reference = cal.copy()
+                err, scale = z["err"], z["disagree"]
+                if (err.shape != (20000,) or scale.shape != err.shape
+                        or not np.isfinite(err).all() or np.any(err < 0)
+                        or not np.isfinite(scale).all() or np.any(scale <= 0)):
+                    raise ValueError("Invalid conformal errors or scales")
+                arm_uq = {}
+                for alpha in (.1, .05):
+                    key = f"a{alpha:g}"
+                    rank = math.ceil((1-alpha) * (len(cal)+1))
+                    for mode, scale_used in (("raw", np.ones_like(scale)), ("scaled", scale)):
+                        quantile = float(np.partition(err[cal] / scale_used[cal], rank-1)[rank-1])
+                        coverage = int(np.count_nonzero(err[ev] <= quantile * scale_used[ev])) / len(ev)
+                        radius = math.fsum(float(quantile*v) for v in scale_used[ev]) / len(ev)
+                        for field, value in (("q", quantile), ("coverage", coverage), ("mean_width", radius)):
+                            if not math.isclose(value, uq[key][mode][field], rel_tol=1e-10, abs_tol=1e-12):
+                                raise ValueError("Conformal measurement does not reproduce")
+                        arm_uq[key + "_" + mode] = dict(coverage=coverage, mean_radius=radius)
+                row["uq"][arm] = arm_uq
         mr = root / "mismatch" / f"s{seed}"
         rec = read(mr / "summary.json")
         if rec["seed"] != seed or sha(mr / "paired_errors.npz") != rec["errors_sha256"]:
@@ -105,10 +139,15 @@ def aggregate(root):
         with np.load(mr / "paired_errors.npz", allow_pickle=False) as z:
             for split, size in (("validation", 1000), ("test", 20000)):
                 validate_indices(z[split + "_indices"], size, f"mismatch {split}")
+                if split == "test" and not np.array_equal(z["test_indices"], test_reference):
+                    raise ValueError("Mismatch and centering test cases differ")
                 metric = rec["metrics"][split]
                 for field, producer in (("base", "base_mean"), ("historical", "historical_correction_mean"), ("consistent", "consistent_correction_mean")):
                     row[split + "_" + field] = checked_mean(z[split + "_" + field], metric[producer], split + field)
                 term = z[split + "_propagated_mismatch"]
+                gap = np.abs(z[split + "_consistent"] - z[split + "_historical"])
+                if np.any(term < 0) or np.any(gap > term + 2e-12):
+                    raise ValueError("Propagated term violates the reverse triangle inequality")
                 row[split + "_mismatch_mean"] = checked_mean(term, metric["propagated_mismatch"]["mean"], "propagated term")
                 for label, value in (("maximum", np.max(term)), ("p95", np.quantile(term, .95))):
                     if not math.isclose(float(value), metric["propagated_mismatch"][label], rel_tol=1e-10, abs_tol=1e-12):
@@ -164,6 +203,10 @@ def aggregate(root):
                 evidence_manifest_sha256=sha(root / "evidence_manifest.json"),
                 centering=dict(rows=centering, aggregate={key: stats(r[key] for r in centering)
                     for key in ("historical", "pooled", "local", "local_minus_pooled")},
+                    uq={arm: {key: {metric: stats(r["uq"][arm][key][metric] for r in centering)
+                                   for metric in ("coverage", "mean_radius")}
+                              for key in centering[0]["uq"][arm]}
+                        for arm in ("pooled", "local")},
                     field_change_range=[min(f["centering_relative_frobenius"] for f in folds), max(f["centering_relative_frobenius"] for f in folds)],
                     independent_solve_max=max(f["independent_solve_max_absolute_difference"] for f in folds)),
                 mismatch=dict(rows=mismatch, aggregate={key: stats(r[key] for r in mismatch)

@@ -4,10 +4,11 @@ Identical arithmetic to campaign/uq_conformal.py; the only change is that member
 prediction files are resolved by their campaign run names (mlpMSE_s3_w1024_..._predte.npy)
 rather than the short names the single-seed script assumed.
 
-The calibration set is drawn from the 20000-sample TEST block, which no training,
-checkpointing, stacking or kernel tuning ever touched, so calibration and evaluation
-scores are exchangeable and the finite-sample guarantee applies exactly. 1000 calibration
-against 19000 evaluation, the quantile the exact ceil((1-alpha)(m+1))-th order statistic.
+The public test block is split into 1000 calibration and 19000 evaluation
+cases. These rows are separate from within-run fitting and selection, but
+the benchmark has been inspected repeatedly across the study. A fresh-population
+coverage claim requires a predictor and scale fixed independently of exchangeable
+calibration/evaluation observations; this script measures retrospective coverage.
 """
 import glob, json, math, os, sys
 import numpy as np

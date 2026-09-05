@@ -37,15 +37,18 @@ def main():
         "status.json", "followup_status.json", "campaign_manifest.json",
         "followup_plan.json", "capacity.jsonl",
         "numerical_controls/driver_controls.json")]
+    for name in ("scheduling_amendment.json", "followup_capacity.jsonl"):
+        if (root / name).exists():
+            paths.append(root / name)
     for folder in ("receipts", "followup_receipts"):
         paths.extend(sorted((root / folder).glob("*.json")))
-    for folder in ("code", "diagnostics"):
+    for folder in ("code", "diagnostics", "tools"):
         paths.extend(sorted((root / folder).rglob("*.py")))
     for seed in range(10):
         sr = root / "seeds" / f"sm_s{seed}"
         paths.extend(sr / name for name in ("summary.json", "paired_errors.npz", "runs/fold_centering.json"))
         for arm in ("runs", "pooled"):
-            for name in ("hpix.json", "hpix_corr.json", "hstk.json", "hpix_uq.json"):
+            for name in ("hpix.json", "hpix_corr.json", "hstk.json", "hpix_uq.json", "hpix_uq.npz"):
                 candidate = sr / arm / name
                 if candidate.exists():
                     paths.append(candidate)

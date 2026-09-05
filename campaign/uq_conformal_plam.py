@@ -18,6 +18,7 @@ Writes <root>/seeds/sm_s<seed>/runs/<tag>_uq_plam.json.
 """
 import argparse, json, math, os, pathlib, sys, time
 import numpy as np
+from conformal_utils import conformal_quantile
 from scipy.linalg import cho_factor, cho_solve, solve_triangular
 
 p = argparse.ArgumentParser()
@@ -61,6 +62,8 @@ sub = rng.choice(n, min(2000, n), replace=False)                    # the correc
 med = float(np.sqrt(np.median(sqdist(Xt[sub], Xt[sub])[np.triu_indices(len(sub), 1)])))
 
 # calibration / evaluation split of the test block: identical to conformal_seeded.py
+if not 0 < args.ncal < len(te):
+    raise ValueError("Calibration and evaluation sets must both be nonempty")
 perm = np.random.default_rng(args.seed).permutation(len(te))
 cal, ev = perm[:args.ncal], perm[args.ncal:]
 alphas = [float(a) for a in args.alphas.split(",")]
@@ -115,9 +118,8 @@ for tag in args.tags.split(","):
                spearman_P_err=float(np.corrcoef(np.argsort(np.argsort(P)), np.argsort(np.argsort(err)))[0, 1]),
                pearson_P_err=float(np.corrcoef(P, err)[0, 1]))
     for alpha in alphas:
-        k = math.ceil((1 - alpha) * (len(cal) + 1))
-        q_p = np.sort(err[cal] / P[cal])[min(k, len(cal)) - 1]
-        q_r = np.sort(err[cal])[min(k, len(cal)) - 1]
+        q_p = conformal_quantile(err[cal] / P[cal], alpha)
+        q_r = conformal_quantile(err[cal], alpha)
         out[f"a{alpha:g}"] = dict(
             target=1 - alpha,
             plam=dict(q=float(q_p), coverage=float(np.mean(err[ev] <= q_p * P[ev])),

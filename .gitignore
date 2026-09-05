@@ -19,3 +19,7 @@ campaign/boxes.local.json
 release_artifacts/
 *.fdb_latexmk
 *.fls
+
+# Paired manuscript build intermediates
+paper/nmkc-build/
+paper/output.*

@@ -1,110 +1,10 @@
-Every result stated in Section~\ref{sec:theory} is checked numerically, and
-the checks are released with the code. They come in two kinds. The first kind
-builds a synthetic object whose ground truth is known exactly and tests the
-stated inequality or identity on it: the certified bound of
-Theorem~\ref{thm:or} is evaluated on a residual constructed inside the native
-space with exactly known norm, at several nuggets, where any pointwise
-violation beyond numerical precision would falsify the statement; the
-leave-half-out identity and unbiasedness of Proposition~\ref{prop:kf} are
-checked by direct enumeration; the effective-dimension
-identity of Lemma~\ref{lem:deff} is checked to machine precision and the
-closed form of Corollary~\ref{cor:mp} against the empirical spectrum of an
-i.i.d.-entry Gram matrix; and the rate mechanism of the heuristic calculation
-in Proposition~\ref{prop:aniso} is exercised on a controlled warped target
-$G=g(A\,\cdot)$ with a known singular-value profile, where the adapted metric
-must dominate at every sample size and improve the empirical rate. All four
-pass: the largest relative violation of the optimal-recovery bound is
-$-3.3\times10^{-2}$, that is, the bound holds with margin everywhere it was
-evaluated; the kernel-flow identity closes to $2.8\times10^{-14}$; the
-effective-dimension identity to $3.7\times10^{-15}$ and its Mar\v{c}enko--Pastur
-closed form to $4.4\times10^{-5}$ across five nuggets spanning four orders of
-magnitude; and the adapted metric dominates the isotropic one at every sample
-size of the warped construction.
+Numerical checks complement the proofs; they do not prove the results or establish that the empirical pipeline meets their hypotheses. The public source snapshot contains synthetic checks and matrix-level checks of the original experiments. This revision did not retrain the networks. The original macro audit found zero disagreements between the reported numerical macros and the released summary records; independent matrix calculations reproduce the sixty-member empirical RMS floor $4.813611\%$ and recorded optimum $4.876133\%$.
 
-The second kind evaluates the statements whose subject is the pipeline itself
-on the pipeline's own released artifacts, at every seed.
-The symmetrization inequality of Proposition~\ref{prop:sym} is checked on every
-trained member. It is a statement about the expected loss, so a finite test
-sample may go the other way, and at ten seeds one does: over the thirty members
-that carry a reflection, averaging lowers test error in twenty-nine cases, by
-$0.16$ points on the metric-trained network, $0.07$ on the FNO and $0.02$ on
-the normalized-MSE one, and raises it in the thirtieth by $0.001$ points. That
-single reversal is the sampling noise the proposition permits and a single-seed
-check cannot see. The second-moment identity of
-Proposition~\ref{prop:secmom} is measured on the validation residual matrix at
-each seed and its predicted risk compared with the realized risk of the weights
-it implies; the ratio is $\dispFac\pm\dispFacSd$ over ten seeds on five
-members and $\dispFacSix\pm\dispFacSixSd$ on six. The simplex minimization
-behind that comparison is solved by sequential quadratic programming under an
-explicit sum-to-one constraint, and the suite guards the solve with the
-cheapest check available: it evaluates the objective at the returned point,
-at every pure-member vertex and at a re-solved optimum, and requires the
-first to be no worse than the others. A clip-and-renormalize projected
-gradient, which is not a projection onto the simplex, fails that check on
-this matrix, stopping $0.8$--$3.6\%$ above the minimum at near-vertex
-points. The bracket of Corollaries~\ref{cor:floor}
-and~\ref{cor:floorpinch} is evaluated against the realized convex stack at
-each seed, with the one-sided bounds read off the measured $S$: on five
-members the normalized minimum $\min_w w^\top Sw/\bar e^{\,2}$ is
-$0.980\pm0.003$ inside a bracket of $[0.949\pm0.005,\,1.039\pm0.004]$, on
-six it is $0.972\pm0.005$ inside $[0.933\pm0.007,\,1.032\pm0.004]$, and the
-inequalities hold at every seed. The signed optimum of
-Corollary~\ref{cor:signed} lies within $0.0005$ points of the convex one at
-every seed and for both member sets; its minimizer carries a small negative
-coordinate at seven of ten seeds for the six members and at one of ten for
-the five (the stored \texttt{signed} records). The bound of Theorem~\ref{thm:blockfloor} is evaluated on the
-sixty predictors of Section~\ref{sec:seeds-arch} with the pool's smallest
-member error and smallest within- and between-architecture second moments:
-$\saBound\%$ against a hindsight convex optimum of $\saSixtyOracleRms\%$ and
-a uniform mixture of $\saSixtyEqRms\%$, root mean square, so the bound holds
-and sits six hundredths below the best mixture any rule could have chosen.
-The exchange rate of Proposition~\ref{prop:exchange} is evaluated at the
-measured values of both campaigns in Supplement~\ref{supp:experiments}. The
-two-member rule of
-Proposition~\ref{prop:secmom}(i) is scored prospectively on every member pair
-of every seed rather than on selected examples --- decided on the validation
-split and checked on the test block, $840$ pairs over the thirty OCO-2
-band-seeds. Section~\ref{sec:secmom-margin} reports what that scoring found,
-which is not a uniform verdict: the rule's accuracy is governed by the margin
-between the two quantities it compares. The selection conditions of
-Propositions~\ref{prop:percoord}, \ref{prop:selectcoord} and~\ref{prop:affine}
-are checked against the realized selections, with the measured constants $b$
-and $W$ of Proposition~\ref{prop:affine} and Corollary~\ref{cor:certificate}
-released next to the realized excesses of the affine stack and of the
-corrected surrogate. Both are capacity bounds: the affine bound evaluated at
-the measured $b$ and $W$ exceeds its realized excess by many orders of
-magnitude, and the corollary's right-hand side, whose remaining constant is
-the analytic $\kappa_{\mathrm{an}}=500$ of Lemma~\ref{lem:kappa} (half the
-smallest nugget on the grid to the power $-1/2$), is larger still; the
-constants are released for what they show about the bounds rather than as a
-guarantee. The realized scale of the correction weights is measured
-separately: the largest $\ell^1$ norm of $c_\gamma(u)$ over the grid and over
-a fixed $500$-point test probe is $\kappaTen\pm\kappaTenSd$ over the ten
-seeds, between $\kappaTenLo$ and $\kappaTenHi$, falling to $3.1$ at the
-largest nugget and length scale of the grid, and recomputing seed~0 on a
-second machine reproduces its value to $10^{-12}$. Being a supremum over a
-finite probe, that value is a lower bound on
-$\sup_{u,\gamma}\|c_\gamma(u)\|_1$ and not a constant the corollary can be
-evaluated at, and the corollary is evaluated at $\kappa_{\mathrm{an}}$. The
-probe value sits a factor of about fifteen below $\kappa_{\mathrm{an}}$, and
-every per-configuration probe value respects the lemma's bound
-$\tfrac12\lambda^{-1/2}$ at its own nugget, the closest approach being
-$0.27$ of the bound, at $\lambda=10^{-3}$. The
-coverage of Proposition~\ref{prop:conf} is computed at every seed and each
-observed value placed against the Beta--binomial law of the evaluation
-fraction in Remark~\ref{rem:covlaw} ($m=1000$ calibration cases, $N=19000$
-evaluation cases): the central $95\%$ band is $[88.0\%,91.8\%]$ at the $90\%$
-level and $[93.5\%,96.3\%]$ at the $95\%$ level. On the six-member pipeline
-ten of ten seeds fall inside at both levels; on the five-member pipeline ten
-of ten at $90\%$ and nine of ten at $95\%$, the tenth ($93.35\%$) falling two
-tenths of a point below the lower edge. Finally the
-data-scaling sweep of the two raw-input kernel rows is refit at nested training
-sizes and at ten seeds per band. The approximate rank of the sensitivity map
-is $12$ of $20$ on O2 and $13$--$14$ of $24$ on the two CO$_2$ bands, a rank
-ratio between $0.54$ and $0.60$, so the heuristic calculation of
-Proposition~\ref{prop:aniso} would permit a rate gain here and not merely a
-constant; the sweep finds the constant and not the rate, and
-Section~\ref{sec:aniso-measured} reports it that way.
+The second-moment identity is checked on the same arrays used to calculate the quadratic form. The validation dispersion factors $\dispFac$ and $\dispFacSix$ compare mean and RMS errors on that same sample, not prospective prediction accuracy. In the original five-member bracket record, the normalized value $0.980\pm0.003$ is the held-out risk of fitted global weights, not a simplex minimum. The six-member value $0.972\pm0.005$ is the validation simplex minimum. These records must not be merged into a single claim about optimized population risk.
+
+The independence requirements of the capacity bounds fail for validation-adapted candidates in this pipeline; empirical values of their constants do not repair that. Likewise, the fitted residual norms under mixed training labels do not certify the norm of the query-time residual. The correction-label mismatch bound is proved explicitly in the main text. Proposition~\ref{prop:aniso} is a finite-design Lipschitz truncation bound with a complete proof. The warped-target scaling experiments are illustrative and do not establish an asymptotic rate theorem.
+
+The reported conformal reference intervals at $m=1000,N=19000$ are $[88.0\%,91.8\%]$ and $[93.5\%,96.3\%]$ at nominal 90\% and 95\%. Their Beta--binomial interpretation is qualified by Remark~\ref{rem:covlaw}; falling within such an interval does not verify the independence assumptions or conditional coverage at individual inputs.
 
 The floor theorem, the exchange rate, the sharpened weight bound, the
 minimax identity and the signed-stack corollary have their own released
@@ -117,8 +17,7 @@ released sixty-predictor matrix, twenty thousand random convex mixtures never
 pass the bound evaluated with the pool's minima, and the mean-entry form of
 the display returns the uniform mixture's value exactly. The two partial
 derivatives of Proposition~\ref{prop:exchange} agree with central
-differences to $4\times10^{-9}$ over two thousand interior points, both are
-positive there, and along the stated direction the change in the optimal
+differences to $4\times10^{-9}$ over two thousand interior points, both are positive at the sampled points away from perfect anticorrelation, and along the stated direction the change in the optimal
 risk is second order in the step. The sharpened bound of
 Lemma~\ref{lem:kappa} holds on fifteen hundred random Mat\'ern designs and
 evaluation points, the largest ratio to the bound being $0.87$, and the
@@ -130,9 +29,5 @@ with equality to $10^{-14}$, and the signed optimum of
 Corollary~\ref{cor:signed} matches its closed form and never lies above a
 sampled convex mixture.
 
-The bound comparisons are reported as measured constants, bound value and
-realized excess side by side; where an oracle risk is needed it is estimated by
-a deterministic refit on the test arrays, which can only make the reported
-ratios conservative. The synthetic checks report pass or fail against explicit
-tolerances; the artifact checks report the measured quantities themselves,
-together with the number of seeds behind each.
+
+These checks cover the displayed algebra at their sampled designs and tolerances. They are not exhaustive tests of every boundary or implementation, and the revision's explicit endpoint conditions remain necessary. The accompanying review report records which summary audits were rerun and which empirical results were retained from the historical campaign.

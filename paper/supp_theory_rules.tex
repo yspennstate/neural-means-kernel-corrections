@@ -1,84 +1,60 @@
-Part~(i) is an exact criterion, but it is used as a decision rule, and a
-decision rule is applied to estimates. Both $\varrho$ and $e_1/e_2$ must be
-formed on data the decision does not see, so what governs the rule in
-practice is not the criterion but the gap it has to resolve relative to the
-noise in that estimation. The following makes this quantitative, and is
-stated for any threshold comparison of this shape.
+The two-member criterion is exact for population second moments. Applying
+it to estimates introduces a separate estimation problem. The following
+bound states explicitly the distributional assumption needed for a margin
+interpretation and assigns ties to the decision not to mix.
 
 \begin{proposition}[margin law for a threshold rule]\label{prop:margin}
-Let $D=\varrho-e_1/e_2$ be the signed gap of Proposition~\ref{prop:secmom}(i),
-so that mixing the weaker member strictly helps exactly when $D<0$, and
-suppose $D\neq0$. Let $\widehat D$ be an estimate of $D$ formed on a split
-independent of the one on which $D$ is evaluated, and suppose the estimation
-error $\widehat D-D$ is subgaussian with variance proxy $\sigma^2$, that is
-$\mathbb E\exp\!\big(\lambda(\widehat D-D)\big)\le\exp(\lambda^2\sigma^2/2)$
-for all $\lambda\in\mathbb R$, conditionally on $D$. Then, writing
-$\Delta=|D|$ for the margin,
-\begin{enumerate}
-\item[(i)] on $\{D\neq0\}$, the decision taken from $\widehat D$ differs from
-the correct one with probability at most
-$\exp(-\Delta^{2}/2\sigma^{2})$;
-\item[(ii)] for every $\tau\ge0$, and with no condition on $D$,
+Let $D=\varrho-e_1/e_2$ be the gap in
+Proposition~\ref{prop:secmom}(i), and define the binary decision
+$d(x)=\mathbf 1\{x<0\}$. Thus $d(D)=1$ means that mixing strictly helps,
+and $d(0)=0$. Suppose, conditionally on $D$, an estimate $\widehat D$
+satisfies, for some fixed $\sigma>0$,
 \[
-\mathbb P\big(\operatorname{sign}\widehat D\neq\operatorname{sign}D,\ \
-|\widehat D|\ge\tau\big)\;\le\;\exp\!\left(-\frac{\tau^{2}}{2\sigma^{2}}\right).
+\mathbb E\!\left[\exp\{t(\widehat D-D)\}\mid D\right]
+\le \exp(t^2\sigma^2/2),\qquad t\in\mathbb R.
+\]
+Then:
+\begin{enumerate}
+\item[(i)] for $D\ne0$, writing $\Delta=|D|$,
+$\mathbb P(d(\widehat D)\ne d(D)\mid D)
+\le \exp(-\Delta^2/(2\sigma^2))$;
+\item[(ii)] for every $\tau\ge0$, including when $D=0$,
+\[
+\mathbb P\big(d(\widehat D)\ne d(D),\ |\widehat D|\ge\tau\big)
+\le \exp(-\tau^2/(2\sigma^2)).
 \]
 \end{enumerate}
 \end{proposition}
 
-\begin{proof}
-Suppose first $D<0$, so $\Delta=-D$ and the correct decision is to mix. The
-decision taken from $\widehat D$ differs only if $\widehat D\ge0$, which
-forces $\widehat D-D\ge-D=\Delta$. The subgaussian hypothesis and the
-Chernoff bound give, for every $\lambda>0$,
-$\mathbb P(\widehat D-D\ge\Delta)\le\exp(\lambda^2\sigma^2/2-\lambda\Delta)$,
-and optimizing at $\lambda=\Delta/\sigma^2$ yields
-$\exp(-\Delta^2/2\sigma^2)$. If instead $D>0$ then $\Delta=D$, the decision
-differs only if $\widehat D\le0$, which forces $\widehat D-D\le-\Delta$, and
-the same argument applied to $-(\widehat D-D)$, which is subgaussian with the
-same proxy, gives the identical bound. The two cases are exhaustive because
-$D\neq0$, which proves (i).
-
-For (ii), condition on $D$ again. If $D<0$ the error event is
-$\{\widehat D\ge0\}$, so on the error event intersected with
-$\{|\widehat D|\ge\tau\}$ we have $\widehat D\ge\tau$ and therefore
-$\widehat D-D\ge\tau-D\ge\tau$; the one-sided estimate above applies with
-$\Delta$ replaced by $\tau$. If $D\ge0$ the error event is
-$\{\widehat D<0\}$, so on it with $|\widehat D|\ge\tau$ we have
-$\widehat D\le-\tau$ and therefore $D-\widehat D\ge\tau+D\ge\tau$, and the
-one-sided estimate in the other direction applies. In both cases the bound is
-$\exp(-\tau^2/2\sigma^2)$, which is free of $D$, so taking the expectation
-over $D$ removes the conditioning.
+\begin{proof}\label{proof:prop:margin}
+Condition on $D$. If $D<0$, a wrong decision requires $\widehat D\ge0$,
+hence $\widehat D-D\ge|D|$. If $D>0$, a wrong decision requires
+$\widehat D<0$, hence $D-\widehat D>|D|$. The one-sided Chernoff bound
+obtained by minimizing $\exp(t^2\sigma^2/2-t\Delta)$ over $t>0$ gives (i).
+For (ii), when $D<0$ the event in question implies $\widehat D\ge\tau$,
+so $\widehat D-D\ge\tau$. When $D\ge0$, including a tie, it implies
+$\widehat D<0$ and $\widehat D\le-\tau$, so $D-\widehat D\ge\tau$.
+The same one-sided bound gives $\exp(-\tau^2/(2\sigma^2))$ in either
+case, and averaging over $D$ proves (ii). At $\tau=0$ the bound is the
+trivial upper bound one.
 \end{proof}
 
-Three remarks on how the statement is used in
-Section~\ref{sec:secmom-margin}. Part~(i) is conditional on the true margin
-$\Delta$, which is not available when the decision is taken; what is
-available is $|\widehat D|$, and part~(ii) is the statement about that
-quantity. It is a joint bound: it limits the probability that a decision is
-both wrong and taken at an observed margin of at least $\tau$, and it makes
-that event rare among all decisions once $\tau$ exceeds a few multiples of
-$\sigma$. It is not a bound on the error rate among the decisions whose
-observed margin exceeds $\tau$ --- that conditional probability is the joint
-one divided by $\mathbb P(|\widehat D|\ge\tau)$, on which the proposition
-says nothing --- so the accuracy within a margin bin is an empirical
-calibration of the rule and not a guarantee, and that is how
-Section~\ref{sec:secmom-margin} reports it. Both bounds are vacuous for
-margins of order $\sigma$ and fall off quickly beyond, so a rule of this
-shape has a band around its own threshold inside which it carries no
-guarantee, and the band is set by $\sigma$ rather than chosen. Second,
-$\sigma$ is estimable without knowing $D$: the differences between
-$\widehat D$ and the value of $D$ realized on a held-out block, taken across
-many pairs, have exactly this scale. Third, $|\widehat D|$ is observable at
-decision time, so a practitioner can report the observed margin next to the
-verdict; part~(ii) says that verdicts reported at a large margin are seldom
-wrong, and the scoreboard of Section~\ref{sec:secmom-margin} says how the
-realized accuracy varies with that margin.
+Part~(ii) bounds the joint event of a wrong decision and a large observed
+margin. It does not bound the error rate conditional on selecting such a
+margin; that would require division by $\mathbb P(|\widehat D|\ge\tau)$.
+The hypothesis also implies conditional centering of the estimation error
+and a sub-Gaussian tail bound, neither of which follows from a small pooled
+mean or standard deviation. The differences across the $840$ dependent
+member pairs describe the observed validation-to-test transfer scale, not a
+certified value of $\sigma$. In particular the OCO-2 validation and test
+blocks have the distribution shift described in Section~\ref{sec:oco2}.
+The margin-bin accuracies and the illustrative exponential calculation of
+Section~\ref{sec:secmom-margin} are therefore empirical diagnostics and a
+conditional reference calculation, respectively.
 
-
-A second consequence of the same decomposition explains the final OCO-2
-surrogate. Evaluation metrics there are diagonal in the output coordinates
-(the radiance metric is the weighting $s_z$), and diagonal metrics decouple.
+A separate observation concerns separable squared output metrics. It
+motivates coordinatewise combinations without implying simultaneous
+optimality for the two reported means of relative norms.
 
 \begin{proposition}[per-coordinate combination under diagonal metrics]
 \label{prop:percoord}
@@ -95,16 +71,14 @@ same for every diagonal metric, and it weakly dominates every combination
 whose weights are shared across coordinates, for all such metrics
 simultaneously.
 \end{proposition}
+\noindent\emph{Proof.} See Supplement~\ref{proof:prop:percoord}.
 
-The practical content: when a problem is scored in several diagonal metrics
-at once, the combination stage does not need to know which one matters. Fit
-the best combination coordinate by coordinate on validation and the result
-serves all of them; only the members need metric-aware training, which is
-where the weighted mean of Section~\ref{sec:oco2} enters.
 
-The proposition as stated covers quadratic metrics with fixed diagonal
-weights, while the experiments report relative errors, which weight each
-sample by its output norm. The decoupling survives that weighting.
+Here each coordinate's feasible weights may be chosen independently, and
+the optimum is a population optimum. With fixed positive diagonal weights,
+the squared risk separates in this way. An empirical minimizer has the same
+algebraic separation for the empirical objective, but need not be a
+population minimizer. A common per-sample weight also preserves separation.
 
 \begin{corollary}[weighted metrics and the reported error]\label{cor:percoordw}
 Let $a:\mathcal U\to[0,\infty)$ be measurable with
@@ -115,152 +89,113 @@ $\mathbb E[a(u)\,\|f_v(u)-G(u)\|_2^2]<\infty$. Then, for every diagonal $w$,
 \]
 so the minimization still splits into $q$ per-coordinate problems, none
 involving $w$. Taking $a(u)=\|G(u)\|_2^{-2}$ and $w=\mathbf 1$ makes the left
-side the mean squared relative error: the combination fitted coordinate by
-coordinate with per-sample weights $a$ on validation is simultaneously
-optimal, within its class, for the squared relative error and for every
+side the mean squared relative error: the population combination minimizing each
+weighted coordinate risk is simultaneously optimal, within its class, for the squared relative error and for every
 diagonal reweighting of it. The reported metric, $\mathbb E\,\|\rho_{f_v}\|_2$
 with $\rho$ the normalized residual of Section~\ref{sec:theory-secmom}, is
 controlled through $\mathbb E\|\rho\|_2\le(\mathbb E\|\rho\|_2^2)^{1/2}$; the
 gap between the two sides is the dispersion factor whose measured value stays
 near $0.93$ across the pipelines of this paper.
 \end{corollary}
+\noindent\emph{Proof.} See Supplement~\ref{proof:cor:percoordw}.
+
 
 The experiments run the combination both ways, unweighted and with the
 per-sample weights of the corollary, and report both.
 
 Proposition~\ref{prop:percoord} and its corollary describe the population
 optimum; the pipeline computes an empirical selection, coordinate by
-coordinate, on the validation split. The finite-sample cost of that step is
-priced by the same argument that priced the stacks.
+coordinate, on the validation split. For candidates fixed independently of an i.i.d. validation sample, the
+following inequality bounds its finite-sample selection cost.
 
 \begin{proposition}[empirical per-coordinate selection]\label{prop:selectcoord}
-Let $f_1,\dots,f_M$ be fixed maps, $a:\mathcal U\to[0,A]$ a bounded
-per-sample weight, and suppose $a(u)\,(f_m(u)_j-G(u)_j)^2\le L$ for
-$\mu$-a.e.\ $u$, every member $m$ and coordinate $j$. On a validation sample
+Let $f_1,\dots,f_M$ be fixed maps, and let $a:\mathcal U\to[0,A]$ be a bounded
+per-sample weight. Suppose $a(u)\,(f_m(u)_j-G(u)_j)^2\le L$ for
+$\mu$-a.e.\ $u$, every member $m$ and coordinate $j$. Take $a$ fixed
+independently of validation. On an i.i.d.\ validation sample from $\mu$
 of size $m_v$ independent of the members, let $\widehat m(j)$ minimize the
 empirical weighted risk of coordinate $j$ over the $M$ members, and let the
 combination take coordinate $j$ from member $\widehat m(j)$. Then, with
 probability at least $1-\delta$, simultaneously for every coordinate,
 \[
-R_j\big(\widehat m(j)\big)\;\le\;\min_{m\le M}R_j(m)\;+\;
-2L\sqrt{\frac{\log(2Mq/\delta)}{2m_v}},
-\qquad R_j(m)=\mathbb E\big[a(u)\big(f_m(u)_j-G(u)_j\big)^2\big],
+\begin{aligned}
+R_j\big(\widehat m(j)\big)&\le\min_{m\le M}R_j(m)+2L\sqrt{\frac{\log(2Mq/\delta)}{2m_v}},\\
+R_j(m)&=\mathbb E\big[a(u)\big(f_m(u)_j-G(u)_j\big)^2\big].
+\end{aligned}
 \]
 and consequently, for every diagonal metric $w$ at once,
-$\sum_j w_j^2 R_j(\widehat m(j))\le\sum_j w_j^2\min_m R_j(m)
-+2L\big(\sum_j w_j^2\big)\sqrt{\log(2Mq/\delta)/(2m_v)}$.
-\end{proposition}
-
-On the OCO-2 bands the deployed combination is exactly this estimator
-($M=6$ members, $q=40$ coordinates, $m_v=2000$), in the unweighted form and,
-for the squared relative error, with $a(u)=\|G(u)\|_2^{-2}$; the proposition
-prices both at the same rate, and the selection cost it bounds is what the
-seed experiments measure directly.
-
-The corollary is the quantity this paper keeps measuring, at two different
-levels. Across architecture families on the structural-mechanics benchmark
-the pairwise correlations exceed $0.86$ at member errors near $4.7\%$, which
-places the floor at $\ensFloor\pm\ensFloorSd\%$ in the root-mean-square
-metric it is stated in; Section~\ref{sec:diversity} makes the comparison
-with the deployed pipeline in that metric rather than across the two.
-Across random seeds of one architecture on the OCO-2 bands the correlations
-are $0.78$, $0.97$ and $0.96$ at member errors of $4.4\%$, $16.4\%$ and
-$8.2\%$; measured in the squared metric of the proposition itself, over all
-$45$ seed pairs per band, the floors are $4.360\%$, $17.970\%$ and $9.248\%$
-and the realized ten-seed ensembles sit at $4.419\%$, $17.997\%$ and
-$9.267\%$ (Section~\ref{sec:oco2}). When an ensemble is at its floor the
-corollary says where improvement cannot come from. The reported tables use
-the mean rather than the root mean square of $\|\rho_f\|_2$, and the two are
-not interchangeable: Remark~\ref{rem:metric} gives the relation, the ratio
-runs from about $0.89$ to $0.94$ across the objects here, and every
-comparison in this paper between a quantity read off $S$ and a table entry is
-made after converting one to the other. The proposition frames the diversity
-experiment of Section~\ref{sec:diversity}: what a new member is worth is
-legible in the row it adds to $S$, before any weights are fitted. On this
-benchmark the rows all look alike, pairwise correlations of
-\corrNetLo{}--\corrNetHi{} among trained networks of three architecture
-families and two losses, \corrKerLo{}--\corrKerHi{} against the kernel
-predictor, so the floor sits just below the best single member, and the
-measured stack lands on it. Part (i) is the same
-computation specialized to two members; it correctly predicts, from measured
-$(e_1,e_2,\varrho)$ alone, which members receive weight in the fitted stack
-and which are dropped. Section~\ref{sec:oco2} applies the same test on a
-problem where the answer comes out the other way: there the kernel's error is
-inflated by a factor the next subsection quantifies, the threshold $e_1/e_2$
-collapses, and the kernel is dropped even at a residual correlation of $0.14$.
-
-
-Suppose the operator factors as $G(u)=g(Au)$ with $A\in\mathbb R^{d\times d}$
-nonsingular and $g$ of unit $H^{s}$ norm, and that $\mu$ has a density bounded
-above and below on a compact domain. Order the singular values
-$\sigma_1\ge\dots\ge\sigma_d$ of $A$; they are the rates at which $G$ varies
-along the input directions. Suppose $A$ has \emph{approximate rank} $r$ at the
-sample size, meaning the trailing singular values fall below the achievable
-resolution, $\sigma_{r+1}\lesssim n^{-1/r}$, so the image $A\,\mathcal U$ is
-effectively $r$-dimensional at scale $n^{-1/r}$. The idealization beneath the
-display also takes the leading-$r$ projection of the image design to keep a
-density bounded above and below, the trailing directions to be exact zeros at
-the working resolution, and the interpolation limit $\lambda\to0$;
-Supplement~\ref{app:proofs} records the argument at that level, as a sketch
-rather than a complete proof. The statement is accordingly a heuristic rate
-calculation, and it is labelled informal: nothing else in the paper rests on
-it, and its role is to say what kind of gain a metric can and cannot produce.
-
-\begin{proposition}[isotropic and adapted kernel rates, informal]\label{prop:aniso}
-Let $\widehat G^{\mathrm{iso}}_n$ be kernel ridge regression with a Mat\'ern
-kernel of smoothness $s$ and a validation-optimal single length scale, and
-$\widehat G^{\mathrm{ard}}_n$ the same construction in the metric
-$u\mapsto Au$. Up to constants depending on $(\sigma_i)$, $g$, $s$ and the
-density bounds, and up to logarithmic factors in $n$, with high probability
-over $n$ i.i.d.\ samples,
 \[
-\mathbb E\big\|G-\widehat G^{\mathrm{iso}}_n\big\|\;\lesssim\;\sigma_1^{\,s}\,n^{-s/d},
-\qquad
-\mathbb E\big\|G-\widehat G^{\mathrm{ard}}_n\big\|\;\lesssim\;n^{-s/r},
+\begin{aligned}
+\sum_j w_j^2 R_j(\widehat m(j))
+&\le\sum_j w_j^2\min_m R_j(m)\\
+&\quad+2L\Big(\sum_j w_j^2\Big)\sqrt{\frac{\log(2Mq/\delta)}{2m_v}}.
+\end{aligned}
 \]
-so the ratio of the two bounds is of order $\sigma_1^{\,s}\,n^{\,s(1/r-1/d)}$.
-When $A$ is close to full rank ($r\approx d$) the two rates coincide and only
-the constant $\sigma_1^{\,s}$ separates them.
 \end{proposition}
-
-The calculation (Supplement~\ref{app:proofs}) is the scattered-data estimate
-$\|G-\widehat G_n\|\lesssim h_X^{\,s}\|G\|_{H^s}$ applied to the two designs:
-one length scale must fill all $d$ directions, so $h_X\asymp n^{-1/d}$ and the
-norm carries $\sigma_1^{\,s}$; the adapted metric, when $A$ has a spectral gap,
-confines the design to $r$ resolved directions and improves the fill distance.
-Both displays are upper bounds under the stated idealization --- the exact
-metric $A$, a fixed $g$, and the length-scale selection folded into the
-logarithmic factors --- and we claim no matching lower bound; the heuristic
-is used here to calibrate what a metric can and cannot buy, not as a rate
-theorem.
-It isolates the \emph{metric} part of a network's advantage, the
-part an anisotropic kernel would recover, and it says this part is a rate gain
-only under an approximate-rank gap; without one it is the constant
-$\sigma_1^{\,s}$ alone. The rest is \emph{representational}: a stationary
-kernel of fixed smoothness reaches only its native space, at any metric, while
-the network adapts its features to the map. The two parts are separated
-experimentally by handing the kernel the anisotropic metric and seeing how
-much of the gap closes. On the OCO-2 bands of Section~\ref{sec:oco2} the metric
-closes a factor of $1.1$ to $1.5$ out of a tenfold gap
-(Section~\ref{sec:aniso-measured}); the remainder is representational, and its
-direct evidence is that the same kernel machinery applied to the network's
-learned features recovers the network's accuracy and slightly exceeds it.
-
-The rate half of the heuristic is tested rather than assumed, and the test is
-the more interesting for not going our way. Both kernel rows are refit at
-nested training sizes over a sixteenfold range, at ten seeds per band. The
-sensitivity map's approximate rank is $0.54$ to $0.60$ of the input dimension,
-a gap wide enough that the calculation would permit a rate gain; the measured
-difference between the two empirical exponents is nevertheless small on all
-three bands and consistent with zero on one. The displays are upper bounds
-with no matching lower bound, so this does not contradict them --- the adapted
-rate is free to beat its own bound --- but it does mean that on these problems
-the rank gap is not converted into a rate, and a reader should take from
-Proposition~\ref{prop:aniso} only the part the measurement supports: an
-anisotropic metric is worth a constant. The controlled rank-gap target of the
-verification suite, where the construction is exactly the idealization the
-calculation assumes, does show the adapted exponent improving; the distance
-between that and the OCO-2 bands is the distance between the idealization and
-a real sensitivity map.
+\noindent\emph{Proof.} See Supplement~\ref{proof:prop:selectcoord}.
 
 
+The OCO-2 selector uses this coordinatewise empirical operation with
+$M=6$, $q=40$ and $m_v=2000$. Its candidate checkpoints and kernel heads
+were themselves selected on the same validation block, and that block has
+a different distribution from the test block. The proposition therefore does
+not provide a risk guarantee for that deployed selector. Its observed gains
+on both reported metrics, and the comparison of unweighted and
+inverse-norm-weighted selectors, are empirical findings.
+
+\subsection{A finite-design bound for truncating an input map}
+
+An approximate rank alone does not imply a learning rate. The next result
+instead separates a deterministic approximation error from the kernel error
+on a specified lower-dimensional design.
+
+\begin{proposition}[finite-design rank truncation]\label{prop:aniso}
+Let $\mathcal U\subset\{u\in\mathbb R^d:\|u\|_2\le R\}$ and let
+$G(u)=g(Au)$, where $A\in\mathbb R^{d\times d}$ has singular values
+$\sigma_1\ge\cdots\ge\sigma_d\ge0$ and
+$g:\mathbb R^d\to\mathbb R^q$ is $L$-Lipschitz in Euclidean norm.
+For $1\le r\le d$, write
+$A_r=U_r\Sigma_rV_r^\top$ for a truncated singular-value decomposition,
+put $\sigma_{d+1}=0$, and define
+\[
+\varphi_r(u)=\Sigma_rV_r^\top u,\qquad
+h(z)=g(U_rz),\qquad G_r=h\circ\varphi_r,\qquad
+\varepsilon=LR\sigma_{r+1}.
+\]
+Suppose the components of $h$ belong to the RKHS $\mathcal H_k$ of a
+positive definite kernel on $\mathbb R^r$, with
+$\|h\|_K^2=\sum_{j=1}^q\|h_j\|_{\mathcal H_k}^2<\infty$.
+For any design $X=(u_1,\ldots,u_n)$ in $\mathcal U$, let
+$Z=(\varphi_r(u_1),\ldots,\varphi_r(u_n))$, $K=k(Z,Z)$ and
+\[
+c_\lambda(u)=(K+n\lambda I)^{-1}k(Z,\varphi_r(u)),\qquad
+\widehat G_\lambda(u)=c_\lambda(u)^\top G(X),
+\]
+where $\lambda\ge0$, and at $\lambda=0$ the inverse is interpreted as
+a pseudoinverse when necessary. Let $\widetilde P_\lambda(u)$ be the
+factor in Theorem~\ref{thm:or}, evaluated in this feature space; equivalently,
+\[
+\widetilde P_\lambda(u)=
+\left\|k(\varphi_r(u),\cdot)
+-\sum_{i=1}^n c_{\lambda,i}(u)k(\varphi_r(u_i),\cdot)
+\right\|_{\mathcal H_k}.
+\]
+Then, for every $u\in\mathcal U$,
+\[
+\|G(u)-\widehat G_\lambda(u)\|_2
+\le \|h\|_K\,\widetilde P_\lambda(u)
++\varepsilon\bigl(1+\|c_\lambda(u)\|_1\bigr).
+\]
+\end{proposition}
+\noindent\emph{Proof.} See Supplement~\ref{proof:prop:aniso}.
+
+
+The proof is in Supplement~\ref{proof:prop:aniso}. The first term is the
+native-space bound on the projected design. The second includes both the
+pointwise approximation error from discarding directions and its propagation
+through the regression weights. For $\lambda>0$ and bounded kernel diagonal,
+Lemma~\ref{lem:kappa} also bounds the latter weights uniformly. No sampling
+rate or comparison with the unprojected kernel follows without additional
+control of the power function and the target norm. The empirical OCO-2
+scaling sweep reports those observed error curves without treating the
+measured sensitivity rank as such a control.

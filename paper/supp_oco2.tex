@@ -1,45 +1,37 @@
 \subsection{What the metric buys, measured}
-The heuristic rate calculation of Proposition~\ref{prop:aniso} splits a
-metric's advantage into a constant $\sigma_1^{\,s}$ and, only under an
-approximate-rank gap, a rate. The seed campaign scores that split directly: both raw-input kernel rows are refit at
-five nested training sizes over a sixteenfold range, at ten seeds, on each of
-the three bands, with the sensitivity map estimated causally from the first $n$
-rows only so that no row sees data a smaller sample would not have had.
+The original campaign refits both raw-input kernel rows at five nested
+training sizes over a sixteenfold range, at ten seeds on each band.
+Each sensitivity map is estimated from the training rows available at its
+own sample size. The singular-value counts retaining $99\%$ of the map's
+squared energy are $12/20$, $14/24$ and $13/24$; the corresponding
+participation ratios are $11.99$, $13.63$ and $13.33$. These are descriptive
+summaries of an estimated linear sensitivity map, not identified dimensions
+of the nonlinear target.
 
-Two things come out. The approximate rank of the sensitivity map is $12$ of
-$20$ on O2 and $13$--$14$ of $24$ on the two CO$_2$ bands, counting the
-singular values that hold $99\%$ of the squared energy. The participation
-ratio is a softer count and agrees on O2 ($11.99$ against $12$) while
-sitting a third of a unit below the threshold count on the two CO$_2$ bands
-($13.63$ against $14$, $13.33$ against $13$); the rank ratio is between
-$0.54$ and $0.60$ on either reading, which is what the argument uses, and it
-is the regime in which the calculation would permit a rate gain and not
-merely a constant.
-
-The rate gain does not appear. Table~\ref{tab:aniso} gives the paired
-difference of the two fitted exponents at each band. On O2 the two exponents
-are indistinguishable across seeds; on the CO$_2$ bands the adapted exponent
-is steeper, but by $0.011$ and $0.052$ against isotropic exponents of $0.086$
-and $0.203$, where the rank ratios above would license something several times
-larger. What is stable instead is the constant: at the largest training size
-the isotropic error exceeds the adapted error by a factor of
-$1.353\pm0.008$, $1.118\pm0.002$ and $1.514\pm0.114$ on the three bands, and
-those ratios are flat in $n$ over the whole sweep. The reading we take is the
-one the measurement supports and no more: a metric is worth a
-constant here, the constant is between $1.1$ and $1.5$, and the tenfold gap to
-the feature kernel is not something a metric closes. Both fitted exponents are
-also steeper than the heuristic's own $s/d$, so the absolute rates are not
-being tested here --- only the difference between them, which is what the
-split concerns.
+Table~\ref{tab:aniso} reports finite-range log--log slopes. On O2 the paired
+slope difference is small relative to its seed variation. The adapted
+kernel's fitted exponent is larger on the two CO$_2$ bands, by $0.011$ and
+$0.052$. At $n=18000$ the isotropic-to-adapted error ratios are
+$1.353\pm0.008$, $1.118\pm0.002$ and $1.514\pm0.114$. Thus the tested
+rescaling improves prediction at that training size but leaves much of
+the raw-input-to-feature-kernel difference. These observations do not
+establish asymptotic rates. Proposition~\ref{prop:aniso} is instead a
+conditional finite-design rank-truncation bound; the estimated ranks alone
+do not verify its Lipschitz, domain-radius, or native-space assumptions.
+All entries here are retained campaign results; no networks or kernels
+were newly trained for this revision.
 
 \begin{table}[t]
 \centering
 \caption{The raw-input kernel refit at nested training sizes, ten seeds per
-band. ``Rank'' counts singular values of the causally estimated sensitivity map
+band. ``Rank'' counts singular values of the training-only estimated sensitivity map
 holding $99\%$ of the squared energy, out of the input dimension. The exponent
 difference is paired within seed; its standard deviation is over seeds. The
-last column is the isotropic-to-adapted error ratio at $n=18000$.}
+last column is the isotropic-to-adapted error ratio at $n=18000$.
+The slopes are descriptive fits over the finite sizes tested, not asymptotic
+convergence rates.}
 \label{tab:aniso}
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{lccccc}
 \toprule
 Band & Rank & $-$slope iso & $-$slope adapted & difference & ratio at $n{=}18000$ \\
@@ -49,6 +41,7 @@ weak CO$_2$   & 14/24 & $0.086\pm0.005$ & $0.097\pm0.006$ & $-0.011\pm0.009$ & $
 strong CO$_2$ & 13/24 & $0.203\pm0.029$ & $0.255\pm0.020$ & $-0.052\pm0.021$ & $1.514\pm0.114$ \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \end{table}
 
 At its largest size the sweep recovers the raw-kernel rows of
@@ -62,12 +55,11 @@ convergence for the network rows. A separate single-seed $750$-epoch run of
 the same code --- not a row of Table~\ref{tab:oco2}, all of whose numbers are
 at $250$ epochs --- reaches $3.82\%$ (flat network) and $3.71\%$ (feature
 head) on this band, with the combination at $3.71\%$ reduced and $0.0174\%$
-radiance. At that one seed the budget moves the levels of the trained rows
-together and reverses none of the orderings discussed below; a ten-seed,
-three-band campaign at a converged budget is not part of this version.
+radiance. This single run shows that the reported levels depend on training
+budget; it does not establish convergence or a replicated budget comparison.
 
-Second, the training metric behaves as a budget, and the campaign measures
-which part of the metric carries it. The second network in
+The recorded training-loss comparison further distinguishes coordinate
+weighting from per-case weighting. The second network in
 Table~\ref{tab:oco2} is trained on a diagonally weighted loss over the
 reduced coefficients, $\|s_z\odot(\hat z-z)\|/\|s_z\odot z\|$. That is a
 surrogate for the radiance-relative error, not the error itself: the
@@ -82,47 +74,44 @@ at ten of ten seeds on both bands, with WCO2 the reverse at eight of ten
 ($0.064\pm0.015\%$ against $0.072\pm0.007\%$). The kernel heads built on
 their features repeat the pattern. Tripling the training budget narrows the
 O2 gap ($0.0212\%$ against $0.0201\%$ at $750$ epochs) without reversing it,
-so slow optimization of the exact loss is at most part of the story. The reason the
-surrogate gives nothing away is the orthogonality noted above: the two
-losses share their numerator exactly, and differ only in the per-sample
-denominator, which reweights states, not coordinates. What the metric buys
-is coordinate weighting, and either loss buys it --- the weighted networks
-give up the trailing coordinates the radiance barely sees and win the
-reported metric by a factor of three to four over the flat network, whose
-per-coordinate profile shows the gap directly: the kernel-flow emulator
-(lengthscales tuned per output) predicts the leading coefficient to $0.0012$
-root mean square against the flat network's $0.0054$, while the flat network
-is three to four times more accurate on the trailing thirty coordinates.
-The practical rule is narrower than ``train in the metric you report'':
-train in a loss that concentrates where the reported metric concentrates.
-Matching the metric's weighting is what pays; matching its algebra is not.
+but these finite-budget comparisons do not identify why one training loss
+performs better. By the reconstruction identity, the two losses share the
+same numerator and differ in their target-dependent denominator, which
+reweights cases. Both concentrate on the leading coefficients, while their
+optimization and generalization behavior can differ. The coordinate
+profile is consistent with this trade-off: the kernel-flow emulator
+predicts the leading coefficient to $0.0012$ root mean square against the
+flat network's $0.0054$, whereas the flat network is three to four times
+more accurate on the trailing thirty coordinates. These measurements
+support trying both losses; they do not imply a generally optimal loss.
 
-Third, the same-class floor of the structural-mechanics study reappears here,
-one level down, and the campaign lets us test it rather than illustrate it.
+The recorded flat-network seeds permit a second-moment analysis similar to
+that on structural mechanics.
 Proposition~\ref{prop:secmom} is stated for the squared-metric risk, so the
 measurement is made there: for each band we form the matrix $S$ of the ten
 seeded copies of the flat network on the test set, in the relative metric,
-and read the floor off it. Three things follow.
+and measure the risks of mixtures of that finite pool.
 
 The identity itself holds numerically. At uniform weights $w^\top Sw$ and the
 directly measured risk of the averaged prediction agree to $7\times10^{-18}$,
 $3\times10^{-17}$ and $1\times10^{-17}$ on the three bands --- the
 proposition's content, checked against real predictions rather than assumed.
 
-The floor is where the proposition puts it. Over all $45$ seed pairs per band
-the residual correlations are $0.787\pm0.010$ (O2), $0.971\pm0.001$ (WCO2) and
-$0.961\pm0.001$ (SCO2), tight enough that the equicorrelated case of
-part~(ii) is a fair description. It predicts a ten-member value of $4.419\%$,
-$17.997\%$ and $9.267\%$ against realized $4.419\%$, $17.997\%$ and $9.267\%$,
-and infinite-seed floors of $4.360\%$, $17.970\%$ and $9.248\%$. Ten seeds
-have already taken essentially all of what seed-ensembling has to give:
-the remaining distance to the infinite-seed floor is six hundredths of a
-point on O2 and less on the other two bands.
+Over the $45$ seed pairs per band, the residual alignments are
+$0.787\pm0.010$ (O2), $0.971\pm0.001$ (WCO2) and
+$0.961\pm0.001$ (SCO2). An equicorrelation summary gives ten-member RMS
+relative errors of $4.419\%$, $17.997\%$ and $9.267\%$, matching the
+recorded uniform-mixture risks at the displayed precision. The corresponding
+infinite-family values, $4.360\%$, $17.970\%$ and $9.248\%$, are
+extrapolations under the equicorrelation model. They are not certified lower
+bounds for untrained seeds or for the architecture class. The exact
+finite-pool statement is the quadratic identity applied to the measured
+matrix $S$.
 
-What the floor does not do is fall to a change of member. The comparison has
-to be made in one metric, since the floor is a squared-metric quantity and
+Comparisons with another readout must use the same metric, since $S$
+determines a squared-relative-error quantity and
 Table~\ref{tab:oco2} reports the mean relative error $\mathbb E\,\ell$.
-Measured in the same metric as the floor, the Mat\'ern head on learned
+Measured in RMS relative error, the Mat\'ern head on learned
 features reaches $4.575\%$, $18.11\%$ and $9.326\%$ --- better than an
 individual seeded network ($4.915\%$, $18.238\%$, $9.433\%$) and worse than
 that network's ten-seed ensemble. The ranking is the same in the mean metric,
@@ -130,68 +119,57 @@ where the seed ensemble reaches $3.916\%$ against the head's $4.111\%$ on
 O2. At this budget a different kind of member buys less than ensembling ten
 copies of the plain one; the order-of-magnitude result of this section is
 the representation ladder, which does not depend on this comparison.
-Ensembling within an architecture class saturates by the same second-moment
-law on both problems, and the two ways of spending a fixed compute budget
---- more seeds of one member, or one member of a better kind --- are close
-here.
+These are comparisons of recorded predictors with different computational
+costs; the study does not establish their ordering at matched total compute.
 
-The floor is a property of the architecture class, not of the problem, and it
-can be probed directly. Different architectures decorrelate: on WCO2 two
-residual MLPs of different activation correlate at $0.84$, a wide shallow
-network against the residual MLP at $0.40$, and a random-Fourier-feature
-network against it at $0.08$ to $0.17$, all far below the $0.971\pm0.001$ that
-ten seeds of one architecture reach on this band.
-Yet the floor did not move, because its other input is accuracy: by
-part~(i) of Proposition~\ref{prop:secmom} a member of error $e_2$ helps a
-reference of error $e_1$ only when their correlation falls below $e_1/e_2$,
-and across a bandwidth sweep the Fourier network was either accurate and
-correlated (error $31\%$, correlation $0.54$, just above the $0.53$ threshold)
-or decorrelated and inaccurate (error above $140\%$). No architecture we tried
-was both accurate and decorrelated enough to lower the floor, which is why
-the residual MLP is the member of record: not that diversity is impossible,
-but that on this map no more accurate diverse member was found. Figure~\ref{fig:floor} shows both halves of this: the correlations
-that make the floor class-specific, and the accuracy-decorrelation trade-off
-that keeps it in place. Adding the Fourier members to the per-coordinate
-combination changes the reported error by less than a hundredth of a point,
-in either direction, on all three bands: the half-split selection gives them
-no weight.
+Exploratory architecture comparisons show that these alignments depend on
+which predictors were trained. On WCO2, two residual MLPs with different
+activations correlate at $0.84$, a wide shallow network with the residual
+MLP at $0.40$, and a random-Fourier-feature network with it at $0.08$ to
+$0.17$. These are below the same-architecture seed alignment, but lower
+alignment alone does not guarantee a useful mixture: the weaker member's
+error also enters Proposition~\ref{prop:secmom}(i). In the recorded
+Fourier-feature bandwidth sweep, more accurate settings were correlated
+(error about $31\%$, alignment about $0.54$), whereas more decorrelated
+settings had error above $140\%$. These exploratory comparisons did not
+identify a useful improvement to the reported combination. Figure~\ref{fig:floor}
+retains the recorded accuracy--alignment comparison. Adding those candidates
+to coordinate selection changed the mean error by less than $0.01$
+percentage points on each band. This is evidence about this trained pool,
+not a lower bound for an architecture class.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figs/floor.pdf}
-\caption{The ensembling floor on WCO2; the architecture comparison in the
-left panel is drawn from one seed of each, and the seed-pair correlation it
-shows is the campaign's mean over $45$ pairs. Left: residual correlations. Two seeds
-of one architecture correlate near the value that sets the floor (dashed);
-different architectures correlate far less, so the floor is a property of the
-architecture class. Right: the Fourier-feature member across bandwidths. A
-member helps the ensemble only in the shaded region, below the
-$e_{\mathrm{ref}}/\varrho$ curve of Proposition~\ref{prop:secmom}(i); the
-accurate settings are too correlated and the decorrelated settings too
-inaccurate, so none lands there with room to spare.}
+\caption{Recorded WCO2 residual alignments and a Fourier-feature bandwidth
+sweep. The architecture comparison uses one seed per architecture; the
+same-architecture dashed reference is the campaign mean over $45$ seed
+pairs. The right panel plots the algebraic two-member boundary from
+Proposition~\ref{prop:secmom}(i). It illustrates the joint dependence on
+error and alignment and does not establish a generalization threshold or
+an architecture-class error floor.}
 \label{fig:floor}
 \end{figure}
 
-Fourth, the regimes of Section~\ref{sec:theory-secmom} are decided by these
-numbers before any stack is fit. Against the flat network the raw-input
-kernel has, in the proposition's quantities on the validation split,
-$\varrho=0.156$ against $e_n/e_k=0.157$ (root-mean-square relative errors of
-$8.41\%$ and $53.5\%$; on the test block the mean relative errors are $4.43\%$
-and $40.57\%$): the condition of Proposition~\ref{prop:secmom} sits on its
-threshold, the sign changing with the seed, and the kernel is dropped on the
-size of the available gain, a few ten-thousandths of a point --- in contrast to
-structural mechanics where the same test keeps it. Because the radiance
-metric is diagonal in the reduced coordinates, the per-coordinate
-combination of Proposition~\ref{prop:percoord} is optimal for either metric
-taken alone, at that metric's own fixed diagonal weight. It is not optimal
-for both at once, and the proposition does not claim to be: the two metrics
-normalize by different sample-dependent denominators, and both are reported
-as means of norms rather than as the squared risk the proposition minimizes,
-where Jensen gives only an upper bound. That one selector improves both is
-therefore something we observe on this data, not something the diagonal-weight
-identity implies. The selector is predeclared and shared: the same
-per-coordinate winners produce both columns of every band's row. It beats the
-kernel-flow emulator on both metrics at once, now on all three bands: O2 reaches
+For the raw-input kernel against the flat network, the stored validation
+summary has $\varrho=0.156$ and $e_n/e_k=0.157$, with RMS relative errors
+$8.41\%$ and $53.5\%$. The sign of the criterion changes across seeds,
+and the recorded optimal mixture gains only a few ten-thousandths of a
+percentage point. This is a retrospective explanation of the pair's small
+contribution, not a validated prospective exclusion rule.
+
+The combination chooses each coordinate from one of the three networks
+and three feature-kernel heads using coordinatewise validation RMSE. By
+Proposition~\ref{prop:percoord}, this minimizes an auxiliary separable
+squared loss over that candidate product. Fixed sample denominators retain
+separability for squared relative losses, with different sample weights
+for the reduced and radiance criteria. The reported means of relative
+norms instead couple coordinates through the square root. Consequently
+this selector is not guaranteed to optimize either reported metric, or
+both simultaneously. The same selected coordinates produce both reported
+columns; the baseline emulator's predictions are not candidates.
+Its seed-averaged errors are lower than those of the rescored
+kernel-flow emulator in both criteria on all three bands: O2 reaches
 $4.12\pm0.05\%$ against $16.89\%$ reduced and $0.0294\pm0.0020\%$ against
 $0.0448\%$ radiance, SCO2 $8.08\pm0.01\%$ against $16.14\%$ and
 $0.0584\pm0.0041\%$ against $0.1147\%$, and WCO2 $16.28\pm0.06\%$ against
@@ -200,85 +178,67 @@ combination beats the emulator on both metrics at ten of ten seeds on O2 and
 SCO2 and at nine of ten on WCO2, the single exception missing on the radiance
 metric by $0.0015$ points.
 
-The pool matters most on the band whose two metrics disagree. On WCO2 the
-flat network and its head split the metrics between them, and it is the two
-radiance-loss members and the heads on their features --- the combination
-selects per coordinate from six members, the flat, weighted and
-exact-radiance networks and the Mat\'ern head on each --- that let one
-selector win both, which is what the per-coordinate argument predicts. The
-emulator's own predictions are not among the members, so the comparison
-remains against an outside baseline. A nine-of-ten margin of $0.0015$ points
-is thin, and we report it as a band that has just crossed rather than as a
-comfortable win. The code releases the per-band numbers alongside this
-paper.
+On O2 the combination's reduced mean is slightly worse than that of the
+flat-feature head ($4.11510\%$ versus $4.11080\%$), while its radiance mean
+improves from $0.07927\%$ to $0.02940\%$. The result is therefore a useful
+trade-off, not dominance over every component. WCO2 has a weaker radiance
+comparison: one seed is worse than the source emulator by $0.0015$
+percentage points. The stored paired-bootstrap interval for that seed is
+$[-0.0012,0.0042]$ percentage points, while the other nine intervals are
+negative. These are descriptive intervals on the public test cases, without
+a correction for repeated benchmark analysis.
 
-
-\subsection{The error is limited by data, and yields to more of it}
+\subsection{Recorded learning curves and training budgets}
 \label{sec:scaling}
-The structural-mechanics error was flat in the sample size, which
-Section~\ref{sec:diversity} reads as evidence consistent with a floor set by
-the benchmark data themselves, a reading whose decisive test, re-solving the
-benchmark on a refined mesh, has not been run; the emulator error is not
-flat, and the contrast is the sharpest practical difference between the two
-problems. The
-left panel of Figure~\ref{fig:ocoscaling} fixes the O2 task and varies only the
-number of training pairs, scoring each on a disjoint held-out set. The
-corrected surrogate's reduced-radiance error falls as a clean power law in $n$,
-fitted slope $-0.68$, from $74\%$ at a few hundred pairs to $4.3\%$ at
-$n=17700$, still descending at the largest sample size we can afford and
-approaching the $3.8\%$ our full pipeline reaches on all $18000$ pairs
-(Table~\ref{tab:oco2}). The exact kernel on the raw state improves far more
-slowly, so at these sizes the network is the component that turns data into
-accuracy. The residual on this task is sample-limited: unlike the
-structural-mechanics error it recedes as pairs are
-added, so the largest lever on this problem is simply more of them, and pairs
-are cheap because the forward model is a program. The complementary case is the
-full-resolution $58\to3048$ map, where the error is instead flat in $n$ across
-the few hundred retrievals we hold: that task is limited by its representation,
-not its sample count, and the reduction the emulator applies is what moves it.
+The recorded OCO-2 learning curve decreases more strongly with training
+size than the structural-mechanics curve over the ranges examined.
+The left panel of Figure~\ref{fig:ocoscaling} shows a one-seed O2 experiment
+with a disjoint held-out set. A finite-range log--log fit gives slope
+$-0.68$, with error decreasing from about $74\%$ at a few hundred pairs to
+$4.3\%$ at $n=17700$. The main ten-seed combination at $18000$ training
+pairs has mean $4.12\%$ at its $250$-epoch budget; the $3.71\%$ result
+above belongs to a separate single-seed $750$-epoch experiment. These are
+different protocols and should not be combined into one scaling fit.
+The raw-input kernel improves more slowly over the recorded sizes.
+A separate full-resolution $58\to3048$ experiment shows little change over
+a few hundred retrievals. Neither observation identifies the limiting
+source of error or an asymptotic convergence rate.
 
-A second benchmark carries the same reading into a data range OCO-2 cannot
-reach. ClimSim \citep{yu2023climsim} is a climate emulation dataset of about
+The retained ClimSim records cover a larger data range. ClimSim \citep{yu2023climsim} is a climate emulation dataset of about
 ten million samples that maps a $124$-dimensional atmospheric state to $128$
-physics tendencies, with published neural baselines. We run the two model
+physics tendencies, with published neural baselines. The recorded runs compare two model
 families at one, two and three and a half million training samples under the
-protocol used everywhere else in this paper --- selection on a held-out
-block drawn from the training pool, the test block scored once --- and the
-right panel of Figure~\ref{fig:ocoscaling} plots those points. ClimSim
-publishes no canonical test split, so each seed there draws its own
-$20000$-row test block and the spreads below include that variation.
+recorded protocol, with within-run selection on a held-out block drawn
+from the training pool and separate evaluation data; the
+right panel of Figure~\ref{fig:ocoscaling} plots those points. Each campaign
+seed draws its own $20000$-row test block, so the spreads below include that
+variation; this is not claimed to reproduce a canonical benchmark split.
 
 What the points establish is the high-data half of the picture. The neural
-mean is far above the kernel and still climbing: $0.544\pm0.005$ at one
+mean has higher recorded $R^2$ than the kernel and increases with size: $0.544\pm0.005$ at one
 million (five seeds), $0.563\pm0.004$ at two million and $0.575\pm0.004$ at
-three and a half million (three seeds each), closing on the published
-multilayer-perceptron baseline near $0.6$. The kernel rows of the campaign
+three and a half million (three seeds each), compared for orientation with a published multilayer-perceptron value near
+$0.6$; a matched split-and-scoring reproduction of that baseline is not
+established here. The kernel rows of the campaign
 read $0.390\pm0.007$, $0.391\pm0.006$ and $0.387\pm0.007$ at the three
 sizes, but that flatness is by construction and says nothing about the
 kernel: the exact solve was fitted on a $6000$-row subsample of the
 training slice at every size, a budget rather than a data point. What the
 kernel does with more rows was measured afterwards under the same protocol
-(selection on the pool validation block, the test block scored once, seed
+(selection on the pool validation block, separate test evaluation, seed
 $0$, the one-million slice): $\csCapSix$ at $6000$ rows, $\csCapTwelve$ at
 $12000$ and $\csCapTwentyFour$ at $24000$ ($\csCapTwentyFourB$ at a second
 seed, whose test block is a different draw). It improves with budget, by about
 three hundredths for the first doubling and one for the second, and at
 $24000$ rows --- four times the campaign's budget, and the largest exact
 solve we ran --- it remains eleven hundredths of $R^2$ below the network at
-one million samples. The separation at the campaign's sizes is some twenty
-times the seed scatter, so the ordering is not a matter of which run one
-looks at; the contrast is between a data-limited mean and a
-budget-limited exact kernel whose diminishing returns per doubling do not
-reach the network within any budget a dense solve affords, which is the
-OCO-2 picture on a larger scale.
-
-Where the two families cross is not something this range can locate: the
-sweep begins above any plausible crossing. The regimes of
-Section~\ref{sec:theory-secmom} gain a data axis from what is measured --- an
-accurate mean is worth building once there is enough data to train it past
-the kernel, and at these sizes there plainly is --- while the sample size at
-which that becomes true is an open number here, and the small-$n$ ladder
-under the same protocol is the obvious next measurement.
+one million samples. The comparison remains unequal in training size and total computation:
+the neural mean uses up to millions of examples, whereas the exact kernel
+uses at most $24000$. The records show an advantage for the network under
+those budgets; they do not establish which method would win at matched
+compute or larger kernel budgets. The smaller-$n$ ClimSim results from an
+earlier analysis were withdrawn because of leakage and are not evidence
+here. The retained range does not locate a crossover between model families.
 
 \begin{figure}[t]
 \centering
@@ -286,19 +246,17 @@ under the same protocol is the obvious next measurement.
 \caption{Error against training-set size, drawn by
 \texttt{campaign/make\_scaling\_fig.py}. Left: the
 OCO-2 O2 task, reduced error of the corrected surrogate at one seed, from the
-data-scaling run; it falls as a
-power law (fitted slope $-0.68$) to $4.3\%$ at $n=17700$, against the
+data-scaling run; a finite-range log--log fit has slope $-0.68$, and the
+recorded error is $4.3\%$ at $n=17700$, against the
 $4.12\%$ the ten-seed pipeline reaches on all $18000$ pairs (dotted). Right:
 ClimSim, test $R^2$ over the outputs with non-negligible variance, at one,
 two and three and a half million training samples under the held-out
 selection protocol --- five seeds at one million and three at each of the
-larger sizes, error bars over seeds. The range begins above any plausible
-crossing between the two families, so none is shown. The kernel points are
+larger sizes, error bars over seeds. No crossover between the two families is observed over this range. The kernel points are
 the campaign's, fitted on $6000$ rows at every training size, so their
 flatness across sizes is by construction; the kernel's own budget ladder,
 measured afterwards under the same protocol, is in the text. The neural
-mean is far above it and still rising toward the published baseline
-(dotted).}
+mean has higher recorded $R^2$; the published baseline (dotted) is an
+orientation point rather than a matched-protocol comparison.}
 \label{fig:ocoscaling}
 \end{figure}
-

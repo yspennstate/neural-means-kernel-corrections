@@ -23,6 +23,8 @@ weakly to a limit law $F$ as $n\to\infty$, then
 $d_{\mathrm{eff}}(\lambda)/n\to 1-\lambda\,m_F(-\lambda)$ with $m_F$ the
 Stieltjes transform of $F$.
 \end{lemma}
+\noindent\emph{Proof.} See Supplement~\ref{proof:lem:deff}.
+
 
 The identity is unconditional; the random-matrix content enters through the
 choice of $F$. For the benchmark's simplest reference model, isotropic linear
@@ -34,7 +36,10 @@ Let $K=XX^\top$ with $X\in\mathbb R^{n\times p}$ having i.i.d.\ entries of
 mean zero and variance $\sigma^2$, and let $p/n\to\gamma\in(0,1]$. Then
 \[
 \frac{d_{\mathrm{eff}}(\lambda)}{n}\;\longrightarrow\;
-\gamma\big(1-\lambda\,m(-\lambda)\big),\qquad
+\gamma\big(1-\lambda\,m(-\lambda)\big),
+\]
+where
+\[
 m(-\lambda)=\frac{\sqrt{\big(\lambda+\sigma^2(1-\gamma)\big)^2+4\gamma\sigma^2\lambda}
 -\big(\lambda+\sigma^2(1-\gamma)\big)}{2\gamma\sigma^2\lambda},
 \]
@@ -44,6 +49,8 @@ simulation with $n=3000$, $p=900$, $\sigma^2=1.7$, the formula agrees with
 the empirical $d_{\mathrm{eff}}(\lambda)/n$ to four decimal places across
 $\lambda\in[10^{-3},10]$.
 \end{corollary}
+\noindent\emph{Proof.} See Supplement~\ref{proof:cor:mp}.
+
 
 Two uses. Quantitatively, the formula makes the nugget--capacity trade-off
 explicit for the bulk of a feature Gram matrix: eigenvalue mass of

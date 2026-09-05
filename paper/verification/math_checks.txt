@@ -1,0 +1,21 @@
+Theorem blockfloor
+  exact block model: quadratic form equals the display       PASS max |diff| 2.6e-18
+  uniform weights attain the floor in the exact model        PASS 
+  perturbed pool: random convex mixtures never pass the bound PASS min 0.002317 bound 0.002300
+  sixty predictors: bound below every sampled convex mixture PASS sqrt: min 4.8881 bound 4.8136
+  sixty predictors: bound below the hindsight optimum        PASS oracle 4.8761
+  sixty predictors: mean-entry form equals the uniform mixture PASS 
+Proposition exchange
+  partial derivatives match finite differences               PASS rel err 4.3e-09 1.8e-09
+  both derivatives positive on the interior region           PASS 
+  the stated direction is indifferent to first order (remainder falls with the step) PASS worst normalized remainder ratio 1.03 (1 = exactly second order)
+Lemma kappa (sharpened)
+  random Matern designs: ||c||_1 <= (1/2) sqrt(k(u,u)/lambda) PASS largest ratio 0.8720
+  cosine kernel example attains the bound                    PASS max |gap| 8.0e-15
+Theorems or and minimax
+  identity Ptilde^2 - P0^2 = (n lambda)^2 k' A^-2 K^-1 k     PASS rel err 3.0e-14
+  ordering P0 <= Ptilde <= P                                 PASS 
+  sharpness: r = g_u attains the certified bound with equality PASS rel err 3.0e-15
+Corollary signed
+  signed optimum = 1/(1'S^-1 1) and never above the convex minimum PASS 
+0 check(s) failed

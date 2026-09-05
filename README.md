@@ -1,42 +1,24 @@
 # Neural means and kernel corrections for operator learning
 
-Code and paper for a study of how neural networks and exact kernel methods
-combine when learning solution operators and physical forward models. The
-same small set of components runs on problems that sit at opposite ends of
-the neural-versus-kernel spectrum, and the paper's theory says which end a
-given problem is on from the members' measured residual correlations, before
-any stack is fit.
+Code and paper for a study of neural predictors combined with exact kernel regression on structural mechanics and OCO-2 radiative-transfer emulation. The experiments compare residual kernel corrections, kernel readouts on frozen neural features, and validation-selected combinations. Ensemble identities and finite-design kernel bounds help interpret the measured results.
 
-The components: a residual network trained directly on the error metric the
-application reports; an exact Matern kernel solve, applied either to the raw
-input, to the network's residual, or to the network's learned features; and a
-per-coordinate combination of members selected on a validation split.
+## Paper, supplement, and Overleaf sources
 
-## Paper and supplement
+- [Main paper](paper/main.pdf): revised manuscript, 32 pages.
+- [Supplement](paper/supplement.pdf): complete proofs and additional experiments, 46 pages. Each result with a deferred proof identifies its location here.
+- [Overleaf ZIP](releases/nmkc_overleaf_20260905.zip): complete editable project, figures, both PDFs, and the twenty-review revision record.
+- [Publication review](paper/reviews/publication_review.pdf): original votes and the substantive corrections.
 
-`paper/main.pdf` is the manuscript on the two problems, the method, and the
-results, in JMLR format. `paper/supplement.pdf` is the online supplement it
-refers to as S1–S10 (direct link:
-https://github.com/yspennstate/neural-means-kernel-corrections/blob/main/paper/supplement.pdf),
-and holds the material a reader needs only
-if they want to check something: the finite-sample bounds behind every fitted
-stage and all the proofs, the margin and per-coordinate selection results, the
-effective-dimension identity, the ablation and error-localization measurements,
-the spectra, the uncertainty-quantification study, the cost accounting, the
-uncontrolled survey of the rest of the suite, the mirror-symmetry check, the
-OCO-2 input-metric study with the data-scaling and ClimSim results, the
-implementation and compute record, and the numerical verification of every
-stated result. The two build from one set of sources and one bibliography:
+The 5 September revision corrects mathematical hypotheses and boundary cases, distinguishes rigorous empirical RMS bounds from correlation diagnostics, and describes the actual estimators behind the reported measurements. It also makes the retrospective status of the benchmark comparisons explicit. No new neural training campaign was run for this revision.
 
-```
+Upload the ZIP to Overleaf, choose **pdfLaTeX**, and select **main.tex**. The supplied build configuration compiles the companion supplement and resolves references in both directions. Locally:
+
+```sh
 cd paper
-pdflatex main && bibtex main && pdflatex main && pdflatex main
-pdflatex supplement && bibtex supplement && pdflatex supplement && pdflatex supplement
+latexmk -pdf -interaction=nonstopmode -halt-on-error -jobname=output main.tex
 ```
 
-Run the pair twice if you have changed a cross-reference: each document reads
-the other's `.aux` through `xr`, so a reference that crosses between them
-settles on the second pass. The JMLR style file is included.
+Select `supplement.tex` instead to display that document as the selected output. Keep `main.pdf` and `supplement.pdf` together under those filenames for links between PDFs. See [paper/README.md](paper/README.md) for provenance, build details, and verification records.
 
 ## After-campaign checks
 
@@ -122,31 +104,13 @@ stored predictions on the same test states.
 | WCO2 | 24.06% / **16.28% +- 0.06%** | 0.0599% / **0.0507% +- 0.0052%** |
 | SCO2 | 16.14% / **8.08% +- 0.01%** | 0.1147% / **0.0584% +- 0.0041%** |
 
-Our columns are mean +- standard deviation over ten seeds per band at a
-matched 250-epoch budget. On all three bands the "ours" entries are one
-model, a per-coordinate combination that beats the emulator on both metrics
-at once -- at ten of ten seeds on O2 and SCO2 and nine of ten on WCO2.
-WCO2 carries the thin margin: the radiance win there is nine
-of ten seeds, the exception missing by 0.0015 points. The same kernel scores
-40% on the raw input: its limitation was the features, not the solve.
+Our columns report mean ± standard deviation over ten seeds per band at a matched 250-epoch training schedule. The two metrics rescore stored predictions in the retained 40-component representation; they do not establish full-spectrum or retrieval accuracy. The coordinate combination improves on the source emulator in both ten-seed means on all three bands. It does so at all ten seeds on O2 and SCO2, and nine seeds on WCO2. The flat feature-kernel head is slightly better than the combination on the reduced-error criterion in O2 and WCO2. The feature kernel substantially improves on the tested raw-input kernel under the reported grids; a wider matched search remains a useful sensitivity check.
 
-**Structural mechanics** (de Hoop, Huang, Qian and Stuart; boundary load to
-von Mises stress field). The pipeline reaches **4.572% +- 0.010%** relative
-test error over ten seeds with five members, and **4.546% +- 0.003%** with
-the FNO trained to a complete schedule and a UNet added (a second ten-seed
-campaign on one 40-core host), within the test block's sampling error of the
-best published architecture (PARA-Net, 4.55%, a single run reported without
-an uncertainty) rather than beating it, and below FNO (4.76%), PCA-Net (4.67%), DeepONet (5.20%)
-and the optimal-recovery kernel (5.18%); in the 1250-sample regime it reaches
-**5.433% +- 0.093%** over ten seeds against a published best of 6.49%. Sixty
-predictors, ten seeds of six architectures, reach 4.61% at equal weights and
-4.58% at the best convex weights chosen in hindsight on the test block: one
-seed of each architecture beats ten seeds of the best one, and a block floor
-theorem places the number from the within- and between-architecture residual
-correlations. The paper argues from measured
-residual correlations, the spatial structure of the shared error, and
-flat scaling in the sample size that the published plateau near 4.5% is a
-property of this benchmark's data rather than of any architecture.
+**Structural mechanics** (de Hoop, Huang, Qian and Stuart; boundary load to von Mises stress field). The five-member pipeline reaches **4.572% ± 0.010%** mean relative test error over ten seeds. With the completed FNO schedule and a UNet, the six-member pipeline reaches **4.546% ± 0.003%**. This is numerically close to the published PARA-Net score of 4.55%; a scalar literature score without matching predictions or training variability does not establish statistical equivalence. In the 1250-label regime, the pipeline reaches **5.433% ± 0.093%**, compared with a published 6.49%, subject to the protocol differences stated in the paper.
+
+For the fixed pool of sixty measured predictors, the empirical global-convex RMS lower bound is **4.814%**, close to the hindsight optimum of **4.876% RMS**. These are RMS quantities, distinct from the mean relative errors above, and they do not bound new predictors, per-pixel stacks, or kernel-corrected estimators. The experiments do not establish a universal benchmark data floor.
+
+The mechanics scores describe the recorded implementation: foldwise kernel weights with pooled training-target centering, in-sample neural training predictions, and a changed kernel input to the refiner at inference. The later fold-local-centering code is not asserted to reproduce those archived scores without a rerun. The public test blocks were inspected across campaigns, so these are retrospective benchmark results.
 
 **Advection with discontinuous inputs** (same source; a supplementary check
 in this repository, not in the paper). A ridge-linear member reaches
@@ -194,9 +158,7 @@ file goes.
 
 ## Requirements
 
-Python with NumPy, SciPy, PyTorch and h5py. Everything runs on a laptop CPU;
-the largest single computation is a Cholesky factorization of a
-19000 x 19000 Gram matrix, about a minute in double precision.
+Python with NumPy, SciPy, PyTorch and h5py. The released training and exact-solve workflows support CPU execution. The largest solves factor a 19000 × 19000 Gram matrix in double precision; memory use and runtime depend on hardware and concurrency. See Supplement S9 for measured costs.
 
 ## Citing
 

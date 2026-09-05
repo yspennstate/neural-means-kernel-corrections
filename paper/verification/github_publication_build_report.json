@@ -1,0 +1,110 @@
+{
+  "purpose": "GitHub publication wording and paired-PDF build",
+  "compile_command": "latexmk -pdf -interaction=nonstopmode -halt-on-error -jobname=output <selected-root>.tex",
+  "started_without_generated_files": true,
+  "edited_source_files": [
+    "intro.tex",
+    "main.tex",
+    "README.md"
+  ],
+  "variants": {
+    "main": {
+      "main": {
+        "pages": 32,
+        "title": "Neural means and kernel corrections for operator learning",
+        "author": "Yitzchak Shmalo",
+        "external_pdf_links": 59,
+        "unresolved": false,
+        "duplicate_labels": false,
+        "bad_destinations": false,
+        "overfull_pt": []
+      },
+      "supplement": {
+        "pages": 46,
+        "title": "Supplement: neural means and kernel corrections for operator learning",
+        "author": "Yitzchak Shmalo",
+        "external_pdf_links": 73,
+        "unresolved": false,
+        "duplicate_labels": false,
+        "bad_destinations": false,
+        "overfull_pt": []
+      },
+      "output": {
+        "pages": 32,
+        "title": "Neural means and kernel corrections for operator learning",
+        "author": "Yitzchak Shmalo",
+        "external_pdf_links": 59,
+        "unresolved": false,
+        "duplicate_labels": false,
+        "bad_destinations": false,
+        "overfull_pt": []
+      }
+    },
+    "supplement": {
+      "main": {
+        "pages": 32,
+        "title": "Neural means and kernel corrections for operator learning",
+        "author": "Yitzchak Shmalo",
+        "external_pdf_links": 59,
+        "unresolved": false,
+        "duplicate_labels": false,
+        "bad_destinations": false,
+        "overfull_pt": []
+      },
+      "supplement": {
+        "pages": 46,
+        "title": "Supplement: neural means and kernel corrections for operator learning",
+        "author": "Yitzchak Shmalo",
+        "external_pdf_links": 73,
+        "unresolved": false,
+        "duplicate_labels": false,
+        "bad_destinations": false,
+        "overfull_pt": []
+      },
+      "output": {
+        "pages": 46,
+        "title": "Supplement: neural means and kernel corrections for operator learning",
+        "author": "Yitzchak Shmalo",
+        "external_pdf_links": 73,
+        "unresolved": false,
+        "duplicate_labels": false,
+        "bad_destinations": false,
+        "overfull_pt": []
+      }
+    }
+  },
+  "source_sha256": {
+    "supp_theory_conf.tex": "4f75cd6aabd43d53c40d90f062943932d0700a9cc6e801a67d364c5c661f17b2",
+    "supp_theory_deff.tex": "f7d7296a53a9bd7eaae5eccad87a5a3e963bfa523a41218e36bf72c3000cc806",
+    "supp_theory_stages.tex": "6ea455f3a1b93da4225012f56c0c11e90c56c54923ea5c4d891c74eb7e89b19b",
+    "theory.tex": "da39030132de672a22e80da97946564b6603e072be5311798272001b98caeb43",
+    "method.tex": "9e0db4eb3518cd4b3bb0d099cd214d6424953f5ea9ef3d387d0ef8a193fc0508",
+    "intro.tex": "e45ffe1e1467cf1b575c1381de1b1bcb7f8c5fff2b37bdc6eba05b73057b401b",
+    "experiments.tex": "006d27384ef7403fd61d218befceb645cc729a443891b92a6e24e934a628d642",
+    "refs.bib": "6b4c3cfcf21b252183f50e68819dbf1ce5f614edb11da8e0e491d9cef6434bfc",
+    "supp_theory_rules.tex": "e4f7b16b87e2cf8d2723b90fabb00f12a02c105c9c7bb6ae09168844cbf6f7dc",
+    "table_oco2ridge.tex": "ab1e4d12166c26b99aeb83d8006788e9fc3be854001363c8646a1bc40ca4062a",
+    "supp_experiments.tex": "555d2ae65b966471be3713183375b37213372a7032856deeb61ac36ab7938d06",
+    "supp_oco2.tex": "13993448ed7bcf10e56f0d8a0b4904346f806fac21f75a5314ce88082cddc5a5",
+    "jmlr2e.sty": "a430a875d561235951800e4e21d2631e18ddf0b369646ec276f43ea5080f27c3",
+    "build_external_documents.pl": "de70697d08c2ed9e6f3e921e27e0abf950523a046f0266c84071fc95cbbec1ab",
+    "verification.tex": "744b77787bb52890dc8b4aebadc22c900b228e07da260d73f86420f2a4dd041e",
+    "impl.tex": "af1eeb891bb0904a00967dba7ff2037dbb836d465739d39683c0f7634c3ccc38",
+    "benchmark.tex": "817b7eaa2c15c1cd2f53da6597bbf04c8010932891b904aec7d639cc78da47f6",
+    "main.tex": "7c0e5e25c790be078acb286354281802a42956e2f2605c16cdc33c9cfc73ad3e",
+    "supp_benchmark.tex": "0bed7bf77ffa0bf8fb525a64c7f1625fea92c476375e950047f6dc633baf3659",
+    "README.md": "c6948e7a94e8ac3b4b96ce45653d92b3477250f9fc808f7e04c1f3e5a032ebed",
+    "discussion.tex": "f680e66e38f4d32ef59541ed88aa020a7c7279772a8ae917642dfa5a5a5b9480",
+    "proofs.tex": "d6e62480132943109e8ca27971b941dc1341ae55dc231acfbf2d702724a57033",
+    "macros.tex": "0480dadb55770cdbb3bf0b9cfdc1776aad3ff086a189721a30dbd89df60e3529",
+    "latexmkrc": "ac09e03c32956b175a2af41b1a831ae910e6605cd0f6bbf3f510be087dad6994",
+    "supplement.tex": "0e24e77808a71139b0916f01399d1c7c441e6d857fb4ca80f1047112460be8d7",
+    "oco2.tex": "b4f71890f35d481242dd7e25a0003acdfadc8dd79fb1abc6f18550b75f215cb8"
+  },
+  "pdf_sha256": {
+    "main": "575744c063d5f745697d9c536bf2f7d1422d3e7a43289cfc673073529b75941f",
+    "supplement": "b4ae6c6dd378235e7d808529e7c1a7565cb6fd9bf029426c2512789a6ac363c2"
+  },
+  "first_page_visual_qa": "PASS: footnote readable, within margins, directs readers to the current online supplement for full proofs.",
+  "first_page_online_supplement_link": "https://github.com/yspennstate/neural-means-kernel-corrections/blob/main/paper/supplement.pdf"
+}

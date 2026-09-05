@@ -1,0 +1,117 @@
+[
+  {
+    "file": "theory.tex",
+    "result": "prop:secmom",
+    "proof_label": "proof:prop:secmom"
+  },
+  {
+    "file": "theory.tex",
+    "result": "cor:floor",
+    "proof_label": "proof:cor:floor"
+  },
+  {
+    "file": "theory.tex",
+    "result": "cor:floorpinch",
+    "proof_label": "proof:cor:floorpinch"
+  },
+  {
+    "file": "theory.tex",
+    "result": "cor:signed",
+    "proof_label": "proof:cor:signed"
+  },
+  {
+    "file": "theory.tex",
+    "result": "thm:blockfloor",
+    "proof_label": "proof:thm:blockfloor"
+  },
+  {
+    "file": "theory.tex",
+    "result": "prop:exchange",
+    "proof_label": "proof:prop:exchange"
+  },
+  {
+    "file": "theory.tex",
+    "result": "prop:pullback",
+    "proof_label": "proof:prop:pullback"
+  },
+  {
+    "file": "theory.tex",
+    "result": "thm:or",
+    "proof_label": "proof:thm:or"
+  },
+  {
+    "file": "theory.tex",
+    "result": "thm:minimax",
+    "proof_label": "proof:thm:minimax"
+  },
+  {
+    "file": "supp_theory_stages.tex",
+    "result": "prop:sym",
+    "proof_label": "proof:prop:sym"
+  },
+  {
+    "file": "supp_theory_stages.tex",
+    "result": "prop:kf",
+    "proof_label": "proof:prop:kf"
+  },
+  {
+    "file": "supp_theory_stages.tex",
+    "result": "prop:stack",
+    "proof_label": "proof:prop:stack"
+  },
+  {
+    "file": "supp_theory_stages.tex",
+    "result": "lem:select",
+    "proof_label": "proof:lem:select"
+  },
+  {
+    "file": "supp_theory_stages.tex",
+    "result": "prop:affine",
+    "proof_label": "proof:prop:affine"
+  },
+  {
+    "file": "supp_theory_stages.tex",
+    "result": "cor:certificate",
+    "proof_label": "proof:cor:certificate"
+  },
+  {
+    "file": "supp_theory_stages.tex",
+    "result": "lem:kappa",
+    "proof_label": "proof:lem:kappa"
+  },
+  {
+    "file": "supp_theory_rules.tex",
+    "result": "prop:percoord",
+    "proof_label": "proof:prop:percoord"
+  },
+  {
+    "file": "supp_theory_rules.tex",
+    "result": "cor:percoordw",
+    "proof_label": "proof:cor:percoordw"
+  },
+  {
+    "file": "supp_theory_rules.tex",
+    "result": "prop:selectcoord",
+    "proof_label": "proof:prop:selectcoord"
+  },
+  {
+    "file": "supp_theory_rules.tex",
+    "result": "prop:aniso",
+    "proof_label": "proof:prop:aniso"
+  },
+  {
+    "file": "supp_theory_conf.tex",
+    "result": "prop:conf",
+    "proof_label": "proof:prop:conf"
+  },
+  {
+    "file": "supp_theory_deff.tex",
+    "result": "lem:deff",
+    "proof_label": "proof:lem:deff"
+  },
+  {
+    "file": "supp_theory_deff.tex",
+    "result": "cor:mp",
+    "proof_label": "proof:cor:mp"
+  }
+]

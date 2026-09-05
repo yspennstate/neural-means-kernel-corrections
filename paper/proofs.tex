@@ -1,4 +1,5 @@
 \subsection{Proof of Proposition~\ref{prop:sym}}
+\label{proof:prop:sym}
 
 By convexity of $\ell(\cdot,v)$,
 \[
@@ -20,6 +21,7 @@ G(Su),G(Su)\big)=\mathbb E\,\ell\big(\widehat G(u),G(u)\big). \qed
 \]
 
 \subsection{Proof of Proposition~\ref{prop:kf}}
+\label{proof:prop:kf}
 
 Strict positive definiteness of the restricted kernel matrix makes $I_C$ the
 (unique) interpolant of the pairs indexed by $C$, so $I_C(z_j)=v_j$ for $j\in
@@ -39,6 +41,7 @@ integrable Lipschitz bound the derivative passes under the expectation, so
 $\mathbb E_{B,C}[\nabla_\theta e_2]=\nabla_\theta\,\mathbb E_{B,C}[e_2]$. \qed
 
 \subsection{Proof of Proposition~\ref{prop:stack}}
+\label{proof:prop:stack}
 
 (i) Since $\sum_m w_m=1$,
 $F_w(u)-G(u)=\sum_m w_m\,(f_m(u)-G(u))$, and the triangle inequality gives
@@ -46,7 +49,8 @@ $\|F_w(u)-G(u)\|_2\le\sum_m w_m\|f_m(u)-G(u)\|_2$. Dividing by $\|G(u)\|_2$
 yields the pointwise claim; taking expectations gives the risk inequality, and
 bounding each $\ell(f_m(u),G(u))$ by $B$ gives $\ell(F_w(u),G(u))\le B$.
 
-(ii) Write $\ell_u(w)=\ell(F_w(u),G(u))$. First, $\ell_u$ is Lipschitz on
+(ii) For $M=1$ there is no weight selection and the asserted inequality
+is immediate. Suppose $M\ge2$ and write $\ell_u(w)=\ell(F_w(u),G(u))$. First, $\ell_u$ is Lipschitz on
 $\Delta$ for the $\ell^1$ norm: for $w,w'\in\Delta$, the reverse triangle
 inequality and the argument of (i) give
 \[
@@ -90,6 +94,7 @@ R(F_{\widehat w})\;\le\;\min_{w\in\Delta}R(F_w)+\frac{8B}{m}
 which is the claim. \qed
 
 \subsection{Proof of Lemma~\ref{lem:select}}
+\label{proof:lem:select}
 
 For each $k$ the validation scores $\ell(g_k(\tilde u_i),G(\tilde u_i))$,
 $i\le m'$, are i.i.d., take values in $[0,B]$, and have mean $R(g_k)$; the
@@ -109,6 +114,7 @@ R(g_{\widehat k})\;\le\;\widehat R(g_{\widehat k})+t\;\le\;
 and $2t=B\sqrt{2\log(2K/\delta)/m'}$. \qed
 
 \subsection{Proof of Proposition~\ref{prop:affine}}
+\label{proof:prop:affine}
 
 Fix a coordinate $j$ and abbreviate $\varphi=\varphi_j$, $Y(u)=G(u)_j$,
 $D=\sqrt{M+1}$. Each entry of $\varphi(u)$ is bounded by $b$ in absolute
@@ -166,6 +172,7 @@ $\widehat w_j$ and $w^\ast$ alike, and the chain above goes through with the
 extra $\lambda W^2$. \qed
 
 \subsection{Proof of Corollary~\ref{cor:floorpinch}}
+\label{proof:cor:floorpinch}
 
 The lower bound is Corollary~\ref{cor:floor}. For the upper bound, evaluate
 the quadratic form at the uniform weights $w_m=1/M$:
@@ -183,6 +190,7 @@ and the minimum over the simplex is at most the value at any feasible point.
 \qed
 
 \subsection{Proof of Corollary~\ref{cor:certificate}}
+\label{proof:cor:certificate}
 
 Fix a coordinate $j$ and a grid point $\gamma$. Substituting the affine form
 of the correction,
@@ -232,6 +240,7 @@ weights, Lemma~\ref{lem:kappa} supplies the hypothesis with
 $\kappa=\kappa_{\mathrm{an}}$. \qed
 
 \subsection{Proof of Lemma~\ref{lem:kappa}}
+\label{proof:lem:kappa}
 
 Fix $u$ and write $k_u=k(X,u)$, $t=n\lambda$, $A=K+tI$ and $c=A^{-1}k_u$.
 Because $k$ is positive definite, the Gram matrix of the $n+1$ points
@@ -269,6 +278,7 @@ $\sup_{u,\gamma}\|c_\gamma(u)\|_1\le\tfrac12\max_\gamma\lambda_\gamma^{-1/2}=500
 irrespective of the length scale and of the design. \qed
 
 \subsection{Proof of Corollary~\ref{cor:signed}}
+\label{proof:cor:signed}
 
 The objective is strictly convex on the hyperplane $\{\mathbf 1^\top w=1\}$,
 so its minimizer there is the unique stationary point of the Lagrangian
@@ -281,6 +291,7 @@ agree exactly when $w^\star$ lies in the simplex, that is, has no negative
 coordinate. \qed
 
 \subsection{Proof of Proposition~\ref{prop:secmom}}
+\label{proof:prop:secmom}
 
 Since $\sum_m w_m=1$, the stack's normalized residual is
 $\rho_{f_w}(u)=\sum_m w_m\rho_{f_m}(u)$, hence
@@ -300,6 +311,7 @@ $w^\top Sw=e^2\big((1-\varrho)\|w\|_2^2+\varrho\big)$ on the simplex, minimized
 by the uniform weights, where $\|w\|_2^2=1/M$. \qed
 
 \subsection{Proof of Corollary~\ref{cor:floor}}
+\label{proof:cor:floor}
 
 Convex weights are nonnegative, so each term of
 $w^\top Sw=\sum_{m}w_m^2S_{mm}+\sum_{m\neq k}w_mw_kS_{mk}$ can be bounded
@@ -314,6 +326,7 @@ is a convex combination of $1$ and $\bar\varrho$, hence at least
 $\bar\varrho$. \qed
 
 \subsection{Proof of Theorem~\ref{thm:blockfloor}}
+\label{proof:thm:blockfloor}
 
 Write $W_a=\sum_kw_{a,k}$ for the total weight of architecture $a$, so that
 $\sum_aW_a=1$. Split the quadratic form into its diagonal terms, the terms
@@ -342,26 +355,32 @@ weights attain the bound. The three limits follow by letting $K$, then $M$,
 grow. \qed
 
 \subsection{Proof of Proposition~\ref{prop:exchange}}
+\label{proof:prop:exchange}
 
 Proposition~\ref{prop:secmom}(i) gives $V=e_1^2e_2^2(1-\varrho^2)/(e_1^2+e_2^2
 -2\varrho e_1e_2)=e_1^2\,t^2(1-\varrho^2)/D$ with $D=1+t^2-2\varrho t$, valid
 whenever the unconstrained minimizer lies in the open simplex, which is the
-condition $\varrho<\min(t,1/t)$. Differentiating,
+condition $\varrho<1/t$ for $t=e_2/e_1\ge1$. The strict derivative
+claims additionally assume $-1<\varrho$, as in the proposition. Differentiating,
 \[
+\begin{aligned}
 \frac{\partial V}{\partial t}
-=\frac{e_1^2\big[2t(1-\varrho^2)D-t^2(1-\varrho^2)(2t-2\varrho)\big]}{D^2}
-=\frac{2e_1^2\,t(1-\varrho^2)\big(D-t^2+\varrho t\big)}{D^2}
-=\frac{2e_1^2\,t(1-\varrho^2)(1-\varrho t)}{D^2},
+&=\frac{e_1^2\big[2t(1-\varrho^2)D-t^2(1-\varrho^2)(2t-2\varrho)\big]}{D^2}\\
+&=\frac{2e_1^2\,t(1-\varrho^2)\big(D-t^2+\varrho t\big)}{D^2}\\
+&=\frac{2e_1^2\,t(1-\varrho^2)(1-\varrho t)}{D^2},
+\end{aligned}
 \]
 and
 \[
+\begin{aligned}
 \frac{\partial V}{\partial\varrho}
-=\frac{e_1^2\big[-2\varrho t^2D+2t^3(1-\varrho^2)\big]}{D^2}
-=\frac{2e_1^2\,t^2\big(t-\varrho-\varrho t^2+\varrho^2t\big)}{D^2}
-=\frac{2e_1^2\,t^2(t-\varrho)(1-\varrho t)}{D^2}.
+&=\frac{e_1^2\big[-2\varrho t^2D+2t^3(1-\varrho^2)\big]}{D^2}\\
+&=\frac{2e_1^2\,t^2\big(t-\varrho-\varrho t^2+\varrho^2t\big)}{D^2}\\
+&=\frac{2e_1^2\,t^2(t-\varrho)(1-\varrho t)}{D^2}.
+\end{aligned}
 \]
-Both are positive on the interior region, since $t-\varrho>0$ and
-$1-\varrho t>0$ there. Setting
+Both are positive for $-1<\varrho<1/t$, since $1-\varrho^2>0$,
+$t-\varrho>0$ and $1-\varrho t>0$ there. Setting
 $\mathrm dV=(\partial V/\partial t)\,\mathrm dt
 +(\partial V/\partial\varrho)\,\mathrm d\varrho=0$ and cancelling the common
 factor $2e_1^2t(1-\varrho t)/D^2$ gives
@@ -370,6 +389,7 @@ stated rate; substituting $\mathrm dt=-\epsilon t$ gives the fractional
 form. \qed
 
 \subsection{Proof of Proposition~\ref{prop:percoord}}
+\label{proof:prop:percoord}
 
 The metric is diagonal, so the squared norm splits over coordinates and the
 $j$-th summand $w_j^2\,\mathbb E\big(\sum_m v_{mj}f_m(u)_j-G(u)_j\big)^2$
@@ -381,6 +401,7 @@ case $v_{mj}=v_m$ for all $j$, a subset of the feasible set of each
 coordinate problem, which gives the domination. \qed
 
 \subsection{Proof of Corollary~\ref{cor:percoordw}}
+\label{proof:cor:percoordw}
 
 The integrand is nonnegative, so Tonelli's theorem permits exchanging the
 expectation with the coordinate sum:
@@ -400,6 +421,7 @@ $\mathbb E\|\rho\|_2\le(\mathbb E\|\rho\|_2^2)^{1/2}$ is Jensen's
 inequality. \qed
 
 \subsection{Proof of Proposition~\ref{prop:selectcoord}}
+\label{proof:prop:selectcoord}
 
 Fix a coordinate $j$ and a member $m$. The validation scores
 $a(\tilde u_i)(f_m(\tilde u_i)_j-G(\tilde u_i)_j)^2$, $i\le m_v$, are i.i.d.,
@@ -423,6 +445,7 @@ by $w_j^2\ge0$ and summing; the selection $\widehat m(\cdot)$ does not
 depend on $w$, so one event serves every diagonal metric. \qed
 
 \subsection{Proof of Proposition~\ref{prop:pullback}}
+\label{proof:prop:pullback}
 
 Let $T:\mathcal H_k\to\mathbb R^{\mathcal X}$ be the composition map
 $Tf=f\circ\varphi$. For $x\in\mathcal X$ the reproducing property gives
@@ -439,114 +462,38 @@ $\|h\circ\varphi\|_{\mathcal H_{k_\varphi}}\le\|h\|_{\mathcal H_k}$, and
 substituting this bound into Theorem~\ref{thm:or} applied with the kernel
 $k_\varphi$ replaces $\|G\|$ by $\|h\|_{\mathcal H_k}$. \qed
 
-\subsection{Heuristic derivation of Proposition~\ref{prop:aniso}}
+\subsection{Proof of Proposition~\ref{prop:aniso}}
+\label{proof:prop:aniso}
 
-The proposition is labelled informal, and this appendix records the
-calculation behind it at the level of the idealization stated with it ---
-projected image marginal bounded above and below, exact rank at the working
-resolution, and the interpolation limit standing in for the validated nugget
---- as a sketch, without tracking constants; no lower bound is claimed. The
-argument has five steps: a pointwise error bound whose design dependence
-is the power function; a fill-distance bound for random designs; an upper
-bound on the warped target's native norm; the two substitutions; and the
-reduction from the validated nugget to the interpolation scale. Throughout,
-$k$ is a Mat\'ern kernel of smoothness $s$ whose native space on a bounded
-Lipschitz domain $\Omega\subset\mathbb R^{d'}$ is norm-equivalent to
-$H^{s+d'/2}(\Omega)$ \citep[Ch.~10]{wendland2004scattered}; we follow the
-convention of the statement and write $s$ for the resulting approximation
-order.
-
-\emph{Step 1: pointwise bound through the power function.} For any target
-$F$ with components in the native space and the interpolant $\widehat F_0$ on
-the design $X$, the argument that proves Theorem~\ref{thm:or} (with
-$\lambda=0$ and $m=0$) gives, for every $u$,
+The truncated singular-value decomposition satisfies
+$\|A-A_r\|_{\mathrm{op}}=\sigma_{r+1}$. Consequently, for every
+$u\in\mathcal U$,
 \[
-\|F(u)-\widehat F_0(u)\|_2\;\le\;\|F\|_K\,P_0(u),
+\|G(u)-G_r(u)\|_2
+=\|g(Au)-g(A_ru)\|_2
+\le L\|(A-A_r)u\|_2
+\le LR\sigma_{r+1}=\varepsilon.
 \]
-and the classical zeros lemma for functions with many zeros on a dense set
-converts the power function into the fill distance
-$h_X=\sup_{u\in\Omega}\min_i\|u-u_i\|$:
-$\sup_u P_0(u)\le C\,h_X^{\,s}$ for $h_X$ below a domain constant
-\citep[Ch.~11]{wendland2004scattered}. Hence
-$\sup_u\|F(u)-\widehat F_0(u)\|_2\le C\,h_X^{\,s}\,\|F\|_K$.
-
-\emph{Step 2: fill distance of an i.i.d.\ design.} Let $u_1,\dots,u_n$ be
-i.i.d.\ from a density bounded below by $p_->0$ on $\Omega$. Fix
-$\delta>0$ and a $\delta/2$-net of $\Omega$ of cardinality
-$N(\delta)\le C_\Omega\,\delta^{-d'}$. A net ball of radius $\delta/2$ has
-$\mu$-mass at least $c\,p_-\delta^{d'}$, so the probability that some net
-ball receives no sample is at most
-$C_\Omega\,\delta^{-d'}(1-c\,p_-\delta^{d'})^n
-\le C_\Omega\,\delta^{-d'}e^{-c\,p_-\,n\delta^{d'}}$.
-Choosing $\delta^{d'}=(2/(c\,p_-))\,(\log n)/n$ makes this at most
-$C'\,n^{-1}$, and on the complement every point of $\Omega$ lies within
-$\delta$ of a sample: with probability at least $1-C'/n$,
+Write $\delta(u)=G(u)-G_r(u)$, and form the kernel predictor of $G_r$
+using the same feature-space weights $c=c_\lambda(u)$. Theorem~\ref{thm:or}
+applied in feature space with zero mean gives
 \[
-h_X\;\le\;C''\,\Big(\frac{\log n}{n}\Big)^{1/d'} .
+\|G_r(u)-c^\top G_r(X)\|_2
+=\|h(\varphi_r(u))-c^\top h(Z)\|_2
+\le\|h\|_K\,\widetilde P_\lambda(u).
 \]
-This is the high-probability statement in the proposition; the logarithm is
-absorbed into the logarithmic factors there.
-
-\emph{Step 3: the warped target's norm, from above.} Let $F=g(A\,\cdot)$
-with $\|g\|_{H^{s}}=1$ (native norm of the isotropic kernel in the image
-variables). For integer $m$, the chain rule gives, for any multi-index
-$\alpha$ with $|\alpha|=m$,
-$D^\alpha\{g(Au)\}=\sum_{|\beta|=m}c_{\alpha\beta}(A)\,(D^\beta g)(Au)$ with
-$\sum_\beta|c_{\alpha\beta}(A)|\le\|A\|^m=\sigma_1^m$, so by the change of
-variables $y=Au$ (Jacobian $|\det A|$),
+The estimator in the proposition is trained on $G(X)$, so
 \[
-\|D^\alpha\{g(A\cdot)\}\|_{L^2(\mathcal U)}\;\le\;\sigma_1^{\,m}\,
-|\det A|^{-1/2}\,\|g\|_{H^m(A\,\mathcal U)} .
+G(u)-c^\top G(X)
+=G_r(u)-c^\top G_r(X)+\delta(u)-\sum_i c_i\delta(u_i).
 \]
-Summing over $|\alpha|\le m$ bounds $\|g(A\cdot)\|_{H^m}$ by
-$C\,\sigma_1^{\,m}|\det A|^{-1/2}\|g\|_{H^m}$ for integer $m$, and the
-fractional case follows by interpolation between consecutive integers
-\citep[Ch.~7]{adams2003sobolev}. Only this upper bound is used; the
-$|\det A|^{-1/2}$ and the domain constants are among the singular-value
-constants absorbed into the statement, leaving the displayed
-$\sigma_1^{\,s}$.
-
-\emph{Step 4: the two designs.} For the isotropic kernel on the raw input the
-domain has dimension $d'=d$, so Steps 1--3 give the first display:
-$C\,h_X^{\,s}\,\sigma_1^{\,s}\lesssim\sigma_1^{\,s}n^{-s/d}$ up to logarithms.
-For the adapted kernel $k_A(u,u')=k(Au,Au')$, interpolating $F$ at $\{u_i\}$
-is interpolating $g$ at the image design $\{Au_i\}$, and $\|F\|_{K_A}=
-\|g\|_K\le 1$ by the pullback identity (Proposition~\ref{prop:pullback}). The
-image measure has a density bounded above and below on its support by the
-idealization of the statement. Split $A=A_r+A_\perp$ along the leading-$r$
-right singular subspace. The projected points $\Pi_r Au_i$ are i.i.d.\ on an
-$r$-dimensional bounded set, so Step 2 (with $d'=r$) puts every projected
-image point within $C(\log n/n)^{1/r}$ of a projected sample; and for every
-$u$ in the domain, $\|Au-\Pi_rAu\|\le\sigma_{r+1}\,\mathrm{diam}(\mathcal U)$.
-The triangle inequality then bounds the image fill distance by
-$C(\log n/n)^{1/r}+2\sigma_{r+1}\,\mathrm{diam}(\mathcal U)$, and the
-approximate-rank hypothesis $\sigma_{r+1}\lesssim n^{-1/r}$ makes the second
-term of the same order as the first. Steps 1 and 3 with $d'=r$ and
-$\|g\|_K\le1$ give the second display. If instead $\sigma_{r+1}$ is not below
-$n^{-1/r}$, the trailing directions are resolved by the design, the image
-fill distance is that of a $d$-dimensional set, and the two rates coincide;
-only the constant $\sigma_1^{\,s}$ separates the bounds, as claimed.
-
-\emph{Step 5: from the interpolant to the validated ridge estimator.} The
-pipeline fits with a nugget from a grid containing values down to $10^{-8}n$
-and selects on validation. For any fixed $\lambda$ the pathwise bound of
-Theorem~\ref{thm:or} controls the ridge estimator by
-$\|F\|_K\,\sup_uP_\lambda(u)$, and a two-line spectral computation compares
-the regularized power function with the interpolation one: with
-$k_u=k(X,u)$ and $A_\lambda=K+n\lambda I$,
-\[
-P_\lambda(u)^2-P_0(u)^2=k_u^\top\big(K^{-1}-A_\lambda^{-1}\big)k_u
-=n\lambda\,k_u^\top K^{-1}A_\lambda^{-1}k_u\;\le\;
-\frac{n\lambda\,\|k_u\|_2^2}{\lambda_{\min}(K)\,
-\big(\lambda_{\min}(K)+n\lambda\big)},
-\]
-which vanishes as $\lambda\to0$. Validation selection over the grid can only
-improve on its smallest-nugget arm up to the selection cost priced by
-Lemma~\ref{lem:select}, which is of lower order than the rates displayed.
-Both displays are upper bounds under the stated idealization, and no matching
-lower bound is claimed. \qed
+Taking Euclidean norms and using $\|\delta(u_i)\|_2\le\varepsilon$
+yields the stated bound. The argument is deterministic and applies to any
+design and any stated nugget, including the pseudoinverse convention at zero.
+\qed
 
 \subsection{Proof of Theorem~\ref{thm:or}}
+\label{proof:thm:or}
 
 Fix $u$ and write $k_u=k(X,u)\in\mathbb R^n$, $A=K+n\lambda I$,
 $w=A^{-1}k_u$. For each component $j$, membership $r_j\in\mathcal H_k$ and
@@ -582,7 +529,7 @@ $\|g_u\|_{\mathcal H_k}=\rho(u)=\widetilde P_\lambda(u)$. If
 $\widetilde P_\lambda(u)=0$ both sides of the bound vanish for every $r$.
 Otherwise take $r_1=(\|G-m\|_K/\rho(u))\,g_u$ and $r_j=0$ for $j\ge2$: this
 residual has norm $\|G-m\|_K$, and since the estimator is built from its own
-training values $r_1(X)=g_u(X)$, the first display gives
+training values $r_1(X)=(\|G-m\|_K/\rho(u))g_u(X)$, the first display gives
 $r_1(u)-\widehat r_{\lambda,1}(u)=\langle r_1,g_u\rangle_{\mathcal
 H_k}=\|G-m\|_K\,\rho(u)$, equality in Cauchy--Schwarz. \qed
 
@@ -592,6 +539,7 @@ showing that smoothing can only tighten this particular bound relative to the
 posterior standard deviation $P_\lambda$ that we report.
 
 \subsection{Proof of Theorem~\ref{thm:minimax}}
+\label{proof:thm:minimax}
 
 Write $k_u=k(X,u)$ and let $g_u=k(u,\cdot)-\sum_i(K^{-1}k_u)_ik(u_i,\cdot)$
 be the function of the previous proof at $\lambda=0$. It vanishes on the
@@ -614,10 +562,12 @@ From the proof of Theorem~\ref{thm:or},
 $\widetilde P_\lambda(u)^2=k(u,u)-k_u^\top A^{-1}(2A-K)A^{-1}k_u$, while
 $P_0(u)^2=k(u,u)-k_u^\top K^{-1}k_u$, so
 \[
+\begin{aligned}
 \widetilde P_\lambda(u)^2-P_0(u)^2
-=k_u^\top\big(K^{-1}-2A^{-1}+A^{-1}KA^{-1}\big)k_u
-=k_u^\top A^{-2}K^{-1}\big(A^2-2AK+K^2\big)k_u
-=k_u^\top A^{-2}K^{-1}(A-K)^2k_u ,
+&=k_u^\top\big(K^{-1}-2A^{-1}+A^{-1}KA^{-1}\big)k_u\\
+&=k_u^\top A^{-2}K^{-1}\big(A^2-2AK+K^2\big)k_u\\
+&=k_u^\top A^{-2}K^{-1}(A-K)^2k_u ,
+\end{aligned}
 \]
 and $A-K=tI$. The right-hand side is nonnegative because $A^{-2}K^{-1}$ is
 positive definite, which gives $P_0\le\widetilde P_\lambda$; the upper
@@ -628,33 +578,28 @@ of which is bounded by $\beta_i^2/\mu_i$ and tends to zero with $t$, so the
 difference vanishes as $\lambda\to0$ by dominated convergence. \qed
 
 \subsection{Proof of Proposition~\ref{prop:conf}}
+\label{proof:prop:conf}
 
-Write $s_i=\|e(\tilde u_i)\|_2/P_\lambda(\tilde u_i)$ for the validation scores
-and $s^\star=\|e(u^\star)\|_2/P_\lambda(u^\star)$ for the test score. Because
-$m$, $\widehat r_\lambda$, $X$ and $P_\lambda$ are fixed and the inputs
-$\tilde u_1,\dots,\tilde u_m,u^\star$ are exchangeable and independent of them,
-the scores $s_1,\dots,s_m,s^\star$ are exchangeable. The event
-$G(u^\star)\in C(u^\star)$ is exactly $\{s^\star\le q\}$, where
-$q=s_{(\lceil(1-\alpha)(m+1)\rceil)}$ is the
-$k:=\lceil(1-\alpha)(m+1)\rceil$-th order statistic of the validation scores.
+Condition on the fixed fitted predictor, scale function and design. The
+calibration scores $s_1,\ldots,s_m$ and the new score $s^\star$ are
+exchangeable, and coverage is the event $s^\star\le q$. If $k=m+1$ then
+$q=+\infty$ and coverage is one. Suppose therefore that $k\le m$.
 
-Consider the augmented sample $s_1,\dots,s_m,s^\star$ of size $m+1$ and let
-$\mathrm{rank}(s^\star)$ be its rank (ties broken uniformly at random, which
-only helps). By exchangeability the rank is uniform on $\{1,\dots,m+1\}$, so
-$\mathbb P(\mathrm{rank}(s^\star)\le k)=k/(m+1)$. If $s^\star$ is among the $k$
-smallest of the $m+1$ values then at most $k-1$ of the $s_i$ are below it, so
-$s^\star\le s_{(k)}=q$; conversely $s^\star\le q$ forces
-$\mathrm{rank}(s^\star)\le k$ except possibly through ties. Hence
+Assign independent continuous random tie breakers to the $m+1$ scores and
+let $J$ be the rank of the new score in this augmented ordering. By
+exchangeability, $J$ is uniform on $\{1,\ldots,m+1\}$. The event $J\le k$
+implies $s^\star\le s_{(k)}$, including in the presence of ties, so
 \[
-\mathbb P(s^\star\le q)\;\ge\;\mathbb P(\mathrm{rank}(s^\star)\le k)
-=\frac{k}{m+1}=\frac{\lceil(1-\alpha)(m+1)\rceil}{m+1}\;\ge\;1-\alpha,
+\mathbb P(s^\star\le q)\ge\mathbb P(J\le k)
+=\frac{k}{m+1}\ge1-\alpha.
 \]
-which is the lower bound. When the scores are almost surely distinct there are
-no ties, $\{s^\star\le q\}=\{\mathrm{rank}(s^\star)\le k\}$ exactly, and
-$k/(m+1)<((1-\alpha)(m+1)+1)/(m+1)=1-\alpha+1/(m+1)$, giving the upper bound.
-\qed
+When the scores are almost surely distinct the two events coincide; their
+probability equals $k/(m+1)\le1-\alpha+1/(m+1)$. The same upper bound
+also includes the already handled case $k=m+1$. Averaging over any
+independent fitted objects preserves these statements. \qed
 
 \subsection{Proof of Corollary~\ref{cor:mp}}
+\label{proof:cor:mp}
 
 The nonzero eigenvalues of $K/n=XX^\top\!/n$ coincide with those of the
 sample covariance matrix $S=X^\top X/n\in\mathbb R^{p\times p}$, and zero
@@ -691,14 +636,17 @@ $m(-\lambda)=\int(x+\lambda)^{-1}dF(x)>0$ requires; rearranging gives the
 stated expression. \qed
 
 \subsection{Proof of Lemma~\ref{lem:deff}}
+\label{proof:lem:deff}
 
 Diagonalize $K$ with eigenvalues $\lambda_i$. Then
 \[
+\begin{aligned}
 \operatorname{tr}\big(K(K+n\lambda I)^{-1}\big)
-=\sum_{i=1}^n\frac{\lambda_i}{\lambda_i+n\lambda}
-=\sum_{i=1}^n\Big(1-\frac{n\lambda}{\lambda_i+n\lambda}\Big)
-= n-\lambda\sum_{i=1}^n\frac{1}{\lambda_i/n+\lambda}
-= n\big(1-\lambda\,\widehat m(-\lambda)\big),
+&=\sum_{i=1}^n\frac{\lambda_i}{\lambda_i+n\lambda}\\
+&=\sum_{i=1}^n\Big(1-\frac{n\lambda}{\lambda_i+n\lambda}\Big)\\
+&= n-\lambda\sum_{i=1}^n\frac{1}{\lambda_i/n+\lambda}\\
+&= n\big(1-\lambda\,\widehat m(-\lambda)\big),
+\end{aligned}
 \]
 using $\widehat m(-\lambda)=\tfrac1n\sum_i(\lambda_i/n+\lambda)^{-1}$. The
 limit statement follows from the weak convergence of the empirical spectral

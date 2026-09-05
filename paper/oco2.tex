@@ -6,12 +6,15 @@ atmospheric state ($20$--$24$ dimensions after the dimension reduction of
 that paper) to the reduced radiance ($40$ PCA coefficients of the
 monochromatic spectrum). The OSF project (\texttt{u2t8a}) publishes a training
 pool of $20000$ pairs and, separately, $2000$ test states together with the
-kernel-flow emulator's own predictions on them; we verified the two sets share
-no point. We split the pool $18000/2000$ into training and validation, and
-every choice in our pipeline --- the network checkpoints, the kernel head's
-length scale and nugget, and the per-coordinate winners of the combination
-below --- is made on that validation split; the $2000$ public test states
-enter no optimizer and are evaluated once per run, for the final numbers.
+kernel-flow emulator's own predictions on them; the released overlap check
+reports that the two sets share no point. The recorded runs split the pool
+$18000/2000$ into training and validation. Within each run, the validation
+split selects network checkpoints, kernel length scales and nuggets, and
+the coordinate winners below. The public test states are used for reported
+evaluation and subsequent diagnostics. Because this study was developed
+through repeated analyses of a public benchmark, its comparisons are
+retrospective, not a preregistered confirmatory test. This revision retains
+the recorded runs and introduces no new training experiments.
 The carve is taken from the source study's Sobol training design while the
 public test states are a separate draw, and the two differ: the flat
 network's mean relative error is $6.7\%$ on the carve against $4.4\%$ on the
@@ -20,55 +23,77 @@ a shift between the two, not a same-distribution choice.
 The comparison is therefore computed on identical test points against the
 published emulator itself rather than against our reimplementation of it.
 
-Two error criteria matter, and they disagree in an instructive way. Both
-are defined here, on the released reduced representation, and neither is the
-acceptance test of the source paper, which scores full reconstructed spectra
-against an instrument-noise criterion. The
-\emph{reduced} metric is the relative $L^2$ error on the $40$ standardized
-coefficients. The \emph{radiance} metric maps predictions back to the
-monochromatic spectrum through the stored PCA projection and norms before
-comparing --- a reconstruction on the retained forty components, so the PCA
-truncation error, the instrument line shape and the noise model lie outside
-it; because the projection is orthogonal, the error \emph{numerator} on
-the reduced side is exactly the diagonally weighted norm
-$\|s_z\odot(\hat z-z)\|$, whose weights concentrate almost entirely on the
-first few coefficients (the denominator is the full reconstructed-radiance
-norm, which adds the reconstruction offsets). It is this diagonal weighting of
-the residual that the per-coordinate combination exploits.
+The two error criteria are defined here on the released reduced
+representation. Neither is the source study's instrument-noise or retrieval
+acceptance test. Let $z\in\mathbb R^{40}$ contain the standardized
+coefficients, let $U$ have the retained orthonormal PCA columns, and put
+$D_z=\operatorname{diag}(s_z)$. The stored means and scales reconstruct
+\begin{equation}
+ R(z)=\mu_y+U(\mu_z+D_z z),\qquad U^\top U=I.
+ \label{eq:oco-reconstruction}
+\end{equation}
+The two reported mean relative errors are
+\begin{align}
+ E_{\rm red}&=\frac1N\sum_{i=1}^N
+       \frac{\|\hat z_i-z_i\|_2}{\|z_i\|_2},
+       \label{eq:oco-reduced}\\
+ E_{\rm rad}&=\frac1N\sum_{i=1}^N
+       \frac{\|D_z(\hat z_i-z_i)\|_2}{\|R(z_i)\|_2}.
+       \label{eq:oco-radiance}
+\end{align}
+Orthogonality gives $\|R(\hat z)-R(z)\|_2
+=\|D_z(\hat z-z)\|_2$; the reconstruction offsets cancel in the
+numerator but remain in the denominator. The radiance criterion compares
+two forty-component reconstructions, so it excludes PCA truncation error,
+the instrument line shape, and the measurement-noise model. Its numerator
+weights concentrate on the leading coefficients.
+
+For fixed nonnegative weights $\omega_i,a_j$, the squared objective
+$N^{-1}\sum_{i,j}\omega_i a_j(\hat z_{ij}-z_{ij})^2$ separates by
+coordinate. Ordinary coordinatewise RMSE selection minimizes this
+objective with $\omega_i=a_j=1$. Squared relative coefficient error instead
+uses $\omega_i=\|z_i\|_2^{-2}$; squared relative radiance error uses
+$\omega_i=\|R(z_i)\|_2^{-2}$ and $a_j=s_{z,j}^2$. Fixed per-sample
+denominators therefore preserve separability for the squared objectives,
+although they can change the winning member. The square root in each
+summand of \eqref{eq:oco-reduced}--\eqref{eq:oco-radiance} couples
+coordinates, so coordinatewise selection need not minimize either reported
+mean norm, or both simultaneously.
 
 \begin{table}[t]
 \centering
 \caption{OCO-2 O2 band, scored on the $2000$ public test states, which are
-disjoint from the training pool; all model selection happened on a validation
-split of the pool. Every trained row is mean $\pm$ standard deviation over ten
-seeds at a matched $250$-epoch budget; the
+disjoint from the training pool; within-run selection used a validation
+split of the pool. Every fitted row is mean $\pm$ standard deviation over ten
+seeds; neural networks use a matched $250$-epoch budget. The
 kernel-flow row is the emulator of \citet{susiluoto2025radiative}, scored
 from its own stored predictions on fixed test points, and is identical at
 every seed. ``Features'' means the penultimate
 activations of the trained network; the kernel head is the same exact
 Mat\'ern solve as everywhere else in this paper, and the two raw-input rows
-are fit by that same routine under the same budget as the feature heads:
+are fit by that same kernel-tuning routine and budget as the feature heads:
 the same scale grid $\{0.5,1,2,4\}$ times the median distance, the same
 nugget grid $\{10^{-8},10^{-6},10^{-4}\}$, the same $6000$-sample tuning
-subsample, and the winner refit on all $18000$ training points. The
+subsample, and the winner refit on all $18000$ training points. This matches
+the kernel stage, not total computation: feature heads additionally require
+neural-network training. The
 raw-input rows' selected settings vary from seed to seed; every feature head,
 by contrast, selected the largest multiplier ($4$) and the smallest nugget
 ($10^{-8}$) of that grid at all thirty band-seeds, so the feature-head
-numbers sit at a boundary of the search, and a wider grid (multipliers to
-$32$, nuggets to $10^{-12}$) at ten seeds per band is being run; its results
-are not part of this version. The ARD radiance cell is left empty because validation,
-which scores the reduced metric, ties between two hyperparameter
-configurations whose radiance differs by a factor of $2.2$ ($0.150\%$ at seven
-seeds, $0.329\%$ at three); a mean over that mixture would describe the
-selection noise, not the model. Table generated from the campaign artifacts by
-\texttt{campaign/gen\_oco\_table.py}.}
+numbers describe this finite search grid and do not establish an optimum
+over wider grids. The ARD radiance summary includes a bimodal selection
+outcome: configurations selected on reduced validation error give
+$0.150\%$ radiance error at seven seeds and $0.329\%$ at three.
+Entries are aggregated from the original campaign records; the ARD
+radiance mean and standard deviation are included here explicitly.}
 \label{tab:oco2}
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{lcc}
 \toprule
 model & reduced & radiance \\
 \midrule
 Mat\'ern kernel, raw input, one length scale & $40.57\pm0.10$\% & $0.233\pm0.003$\% \\
-Mat\'ern kernel, raw input, sensitivity-scaled (ARD) & $29.98\pm0.15$\% & --- \\
+Mat\'ern kernel, raw input, sensitivity-scaled (ARD) & $29.98\pm0.15$\% & $0.204\pm0.087$\% \\
 kernel-flow emulator \citep{susiluoto2025radiative} & 16.89\% & 0.0448\% \\
 residual MLP, flat metric & $4.43\pm0.05$\% & $0.195\pm0.014$\% \\
 residual MLP, weighted-coefficient loss & $49.32\pm0.40$\% & $0.0442\pm0.0044$\% \\
@@ -79,6 +104,7 @@ Mat\'ern head on the radiance network's features & $20.48\pm0.61$\% & $0.0379\pm
 per-coordinate combination & $\mathbf{4.12\pm0.05}$\% & $\mathbf{0.0294\pm0.0020}$\% \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \end{table}
 
 \begin{table}[t]
@@ -89,7 +115,7 @@ networks the same
 frozen last-layer features are read out three ways: by the network's own
 trained output layer, by a ridge regression refit on those features with
 the penalty chosen on validation, and by the exact Mat\'ern head. The rows
-come from a rerun of the campaign script with the ridge rows added
+come from the recorded follow-up run of the campaign script with the ridge rows added
 (\texttt{campaign/jpl\_seeded.py}; body generated by
 \texttt{campaign/gen\_oco\_ridge\_table.py}); the rerun's network and head
 rows reproduce Table~\ref{tab:oco2} within the seed spread.}
@@ -121,43 +147,50 @@ each coordinate from whichever model wins it.}
 \label{fig:oco2}
 \end{figure}
 
-Table~\ref{tab:oco2} carries four findings, and Figure~\ref{fig:oco2} shows
-the two central ones. First, the representation
-ladder: the same exact kernel machinery scores $40\%$ on the raw input,
-$30\%$ after rescaling each input coordinate by its measured sensitivity, and
-$4.1\%$ on the trained network's features, past the network's own head. The
-raw-input kernel was limited by its features, not by anything kernel-shaped,
-and the deep kernel head, an exact solve on learned features, is the
-strongest single model on the reduced metric. Its margin over the network it
-feeds on ($4.11\pm0.05\%$ against $4.43\pm0.05\%$) is small --- a third of a
-point --- but it is not a seed accident: the head wins at ten of ten seeds on
-this band and at ten of ten on each of the other two, paired within seed. We
-still lean on the ladder's order of magnitude rather than on that gap. The
-gain is the kernel's and not a refitting of the readout: a ridge regression
-refit on the same frozen features (Table~\ref{tab:oco2ridge}) is worse than
-the network's own trained output layer on the flat loss on every band at
-every seed, while the kernel head is better than both at every seed on
-every band, by $0.60\pm0.07$ points on O2 and about a quarter of a point on
-the other two; admitting the ridge readouts as candidates in the
-per-coordinate selection moves the combination by at most $0.002$ points on
-any band.
+Table~\ref{tab:oco2} and Figure~\ref{fig:oco2} show the principal comparisons.
+The tested kernel routine scores $40\%$ on raw input, $30\%$ after rescaling
+each input coordinate by its estimated sensitivity, and $4.1\%$ on the
+trained network's features. Under this routine, learned features are more
+useful than the raw coordinates or the tested input rescaling. The deep
+kernel head is the strongest single model tested on the O2 reduced metric.
+Its margin over the network it reads out is $4.11\pm0.05\%$ against
+$4.43\pm0.05\%$, and the head has lower error at all ten recorded seeds
+on each band.
+
+A linear ridge regression refitted on the same frozen features
+(Table~\ref{tab:oco2ridge}) is worse than the network's trained output layer
+on the flat-loss network at every band-seed. The Mat\'ern head is better
+than both at every band-seed, with a margin over ridge of
+$0.60\pm0.07$ percentage points on O2 and about a quarter of a point on
+the other bands. Thus this tested linear-refit control does not reproduce
+the Mat\'ern improvement; it does not rule out other readout objectives or
+optimization procedures. Adding the ridge readouts to coordinate selection
+changes the combination by at most $0.002$ percentage points on any band.
 
 Three statements of scope belong next to these numbers. The combination
-row is produced by the unweighted selector, which takes each reduced
+row is produced by the unweighted selector over the three networks and
+their three feature-kernel heads. It takes each reduced
 coordinate from the model with the smallest validation root-mean-square
 error on that coordinate; the campaign script also runs a selector
 weighted by the inverse squared norm of each validation state, the exact
 optimizer of the squared relative error that Proposition~S2.2 covers, and
 it chooses different winners at three seeds on O2 and four on WCO2 yet
-lands on the same reduced and radiance means to the printed precision on
-every band (both records are in the release). The uncertainty of the
+changes each band's mean reduced error by less than $0.001$ percentage
+points, with unchanged radiance means at the reported precision (both
+records are in the release). On O2 the unweighted combination has mean
+reduced error $4.11510\%$, slightly above the flat-feature head's
+$4.11080\%$, while improving radiance error from $0.07927\%$ to
+$0.02940\%$. It therefore does not dominate every individual model on both
+criteria. The uncertainty of the
 comparison against the emulator is paired: on the same $2000$ test states,
 a case-resampling bootstrap of the difference between the combination and
 the emulator excludes zero at ten of ten seeds on both metrics on O2 and
 SCO2, and at ten of ten on WCO2's reduced metric and nine of ten on its
 radiance metric, the exception being the seed that loses by $0.0015$ points;
 the seed standard deviations in Table~\ref{tab:oco2} describe retraining
-variability, not that comparison. And the claim is confined to what is
+variability, not that comparison. These are descriptive case-resampling
+intervals for the recorded predictors, with no adjustment for repeated
+benchmark analyses. The claim is confined to what is
 rescored: two criteria defined here on the released reduced representation
 (the coefficients, and the radiance reconstructed from the retained forty
 components), not the full-spectrum acceptance test of
@@ -172,48 +205,42 @@ the kernel-flows cross-validation loss of \citet{owhadi2019kernel} reaches the
 same $30\%$ on the raw state, and a low-rank Mahalanobis metric with a thousand
 more parameters does not improve on it; on the features, where the network has
 already conditioned the representation, a learned metric gives no gain over the
-isotropic kernel. The metric is a constant-factor lever, and the
-representation is the order-of-magnitude one.
+isotropic kernel. These observations concern the tested metrics, feature
+maps, and tuning budgets; they do not exclude stronger raw-input kernels.
 
 \subsection{What the metric buys, measured}
 \label{sec:aniso-measured}
-The heuristic split of Proposition~\ref{prop:aniso} --- a constant
-$\sigma_1^{\,s}$ always, a rate only under an approximate-rank gap
---- is scored directly by refitting both raw-input kernel rows at five
-nested training sizes, ten seeds per band, with the sensitivity map
-estimated causally at each size. The sweep, reported in full in the
-online supplement (Section~S7), finds the constant and not the rate:
-the measured exponent difference is small on all three bands and
-consistent with zero on one, so a reader should take from the
-proposition only the part the measurement supports, and the
-representational term of Proposition~\ref{prop:pullback} remains the
-order-of-magnitude lever.
-\subsection{Where the two-member rule can be trusted}
+The recorded sweep refits both raw-input kernel rows at five nested
+training sizes, ten seeds per band, estimating the sensitivity map from
+the available training rows at each size. At $n=18000$ the isotropic-to-adapted
+error ratios range from $1.1$ to $1.5$. The fitted log--log slopes differ
+little on O2 and more on strong CO$_2$; the numerical results are in
+Section~S7. These slopes summarize a finite range of training sizes and
+are not asymptotic rates. Proposition~\ref{prop:aniso} instead gives a
+conditional finite-design bound for rank truncation; this sweep does not
+verify its Lipschitz or native-space assumptions.
+\subsection{Retrospective transfer of the two-member rule}
 \label{sec:secmom-margin}
-Part~(i) of Proposition~\ref{prop:secmom} is the one result in this paper
-used as a decision rule rather than as a description: it says a weaker member
-helps exactly when $\varrho<e_1/e_2$, and we drop members on that test. A
-rule of that kind deserves to be scored the way it is used, so we decide it
-on the validation split and check it on the test block, for every pair of the
-eight members at every band-seed --- $\binom{8}{2}=28$ pairs at each of the
-thirty seeds, $840$ in all.
+Part~(i) of Proposition~\ref{prop:secmom} says that a weaker member helps
+the optimal two-member squared-relative-error mixture exactly when
+$\varrho<e_1/e_2$. We examine this criterion retrospectively using stored
+validation and test predictions for eight models: the two raw-input
+kernels, three networks, and three feature-kernel heads. There are
+$\binom{8}{2}=28$ pairs at each of thirty band-seeds, $840$ in all.
+This diagnostic is not a preregistered member-admission experiment.
 
-Two separate things are being tested by this, and separating them is the
-point. The first is whether the proposition is true. Evaluated with both
-sides computed on the same block, the criterion $\varrho<e_1/e_2$ agrees with
-whether the optimal convex mix actually beats the better member on all $840$
-pairs, without exception. That is the proposition's own content rather than
-evidence about the world --- it is an identity, and this is the numerical
-check that we implemented it correctly --- but $840$ instances is a strong
-form of that check, and it locates the difficulty elsewhere.
+Evaluating both sides on the same block, the criterion agrees with whether
+the optimal convex mix beats the better member on all $840$ pairs. This
+checks an algebraic identity against stored predictions; it is not
+independent statistical evidence for the proposition.
 
-The second is whether the rule survives being used, which requires
-$\varrho$ and $e_1/e_2$ to be estimated on data the decision does not see.
-Decided on validation and checked on test --- the test-side outcome being
+The separate transfer question uses $\varrho$ and $e_1/e_2$ estimated
+on validation, then compares that verdict with the test-block result.
+The test-side outcome is
 whether the optimal convex two-member mix beats the better of the two members
 \emph{on test}, whichever that is (the order of a pair flips between the
-splits in $40$ of the $840$) --- the rule is correct on $62.4\%$ of the $840$
-pairs. The average is the wrong summary: sorted by the margin
+splits in $40$ of the $840$). The rule is correct on $62.4\%$ of the $840$
+pairs. Stratified by the observed margin
 $|\varrho-e_1/e_2|$ that the rule must resolve, the outcome is
 $101$ of $257$ below $0.02$, $95$ of $215$ from $0.02$ to $0.05$, $81$ of
 $88$ from $0.05$ to $0.10$, $215$ of $248$ from $0.10$ to $0.25$, and $32$
@@ -224,11 +251,10 @@ test member --- the counts are $142$ of $257$, $107$ of $215$, $76$ of $88$,
 $125$ of $248$ and $31$ of $32$ ($57.3\%$ overall). Those are rates at which
 the rule's yes-or-no prediction about the shipped outcome is right; in
 absolute terms $356$ of the $840$ transferred mixtures beat the better test
-member, all of them among the $715$ pairs the rule admitted. The prediction that a
-helpful mix exists is as reliable as before, but the weight carried over from
-validation realizes the gain in only half of the mid-margin pairs, because a
-gain of a few thousandths of a point is smaller than the transfer error of
-the weight. Every quantity here is the root-mean-square relative error and
+member, all of them among the $715$ pairs with a positive admission verdict.
+A verdict about the existence of a helpful mixture is different from
+realizing that gain using a weight transferred from validation. Every
+quantity here is the root-mean-square relative error and
 the uncentered alignment the proposition is stated in
 (\texttt{oco\_ensemble\_recheck.json} in the release). These counts are not independent observations: the $28$ pairs of a
 band-seed share members, and the ten seeds of a band share one test block,
@@ -237,58 +263,30 @@ binomial samples. Nothing about
 the proposition degrades in the small-margin pairs; what degrades is the
 transfer of two estimates from one block to another.
 
-That transfer is measurable, and it is what sets the band.  The signed gap
-$D=\varrho-e_1/e_2$ moves between validation and test with standard deviation
-$0.099$ across the $840$ pairs, essentially unbiased (mean $0.0004$). This
-is an order of magnitude larger than the seed-to-seed scatter of $D$ within a
-fixed pair, which is $0.010$: replication across seeds is not what limits the
-rule, and a study that varied only the seed would have missed this. Because
-the pairs are binned by the margin the decision actually sees, it is
-part~(ii) of Proposition~\ref{prop:margin} that speaks to the scoreboard,
-and it is a joint statement: if the estimation error were sub-Gaussian
-with variance proxy $\sigma^2$, the probability that a decision is both
-wrong and taken at an observed margin of at least $0.25$ would be at most
-$\exp(-0.25^2/2\sigma^2)$, about four percent of all decisions, and the
-corresponding bound at a margin of $0.10$ would exceed one half and say
-nothing. An empirical standard deviation over $840$ dependent pairs does
-not establish that proxy, so the four percent is an illustration of the
-proposition's scale and not a bound we claim. The proposition
-does not bound the error rate within a margin bin, which would require a
-lower bound on how often such margins occur, so the percentages above are an
-empirical calibration of the rule rather than a guarantee it carries. What
-they show is a trend consistent with the proposition: the rule's accuracy
-rises with the observed margin, and at the top of the range, where the joint
-bound leaves room for only a few percent of confident errors among the $840$
-decisions, the scoreboard records none in $32$.
+The signed gap $D=\varrho-e_1/e_2$ changes between validation and test
+with empirical standard deviation $0.099$ across these dependent pairs and
+mean change $0.0004$. Its within-pair seed scatter is $0.010$. The
+validation-to-test design shift is therefore material in this diagnostic.
+Proposition~\ref{prop:margin} would require a proved estimation-error
+condition to supply a probabilistic bound. The empirical standard deviation
+does not establish such a condition. Neither the observed margin bins nor
+the $32$ correct existence decisions above margin $0.25$ establish a
+validated admission threshold for future models or data.
 
-The practical reading, from the scoreboard rather than from the bound: on
-these problems the rule is dependable when the two quantities are separated
-by more than about $0.25$, suggestive between $0.05$ and $0.25$, and
-uninformative below that. This applies to our own use of it. The
-kernel-versus-network decision earlier in this section, taken in the
-proposition's own quantities --- root-mean-square relative errors and the
-uncentered alignment $S_{12}/(e_1e_2)$ on the validation split, ten-seed
-means, from the release's \texttt{oco\_ensemble\_recheck.json} --- has
-$\varrho=0.156$ against $e_n/e_k=0.157$: a margin of $0.001$, the sign of
-the difference changing from seed to seed (the kernel is admitted at five
-seeds of ten). That is inside the band the scoreboard says not to trust, and
-we therefore do not rest the exclusion of the raw kernel on that comparison.
-What does settle it is the same proposition read for magnitude rather than
-for sign: with these two errors and this alignment, part~(i) puts the
-two-member optimum at $8.4079\%$ against the network's own $8.4081\%$ on the
-validation split (the validation carve is harder than the public test block,
-where the same network's mean relative error is $4.43\%$), at a weight of
-$0.9999$ on the network; on the test block the optimal convex mix and the
-network differ by $0.0004$ points. Whichever side of the threshold the pair
-truly falls, the entire quantity in dispute is a few ten-thousandths of a
-point, so the member is dropped on the size of the available gain and not on
-a threshold the data cannot resolve. Reporting the margin
-alongside the verdict is what makes that distinction visible, and we
-recommend it wherever this rule is used.
+For the raw-input kernel against the flat network, the ten-seed validation
+means are $\varrho=0.156$ and $e_n/e_k=0.157$. The difference changes sign
+across seeds, giving an admission verdict at five of ten. The corresponding
+optimal validation RMS relative errors are $8.4079\%$ for the mixture and
+$8.4081\%$ for the network, at a network weight of $0.9999$. The test-block
+hindsight optimum differs from the network by $0.0004$ percentage points.
+These recorded gains are too small to support a practical improvement from
+this pair. They explain its limited contribution retrospectively, without
+claiming a reliable validation-only exclusion threshold or an improvement
+in the reported mean-relative-error objective.
 
 \subsection{Data scaling}
 \label{sec:oco-scaling-summary}
-The error on this problem is limited by data and yields to more of
-it; the measured scaling, and the surviving large-$n$ observation on
-ClimSim after the withdrawal of the leaked small-$n$ points, are in
-the online supplement (Section~S7).
+The recorded OCO-2 error decreases over the training sizes examined. The
+finite-range learning curves, and the retained large-$n$ ClimSim records
+after withdrawal of leaked small-$n$ points, are reported in Section~S7.
+They do not identify an asymptotic rate or exclude other error sources.

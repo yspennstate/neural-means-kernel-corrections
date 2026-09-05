@@ -1,0 +1,15 @@
+# Build both documents before the selected Overleaf root.  This also works
+# when Overleaf renames the selected root's output to output.pdf/output.aux.
+# No shell-escape setting is required: latexmk, rather than TeX, runs the helper.
+# Select pdfLaTeX and either main.tex or supplement.tex in Overleaf's menu.
+
+$pdf_mode = 1;
+$max_repeat = 8;
+@default_files = ('main.tex');
+
+# A clean-only request must not trigger a new build.
+unless (grep { /^-(?:c|C|CA|h|help|v|version)$/ } @ARGV) {
+    my $status = system('perl', 'build_external_documents.pl');
+    die "The paired-document build failed; inspect nmkc-build/*.build.log.\n"
+        if $status != 0;
+}

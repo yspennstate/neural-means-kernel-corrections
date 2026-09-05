@@ -1,0 +1,21 @@
+{
+  "pdf": "overleaf/supplement.pdf",
+  "sha256": "98060dff464b541452b0c017afaec6f023e2990b7c90625fa748c124b9ff288d",
+  "pages": 46,
+  "all_pages_rendered_dpi": 36,
+  "contact_sheets_viewed": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "readable_pages_viewed_dpi": 120,
+  "readable_pages": [
+    4,
+    32,
+    35
+  ],
+  "result": "PASS",
+  "findings": "No clipping, overlapping elements, missing formulas, unreadable glyph artifacts, or unreasonable page breaks observed. Split proof continuations are conventional; theorem and proof displays remain inside margins.",
+  "image_directory": "tmp/pdfs/supplement_visual"
+}

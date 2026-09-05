@@ -3,6 +3,8 @@
 \usepackage{amsmath,amssymb,amsthm,mathtools}
 \usepackage[preprint]{jmlr2e}
 \usepackage{booktabs}
+\usepackage{xurl}
+\usepackage{adjustbox}
 \usepackage[dvipsnames,table]{xcolor}
 \usepackage{microtype}
 \usepackage{subcaption}
@@ -31,28 +33,8 @@
 
 \maketitle
 
-\begin{abstract}%
-Where should an exact kernel regression sit relative to a trained neural
-network? We study the question on two operator-learning problems,
-replicating every stage at ten seeds. On the
-structural-mechanics benchmark of de Hoop et al., where kernels and neural
-operators are competitive, the kernel corrects the residual of a stacked
-neural mean: the pipeline reaches $\errSix\pm\errSixSd$\% test error, within
-the test block's sampling error of the best published method (PARA-Net,
-\pubBestHi\%) and below every other, and $\errBestLow\pm\errBestLowSd$\% in
-the 1250-sample protocol against a published \pubBestLo\%. On the OCO-2
-radiative-transfer problem of Lamminp\"a\"a et al., where the same kernel on
-the raw state trails the network tenfold, it belongs on the network's
-learned features, and a per-coordinate combination improves on the
-published Gaussian-process emulator on two rescoring criteria defined on
-the released reduced representation, on all three bands. The replicates show why ensembles saturate on
-structural mechanics: every architecture's residuals align above
-\corrNetLoSix{} at every seed, sixty predictors reach a root-mean-square
-relative error of $\saSixtyOracleRms$\% at hindsight-optimal convex weights,
-and a floor theorem for pools of seeds and architectures places that number
-within a tenth of a point ($\saBound$\%), for the pool trained, from three
-measured alignments. The supporting bounds are stated with their
-conditions and checked numerically.
+\begin{abstract}
+A kernel fitted after a neural network can correct its residuals or replace its output layer. We study these two roles on public operator-learning problems, repeating the main experiments at ten seeds. On structural mechanics, a residual kernel correction of a six-member stack reaches $\errSix\pm\errSixSd\%$ mean relative test error, close to the published PARA-Net score of $\pubBestHi\%$, without establishing statistical equivalence. In the 1250-label regime, the pipeline reaches $\errBestLow\pm\errBestLowSd\%$ against a published $\pubBestLo\%$. On OCO-2, the same Mat\'ern regression scores approximately $40\%$ reduced error on raw inputs and $4.1\%$ on frozen neural features in the O2 band. A per-coordinate combination improves on the source emulator's stored predictions in the ten-seed means under both retained-representation rescoring criteria on all three bands; full-spectrum and retrieval accuracy are outside this comparison. Residual alignment explains the limited gains from averaging the trained mechanics predictors: a block lower bound of $\saBound\%$ lies close to the hindsight-optimal global convex RMS error of $\saSixtyOracleRms\%$ for the sixty-member pool. Supporting ensemble identities and conditional native-space bounds clarify the scope of these measurements. Calibrated uncertainty sets are also compared; a constant-width set is narrower on average than one scaled by the kernel power function. The public test blocks were examined across several campaigns, so the results constitute retrospective benchmark evidence.
 \end{abstract}
 
 \begin{keywords}
@@ -114,20 +96,16 @@ experiments and diagnostics, the downloading, assembly and preparation of the
 benchmark and OCO-2 datasets, and the adaptation of the publicly released
 emulator code of Lamminp\"a\"a et al.\ --- originally split between Julia and a
 ReFRACtor-driving Python layer --- into a single Python pipeline for sampling
-states and reducing radiances. The main contributions are the author's: the
-residual coupling of neural means and exact kernel corrections, the
+states and reducing radiances. The study's contributions are the empirical comparisons, the
 two-regime framing that organizes the paper, and the supporting theory, all
-developed with AI assistance in calculation, drafting, and exposition. Each
-theorem and its proof was checked independently and more than once --- by
-Fable~5, by ChatGPT Pro (OpenAI, 2026), and by the author --- and the reported
-numbers were verified against the released per-run data. The author reviewed
+developed with AI assistance in calculation, drafting, and exposition. AI-assisted review was used for mathematical and editorial checks, including separate reviews of the mathematical arguments and exposition. Selected reported numbers were checked against the released per-run summaries; the training campaigns were not rerun for this revision. The author reviewed
 all of the above and takes full responsibility for the content of the
 manuscript.
 
 \section*{Data and code availability}
 The code, the per-run summaries behind every reported number, and the exact
 configuration of each experiment are available at
-\url{https://github.com/yspennstate/neural-means-kernel-corrections}. The
+\url{https://github.com/yspennstate/neural-means-kernel-corrections}. The base source for this revision was commit \texttt{50c05ff1cce3} (full identifier in the source-package README), whose main PDF matches the original supplied manuscript. The repository's \texttt{paper/} directory contains the current article, supplement, and editable sources. Full checkpoints and large prediction/residual arrays are not bundled in the public repository; the source record reports them as retained and available on request. The
 structural-mechanics, Helmholtz, Navier--Stokes and advection data are
 distributed through the data record accompanying \citet{dehoop2022cost}
 (\texttt{data.caltech.edu}, record \texttt{20091}); the OCO-2 emulation data
@@ -136,20 +114,15 @@ and the kernel-flow emulator's predictions through the OSF project
 \texttt{subsampled\_low\_res}.
 
 \section*{Supplementary material}
-An online supplement accompanies this paper, referenced throughout as
-Supplement~S1--S10. It is available at
-\url{https://github.com/yspennstate/neural-means-kernel-corrections/blob/main/paper/supplement.pdf},
-in the repository that holds the code, and is built from the same sources as
-this manuscript. It contains the finite-sample bounds for every fitted stage and
+The online supplement, referenced throughout as Supplement~S1--S10, is part of this manuscript. The repository hosts the current \href{https://github.com/yspennstate/neural-means-kernel-corrections/blob/main/paper/main.pdf}{article} and \href{https://github.com/yspennstate/neural-means-kernel-corrections/blob/main/paper/supplement.pdf}{supplement}, together with their editable sources in \texttt{paper/}. Consult the supplement for the full proofs; each formal result identifies its specific proof location.
+It contains the finite-sample bounds for every fitted stage and
 all proofs, the margin and per-coordinate selection results, the
 effective-dimension identity, the ablation, error-localization, spectra,
 uncertainty-quantification and cost detail on structural mechanics, the
 uncontrolled survey of the remaining suite problems and the mirror-symmetry
 check, the OCO-2 input-metric study with the data-scaling and ClimSim
 results, the implementation and compute record, and the numerical
-verification of every stated result. The main text is self-contained: the
-supplement carries derivations and measurements, not claims that are made
-only there.
+verification of every stated result. Both documents and their editable sources are also included in the accompanying Overleaf package.
 
 \bibliography{refs}
 

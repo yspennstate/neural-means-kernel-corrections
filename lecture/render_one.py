@@ -59,7 +59,7 @@ def main():
     parser.add_argument("--segment", type=int, default=0)
     parser.add_argument("--reuse-tex-from", type=Path,
                         help="Reuse exact TeX/SVG asset pairs from a completed owned build")
-    parser.add_argument("--quality", choices=("preview", "samples", "draft", "final"), required=True)
+    parser.add_argument("--quality", choices=("preview", "samples", "notation", "draft", "final"), required=True)
     args = parser.parse_args()
     if os.name != "nt":
         raise RuntimeError("This launcher implements the Windows environment only")
@@ -152,9 +152,10 @@ def main():
         cache_record.write_text(json.dumps(provenance, indent=2), encoding="utf-8")
         inputs[cache_record.name] = hashlib.sha256(cache_record.read_bytes()).hexdigest()
     (build/"input_manifest.json").write_text(json.dumps(inputs, indent=2), encoding="utf-8")
-    quality = ["-s", "-r", "1920,1080"] if args.quality in ("preview", "samples") else (
+    quality = ["-s", "-r", "1920,1080"] if args.quality in ("preview", "samples", "notation") else (
         ["-r", "1280,720", "--fps", "30"] if args.quality == "draft" else ["-r", "1920,1080", "--fps", "30"])
-    target = ("BoardPreview" if args.quality == "preview" else
+    target = ("NotationProbe" if args.quality == "notation" else
+              "BoardPreview" if args.quality == "preview" else
               "BoardSamples" if args.quality == "samples" else "LectureChapter")
     command = [str(PYTHON), "-B", "-m", "manim", "render", *quality, "--disable_caching",
                "--media_dir", str(build / "media"), "-o", tag, "scenes.py", target]

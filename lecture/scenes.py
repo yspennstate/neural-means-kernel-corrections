@@ -37,6 +37,8 @@ if (HERE / "tex_seed").exists():
 config.text_dir = str(HERE / "media" / "texts" / f"p{os.getpid()}")
 TEMPLATE = TexTemplate(tex_compiler="pdflatex", output_format=".pdf")
 TEMPLATE.add_to_preamble(r"\usepackage[T1]{fontenc}\usepackage{amsmath,amssymb,bm,newtxtext,newtxmath}")
+from tex_rules import install as install_tex_rules
+install_tex_rules(HERE)
 
 
 def escape(text):
@@ -975,6 +977,17 @@ class BoardPreview(BoardMixin, Scene):
         self.add(self.segment_text(board["segments"][index]))
 
 
+class NotationProbe(Scene):
+    def construct(self):
+        self.add(prose('LaTeX notation: native-resolution conversion check', size=36).to_edge(UP))
+        expressions = [r'\frac{a+b}{c+d}\qquad\tfrac{1}{2}\qquad\dfrac{x^2}{1+x}',
+                       r'\sqrt{x^2+y^2}\qquad\overline{AB}\qquad\underline{a+b}',
+                       r'\binom{n}{k}\qquad\begin{pmatrix}a&b\\c&d\end{pmatrix}',
+                       r'\begin{array}{c|c}a&b\\\hline c&d\end{array}\qquad x_i^{2}+x_{i+1}^{-1}']
+        for expression, y in zip(expressions, (2.0,.6,-.9,-2.4)):
+            self.add(formula(expression,size=42,max_width=12).move_to([0,y,0]))
+
+
 class BoardSamples(BoardMixin, Scene):
     def construct(self):
         out = HERE / "media" / "board_samples" / CHAPTER
@@ -1027,11 +1040,6 @@ class LectureChapter(BoardMixin, Scene):
                 else:
                     self.play(ReplacementTransform(text, current), run_time=.45)
                 text = current
-                self.renderer.update_frame(self)
-                sample_path = samples / (key + ".png")
-                self.renderer.camera.get_image().save(sample_path)
-                sample_rows.append({"key": key, "path": sample_path.name,
-                                    "sha256": hashlib.sha256(sample_path.read_bytes()).hexdigest()})
                 # All voice duration remains available; animation never truncates speech.
                 self.add_sound(str(HERE / "audio" / CHAPTER / (key + ".wav")))
                 voice_start = self.renderer.time
@@ -1044,6 +1052,12 @@ class LectureChapter(BoardMixin, Scene):
                 self.wait(max(0, remaining))
                 hold = .7 if CHAPTER == "01" else 1.6
                 self.wait(hold)
+                self.renderer.update_frame(self)
+                sample_path = samples / (key + ".png")
+                self.renderer.camera.get_image().save(sample_path)
+                sample_rows.append({"key": key, "path": sample_path.name,
+                                    "sha256": hashlib.sha256(sample_path.read_bytes()).hexdigest(),
+                                    "state": "after_segment_animation_and_hold"})
                 timing.append({"key": key, "start": start, "voice_start": voice_start,
                                "voice_seconds": duration, "end": self.renderer.time,
                                "board": board["key"]})

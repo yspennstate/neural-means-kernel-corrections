@@ -29,10 +29,14 @@ snapshot. Current scripts must not describe unfinished sensitivity runs as
 completed results.
 
 The first narrated draft is 503.289 seconds at 1280 by 720, with 18 recorded
-segments. Its author integrity check verified all 50 frozen inputs, the audio
-identities and timeline coverage. This is not a claim of auditory review or
-approval of the completed two-hour lecture. Eleven topic chapters are drafted;
-the closing synthesis awaits the full sensitivity results.
+segments. It is superseded: the author found that PDF-derived fraction bars
+and other LaTeX rules were lost during SVG import. Earlier source, audio,
+timeline and layout checks did not detect this notation defect. Corrected
+renders require native-resolution inspection of every board, explicitly
+checking fractions, radicals, accents, brackets, and sub/superscripts against
+the authored mathematics. No auditory or full audiovisual approval has been
+given. Eleven topic chapters are drafted; the closing synthesis awaits the
+full sensitivity results.
 
 `preflight_equations.py` compiles all authored equations in one LaTeX document
 and measures their boxes before expensive video rendering. Final glyph bounds
@@ -47,3 +51,10 @@ installed writer's hash. Scientific assets retain their input hashes, case
 selection rules, units and reconstruction checks. OCO-2 spectra are benchmark
 simulator reconstructions; mechanics images and calibration deciles come from
 saved predictions, including unfavorable cases.
+
+`tex_rules.py` converts the PDF converter's stroke-only straight rules into
+filled vector outlines before Manim imports them. It handles both fresh
+conversions and copied cache hits. Original frozen cache assets are preserved;
+conversion receipts identify the before/after SVG hashes. Unsupported stroke
+geometry stops the render. `NotationProbe` supplies a native-resolution check
+of the affected notation classes before any corrected chapter is released.

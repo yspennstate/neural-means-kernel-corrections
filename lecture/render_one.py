@@ -16,6 +16,7 @@ import time
 import xml.etree.ElementTree as ET
 
 import psutil
+from compute_admission import health
 
 HERE = Path(__file__).resolve().parent
 PYTHON = Path(r"C:\Users\owner\lecture\venv\Scripts\python.exe")
@@ -85,10 +86,23 @@ def main():
     handle = kernel.GetCurrentProcess()
     kernel.SetPriorityClass(handle, 0x4000)  # BELOW_NORMAL_PRIORITY_CLASS
     guard = json.loads(GUARD.read_text(encoding="utf-8-sig"))
-    if not 0 <= time.time()-GUARD.stat().st_mtime <= 15:
-        raise RuntimeError("CPU guard is stale")
     if guard.get("background_cpus") != BACKGROUND or guard.get("reserved_cpus") != RESERVED:
         raise RuntimeError("CPU partition changed")
+    admissions = []
+    deadline = time.monotonic()+600
+    while True:
+        admission = health(); admissions.append(admission)
+        if admission['allow']:
+            break
+        print('Waiting for a fresh healthy sample: '+str(admission['hold_reasons']),flush=True)
+        if time.monotonic()>=deadline:
+            raise RuntimeError('No healthy admission within ten minutes: '+str(admissions))
+        time.sleep(20)
+    # The guard's partition remains a constraint, even when its heartbeat is
+    # stale. Current pressure is measured directly; child priority and affinity
+    # are checked before its first instruction below. This is not guard repair.
+    admission['partition_record_age_seconds'] = time.time()-GUARD.stat().st_mtime
+    admission['prior_admission_attempts'] = admissions[:-1]
     mask = (1 << 4) | (1 << 5)
     # The observer stays on the background pool; the render child gets two
     # explicitly designated background CPUs. Lowest available is NOT safe:
@@ -97,7 +111,7 @@ def main():
         raise ctypes.WinError()
     env = dict(os.environ, NMKC_CHAPTER=args.chapter, NMKC_SEGMENT=str(args.segment), NMKC_ENCODER=args.encoder,
                OMP_NUM_THREADS="1", OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1",
-               NUMEXPR_NUM_THREADS="1", PYTHONIOENCODING="utf-8")
+               NUMEXPR_NUM_THREADS="1", PYTHONIOENCODING="utf-8", PYTHONFAULTHANDLER="1", PYTHONUNBUFFERED="1")
     if args.board:
         env["NMKC_BOARD"] = args.board
     log_dir = HERE / "logs"; log_dir.mkdir(exist_ok=True)
@@ -175,6 +189,7 @@ def main():
         cache_record.write_text(json.dumps(provenance, indent=2), encoding="utf-8")
         inputs[cache_record.name] = hashlib.sha256(cache_record.read_bytes()).hexdigest()
     (build/"input_manifest.json").write_text(json.dumps(inputs, indent=2), encoding="utf-8")
+    (build/"admission.json").write_text(json.dumps(admission, indent=2), encoding="utf-8")
     quality = ["-s", "-r", "1920,1080"] if args.quality in ("preview", "samples", "notation") else (
         ["-r", "1280,720", "--fps", "30"] if args.quality == "draft" else ["-r", "1920,1080", "--fps", "30"])
     target = ("NotationProbe" if args.quality == "notation" else
@@ -225,6 +240,10 @@ def main():
                "visibility_scope": "New nonzero-area console windows systemwide during this render; unrelated windows are not attributed to this task.",
                "visibility_conclusion": "INCONCLUSIVE" if observed or max(intervals, default=0) > .05 else "No new visible console observed at intervals <=50ms"}
     (log_dir / (tag + "_render_receipt.json")).write_text(json.dumps(receipt, indent=2), encoding="utf-8")
+    # Retain each attempt, including native crashes, when the convenience log
+    # for a chapter is replaced by a later explicit retry.
+    (build / 'render.log').write_bytes((log_dir / (tag + '_render.log')).read_bytes())
+    (build / 'render_receipt.json').write_text(json.dumps(receipt, indent=2), encoding='utf-8')
     print(json.dumps(receipt, indent=2), flush=True)
     raise SystemExit(proc.returncode)
 

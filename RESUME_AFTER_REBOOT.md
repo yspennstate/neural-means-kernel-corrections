@@ -1,5 +1,156 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
+## Current checkpoint: 22:58 Jerusalem
+
+The alternate supplement-root build has now finished successfully: receipt
+`final-build-06-supp/completion_receipt.json`, return 0, selected supplement,
+same source manifest e20ecd74e50a6f22f41d33d27c028bbc3b331d648a25b0faea58abe547419a0a.
+Its output is the 51-page supplement, with the 34-page article also present;
+no undefined references or overfull boxes in the three final logs.
+
+Referee 06's FIRST attempt is FAILED, not active: the controller incorrectly
+classified a 17.8-second health measurement as actual distress and terminated
+the CLI before it emitted any review work (only thread.started/turn.started).
+The existing old status.json incorrectly still says REVIEWING. Preserve that
+evidence; do not count a vote. The distinction is now fixed: stale/slow sampling
+holds new admission, but alone does not classify an existing light reader as
+distressed. A 20-second delayed-sample regression control checks this behavior.
+A fresh 06–10 controller was launched at 22:56:18, PID 46976, with run-tag
+`retry2`, logs `panel06_10_retry2_*`. Referee 01 continues under the first batch.
+
+The 22:47 sample render was also refused for slow sampling; it never drew a
+board. A bounded admission loop now resamples for at most ten minutes while
+retaining the same headroom limits. New sample attempt: 22:56:17, PID 23324,
+logs `chapter12_samples_retry3_*`. Check the live process and receipt before
+calling it active or complete. No corrected full chapter movie exists yet.
+
+All audio also passed a separate RIFF/PCM byte-count path, without reusing the
+recording contract's WAV parser. `lecture/narration_manifest.json` binds all
+252 segments to chapter source hashes, audio/receipt hashes and exact frames.
+Total remains 6718.992 seconds (839874/125). Planned transitions and holds add
+500.4 seconds; 7219.392 seconds is a prediction, not assembled film duration.
+
+### Earlier recovery detail, 22:48
+
+Continue through September 6 at 12:55 Jerusalem. No reviewer vote has returned.
+The immutable packet and source identifiers in the older checkpoint below
+remain current. Referee 01 is actually running in the 01–05 controller
+(parent 51324, worker 57100); its exact-thread wake completed. The second
+controller, 06–10, PID 52004 / birth 1788636698.640, is still verifying the
+packet before launching a worker. Do not duplicate either batch. Both use
+fresh Codex CLI contexts, with at most one worker active per controller.
+
+Disk pressure has recovered: Windows Search is stopped/disabled, and C: has
+about 214 GiB free. No files were deleted by this NMKC agent. The governor is
+fresh again, warning about remote reachability and sometimes process pressure.
+`lecture/compute_admission.py` supplements the shared state with current CPU,
+PSAPI physical/commit memory, visible-window hung status and disk readings.
+It preserves a shared distress/throttle veto and all previous numerical
+limits. Failure controls passed; the first PSAPI commit limit also agreed
+exactly with Windows performance counters. This is not a global guard repair.
+The render child still gets verified CPUs 4–5 and BelowNormal before resume.
+
+Chapter 12 narration is COMPLETE: 18 segments, 404.616 seconds. All twelve
+chapters total 252 segments / 6718.992 spoken seconds by text-bound WAV checks.
+The first chapter 12 sample attempt crashed with 0xc0000005 before producing
+a board. Windows Application event 1000 identifies OLEAUT32.dll, PID 52424;
+there was no Display 4101 in the queried interval. Cause is NOT yet established.
+Its immutable failed build is `lecture/builds/20260905T223334_chapter12_samples`.
+The first retry was correctly refused when live sampling took 18.9 seconds.
+A second explicit retry started 22:47:09, PID 43572, with Python faulthandler
+and unbuffered logs. Inspect `.local-verification/chapter12_samples_retry2_*`
+and `lecture/logs/chapter12_samples_render.log` before any further attempt.
+
+The interrupted alternate build 06 was ended by birth-verified exact process
+claims. The first cleanup stopped four processes then hit a mesh assert timeout;
+the second ended the remaining 46280/51312/51776 and wrote the actual
+`final-build-06-supp/author_stop_receipt.json`. No other TeX tree was touched.
+Recovery through `resume_pair.py final-build-06-supp supplement` started
+22:47:10, PID 43576. It rechecks the source hashes and current health, then
+uses a fresh 1800-second wait. Inspect `build06_resume_*` and the build receipt.
+Do not resume the dead original parent 28116 or launch a duplicate.
+
+Latest verified remote commit before the next checkpoint push remains
+`095affece5eeb70288225a1d4a6c09d1dab389a1`. The live goal API still carries an
+old BLOCKED value; actual work is continuing, and the overnight task is not done.
+
+## Historical checkpoint: 22:12 Jerusalem, after the reboot
+
+The overnight order continues through 6 September at 12:55 Jerusalem. Do not
+end the task merely because one front is complete. The goal API currently
+reports an old BLOCKED state; actual work has continued under the owner's
+resumed instruction. That API state is not a completed task.
+
+Latest verified push: `095affece5eeb70288225a1d4a6c09d1dab389a1` on the
+completion branch. All Caltech work described below is complete. Do not
+restart its queue. The current paired build is
+`.local-verification/final-build-05`, with successful `completion_receipt.json`:
+34 article pages and 51 supplement pages. All changed pages were inspected
+at 144 dpi after pixel comparison with the prior build. Main page 14 and
+supplement pages 44–51 changed. The final logs have no unresolved references
+or overfull boxes; ordinary class/package warnings remain.
+
+The independent-review target is now COMPLETE and IMMUTABLE under the Brain
+audit home at `evidence/nmkc_publication_20260905/final_panel/`:
+`packet_97554dd4b58e_final-build-05_v2`. It contains 1,103 payload files,
+84,123,589 bytes, and MANIFEST.json SHA-256
+`42f48db7bd004625ee4d5d2a42dd7cc70332a12effc9019c6d5f2195358572fe`.
+Its scientific source commit is `97554dd4b58ece92675efd1f6faebdbce75d5e80`;
+subsequent commits concern the excluded lecture. Previous votes are excluded.
+Do not rerun the packet assembler on this completed directory. PDF extracted
+text contains some mathematical control characters; use the PDF and TeX for
+formula checking. Windows universal-newline conversion caused a false text
+mismatch during assembly; exact byte comparison resolved it.
+
+NO independent referee vote has returned. A hidden BelowNormal controller for
+reviewers 01–05 was launched at 22:10:49, PID 51324, birth 1788635449.006.
+It verifies the packet, then waits for fresh healthy compute readings before
+starting a Codex CLI worker. Logs: `.local-verification/panel01_05_*`; runtime
+under the final-panel evidence leaf. Inspect it before any restart. Its health
+admission wait is bounded to one hour. Reviewers 06–10 are not launched.
+Do not count an admission controller as a reviewer or a completed vote.
+
+Current pressure is DISK-ONLY DISTRESS: free C: space fell from about 86 GiB at
+21:03 to 23–28 GiB around 22:00. The entire frozen paper packet is only 84 MB.
+Guard and restore owners are notified; no other agent's processes or files
+were changed. `.local-verification/disk_pause_receipt.json` records the exact
+birth-verified processes suspended. Roots 28116 (alternate supplement-root
+build) and 33252 (chapter-12 narration) were independently confirmed STOPPED
+around 22:00. Resume their recorded live identities after pressure recovery;
+if a process died, use its existing validated outputs and bounded launcher.
+The alternate build lives in `final-build-06-supp`; its wait timeout includes
+wall time, so inspect for timeout/remaining children before resuming it.
+The interactive CPU guard heartbeat was stale at 21:09 despite supervisor
+restart attempts. Do not call stale telemetry healthy.
+
+Lecture chapter 12 now has six boards and 18 segments, using checked centering
+and grid figures. Its 18 equations compile after one line was reflowed.
+Twelve closing narration segments were recorded before suspension; validate
+actual WAV receipts before counting them. Use C:/Python314/pythonw.exe for
+narrate.py: edge_tts is installed in its user site, not the Manim venv. The
+existing eleven chapters retain 234 recordings. Full corrected lecture
+rendering and audiovisual review remain unfinished.
+
+GPU convention changed by the owner's native 19:38:49 prompt: concurrent useful
+GPU work is allowed, with disjoint workload claims. This supersedes the old
+card-wide exclusive convention lower in this historical note. NMKC uses
+`topic:gpu-workload/MATH-ROSS20/codex-nmkc-resume-20260905`. Preserve CPU masks,
+BelowNormal, fresh pressure checks and VRAM limits. The 600-frame real-writer
+probe is complete: 110.4747 s NVENC versus 165.8925 s CPU (ratio 1.50163),
+with independent ffprobe counts of 600 frames / 20 s / 1920×1080 / 30 fps in
+both. Both decoded first frames were inspected. Direct NVML sampling had no
+errors; device-wide encoder peak was 95%, which includes concurrent work.
+See `lecture/encoder_comparison_20260905.json` and the private `probe_pair_2120`
+receipts. This is not a full-chapter speed or audiovisual approval claim.
+
+An additional plain-math beta-binomial summation reproduced the supplement's
+central 95% reference intervals: 16725–17449 of 19000 (88.0263–91.8368%) and
+17772–18297 of 19000 (93.5368–96.3000%), for m=1000 and ranks 901/951. This is
+an author recheck, not an independent panel vote or a validation of sampling
+independence in the historical benchmark.
+
+## Historical pre-reboot checkpoint
+
 Saved at 16:32 Jerusalem for the owner's planned reboot. This is an interruption
 checkpoint, not a completed-paper or publication verdict.
 

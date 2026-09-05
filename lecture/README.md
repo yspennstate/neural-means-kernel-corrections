@@ -40,8 +40,12 @@ timeline and layout checks did not detect this notation defect. Corrected
 renders require native-resolution inspection of every board, explicitly
 checking fractions, radicals, accents, brackets, and sub/superscripts against
 the authored mathematics. No auditory or full audiovisual approval has been
-given. Eleven topic chapters are drafted; the closing synthesis awaits the
-full sensitivity results.
+given. All twelve chapters are drafted. The closing chapter uses the completed
+sensitivity campaign, with three checked figures and 18 equation segments.
+All 252 narration segments are recorded and checked against the current text.
+They contain 6,718.992 seconds of speech. Corrected chapter renders are still
+in production. `verify_narration.py` also counts the stored PCM frames
+independently; neither duration check certifies pronunciation or listening quality.
 
 `preflight_equations.py` compiles all authored equations in one LaTeX document
 and measures their boxes before expensive video rendering. Final glyph bounds
@@ -54,8 +58,14 @@ policy supports bounded `libx264` and `h264_nvenc` output with an eight-frame
 queue; the shared Manim installation is not edited. Hardware encoding requires
 the GPU lease and a fresh responsiveness check. The NVENC adapter is pinned to
 the inspected writer bytes and records its in-memory transformation. Its
-construction has been checked; actual hardware output and visual comparison
-remain pending. Use `--encoder h264_nvenc` for an admitted movie render.
+construction and actual hardware output have been checked. On one fixed
+1920×1080 board, delivering and encoding 600 frames took 110.5 seconds with
+NVENC and 165.9 seconds with libx264. Both outputs independently decoded to
+600 frames and 20 seconds, and their decoded first frames retained the
+mathematics and data labels. This comparison excludes scene construction;
+it does not establish full-chapter throughput. Settings and limitations are
+in `encoder_comparison_20260905.json`. Use `--encoder h264_nvenc` for an
+admitted movie render, under the current disjoint GPU workload claim.
 Scientific assets retain their input hashes, case
 selection rules, units and reconstruction checks. OCO-2 spectra are benchmark
 simulator reconstructions; mechanics images and calibration deciles come from

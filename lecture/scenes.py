@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 
 import numpy as np
 from manim import *
@@ -24,6 +25,15 @@ config.max_inflight_encoders = 1
 from encoder_policy import record as record_encoder_policy
 ENCODER_POLICY = record_encoder_policy(HERE)
 config.tex_dir = str(HERE / "media" / "Tex" / f"p{os.getpid()}")
+if (HERE / "tex_seed").exists():
+    frozen_inputs = json.loads((HERE / "input_manifest.json").read_text(encoding="utf-8"))
+    Path(config.tex_dir).mkdir(parents=True, exist_ok=True)
+    for asset in (HERE / "tex_seed").iterdir():
+        key = asset.relative_to(HERE).as_posix()
+        if (asset.suffix not in (".tex", ".svg")
+                or hashlib.sha256(asset.read_bytes()).hexdigest() != frozen_inputs.get(key)):
+            raise ValueError("Frozen TeX vector asset identity failed")
+        shutil.copyfile(asset, Path(config.tex_dir) / asset.name)
 config.text_dir = str(HERE / "media" / "texts" / f"p{os.getpid()}")
 TEMPLATE = TexTemplate(tex_compiler="pdflatex", output_format=".pdf")
 TEMPLATE.add_to_preamble(r"\usepackage[T1]{fontenc}\usepackage{amsmath,amssymb,bm,newtxtext,newtxmath}")
@@ -71,7 +81,7 @@ def mechanics():
 
 def field_image(grid, cmap, low, high, center, size=2.15):
     palette_path = HERE / "assets/colormaps.json"
-    palette = np.asarray(json.loads(palette_path.read_text())[cmap], dtype=np.uint8)
+    palette = np.asarray(json.loads(palette_path.read_text(encoding="utf-8"))[cmap], dtype=np.uint8)
     norm = np.clip((grid.T-low) / max(high-low, 1e-30), 0, 1)
     rgba = palette[np.rint(norm*255).astype(int)]
     # Image row zero is at the top; stored x2=0 must be at the bottom.

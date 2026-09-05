@@ -57,6 +57,8 @@ def main():
     parser.add_argument("--chapter", required=True)
     parser.add_argument("--board")
     parser.add_argument("--segment", type=int, default=0)
+    parser.add_argument("--reuse-tex-from", type=Path,
+                        help="Reuse exact TeX/SVG asset pairs from a completed owned build")
     parser.add_argument("--quality", choices=("preview", "samples", "draft", "final"), required=True)
     args = parser.parse_args()
     if os.name != "nt":
@@ -108,6 +110,47 @@ def main():
         if hashlib.sha256(source.read_bytes()).hexdigest() != digest:
             raise RuntimeError(f"Source changed while freezing: {relative}")
         inputs[relative.as_posix()] = digest
+    if args.reuse_tex_from:
+        old = args.reuse_tex_from.resolve()
+        if old.parent != (HERE / "builds").resolve() or not (old / "input_manifest.json").is_file():
+            raise ValueError("TeX reuse requires an owned build in this lecture directory")
+        # A complete sample manifest proves the render reached its final board;
+        # a running or failed build is never used as a cache donor.
+        manifests = list((old / "media/board_samples").glob("*/manifest.json"))
+        if len(manifests) != 1:
+            raise ValueError("TeX donor has no unique completed board manifest")
+        old_manifest = json.loads(manifests[0].read_text(encoding="utf-8"))
+        if not old_manifest.get("rows"):
+            raise ValueError("TeX donor has no completed boards")
+        for row in old_manifest["rows"]:
+            frame = manifests[0].parent / row["path"]
+            if hashlib.sha256(frame.read_bytes()).hexdigest() != row["sha256"]:
+                raise ValueError("TeX donor board identity has changed")
+        for tex in sorted((old / "media/Tex").glob("p*/*.tex")):
+            svg = tex.with_suffix(".svg")
+            if not svg.is_file():
+                continue
+            # Manim keys its TeX source, including the full template, by this
+            # digest. Color and placement are applied after loading the SVG.
+            source_text = tex.read_text(encoding="utf-8")
+            if hashlib.sha256(source_text.encode("utf-8")).hexdigest()[:16] != tex.stem:
+                raise ValueError("TeX donor source no longer matches its content key")
+            for asset in (tex, svg):
+                relative = Path("tex_seed") / asset.name
+                destination = build / relative
+                destination.parent.mkdir(exist_ok=True)
+                payload = asset.read_bytes()
+                if destination.exists() and destination.read_bytes() != payload:
+                    raise ValueError("Conflicting TeX cache keys")
+                destination.write_bytes(payload)
+                inputs[relative.as_posix()] = hashlib.sha256(payload).hexdigest()
+        provenance = dict(source_build=old.name,
+                          source_input_manifest_sha256=hashlib.sha256((old/"input_manifest.json").read_bytes()).hexdigest(),
+                          pairs=sum(name.endswith(".svg") for name in inputs if name.startswith("tex_seed/")),
+                          scope="Exact previously typeset vector assets; new or changed TeX compiles normally")
+        cache_record = build / "tex_cache_provenance.json"
+        cache_record.write_text(json.dumps(provenance, indent=2), encoding="utf-8")
+        inputs[cache_record.name] = hashlib.sha256(cache_record.read_bytes()).hexdigest()
     (build/"input_manifest.json").write_text(json.dumps(inputs, indent=2), encoding="utf-8")
     quality = ["-s", "-r", "1920,1080"] if args.quality in ("preview", "samples") else (
         ["-r", "1280,720", "--fps", "30"] if args.quality == "draft" else ["-r", "1920,1080", "--fps", "30"])

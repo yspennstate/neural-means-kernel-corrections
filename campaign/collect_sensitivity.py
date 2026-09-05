@@ -36,7 +36,17 @@ def main():
     paths = [root / name for name in (
         "status.json", "followup_status.json", "campaign_manifest.json",
         "followup_plan.json", "capacity.jsonl",
-        "numerical_controls/driver_controls.json")]
+        "numerical_controls/driver_controls.json",
+        "check_completed_grids.py", "grid_prediction_check.json",
+        "benchmark_metric_check.py", "benchmark_metric_check.json")]
+    grid_check = json.loads((root / "grid_prediction_check.json").read_text(encoding="utf-8"))
+    metric_check = json.loads((root / "benchmark_metric_check.json").read_text(encoding="utf-8"))
+    if (grid_check["seeds"] != [0, 1, 2] or len(grid_check["rows"]) != 18
+            or grid_check["driver_sha256"] != sha(root / "check_completed_grids.py")
+            or metric_check["seeds"] != list(range(10))
+            or len(metric_check["member_rows"]) != 60 or metric_check["pool"] is None
+            or metric_check["driver_sha256"] != sha(root / "benchmark_metric_check.py")):
+        raise ValueError("Independent prediction verification is incomplete or stale")
     for name in ("scheduling_amendment.json", "followup_capacity.jsonl"):
         if (root / name).exists():
             paths.append(root / name)

@@ -61,6 +61,68 @@ GRID_MODELS = {"kernel_flow", "kernel_raw", "kernel_ard", "combined", "combined_
     prefix + "_" + mode for prefix in ("mean", "ridge", "dkr") for mode in ("flat", "wnum", "radx")}
 
 
+def validate_independent_checks(root):
+    """Require a complete raw-prediction check before accepting producer scores."""
+    check = read(root / "grid_prediction_check.json")
+    if (check["kind"] != "completed_grid_prediction_recomputation"
+            or check["seeds"] != [0, 1, 2] or check["bands"] != ["o2", "wco2", "sco2"]
+            or check["driver_sha256"] != sha(root / "check_completed_grids.py")):
+        raise ValueError("Independent grid check has the wrong design or source")
+    expected = {(b, s, g) for b in check["bands"] for s in range(3) for g in GRIDS}
+    seen = set()
+    for row in check["rows"]:
+        key = row["band"], row["seed"], row["scenario"]
+        if key not in expected or key in seen:
+            raise ValueError("Independent check contains a duplicate or unexpected grid")
+        seen.add(key)
+        if (row["models"] != 14 or row["cases"] != 2000 or set(row["metrics"]) != GRID_MODELS
+                or not 0 <= row["max_per_case_difference"] <= 2e-9):
+            raise ValueError("Independent prediction coverage or agreement failed")
+        folder = root / "oco_grid/seeds" / f"oco_{row['band']}_s{row['seed']}"
+        report = read(folder / (row["scenario"] + ".json"))
+        for model, values in row["metrics"].items():
+            if set(values) != {"reduced", "radiance"}:
+                raise ValueError("Independent check omits a metric")
+            for metric, value in values.items():
+                if not math.isclose(value, report["metrics"][model][metric], rel_tol=2e-9, abs_tol=2e-12):
+                    raise ValueError("Independent score differs from collected result")
+        if row["selectors"] != report["winners"]:
+            raise ValueError("Independent coordinate selector differs")
+    if seen != expected:
+        raise ValueError("Independent check omits one or more completed grids")
+    # The remote check identifies prediction files too; retain those hashes while
+    # cross-checking every identified small result file included in this package.
+    for remote, identity in check["input_sha256"].items():
+        marker = "/nmkc_paper1_20260905/"
+        if marker in remote:
+            local = root / remote.split(marker, 1)[1]
+            if local.is_file() and sha(local) != identity:
+                raise ValueError("Raw check and collected inputs have different identities")
+    metric = read(root / "benchmark_metric_check.json")
+    if (metric["driver_sha256"] != sha(root / "benchmark_metric_check.py")
+            or metric["seeds"] != list(range(10)) or len(metric["rows"]) != 10
+            or len(metric["member_rows"]) != 60 or metric["pool"] is None):
+        raise ValueError("Historical metric/pool check is incomplete or stale")
+    if [r["seed"] for r in metric["rows"]] != list(range(10)):
+        raise ValueError("Historical metric seeds are reordered or duplicated")
+    for row in metric["rows"]:
+        if (not all(math.isfinite(row[k]) and row[k] >= 0 for k in ("plain", "trapezoidal"))
+                or not 0 <= row["independent_quadrature_max_error"] <= 1e-12
+                or not math.isclose(row["trapezoidal"] - row["plain"], row["trapezoidal_minus_plain"], abs_tol=1e-14)):
+            raise ValueError("Historical metric independent quadrature failed")
+    pool = metric["pool"]
+    names = [a + f"_s{s}" for a in ("mlp", "mlpMSE", "mlpR", "fno", "unet", "krr") for s in range(10)]
+    matrix = np.asarray(pool["S_ev"])
+    if (pool["names"] != names or (pool["n_fit"], pool["n_eval"]) != (1000, 19000)
+            or matrix.shape != (60, 60) or not np.isfinite(matrix).all()
+            or not np.allclose(matrix, matrix.T, rtol=0, atol=1e-14)
+            or np.linalg.eigvalsh(matrix)[0] < -1e-12):
+        raise ValueError("Independent pool matrix identity or positivity failed")
+    return dict(grid_check_sha256=sha(root / "grid_prediction_check.json"),
+                metric_check_sha256=sha(root / "benchmark_metric_check.json"),
+                scenarios=len(seen), models_per_scenario=14, cases_per_scenario=2000)
+
+
 def validate_grid_report(report, errors, scenario):
     if report["scenario"] != scenario or set(report["metrics"]) != GRID_MODELS:
         raise ValueError("Unexpected grid scenario or predictor set")
@@ -109,6 +171,7 @@ def aggregate(root):
     for name in ("status.json", "followup_status.json"):
         if read(root / name)["status"] != "COMPLETE":
             raise ValueError("Unfinished controller: " + name)
+    independent = validate_independent_checks(root)
     centering = []; mismatch = []; folds = []
     for seed in range(10):
         sr = root / "seeds" / f"sm_s{seed}"
@@ -266,6 +329,7 @@ def aggregate(root):
     return dict(schema=1, units="fractions; multiply by 100 for percent or percentage-point differences",
                 seed_uncertainty="sample standard deviation on shared benchmark cases, not a population confidence interval",
                 evidence_manifest_sha256=sha(root / "evidence_manifest.json"),
+                independent_prediction_checks=independent,
                 centering=dict(rows=centering, aggregate={key: stats(r[key] for r in centering)
                     for key in ("historical", "pooled", "local", "local_minus_pooled")},
                     uq={arm: {key: {metric: stats(r["uq"][arm][key][metric] for r in centering)

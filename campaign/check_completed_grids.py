@@ -83,6 +83,10 @@ def main():
                         raise ValueError('Prediction targets differ from source and seeded split')
                     preds={k.removeprefix('test_'):z[k].copy() for k in z.files if k.startswith('test_')}
                     val={k.removeprefix('val_'):z[k].copy() for k in z.files if k.startswith('val_')}
+                expected={'kernel_flow','kernel_raw','kernel_ard','combined','combined_plus_ridge'} | {
+                    prefix+'_'+mode for prefix in ('mean','ridge','dkr') for mode in ('flat','wnum','radx')}
+                if set(preds)!=expected or set(report['metrics'])!=expected:
+                    raise ValueError('Prediction check requires all fourteen named predictors')
                 if not np.array_equal(preds['kernel_flow'],kf):raise ValueError('Source emulator prediction differs')
                 names=[prefix+'_'+mode for mode in ('flat','wnum','radx') for prefix in ('mean','dkr')]
                 selectors={}
@@ -99,6 +103,8 @@ def main():
                     selectors[label]=winners
                 scores={};max_discrepancy=0.
                 with np.load(folder/(scenario+'_errors.npz')) as err:
+                    if set(err.files)!={m+'_'+q for m in expected for q in ('reduced','radiance')}:
+                        raise ValueError('Unexpected error-array model or metric set')
                     for model,pred in preds.items():
                         if pred.shape!=target.shape or not np.isfinite(pred).all():raise ValueError('Invalid prediction')
                         delta=pred-target;scaled=delta*zscale

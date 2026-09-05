@@ -1,15 +1,30 @@
 """Out-of-fold KRR predictions on the training pool (for the refiner net).
 
-4-fold CV with the tuned kernel (smult 1.0 x median, lam 1e-6): each fold's
-training predictions come from a model fitted on the other folds. Val/test
-predictions come from the full 19000-sample fit (already saved by krr_full).
-Saves runs/krr_oof_train.npy aligned with the canonical train order.
+4-fold CV with the tuned kernel (smult 1.0 x median, lam 1e-6). The default
+uses each fold's fitting-target mean. --target-centering pooled reproduces
+the historical field construction, including its held-out-target reuse.
+Val/test predictions come from the full 19000-sample fit (train_krr.py).
+Saves krr_oof_train.npy in the canonical train order and a metadata sidecar.
 """
+import argparse, hashlib, json, os
+from pathlib import Path
 import numpy as np, sys, time
 from scipy.linalg import cho_factor, cho_solve
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent))
 from common import load_arrays, canonical_split, rel_l2, RUNS
 
+
+def target_mean(y, fit, mode):
+    if mode == "fold-local":
+        return y[fit].mean(0)
+    if mode == "pooled":
+        return y.mean(0)
+    raise ValueError("Unknown target-centering mode")
+
+
+p = argparse.ArgumentParser()
+p.add_argument("--target-centering", choices=("fold-local", "pooled"), default="fold-local")
+args = p.parse_args()
 SMULT, LAM = 1.0, 1e-6
 loads, stress = load_arrays()
 tr, va, te = canonical_split(n_val=1000, seed=0)
@@ -40,7 +55,7 @@ for f, hold in enumerate(folds):
     K = m52(sqdist(Xn[fit], Xn[fit]), s)
     K.flat[::len(fit)+1] += LAM * len(fit)
     c = cho_factor(K, lower=True, check_finite=False, overwrite_a=True)
-    muY = Y[fit].mean(0)   # fold-local: the held-out fold's targets do not enter the centering (second review, 2026-09-03; the released fields used the pooled mean)
+    muY = target_mean(Y, fit, args.target_centering)
     a1 = cho_solve(c, Y[fit] - muY, check_finite=False)
     del K, c
     Kq = m52(sqdist(Xn[hold], Xn[fit]), s)
@@ -50,4 +65,11 @@ for f, hold in enumerate(folds):
 
 print("total OOF rel-L2:", rel_l2(oof, Y), flush=True)
 np.save(RUNS / "krr_oof_train.npy", oof.astype(np.float32))
+metadata = dict(target_centering=args.target_centering, ntrain=n, folds=4,
+                smult=SMULT, lam=LAM, scale=float(s),
+                split_seed=int(os.environ.get("NMKC_SPLIT_SEED", "0")),
+                driver_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                field_sha256=hashlib.sha256((RUNS / "krr_oof_train.npy").read_bytes()).hexdigest(),
+                training_index_sha256=hashlib.sha256(tr.tobytes()).hexdigest())
+(RUNS / "krr_oof_train.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
 print("saved", flush=True)

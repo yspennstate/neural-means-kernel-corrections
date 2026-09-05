@@ -38,7 +38,8 @@ print("device:", dev, flush=True)
 
 loads, stress = load_arrays()
 tr, va, te = canonical_split(n_val=1000, seed=0)
-# field channel: OOF predictions on train (no leakage), full-model on val/test
+# Training-field centering is recorded by krr_oof.py; old pooled fields reuse
+# held-out targets in their mean. Validation/test use the full-data KRR fit.
 K_tr = np.load(RUNS / args.field_tr)
 K_va = np.load(RUNS / args.field_va)
 K_te = np.load(RUNS / args.field_te)

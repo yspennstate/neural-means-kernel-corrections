@@ -36,6 +36,14 @@ recorded. Neither grid is claimed to locate a global hyperparameter optimum.
 
 ## Execution
 
+For a reconstruction from the public dataset, `krr_oof.py` defaults to
+`--target-centering fold-local`. Pass `--target-centering pooled` explicitly
+to reproduce the historical target-mean convention. Both modes write the
+choice and the field hash to `krr_oof_train.json`. The paired campaign below
+uses retained historical runs so that unchanged members need not be trained
+again; its executed sources are frozen separately from later documentation
+and reproducibility improvements in this repository.
+
 Use Linux and the campaign's locked Python environment. Prepare a new root
 with this repository's Python sources in `code/`. The historical root has
 `data/structmech/` and `seeds/sm_s0/runs/` through `sm_s9/runs/`.

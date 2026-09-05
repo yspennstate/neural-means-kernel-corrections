@@ -16,15 +16,10 @@ my @documents = ('main', 'supplement');
 make_path($build);
 make_path("$build/$_") for @documents;
 
-# MiKTeX may invoke BibTeX from the output directory without adding the
-# source directory to BIBINPUTS. Keep exact current bibliography copies
-# beside each child's auxiliary file, independently of shell path syntax.
-for my $bib (glob('*.bib')) {
-    for my $document (@documents) {
-        copy($bib, "$build/$document/$bib")
-            or die "Cannot stage $bib for $document: $!\n";
-    }
-}
+# Build the two distinct child jobs beside their sources. On Windows,
+# MiKTeX plus an MSYS Perl can otherwise give one outdir bibliography two
+# identities (absolute and relative), repeatedly invalidating the same file.
+# The job prefixes keep these files separate from either selected editor root.
 
 sub contents {
     my ($path) = @_;
@@ -52,7 +47,7 @@ sub compile_document {
         # -norc prevents this child from loading the outer latexmkrc again.
         exec('latexmk', '-norc', '-pdf', '-interaction=nonstopmode',
              '-halt-on-error', '-file-line-error',
-             "-jobname=$job", "-outdir=$build/$document", "$document.tex");
+             "-jobname=$job", "$document.tex");
         die "Cannot execute latexmk: $!\n";
     }
     waitpid($pid, 0);
@@ -63,8 +58,15 @@ sub compile_document {
         print STDERR join("\n", @lines[$start .. $#lines]), "\n";
         die "Cannot compile $document.tex; full details: $log\n";
     }
-    my $aux = "$build/$document/$job.aux";
+    my $aux = "$job.aux";
     die "The $document build did not produce $aux\n" unless -s $aux;
+    # Retain the per-document logs and outputs in the documented evidence
+    # directory; latexmk's working dependency files remain beside the sources.
+    for my $suffix ('aux', 'log', 'pdf', 'bbl', 'blg', 'fls', 'fdb_latexmk') {
+        my $artifact = "$job.$suffix";
+        copy($artifact, "$build/$document/$artifact")
+            or die "Cannot archive $artifact: $!\n" if -f $artifact;
+    }
     # xr searches beside the .tex sources, independently of the editor job name.
     # Each document owns its bibliography.  Older xr versions also import
     # \bibcite, causing duplicate citation labels.  Export only \newlabel

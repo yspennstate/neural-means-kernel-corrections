@@ -1,6 +1,42 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
-## Current checkpoint: September 6, 02:10 Jerusalem
+## Current checkpoint: September 6, 02:39 Jerusalem
+
+Four original-packet reviews have returned YES: 01, 02, 06, 07. Root read
+reviewer 07's full report and verified all 13 snapshot hashes; report SHA
+666408d73922ab621e985e6cc19f19972d3f97e16673a2791c366eb298dadb5c.
+Its three minor comments duplicate the working-source corrections already
+recorded below. Reviewer 03 remains active under native PID 40756; controller
+43484 has advanced to reviewer 08, native PID 38356. Keep the packet unchanged.
+All formal Brain registration and corrected-packet reassessments remain pending.
+
+Chapter 04 completed in 1047.906 seconds: 21,685 frames, exact duration 4337/6
+seconds, 673.536 spoken seconds. All 752 frozen inputs and 24 narration
+waveforms pass. Movie SHA
+af511ac4d6857b0596f062e182702b9372263a30ee2b57619d07396b64fc10c0.
+Its 24 decoded end frames still need native inspection. Chapter 05 is rendering
+in 20260906T022927_chapter05_final, launcher 19632 / Manim 7480, logs
+.local-verification/chapter05_0229_*. It uses the completed chapter-04 TeX cache.
+
+All 24 chapter-03 frames were inspected. The rho_2 and zero-member labels cross
+an axis; source positions are corrected. The metrics slide now explicitly
+says the difference of the metrics' squares equals the error variance; its
+formula and narration were already correct. The receipt is
+lecture/out/20260906T014748_chapter03_final_author_check/visual_review_0233.json.
+Chapters 02, 03 and 12 require replacement renders and repeated frame checks.
+
+The exact assembly contract has four passing bounded tests covering missing
+or duplicate chapters, sample-exact joins, and refusal to truncate nonzero
+audio. assemble_lecture.py now implements the twelve-chapter selection,
+receipt/hash validation, original-PCM assembly, native stream-copy join,
+single AAC encode, chapter markers and transcript. Syntax and metadata-escaping
+checks pass; it has not yet assembled the film or passed a native integration
+probe. Whole-film waveform, transition and auditory checks remain outstanding.
+Root mesh pulse at 02:27:51 renewed claims through 03:12:51.
+Last verified push before this checkpoint: c79b39cfc2decfdcf72c18dfe46a4f3c522cd1bd.
+Continue through the owner's 12:55 deadline.
+
+## Historical checkpoint: September 6, 02:10 Jerusalem
 
 Three original-packet votes are now in: 01 YES, 02 YES, 06 YES; no blocking
 findings. Reviewer 03 is active under controller 33120/native 40756; reviewer

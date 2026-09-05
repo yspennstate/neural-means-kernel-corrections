@@ -209,7 +209,7 @@
           "say": "Let X be the per-sample relative error, a nonnegative scalar. The paper's headline tables report its mean. The second-moment matrix determines the square root of its mean square, or RMS. These two quantities are often close, but they are not identical. Squaring first puts more weight on difficult cases. A proof about the quadratic form therefore belongs to RMS error, unless we have additional information about the error distribution."
         },
         {
-          "line": "Their difference is exactly the error variance",
+          "line": "The difference of their squares is the error variance",
           "math": "\\mathcal E_2^2-\\mathcal E_1^2=\\operatorname{Var}(X)",
           "say": "Use the defining identity for variance: mean square minus squared mean. That gives an exact relation between the two metrics. The mean is no larger than the RMS, with equality only when the error is constant almost surely. An upper bound on RMS also bounds the mean. A lower bound on RMS does not transfer downward: the mean can be much smaller when a few large errors account for much of the second moment."
         },

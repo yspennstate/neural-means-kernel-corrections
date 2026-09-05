@@ -770,7 +770,7 @@ def build_visual(spec):
         error = DashedLine(origin, optimum, color=RED, stroke_width=3)
         dot = Dot(ax.c2p(*first), color=RED, radius=.075)
         labels = VGroup(formula(r"\rho_1", 28, BLUE).next_to(v1.get_end(), DOWN, buff=.18),
-                        formula(r"\rho_2", 28, GOLD).next_to(v2.get_end(), UP, buff=.17),
+                        formula(r"\rho_2", 28, GOLD).next_to(v2.get_end(), UP, buff=.17).shift(.32*LEFT),
                         formula(rf"t^\star={result['weight']:.3f}", 28, GREEN).move_to([4.8, -.4, 0]),
                         formula(rf"\min\|\rho_w\|^2={result['squared_error']:.3f}", 28, RED).move_to([2.6, -2.5, 0]))
         group = VGroup(ax, segment, v1, v2, error, dot, labels)
@@ -785,7 +785,7 @@ def build_visual(spec):
             tangent_segment = Line(ax.c2p(*first), tangent_end, color=GREEN, stroke_width=3)
             zero_segment = Line(origin, tangent_end, color=GREEN, stroke_width=3)
             zero_error = formula(r"\min\|\rho_w\|^2=0", 28, RED).move_to(labels[3])
-            zero_member = formula(r"\rho_1=0", 28, BLUE).next_to(origin, DOWN, buff=.2)
+            zero_member = formula(r"\rho_1=0", 28, BLUE).next_to(origin, DOWN, buff=.2).shift(.55*RIGHT)
             return group, [lambda: Indicate(v2, color=GOLD),
                 lambda: AnimationGroup(Transform(v2, tangent_vector), Transform(segment, tangent_segment),
                     labels[1].animate.next_to(tangent_end, UP, buff=.17)),

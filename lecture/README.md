@@ -25,6 +25,14 @@ be broken into lines instead of being shrunk to fit. Preflight and rendering
 import the same LaTeX preamble from `tex_style.py`. A preamble change creates
 new TeX cache keys; frozen earlier font assets are retained as evidence.
 
+`assemble_lecture.py` accepts an explicit twelve-chapter manifest. Every row
+pins its frozen build and its media, waveform and visual-review receipts;
+all 252 segments must be present. The video is joined by stream copy, and
+original mono PCM is joined on exact video-frame boundaries before one AAC
+encode. It also writes chapter markers and a narration transcript. The
+boundary contract tests pass; native integration and full-film verification
+are still pending. Input checks are not a completed-movie approval.
+
 Record narration before rendering. Each audio receipt binds the current text,
 voice, settings and actual WAV hash. Changed text or settings invalidate the
 recording. Visuals are timed from those recordings. Final equations have no

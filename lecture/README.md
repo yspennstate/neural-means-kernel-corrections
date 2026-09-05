@@ -49,10 +49,14 @@ and page placement still need visual inspection. `verify_render.py` verifies
 the frozen inputs and narration against the actual media and extracts a frame
 from every spoken segment for that inspection.
 
-Every long render reads an immutable build snapshot. New renders use a
-process-local CPU encoder policy with one encoder thread and an eight-frame
-queue; the shared Manim installation is not edited. The policy records the
-installed writer's hash. Scientific assets retain their input hashes, case
+Every long render reads an immutable build snapshot. The process-local encoder
+policy supports bounded `libx264` and `h264_nvenc` output with an eight-frame
+queue; the shared Manim installation is not edited. Hardware encoding requires
+the GPU lease and a fresh responsiveness check. The NVENC adapter is pinned to
+the inspected writer bytes and records its in-memory transformation. Its
+construction has been checked; actual hardware output and visual comparison
+remain pending. Use `--encoder h264_nvenc` for an admitted movie render.
+Scientific assets retain their input hashes, case
 selection rules, units and reconstruction checks. OCO-2 spectra are benchmark
 simulator reconstructions; mechanics images and calibration deciles come from
 saved predictions, including unfavorable cases.

@@ -57,10 +57,18 @@ def main():
     parser.add_argument("--chapter", required=True)
     parser.add_argument("--board")
     parser.add_argument("--segment", type=int, default=0)
+    parser.add_argument("--encoder", choices=("libx264", "h264_nvenc"), default="libx264")
     parser.add_argument("--reuse-tex-from", type=Path,
                         help="Reuse exact TeX/SVG asset pairs from a completed owned build")
     parser.add_argument("--quality", choices=("preview", "samples", "notation", "draft", "final"), required=True)
     args = parser.parse_args()
+    if args.encoder == 'h264_nvenc':
+        if args.quality not in ('draft', 'final'):
+            raise ValueError('Still frames have no video encoding stage')
+        mesh = Path(r'C:\Users\owner\ai-memories-and-functionality\12_cognitive_architecture\agent_mesh\agent_mesh.py')
+        subprocess.run([r'C:\Python314\python.exe', '-B', str(mesh), 'assert', '--agent',
+                        'codex-nmkc-resume-20260905', '--resource', 'topic:gpu/MATH-ROSS20'],
+                       check=True, creationflags=0x08000000)
     if os.name != "nt":
         raise RuntimeError("This launcher implements the Windows environment only")
     kernel = ctypes.windll.kernel32
@@ -82,7 +90,7 @@ def main():
     # a full inherited mask includes the owner's protected terminal CPUs.
     if not kernel.SetProcessAffinityMask(handle, ctypes.c_size_t(sum(1 << c for c in BACKGROUND))):
         raise ctypes.WinError()
-    env = dict(os.environ, NMKC_CHAPTER=args.chapter, NMKC_SEGMENT=str(args.segment),
+    env = dict(os.environ, NMKC_CHAPTER=args.chapter, NMKC_SEGMENT=str(args.segment), NMKC_ENCODER=args.encoder,
                OMP_NUM_THREADS="1", OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1",
                NUMEXPR_NUM_THREADS="1", PYTHONIOENCODING="utf-8")
     if args.board:
@@ -192,7 +200,7 @@ def main():
     finally:
         stop.set(); watcher.join()
     intervals = samples[1:]
-    receipt = {"command": command, "returncode": proc.returncode, "affinity_mask": mask,
+    receipt = {"command": command, "encoder": args.encoder, "returncode": proc.returncode, "affinity_mask": mask,
                "build_directory": str(build), "input_manifest_sha256": hashlib.sha256(
                    (build/"input_manifest.json").read_bytes()).hexdigest(),
                "elapsed_seconds": time.perf_counter()-start, "visibility_samples": len(samples),

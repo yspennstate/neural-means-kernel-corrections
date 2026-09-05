@@ -75,8 +75,15 @@ Explicit constant-frame-rate output and FFmpeg concatenation retain exact
 frame counts and decode timestamps. A complete narrated-board check produced
 2,190 frames and exactly 73 seconds, including all three recordings and all
 15 animations; its three decoded end frames were inspected at full resolution.
-This checks the actual writer, concatenation and audio assembly together.
-It does not certify a full chapter or listening quality. `--cpus 14,15` selects
+Subsequent waveform comparison caught a 21 ms delay and a 3 dB level change
+in Manim's intermediate AAC conversion. The native writer now encodes the
+original mono WAV directly into MP4. The repaired scene passes whole-recording
+alignment checks with zero sample offset; the repaired closing chapter also
+passes all 18 recordings and measures 13,246 frames / 441.533333 seconds.
+`verify_audio_alignment.py` checks every source waveform against the muxed
+audio. These checks do not certify pronunciation or listening quality.
+Partial movies, logs and receipts are retained without Manim cache eviction.
+`--cpus 14,15` selects
 two allowed background CPUs; choose only within the owner's current partition
 and recheck pressure. The shared Manim environment and owner guard are unchanged.
 

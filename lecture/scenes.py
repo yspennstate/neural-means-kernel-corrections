@@ -22,6 +22,9 @@ BG, INK, DIM = "#111A23", "#F2EEE7", "#AEBBC9"
 GOLD, BLUE, GREEN, RED = "#E5B85C", "#70B7DF", "#94C9A9", "#EC8C86"
 config.background_color = BG
 config.max_inflight_encoders = 1
+# Each partial has a movie, command log and receipt. Preserve all three so
+# Manim's cache limit cannot silently remove the production evidence.
+config.max_files_cached = -1
 from encoder_policy import record as record_encoder_policy
 ENCODER_POLICY = record_encoder_policy(HERE)
 config.tex_dir = str(HERE / "media" / "Tex" / f"p{os.getpid()}")
@@ -140,7 +143,7 @@ def build_visual(spec):
         outside=Dot(centre+[1.85,1.25,0],color=RED,radius=.075)
         labels=VGroup(formula(r"\widehat G(u)",29,GOLD).next_to(prediction,DOWN,buff=.18),
                       formula(r"Qa(u)",29,GREEN).move_to(centre+[.85,-.4,0]),
-                      small_label("Covered",inside.get_center()+[-.3,.45,0],25,GREEN),
+                      small_label("Covered",inside.get_center()+[.2,-.35,0],25,GREEN),
                       small_label("Outside",outside.get_center()+[.1,.45,0],25,RED),
                       small_label("One ball for the entire output field",[2.6,-2.35,0],25))
         return VGroup(circle,prediction,radius,inside,outside,labels),[lambda:Indicate(prediction,color=GOLD),

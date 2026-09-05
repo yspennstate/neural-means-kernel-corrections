@@ -34,6 +34,7 @@ def main():
     ap.add_argument('--build',type=Path,required=True)
     ap.add_argument('--chapter',required=True)
     ap.add_argument('--cpu',type=int,default=14)
+    ap.add_argument('--video',type=Path,help='Explicit soundtrack repair of this frozen render')
     args=ap.parse_args()
     if os.name=='nt':
         process=psutil.Process()
@@ -56,9 +57,10 @@ def main():
         if digest(root/rel)!=expected:raise ValueError(f'Changed frozen input: {rel}')
     selected=timing.get('selected_board')
     pattern=f'*/{selected}.mp4' if selected else f'*/chapter{args.chapter}_*.mp4'
-    videos=list((root/'media/videos/scenes').glob(pattern))
+    videos=[x for x in (root/'media/videos/scenes').glob(pattern) if not x.name.endswith(('.silent.mp4','_temp.mp4'))]
     if len(videos)!=1:raise ValueError('Expected exactly one completed chapter video')
-    video=videos[0]
+    video=args.video.resolve() if args.video else videos[0]
+    video_hash=digest(video)
     probe=json.loads(run([shutil.which('ffprobe'),'-v','error','-count_frames','-show_format','-show_streams',
                           '-of','json',str(video)]).stdout)
     vs=[s for s in probe['streams'] if s['codec_type']=='video']
@@ -77,7 +79,8 @@ def main():
              for i,s in enumerate(b['segments'],1)]
     if [k for k,_ in entries]!=[r['key'] for r in timing['segments']]:
         raise ValueError('Missing, reordered or duplicated narration segment')
-    out=HERE/'out'/f'{root.name}_author_check'
+    suffix=f'_remux_{video_hash[:12]}' if args.video else ''
+    out=HERE/'out'/f'{root.name}_author_check{suffix}'
     out.mkdir(parents=True,exist_ok=False)
     rows=[]
     previous_end=0.
@@ -98,7 +101,7 @@ def main():
         raise ValueError('Muxed audio ends before the final spoken segment')
     result=dict(kind='author_media_integrity_check',chapter=args.chapter,build_directory=str(root),
                 selected_board=selected,frame_count=frame_count,exact_duration=str(exact_duration),
-                video_sha256=digest(video),input_manifest_sha256=digest(root/'input_manifest.json'),
+                video_path=str(video),video_sha256=video_hash,input_manifest_sha256=digest(root/'input_manifest.json'),
                 duration_seconds=duration,spoken_seconds=sum(r['voice_seconds'] for r in timing['segments']),
                 width=vs[0]['width'],height=vs[0]['height'],frozen_inputs_checked=len(inputs),
                 narration_segments_checked=len(entries),frames=rows,

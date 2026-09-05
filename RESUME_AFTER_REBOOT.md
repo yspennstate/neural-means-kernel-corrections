@@ -1,6 +1,52 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
-## Current checkpoint: September 6, 00:50 Jerusalem
+## Current checkpoint: September 6, 01:18 Jerusalem
+
+The overnight order continues through 12:55. Current independent votes are
+reviewer 01 YES and reviewer 06 YES, with no blocking findings. ROOT read both
+reports and independently verified every cited snapshot hash (10 for 01,
+8 for 06). Reviewer 06 recommends correcting the Table 4 KRR symmetrization
+caption, making centering explicit in seed_pipeline.py with safe resume
+provenance, and correcting the old embedded lemma label. Formal registration
+and human review remain PENDING. Do not change the frozen review packet.
+
+Reviewer 02 continues under controller 33120/native 41212. Reviewer 07 is
+active under controller 43484/native 55924, runtime 07_10_after06. Both last
+reported REVIEWING after recovering from pressure holds. They will advance
+through 05 and 10 respectively. Native 44992 for reviewer 06 was still alive
+at 01:12 after writing its final report; check cleanup before assuming gone.
+
+Full closing render 20260906T004953_chapter12_final completed with return 0
+in 401.604 seconds. Its original MP4 used Manim's faulty intermediate AAC:
+21.333 ms delay and approximately -3 dB level. The preserved original video
+was copied with its original mono WAV directly into a new MP4 at
+lecture/out/chapter12_audio_repair_0110/chapter12_final.mp4, SHA
+2f398bc7e45eac1c3fa0b9ad72f095103bca37d815c0359755b4e1315efa29b0.
+It has exactly 13,246 frames, 441.533333 seconds, 404.616 spoken seconds.
+All 315 frozen inputs and all 18 waveform alignments pass. All 18 decoded
+end-of-segment frames were inspected at native resolution. One small visual
+defect remains in this movie: Covered crosses the prediction-ball boundary.
+The current scene source moves it safely inward; rerender chapter 12 after
+this fix before final delivery. Auditory review has not been performed.
+
+Manim's default cache limit deleted 170 temporary partial artifacts from
+that completed build. The final media, source manifest, WAV, stills and timing
+survive. Current scenes.py disables that eviction to retain every subsequent
+partial movie, log and receipt. Do not claim the deleted diagnostics survive.
+
+Chapter 01 is now rendering in 20260906T011010_chapter01_final, launcher
+33356 (birth 1788646205.311545), logs .local-verification/chapter01_0110_*.
+It uses the new native audio combiner and no-cache-eviction setting, and
+actual Manim runs on allowed CPUs 14,15. It does not contain the later
+Covered-label position edit, which does not affect chapter 01. Verify this
+first complete use of the new combine_to_movie override before continuing.
+The other ten opening chapters still need production renders and all QA.
+
+Latest verified remote commit before this update:
+1288342b79feb833a12f6c0b38794c728fc9c70a on the completion branch.
+Mesh pulse 01:07:56 renewed root claims through 01:52:56 Jerusalem.
+
+## Historical checkpoint: September 6, 00:50 Jerusalem
 
 Continue through 12:55 Jerusalem. The paper and full two-hour lecture are not
 finished. One current independent vote has returned: reviewer 01, YES with

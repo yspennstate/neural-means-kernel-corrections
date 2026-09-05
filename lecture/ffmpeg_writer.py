@@ -18,6 +18,27 @@ FFMPEG_SHA256 = '2ce797a0f88d7f067180338fb227f7b1928ea727bd9a4d7a1d022f7c52af71a
 WRITER_SHA256 = '66ffdee7bc6d2b62e3b135c8d0a7e66dff607c5ea6994ad1e413cde683f6ba7f'
 
 
+def mux_narration(video, audio, output, seconds):
+    """Keep mono level and AAC priming metadata in the final MP4 container."""
+    video, audio, output = map(Path, (video, audio, output))
+    if output.exists():raise FileExistsError(output)
+    command=[str(FFMPEG),'-hide_banner','-loglevel','warning','-nostdin','-n',
+        '-threads','1','-i',str(video),'-i',str(audio),'-map','0:v:0','-map','1:a:0',
+        '-c:v','copy','-c:a','aac','-ar','24000','-ac','1','-b:a','128k',
+        '-af','apad','-t',f'{float(seconds):.9f}','-movflags','+faststart',str(output)]
+    result=subprocess.run(command,capture_output=True,text=True,
+        creationflags=subprocess.CREATE_NO_WINDOW|subprocess.BELOW_NORMAL_PRIORITY_CLASS,timeout=900)
+    receipt=dict(command=command,returncode=result.returncode,stderr=result.stderr,
+        adapter_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        source_video_sha256=hashlib.sha256(video.read_bytes()).hexdigest(),
+        source_audio_sha256=hashlib.sha256(audio.read_bytes()).hexdigest(),
+        requested_seconds=str(seconds),channels=1,sample_rate=24000,
+        purpose='Encode directly into MP4; retain priming metadata and mono level')
+    output.with_suffix('.audio_mux.json').write_text(json.dumps(receipt,indent=2),encoding='utf-8')
+    if result.returncode:raise RuntimeError(result.stderr)
+    return receipt
+
+
 class Partial:
     def __init__(self, path, width, height, fps, codec):
         self.path = Path(path)
@@ -178,6 +199,22 @@ def install(codec):
         if result.returncode:
             raise RuntimeError(result.stderr)
     cls.combine_files = combine
+
+    def combine_movie(self):
+        files=[p for p in self.partial_movie_files if p is not None]
+        if not files:raise RuntimeError('No lecture video fragments')
+        movie=Path(self.movie_file_path)
+        silent=movie.with_suffix('.silent.mp4') if self.includes_sound else movie
+        self.combine_files(files,silent)
+        if self.includes_sound:
+            # Avoid the generic ADTS intermediate: it changes mono/24 kHz to
+            # stereo/48 kHz and loses the encoder-delay metadata on this stack.
+            audio=movie.with_suffix('.wav')
+            self.audio_segment.export(audio,format='wav')
+            frames=sum(json.loads(Path(p).with_suffix('.writer.json').read_text(encoding='utf-8'))['expected_frames'] for p in files)
+            mux_narration(silent,audio,movie,Fraction(frames)/Fraction(str(manim.config.frame_rate)))
+        self.print_file_ready_message(str(movie))
+    cls.combine_to_movie=combine_movie
     return dict(backend='ffmpeg71', executable=str(FFMPEG), version=version,
         executable_sha256=executable_hash,
         adapter_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),

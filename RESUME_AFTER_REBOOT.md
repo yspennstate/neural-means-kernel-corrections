@@ -1,6 +1,50 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
-## Current checkpoint: September 6, 01:43 Jerusalem
+## Current checkpoint: September 6, 02:10 Jerusalem
+
+Three original-packet votes are now in: 01 YES, 02 YES, 06 YES; no blocking
+findings. Reviewer 03 is active under controller 33120/native 40756; reviewer
+07 continues under controller 43484/native 55924. Keep the original packet
+unchanged. Reviewer 02 found one additional minor erratum: two copies of
+100*0.0169/sqrt(20000) combine to 0.0169 percentage points, not 0.020.
+Independent binary-hypot and decimal-variance calculations agree; macros.tex
+now displays 0.017. The corrected paper still needs a fresh paired PDF build.
+Reviewer 02 disclosed an interactive-console history write outside its leaves;
+the target is unchanged, but do not claim perfect outside-leaf compliance.
+Its full disclosure remains in the canonical review and mutation log.
+
+Chapter 02 completed: 18,780 frames, exactly 626 seconds, 582.912 spoken
+seconds; movie SHA c85ba9131ea33707d8c0bf99869e3b08f26bb8aac099c87c1443aa6f0ae45f57.
+All 380 frozen inputs and 21 audio recordings pass; offsets are zero.
+Root viewed all 21 decoded end frames at 1920x1080. The averaging diagram's
+f1/f3 labels cross axes, the feature diagram's A label touches an axis, and
+the mismatch diagram's arrowhead crowds m_full. Current scenes.py moves the
+labels, but a replacement chapter-02 render and visual check are REQUIRED.
+See its author_check/visual_review_0210.json. Chapter 12 also still needs
+its previously documented Covered-label replacement render.
+
+Chapter 03 completed in 940.900 seconds in 20260906T014748_chapter03_final;
+input manifest SHA 9b506cc13e73639652a34f7b8215b145ff6ef1488c292e0df734bc26a3e35237.
+All 24 source-to-mux audio checks pass. Media/frame inspection remains next.
+Chapter 04 launched hidden at 02:07:31, launcher PID 40996, logs
+.local-verification/chapter04_0207_*. Only one owned chapter render is active.
+The renderer now keeps snapshot helpers on the selected CPUs 14/15 and
+rechecks pressure after freezing inputs immediately before rendering.
+
+Chapter 04 no longer falsely refers back to an unpresented signed-weight
+formula. Exactly one spoken sentence changed, and its recording was replaced
+using system C:/Python314/pythonw.exe (the Manim venv lacks edge_tts).
+Old source/audio are preserved in .local-verification/c04_continuity_0159.
+All 252 recordings pass current-text identity and independent PCM counts:
+6717.456 spoken seconds, exact 839682/125. Final movie duration is still unmeasured.
+
+Last verified push before this update: ca4f2e1360fe3c0dbdab710d9462d110351c76c3.
+Root mesh pulse at 02:05:26 renewed claims through 02:50:26 Jerusalem.
+The UI/compute owner reported the stale GPU reflex corrected; message
+msg-2ffeca5953 was read and acknowledged. No global guard was changed here.
+The timed order continues through 12:55; do not stop after this checkpoint.
+
+## Historical checkpoint: September 6, 01:43 Jerusalem
 
 The two votes are still 01 YES and 06 YES. Reviewers 02 and 07 continue in
 their existing controllers; no duplicate panel has been launched. Root began

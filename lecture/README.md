@@ -17,6 +17,9 @@ following the owner's September 5 preference. Text is sent to Microsoft's
 speech service. Mathematical notation is authored as explicit LaTeX and
 rendered with `pdflatex` and the PDF route of `dvisvgm`.
 Latin Modern matches the Computer Modern family used in the manuscript.
+The current 252 recordings contain 6717.456 spoken seconds, verified from
+their PCM frame counts and text-bound receipts. The finished film also
+includes diagram animations and pauses; its duration still needs measurement.
 The main displayed equations use a fixed font size; long expressions must
 be broken into lines instead of being shrunk to fit. Preflight and rendering
 import the same LaTeX preamble from `tex_style.py`. A preamble change creates

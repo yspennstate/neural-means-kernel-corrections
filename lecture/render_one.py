@@ -125,10 +125,10 @@ def main():
     admission['partition_record_age_seconds'] = time.time()-GUARD.stat().st_mtime
     admission['prior_admission_attempts'] = admissions[:-1]
     mask = sum(1 << c for c in render_cpus)
-    # The observer stays on the background pool; the render child gets two
-    # explicitly designated background CPUs. Lowest available is NOT safe:
+    # Keep snapshotting and observation on the selected background pair too.
+    # The wider pool may contain saturated cores. Lowest available is NOT safe:
     # a full inherited mask includes the owner's protected terminal CPUs.
-    if not kernel.SetProcessAffinityMask(handle, ctypes.c_size_t(sum(1 << c for c in BACKGROUND))):
+    if not kernel.SetProcessAffinityMask(handle, ctypes.c_size_t(mask)):
         raise ctypes.WinError()
     env = dict(os.environ, NMKC_CHAPTER=args.chapter, NMKC_SEGMENT=str(args.segment), NMKC_ENCODER=args.encoder,
                NMKC_WRITER=args.writer,
@@ -212,6 +212,18 @@ def main():
         inputs[cache_record.name] = hashlib.sha256(cache_record.read_bytes()).hexdigest()
     (build/"input_manifest.json").write_text(json.dumps(inputs, indent=2), encoding="utf-8")
     (build/"admission.json").write_text(json.dumps(admission, indent=2), encoding="utf-8")
+    # Freezing a large cache can take minutes. Recheck pressure immediately
+    # before rendering, instead of treating that earlier admission as current.
+    final_admissions = []
+    final_deadline = time.monotonic()+600
+    while True:
+        final_admission = health(); final_admissions.append(final_admission)
+        if final_admission['allow']:
+            break
+        if time.monotonic() >= final_deadline:
+            raise RuntimeError('No healthy post-snapshot admission within ten minutes')
+        time.sleep(20)
+    (build/'render_admission.json').write_text(json.dumps(final_admissions, indent=2), encoding='utf-8')
     quality = ["-s", "-r", "1920,1080"] if args.quality in ("preview", "samples", "notation") else (
         ["-r", "1280,720", "--fps", "30"] if args.quality == "draft" else ["-r", "1920,1080", "--fps", "30"])
     target = ("NotationProbe" if args.quality == "notation" else

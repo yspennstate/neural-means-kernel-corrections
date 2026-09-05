@@ -76,7 +76,7 @@
         {
           "line": "Member weights are nonnegative and sum to one",
           "math": "w_{a,k}\\ge0,\\qquad\\sum_{a,k}w_{a,k}=1",
-          "say": "We are proving a statement about convex averaging. Every member weight is nonnegative, and all the weights sum to one. This restriction is doing real work. When we multiply an entrywise lower bound by a product of two weights, the inequality keeps its direction because that product is nonnegative. If we allowed arbitrary signed weights, this step would fail. A signed global stack has a different exact optimization formula, which we discussed in the previous chapter."
+          "say": "We are proving a statement about convex averaging. Every member weight is nonnegative, and all the weights sum to one. This restriction is doing real work. When we multiply an entrywise lower bound by a product of two weights, the inequality keeps its direction because that product is nonnegative. If we allowed arbitrary signed weights, this step would fail. Signed weights require a separate analysis; this proof concerns convex weights."
         },
         {
           "line": "Add the seed weights inside each architecture",

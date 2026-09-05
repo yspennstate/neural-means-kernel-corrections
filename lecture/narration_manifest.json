@@ -4,8 +4,8 @@
   "generator_sha256": "60ab914d7b7c6777ed3a3a0b0c3967edcb5c2c0deae69d4782df7b9da29f086d",
   "chapter_count": 12,
   "segment_count": 252,
-  "spoken_seconds": 6718.992,
-  "exact_spoken_seconds": "839874/125",
+  "spoken_seconds": 6717.456,
+  "exact_spoken_seconds": "839682/125",
   "validation": "Current text/settings/WAV identity plus independent PCM frame counts",
   "limits": "Duration and provenance checks do not certify pronunciation, audible quality, or final audiovisual timing.",
   "chapters": [
@@ -539,9 +539,9 @@
     },
     {
       "chapter": "04",
-      "source_sha256": "b2c7b251a59b673f1cea7ac9b061b0cc4c4c7484f799d09bda4c48d7a2145947",
+      "source_sha256": "cb1c0a2a83aca4bf536a08385d26ff88595eac7ab0bf8f4dd25ac8806f53053a",
       "segment_count": 24,
-      "spoken_seconds": 675.072,
+      "spoken_seconds": 673.536,
       "segments": [
         {
           "key": "c04_three_directions_01",
@@ -593,11 +593,11 @@
         },
         {
           "key": "c04_weights_01",
-          "frames": 640512,
+          "frames": 603648,
           "sample_rate": 24000,
-          "seconds": 26.688,
-          "wav_sha256": "e67b43e83756794dbd6d266486636a2e25e50b62145c8c68f0a5772e71654bfd",
-          "receipt_sha256": "3dc5e24905180b7c38bd9bb0453b24f19e5454b0308fa3d5216ad209c02da6d3"
+          "seconds": 25.152,
+          "wav_sha256": "9f5680092c20d908d2dd6b3021ce855e86c87bf2a2557b610398516af6142cda",
+          "receipt_sha256": "930f378110a69d509200a3d4968df1d24b33022af0e888d5b8176b03e11c6b28"
         },
         {
           "key": "c04_weights_02",

@@ -278,7 +278,7 @@ def build_visual(spec):
         old = Arrow(a, y, buff=.08, color=BLUE)
         new = Arrow(b, y, buff=.08, color=GREEN)
         labels = VGroup(formula(r"M_{\rm tr}", 28, BLUE).next_to(a, DOWN, buff=.18),
-                        formula(r"m_{\rm full}(X)", 27, GREEN).next_to(b, DOWN, buff=.18),
+                        formula(r"m_{\rm full}(X)", 27, GREEN).next_to(b, DOWN, buff=.40),
                         formula(r"G(X)", 29, INK).next_to(y, UP, buff=.18),
                         formula(r"\Delta", 27, GOLD).move_to((a+b)/2+[0,-.48,0]),
                         small_label("One schematic training row", [2.6,-2.55,0], 24))
@@ -460,7 +460,10 @@ def build_visual(spec):
                          Line(dots[0].get_center(),dots[2].get_center(),color=GOLD,stroke_width=3))
             labels=VGroup(small_label(title,[centre[0],2.15,0],22))
             for dot,letter,direction in zip(dots,('A','B','C'),(DOWN,RIGHT,UP)):
-                labels.add(formula(letter,24,INK).next_to(dot,direction,buff=.09))
+                label=formula(letter,24,INK).next_to(dot,direction,buff=.09)
+                if letter=='A':
+                    label.set_y(ax.get_bottom()[1]-.20)
+                labels.add(label)
             panels.add(VGroup(ax,lines,dots,labels));segments.append(lines)
         transform=formula(r'\varphi(x_1,x_2)=(2x_1,x_2/2)',27,GREEN,6.7).move_to([2.6,-1.5,0])
         distances=VGroup(formula(r'AB=AC=0.5',24,INK).move_to([.65,-2.2,0]),
@@ -475,9 +478,9 @@ def build_visual(spec):
         hull=Polygon(*points,color=BLUE,fill_color=BLUE,fill_opacity=.1)
         dots=VGroup(*[Dot(p,color=BLUE,radius=.065) for p in points])
         global_mean=Dot(ax.c2p(1,.6),color=GREEN,radius=.085)
-        labels=VGroup(formula(r'f_1=(0,0)',23,BLUE).next_to(dots[0],DOWN,buff=.12),
+        labels=VGroup(formula(r'f_1=(0,0)',23,BLUE).next_to(dots[0],DOWN,buff=.32),
             formula(r'f_2=(2,0)',23,BLUE).next_to(dots[1],DOWN,buff=.12),
-            formula(r'f_3=(0,2)',23,BLUE).next_to(dots[2],UP,buff=.12),
+            formula(r'f_3=(0,2)',23,BLUE).next_to(dots[2],UP,buff=.12).shift(.72*RIGHT),
             formula(r'm=(1,0.6)',24,GREEN).next_to(global_mean,DOWN,buff=.16))
         base=VGroup(ax,hull,dots,global_mean,labels)
         coordinate=Dot(ax.c2p(2,2),color=GOLD,radius=.085)

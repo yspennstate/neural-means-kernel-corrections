@@ -9,6 +9,13 @@ The current corrected chapter-1 sample build is
 source checkpoint is on branch `codex/paper1-completion-20260905`.
 The old 8m23 preview is superseded for missing mathematical rules.
 
+At about 16:25 Jerusalem another agent accidentally terminated this renderer
+while using an overly broad process filter. Its admission is recorded in the
+private checkpoint. Nine PNGs survive; eight have been inspected at native size,
+and `c01_error03` has not yet been inspected. There is no completed manifest.
+The old renderer PIDs were verified absent at 16:26. Recheck current process
+identities after restart; do not treat this timestamp as a fresh health check.
+
 Completed TeX/SVG pairs survive interruption. After confirming the old renderer
 has exited, run one hidden, BelowNormal launcher using Python314:
 
@@ -41,3 +48,6 @@ anything. At 16:18 Jerusalem, only `grid_sco2_s2` remained. Never relaunch finis
 seeds or append a sweep. The paper's final raw-prediction check, evidence
 collection, table generation, paired PDF build and ten publication reviews
 follow completion. See `.local-verification/checkpoint.md` for current details.
+The autonomous finalizer is already running remotely; inspect its status before
+starting any checker. See the root `RESUME_AFTER_REBOOT.md` for the ordered paper
+integration and review steps.

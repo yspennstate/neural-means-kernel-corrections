@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 
 from aggregate_sensitivity import aggregate
+from compare_reconstructed_pool import compare
 
 
 def pm(record, digits=4, multiplier=100):
@@ -17,6 +18,8 @@ def pm(record, digits=4, multiplier=100):
 
 def render(root, paper, summary_path):
     data = aggregate(root)
+    data["metric_reconstruction"] = compare(root / "benchmark_metric_check.json",
+        Path(__file__).resolve().parent / "collected/dgx/seedarch.json")
     cent = data["centering"]["aggregate"]
     mis = data["mismatch"]["aggregate"]
     outputs = {}
@@ -24,6 +27,16 @@ def render(root, paper, summary_path):
 
     def macro(name, value, digits=4, multiplier=100):
         macro_lines.append(rf"\newcommand{{\{name}}}{{{multiplier*value:.{digits}f}}}")
+
+    reconstruction = data["metric_reconstruction"]
+    for name, key in (("GridPlain", "plain"), ("GridWeighted", "trapezoidal")):
+        record = reconstruction["historical_corrected_pipeline_metrics"][key]
+        macro("sens" + name, record["mean"])
+        macro("sens" + name + "Sd", record["sd"])
+    for name, value in (("PoolMatrixGap", reconstruction["matrix_max_absolute_difference"]),
+                        ("PoolOptimumGap", abs(reconstruction["optimum_difference_percentage_points"]))):
+        mantissa, exponent = f"{value:.2e}".split("e")
+        macro_lines.append(rf"\newcommand{{\sens{name}}}{{{mantissa}\times10^{{{int(exponent)}}}}}")
 
     for name, key in (("Pooled", "pooled"), ("Local", "local"), ("CenterDelta", "local_minus_pooled")):
         for suffix, stat in (("", "mean"), ("Sd", "sd")):
@@ -140,6 +153,9 @@ def render(root, paper, summary_path):
     summary_path.write_text(json.dumps(data, indent=2)+"\n", encoding="utf-8")
     paths = [paper/name for name in outputs] + [paper/"figs/paired_implementation_sensitivity.pdf", summary_path]
     receipt = dict(evidence_manifest_sha256=data["evidence_manifest_sha256"],
+                   metric_reconstruction_inputs=reconstruction["input_sha256"],
+                   metric_reconstruction_driver_sha256=reconstruction["driver_sha256"],
+                   metric_solver_sha256=reconstruction["solver_source_sha256"],
                    generator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                    outputs={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in paths})
     (paper/"sensitivity_generation.json").write_text(json.dumps(receipt,indent=2)+"\n",encoding="utf-8")

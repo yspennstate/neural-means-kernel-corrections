@@ -99,6 +99,22 @@ def field_image(grid, cmap, low, high, center, size=2.15):
 
 def build_visual(spec):
     kind = spec["kind"]
+    if kind == "sensitivity_results":
+        receipt=json.loads((HERE/'assets/sensitivity_figures.json').read_text(encoding='utf-8'))
+        row=next(r for r in receipt['rows'] if r['kind']==spec['chart'])
+        path=HERE/'assets'/row['path']
+        if hashlib.sha256(path.read_bytes()).hexdigest()!=row['sha256']:
+            raise ValueError('Sensitivity plot differs from its evidence receipt')
+        plot=ImageMobject(str(path)).set_width(7.1).move_to([2.65,0,0])
+        if spec['chart']=='centering':
+            boxes=[Rectangle(width=6.6,height=2.2,color=BLUE).move_to([2.7,1.25,0]),
+                   Rectangle(width=6.6,height=2.2,color=BLUE).move_to([2.7,1.25,0]),
+                   Rectangle(width=6.6,height=2.2,color=GOLD).move_to([2.7,-1.3,0])]
+        else:
+            boxes=[SurroundingRectangle(plot,color=DIM,buff=.05),
+                   Rectangle(width=6.2,height=4.5,color=GOLD).move_to([2.9,0,0]),
+                   Rectangle(width=1.65,height=4.4,color=GREEN).move_to([5.0,-.1,0])]
+        return Group(plot),[lambda box=box:ShowPassingFlash(box) for box in boxes]
     if kind == "uq_measured":
         receipt=json.loads((HERE/'assets/uq_figures.json').read_text(encoding='utf-8'))
         row=next(r for r in receipt['rows'] if r['kind']==spec['figure'])
@@ -369,6 +385,107 @@ def build_visual(spec):
         group = Group(original, reflected, arrow, labels)
         return group, [lambda: Indicate(original[1], color=BLUE), lambda: Indicate(reflected[1], color=GOLD),
                        lambda: Indicate(arrow, color=GOLD)]
+    if kind == "member_paths":
+        def box(tex,point,color,width=1.7):
+            frame=RoundedRectangle(width=width,height=.64,corner_radius=.06,color=color,
+                                   fill_color=color,fill_opacity=.1).move_to(point)
+            return VGroup(frame,formula(tex,25,color,width-.14).move_to(frame))
+        inputs=VGroup(*[formula(r'u',28,INK).move_to([-.3,y,0]) for y in (1.35,-.15,-2.0)])
+        neural=box(r'f_\theta',[2.05,1.35,0],BLUE)
+        field=box(r'\widehat G',[4.6,1.35,0],BLUE)
+        kernel=box(r'\widehat G_{\rm KRR}',[1.55,-.65,0],GOLD)
+        refiner=box(r'f_{\rm ref}',[4.4,-.15,0],GREEN)
+        feature=box(r'\varphi_\theta',[1.6,-2.0,0],BLUE)
+        head=box(r'k_\varphi',[4.4,-2.0,0],GREEN)
+        links=VGroup(Arrow(inputs[0].get_right(),neural.get_left(),buff=.08,color=BLUE),
+            Arrow(neural.get_right(),field.get_left(),buff=.08,color=BLUE),
+            Arrow(inputs[1].get_right(),kernel.get_left(),buff=.08,color=GOLD),
+            Arrow(kernel.get_right(),refiner.get_left(),buff=.08,color=GOLD),
+            Arrow(inputs[2].get_right(),feature.get_left(),buff=.08,color=BLUE),
+            Arrow(feature.get_right(),head.get_left(),buff=.08,color=GREEN))
+        direct=VMobject(color=INK,stroke_width=2).set_points_as_corners(
+            [inputs[1].get_top(),[-.3,.35,0],[3.15,.35,0],[3.15,-.15,0]])
+        links.add(direct,Arrow([3.15,-.15,0],refiner.get_left(),buff=.02,color=INK))
+        labels=VGroup(small_label('Direct field prediction',[2.4,2.05,0],23,BLUE),
+            small_label('Input and kernel prediction',[2.5,.73,0],22,GOLD),
+            small_label('Learned representation',[2.5,-1.4,0],23,GREEN))
+        group=VGroup(inputs,neural,field,kernel,refiner,feature,head,links,labels)
+        return group,[lambda:Indicate(neural,color=BLUE),
+                      lambda:AnimationGroup(Indicate(kernel,color=GOLD),Indicate(refiner,color=GREEN)),
+                      lambda:AnimationGroup(Indicate(feature,color=BLUE),Indicate(head,color=GREEN))]
+    if kind == "kernel_system":
+        def matrix(rows,columns,point,color):
+            cells=VGroup(*[Square(side_length=.37,color=color,stroke_width=1,
+                fill_color=color,fill_opacity=.14+.08*((i+j)%3)).move_to([j*.39,-i*.39,0])
+                for i in range(rows) for j in range(columns)])
+            cells.move_to(point)
+            bracket=SurroundingRectangle(cells,buff=.09,color=DIM,stroke_width=1)
+            return VGroup(cells,bracket)
+        A=matrix(3,3,[.65,.8,0],BLUE);alpha=matrix(3,2,[2.7,.8,0],GREEN)
+        R=matrix(3,2,[4.95,.8,0],GOLD)
+        labels=VGroup(formula(r'K+n\lambda I',26,BLUE).next_to(A,UP,buff=.2),
+            formula(r'\alpha',29,GREEN).next_to(alpha,UP,buff=.2),
+            formula(r'R',29,GOLD).next_to(R,UP,buff=.2),
+            formula(r'=',32,INK).move_to([3.85,.8,0]),
+            small_label('One factorization, all output columns',[2.65,2.35,0],23))
+        for obj,shape in ((A,r'3\times3'),(alpha,r'3\times2'),(R,r'3\times2')):
+            labels.add(formula(shape,22,DIM).next_to(obj,DOWN,buff=.15))
+        query=matrix(1,3,[.65,-1.55,0],BLUE);residuals=matrix(3,2,[2.7,-1.55,0],GOLD)
+        answer=matrix(1,2,[4.95,-1.55,0],GREEN)
+        labels.add(formula(r'c(u)^\top',25,BLUE).next_to(query,UP,buff=.18),
+            formula(r'R',26,GOLD).next_to(residuals,UP,buff=.18),
+            formula(r'=',32,INK).move_to([3.85,-1.55,0]),
+            formula(r'\widehat r(u)',25,GREEN).next_to(answer,UP,buff=.18),
+            small_label('The same query weights combine every coordinate',[2.65,-2.62,0],21))
+        group=VGroup(A,alpha,R,query,residuals,answer,labels)
+        return group,[lambda:Indicate(A,color=BLUE),
+            lambda:AnimationGroup(Indicate(alpha,color=GREEN),Indicate(R,color=GOLD)),
+            lambda:AnimationGroup(Indicate(query,color=BLUE),Indicate(answer,color=GREEN))]
+    if kind == "learned_distance":
+        panels=VGroup();segments=[]
+        for centre,points,title in (([.65,.45,0],[[.1,.2],[.6,.2],[.1,.7]],'Input coordinates'),
+                                    ([4.45,.45,0],[[.2,.1],[1.2,.1],[.2,.35]],'Feature coordinates')):
+            ax=axes(x=(0,1.5,.5),y=(0,1.5,.5),width=2.65,height=2.65).move_to(centre)
+            dots=VGroup(*[Dot(ax.c2p(*p),color=color,radius=.06)
+                for p,color in zip(points,(INK,BLUE,GOLD))])
+            lines=VGroup(Line(dots[0].get_center(),dots[1].get_center(),color=BLUE,stroke_width=3),
+                         Line(dots[0].get_center(),dots[2].get_center(),color=GOLD,stroke_width=3))
+            labels=VGroup(small_label(title,[centre[0],2.15,0],22))
+            for dot,letter,direction in zip(dots,('A','B','C'),(DOWN,RIGHT,UP)):
+                labels.add(formula(letter,24,INK).next_to(dot,direction,buff=.09))
+            panels.add(VGroup(ax,lines,dots,labels));segments.append(lines)
+        transform=formula(r'\varphi(x_1,x_2)=(2x_1,x_2/2)',27,GREEN,6.7).move_to([2.6,-1.5,0])
+        distances=VGroup(formula(r'AB=AC=0.5',24,INK).move_to([.65,-2.2,0]),
+                         formula(r'AB=1,\ AC=0.25',24,INK).move_to([4.45,-2.2,0]))
+        link=Arrow([2.1,.6,0],[2.95,.6,0],buff=.04,color=GREEN)
+        group=VGroup(panels,transform,distances,link)
+        return group,[lambda:Indicate(segments[0]),lambda:Indicate(segments[1],color=GREEN),
+                      lambda:Indicate(transform,color=GREEN)]
+    if kind == "stacking_classes":
+        ax=axes(x=(-.2,2.5,.5),y=(-.2,2.5,.5),width=4.5,height=4.5).move_to([2.6,.2,0])
+        points=[ax.c2p(*p) for p in ((0,0),(2,0),(0,2))]
+        hull=Polygon(*points,color=BLUE,fill_color=BLUE,fill_opacity=.1)
+        dots=VGroup(*[Dot(p,color=BLUE,radius=.065) for p in points])
+        global_mean=Dot(ax.c2p(1,.6),color=GREEN,radius=.085)
+        labels=VGroup(formula(r'f_1=(0,0)',23,BLUE).next_to(dots[0],DOWN,buff=.12),
+            formula(r'f_2=(2,0)',23,BLUE).next_to(dots[1],DOWN,buff=.12),
+            formula(r'f_3=(0,2)',23,BLUE).next_to(dots[2],UP,buff=.12),
+            formula(r'm=(1,0.6)',24,GREEN).next_to(global_mean,DOWN,buff=.16))
+        base=VGroup(ax,hull,dots,global_mean,labels)
+        coordinate=Dot(ax.c2p(2,2),color=GOLD,radius=.085)
+        outside=VGroup(coordinate,DashedLine(points[1],coordinate.get_center(),color=GOLD),
+            DashedLine(points[2],coordinate.get_center(),color=GOLD),
+            formula(r'm_{\rm coord}=(2,2)',23,GOLD).move_to([4.5,2.3,0]))
+        cases=VGroup(*[Square(.3,color=BLUE,fill_color=BLUE,fill_opacity=.3).move_to([.7+j*.43,1.1,0])
+                      for j in range(10)])
+        selection=VGroup(cases,small_label('The same validation cases',[2.6,2.05,0],25),
+            small_label('Fit weights',[.8,-.65,0],27,BLUE),
+            small_label('Choose a variant',[4.3,-.65,0],27,GOLD),
+            Arrow([1.5,.85,0],[.8,-.25,0],color=BLUE,buff=.05),
+            Arrow([3.3,.85,0],[4.3,-.25,0],color=GOLD,buff=.05),
+            small_label('These decisions share their observations',[2.6,-2.0,0],23))
+        return base,[lambda:Indicate(hull,color=BLUE),lambda:FadeIn(outside),
+            lambda:AnimationGroup(FadeOut(base),FadeOut(outside),FadeIn(selection))]
     if kind == "pipeline_stages":
         def box(label, x, y, color):
             frame = RoundedRectangle(width=1.95, height=.84, corner_radius=.08,
@@ -841,10 +958,17 @@ class BoardSamples(BoardMixin, Scene):
         out.mkdir(parents=True, exist_ok=True)
         rows = []
         for board in DATA["boards"]:
+            self.clear()
+            _, effects = self.frame(board)
+            text = None
             for i, segment in enumerate(board["segments"], 1):
-                self.clear()
-                self.frame(board)
-                self.add(self.segment_text(segment))
+                if text is not None:
+                    self.remove(text)
+                text = self.segment_text(segment)
+                self.add(text)
+                # -s skips encoding but applies the actual permanent changes
+                # from each animation. Later samples retain earlier geometry.
+                self.play(effects[min(i-1,len(effects)-1)](), run_time=1.4)
                 self.renderer.update_frame(self)
                 path = out / f'{board["key"]}_{i:02}.png'
                 self.renderer.camera.get_image().save(path)

@@ -31,13 +31,13 @@
     },
     {
       "key": "c02_members",
-      "title": "Different neural members learn different approximations",
+      "title": "Networks supply predictions and learned features",
       "visual": {
-        "kind": "two_kernel_roles",
-        "label": "Structural-mechanics pipeline: fitted stages and their data flow",
+        "kind": "member_paths",
+        "label": "Three computational paths: direct prediction, kernel-conditioned refinement, and feature geometry",
         "source": "paper/method.tex"
       },
-      "visual_argument": "The upper route changes the target of kernel regression, whereas the lower route changes its input representation.",
+      "visual_argument": "The refiner receives two inputs, while a direct field predictor and a feature map have different output roles.",
       "segments": [
         {
           "line": "A residual MLP maps the sampled load directly to the field",
@@ -87,8 +87,8 @@
       "key": "c02_stack",
       "title": "Choose how the members contribute",
       "visual": {
-        "kind": "architecture_weights",
-        "label": "Illustrative nonnegative weights, grouped for readability",
+        "kind": "stacking_classes",
+        "label": "Two-output illustration: coordinate-specific combinations can leave the global convex hull",
         "source": "paper/method.tex"
       },
       "visual_argument": "Coloured pieces denote weights; a uniform combination can be reweighted, with nonnegative weights remaining inside a simplex.",
@@ -114,8 +114,8 @@
       "key": "c02_kernel",
       "title": "A kernel combines residual fields across training inputs",
       "visual": {
-        "kind": "kernel_projection",
-        "label": "Finite-feature illustration of query coefficients; toy vectors, not benchmark data",
+        "kind": "kernel_system",
+        "label": "Schematic matrix shapes: three training inputs and two output coordinates",
         "source": "lecture/kernel_geometry.py; paper/method.tex"
       },
       "visual_argument": "The query receives coefficients determined by similarity to the training design; those coefficients combine all output coordinates.",
@@ -141,8 +141,8 @@
       "key": "c02_geometry",
       "title": "A second kernel can use a different notion of distance",
       "visual": {
-        "kind": "two_kernel_roles",
-        "label": "Structural-mechanics pipeline: fitted stages and their data flow",
+        "kind": "learned_distance",
+        "label": "Illustrative two-coordinate feature map; the learned maps used in the paper have more coordinates",
         "source": "paper/method.tex"
       },
       "visual_argument": "The network supplies either a baseline output or a feature map; the two arrows change different mathematical objects.",
@@ -168,8 +168,8 @@
       "key": "c02_compatibility",
       "title": "A theorem must describe the labels actually fitted",
       "visual": {
-        "kind": "pipeline_stages",
-        "label": "Structural-mechanics pipeline: fitted stages and their data flow",
+        "kind": "mean_mismatch",
+        "label": "Stored training-row means and evaluations of the deployed mean need not coincide",
         "source": "paper/method.tex"
       },
       "visual_argument": "Training-row means and deployed means feed different residual labels unless their values agree at the training design.",

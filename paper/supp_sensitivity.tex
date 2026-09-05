@@ -152,6 +152,30 @@ $\sensScoNewFailed$, for the recorded and expanded grids respectively.}
 \end{adjustbox}
 \end{table}
 
+\subsection{Reconstruction from saved prediction fields}
+The mechanics reconstruction subtracts the saved reference fields in
+float64, independently recomputes the errors of all sixty retained members,
+and accumulates the $60\times60$ evaluation second-moment matrix in blocks
+of 200 cases. It uses the original fixed 1000/19000 fitting/evaluation split.
+The largest entrywise difference from the retained matrix is
+$\sensPoolMatrixGap$. An independent active-set solve, checked by a convex
+first-order lower bound, changes the optimal RMS relative error by
+$\sensPoolOptimumGap$ percentage points. The block lower bound and the
+convex optimum agree with the retained analysis to four decimal places
+when expressed as percentages. The original records remain available
+alongside the reconstruction.
+
+The reported mechanics accuracy uses the ordinary Euclidean norm on the
+$41\times41$ output grid. As a separate metric check, we also apply tensor-product
+trapezoidal weights: one in the interior, one half on edges, and one quarter
+at corners. The common grid-spacing factor cancels in the relative error.
+For the ten historical corrected pipelines, the plain-grid error is
+$\sensGridPlain\pm\sensGridPlainSd\%$, while the trapezoidal-grid error is
+$\sensGridWeighted\pm\sensGridWeightedSd\%$. Nested one-dimensional
+quadrature independently reproduces the weighted calculation. This check
+does not refit a predictor or rescore the quoted external comparators; the
+main comparison continues to use the stated plain-grid metric.
+
 \subsection{Evidence and recomputation}
 The evidence archive contains executed source files, input hashes, stage
 receipts, per-case error arrays, calibration scores and partitions, and
@@ -159,6 +183,10 @@ complete kernel-grid records. The table generator first checks the
 archive's exact file set and hashes, the completed run list, case counts
 and ordering, paired signs, calibration quantiles, and validation winners.
 It recomputes reported means from the per-case arrays by a separate
-summation path. Checkpoints and large prediction fields remain in the
+summation path. The OCO-2 prediction check rebuilds all fourteen predictors'
+scores under both grids in all nine band--seed combinations. It uses a
+spectral Gram quadratic form, cross-checks selected cases by direct
+full-spectrum summation, and reconstructs the coordinate selectors from
+validation predictions. Checkpoints and large prediction fields remain in the
 retained run directories. Scripts for collection, verification, and table
 generation are under \texttt{campaign/} in the code release.

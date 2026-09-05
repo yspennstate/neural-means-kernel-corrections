@@ -10,6 +10,22 @@ receipts, process identities, and the exact local session restoration record.
 
 ## Paper and simulations
 
+**16:36 update:** all planned simulations and the autonomous finalization have
+finished. All 18 raw grid scenarios passed. The 27,793,233-byte evidence archive
+was downloaded locally; its SHA-256 is
+`2cb72d8c84c800113406ceb0f5790000bef62f5c90bccf81cafdb09aed36026f`.
+The local exact manifest and every one of its 454 files were verified before
+extraction into `.local-verification/evidence-final`. The aggregate validation
+completed successfully; its unchanged output is committed as
+`campaign/sensitivity_summary_final.json`, SHA-256
+`b17dd2b71e2e4f610364e892e668556501094aaf0afdc749f72a59ad41c4c5b0`.
+Use that summary and evidence directory for table and figure generation. There
+is no remaining simulation queue. Centering and mismatch changes are tiny;
+the expanded grid increases the combined model's mean reduced-space error in
+all three bands. Preserve these adverse results and the mixed radiance results.
+The following 16:30 status is retained only as earlier context; do not relaunch
+the campaign or finalizer.
+
 The three main results have complete proofs in the manuscript and supplement.
 The latest revision also spells out why evaluation vectors lie in the Gram
 matrix range when that matrix is singular. The final independent referee panel

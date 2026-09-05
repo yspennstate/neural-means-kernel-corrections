@@ -1,0 +1,197 @@
+{
+  "id": "08",
+  "title": "Why no recovery rule can beat interpolation",
+  "boards": [
+    {
+      "key": "c08_question",
+      "title": "What can be recovered from the same observations?",
+      "visual": {
+        "kind": "invisible_residuals",
+        "label": "Exact linear-kernel example: the design observes only the horizontal component",
+        "source": "paper/theory.tex:thm:minimax; lecture/kernel_geometry.py"
+      },
+      "visual_argument": "Two vertical residual directions have the same horizontal projection, so the training observation cannot distinguish them.",
+      "segments": [
+        {
+          "line": "Allow any rule for turning observations into a query value",
+          "math": "\\Psi:\\mathbb R^{n\\times q}\\to\\mathbb R^q",
+          "say": "Suppose we are free to replace kernel interpolation by any rule whatsoever. The rule sees the residual values at the same n design points and must predict the residual at one specified query. It may be nonlinear. It may use a complicated internal representation. We impose no continuity or linearity condition on this map. We do, however, hold the information fixed: the observations are exactly the residual values on the design, and the allowed residuals lie in the same RKHS ball."
+        },
+        {
+          "line": "The adversary chooses a residual in a fixed ball",
+          "math": "\\sup_{\\|r\\|_K\\le\\rho}\\|r(u)-\\Psi(r(X))\\|_2",
+          "say": "For each recovery rule, consider its largest error over the ball of radius rho. The order matters. The rule is chosen first, and we then ask which permitted residual makes it fail most badly. This is a worst-case comparison, not an average over a population of physical loads. A rule can do better on the benchmark distribution while having a worse worst case over a large function class. Those are different questions, and both can be useful."
+        },
+        {
+          "line": "Find two residuals the observations cannot tell apart",
+          "math": "r^+(X)=r^-(X),\\qquad r^+(u)\\ne r^-(u)",
+          "say": "The proof starts by looking for ambiguity. If two possible residual functions agree at every observed input but disagree at the query, the rule receives the same information in both cases. It must therefore return the same answer. It cannot be very close to both query values if those values are far apart. We will construct such a pair using the orthogonal component of the query kernel section. The picture shows the simplest instance: horizontal observations reveal nothing about a vertical component."
+        }
+      ]
+    },
+    {
+      "key": "c08_nullspace",
+      "title": "The interpolation error representer is invisible on the design",
+      "visual": {
+        "kind": "kernel_projection",
+        "ridge": 0,
+        "label": "At zero nugget, the red representer is orthogonal to the observed span",
+        "source": "paper/theory.tex:thm:minimax"
+      },
+      "visual_argument": "The orthogonal remainder has zero inner product with every design section, which means zero evaluation at every design point.",
+      "segments": [
+        {
+          "line": "Set the nugget to zero",
+          "math": "\\begin{aligned}c_0&=K^{-1}k_u\\\\g_0&=k(u,\\cdot)-\\sum_i(c_0)_i k(u_i,\\cdot)\\end{aligned}",
+          "say": "Assume the design Gram matrix is positive definite, as in the stated minimax theorem. Set the nugget to zero and use the interpolation coefficient vector. Define g zero as the query section minus its interpolating combination of design sections. This is the same representer used in the sharp-bound proof, specialized to interpolation. The zero nugget is essential here: it gives exact orthogonality to the observed span. The ridge representer generally retains a component inside that span."
+        },
+        {
+          "line": "Its values at all observed inputs are zero",
+          "math": "g_0(X)=k_u-Kc_0=0",
+          "say": "Evaluate g zero at all design points. The query section contributes k sub u. The fitted combination contributes K times c zero. By the defining linear system these two vectors agree, so their difference is zero. Equivalently, g zero is orthogonal to every design kernel section. The two descriptions are the same statement because evaluation is an inner product in the RKHS. This is the precise reason that a multiple of g zero is invisible to the observations."
+        },
+        {
+          "line": "At the query, its value equals its squared norm",
+          "math": "\\|g_0\\|^2=P_0(u)^2=g_0(u)",
+          "say": "The earlier norm calculation gives the squared norm of g zero as P zero squared. Evaluate the function at u and obtain k of u u minus k sub u transpose K inverse k sub u, the same expression. Geometrically, the inner product of the orthogonal remainder with the full query vector equals the squared length of the remainder. Its inner product with the projected part vanishes. We now know both its size in function space and the size of its effect at the query."
+        }
+      ]
+    },
+    {
+      "key": "c08_pair",
+      "title": "Put two opposite functions on the boundary of the ball",
+      "visual": {
+        "kind": "invisible_residuals",
+        "label": "The positive and negative vertical residuals have equal norm and identical observed values",
+        "source": "paper/theory.tex:thm:minimax"
+      },
+      "visual_argument": "Reflect a residual through the origin in the unobserved direction; the design still sees zero while the query value changes sign.",
+      "segments": [
+        {
+          "line": "Normalize the invisible representer",
+          "math": "r^\\pm=\\pm\\rho\\frac{g_0}{P_0(u)}e_1",
+          "say": "Suppose first that P zero at the query is positive. Divide g zero by P zero to give it unit RKHS norm. Multiply by rho, choose either sign, and put the result in the first output component. The symbol e one is the first coordinate vector in the output space. The remaining output components are zero. We have constructed two vector-valued residuals, each exactly on the boundary of the permitted ball. No probability model was used to choose them."
+        },
+        {
+          "line": "Both produce the same training matrix",
+          "math": "\\|r^\\pm\\|_K=\\rho,\\qquad r^\\pm(X)=0",
+          "say": "Each residual has product-space norm rho. Each is zero at every design point because g zero is zero there. Therefore the entire observed n by q matrix is zero for both residuals. A recovery rule receives literally the same input matrix in the two cases. Extra computation cannot create a distinction absent from its information. Additional assumptions on the target might create one, but they would define a smaller class than the ball we are considering."
+        },
+        {
+          "line": "Their query values are separated by twice the proposed bound",
+          "math": "r^\\pm(u)=\\pm\\rho P_0(u)e_1",
+          "say": "At the query, g zero has value P zero squared. Dividing by P zero and multiplying by rho leaves rho P zero, with either sign. The two possible output vectors lie on opposite sides of the origin, separated by a distance of twice rho P zero. In the exact two-dimensional example, the design feature is one zero and the query feature is three two. The unseen unit direction is vertical. Residual coefficients zero plus or minus rho give the query values plus or minus two rho."
+        }
+      ]
+    },
+    {
+      "key": "c08_triangle",
+      "title": "One prediction cannot be close to both possibilities",
+      "visual": {
+        "kind": "minimax_interval",
+        "label": "Output-space distances for two indistinguishable residual functions",
+        "source": "paper/theory.tex:thm:minimax"
+      },
+      "visual_argument": "A single prediction lies between or outside two possible outputs; at least one distance is half their separation or greater.",
+      "segments": [
+        {
+          "line": "The recovery rule returns the same vector for both",
+          "math": "\\psi=\\Psi(0)",
+          "say": "Write psi for the rule's answer when the observation matrix is zero. This answer can be any vector in the output space. It need not lie on the line connecting our two constructed outputs. The drawing places it on that line so the distances are easy to see, but the argument will use the Euclidean triangle inequality and therefore covers every possible position. Moving away from the line cannot evade that inequality."
+        },
+        {
+          "line": "Apply the triangle inequality",
+          "math": "\\begin{aligned}2\\rho P_0(u)&=\\|r^+(u)-r^-(u)\\|_2\\\\&\\le\\|r^+(u)-\\psi\\|_2\\\\&\\quad+\\|r^-(u)-\\psi\\|_2\\end{aligned}",
+          "say": "Travel from one possible output to the other through psi. The direct distance is no greater than the sum of the two distances through that intermediate point. The direct distance is twice rho P zero. If both prediction errors were strictly smaller than rho P zero, their sum would be strictly smaller than twice rho P zero, contradicting the triangle inequality. Thus at least one of the two constructed residuals forces an error of rho P zero or more."
+        },
+        {
+          "line": "This proves a lower bound for every recovery rule",
+          "math": "\\sup_{\\|r\\|_K\\le\\rho}\\|r(u)-\\Psi(r(X))\\|_2\\ge\\rho P_0(u)",
+          "say": "Both constructed functions belong to the allowed ball, so the largest error over the ball is at least the larger error on this pair. That gives the desired lower bound for every rule. Notice how little we needed to know about the rule itself. Its linearity, training algorithm and parameter count never entered. The only decisive fact was that identical observations produce one answer. This is why the lower-bound construction is stronger than comparing a few specific estimators numerically."
+        }
+      ]
+    },
+    {
+      "key": "c08_attainment",
+      "title": "Interpolation reaches the lower bound",
+      "visual": {
+        "kind": "minimax_interval",
+        "label": "Interpolation attains the center of the indistinguishable zero-data pair",
+        "source": "paper/theory.tex:thm:or and thm:minimax"
+      },
+      "visual_argument": "Moving the prediction to the midpoint makes the two unavoidable errors equal; the preceding upper bound proves this works over the entire ball.",
+      "segments": [
+        {
+          "line": "The sharp-bound theorem supplies the upper bound",
+          "math": "\\|r(u)-k(u,X)K^{-1}r(X)\\|_2\\le\\rho P_0(u)",
+          "say": "Return to the previous theorem and set lambda to zero. The exact representer factor is then P zero. For every residual in the ball, kernel interpolation has error at most rho P zero. This statement is uniform over the ball, not merely a calculation on our two special functions. Combining it with the lower bound shows that the best achievable worst-case error is exactly rho P zero and that interpolation attains it."
+        },
+        {
+          "line": "The minimax value is now determined exactly",
+          "math": "\\inf_\\Psi\\sup_{\\|r\\|_K\\le\\rho}\\|r(u)-\\Psi(r(X))\\|_2=\\rho P_0(u)",
+          "say": "The infimum over recovery rules cannot be below the lower bound we proved for every rule. It cannot be above that bound because the interpolant achieves it. The two sides meet. This establishes minimax optimality at the fixed query for the specified native-space ball and exact observations. It does not establish that kernel interpolation is the best method for every scientific problem, every distribution of targets, or every noisy observation model."
+        },
+        {
+          "line": "If the query representer is already observed, the value is zero",
+          "math": "P_0(u)=0\\quad\\Longrightarrow\\quad\\text{exact recovery}",
+          "say": "There is one boundary case left. If P zero is zero, the query kernel section belongs to the span of the observed sections. Then every compatible RKHS function has its query value determined by the observed values, and interpolation recovers it exactly. The lower bound is simply zero, and no division by P zero is needed. This includes a query at an observed design point when the Gram matrix is invertible, but other kernels and designs can also produce exact dependence."
+        }
+      ]
+    },
+    {
+      "key": "c08_ridge",
+      "title": "Ridge leaves some error inside the observed span",
+      "visual": {
+        "kind": "kernel_projection",
+        "ridge": 0.5,
+        "label": "Ridge adds a horizontal remainder to the unavoidable vertical remainder",
+        "source": "lecture/kernel_geometry.py; paper/theory.tex:thm:minimax"
+      },
+      "visual_argument": "The ridge error vector decomposes into orthogonal unobserved and within-span components, so their squared lengths add.",
+      "segments": [
+        {
+          "line": "Write the nugget as t equals n lambda",
+          "math": "t=n\\lambda,\\qquad A=K+tI",
+          "say": "What changes when we use ridge regularization? Write t for n lambda and A for K plus t times the identity. The interpolation approximation is an orthogonal projection. Ridge shrinks its coefficients, leaving an additional error inside the observed span. That additional component is orthogonal to the interpolation remainder, which lies outside the span. Consequently, the squared exact ridge factor is the interpolation factor squared plus a nonnegative extra term."
+        },
+        {
+          "line": "Compute the extra squared error",
+          "math": "\\begin{aligned}\\widetilde P_\\lambda^2-P_0^2&=k_u^\\top(K^{-1}-2A^{-1}\\\\&\\quad+A^{-1}KA^{-1})k_u\\end{aligned}",
+          "say": "Subtract the interpolation expression from the exact ridge expression. The k of u u terms cancel. What remains is a quadratic form with K inverse, minus twice A inverse, plus A inverse K A inverse. The matrix inside this expression is positive semidefinite, but that fact is easier to see after factoring it. K and A commute because A is K plus a multiple of the identity, so they have the same eigenvectors."
+        },
+        {
+          "line": "Factor the matrix to expose its sign",
+          "math": "\\widetilde P_\\lambda^2-P_0^2=t^2 k_u^\\top A^{-2}K^{-1}k_u\\ge0",
+          "say": "Use the common eigenbasis, or multiply out directly, to factor the matrix as A inverse squared times K inverse times A minus K squared. Since A minus K is t times the identity, the result is t squared times k sub u transpose A inverse squared K inverse k sub u. Every eigenvalue of A inverse squared K inverse is positive. The gap is therefore nonnegative. This calculation gives the exact nugget cost for the fixed design and query, not just its sign."
+        }
+      ]
+    },
+    {
+      "key": "c08_spectrum",
+      "title": "Read the nugget cost one eigendirection at a time",
+      "visual": {
+        "kind": "nugget_factors",
+        "label": "Exact toy example: interpolation stays at four while both ridge factors grow",
+        "source": "lecture/kernel_geometry.py"
+      },
+      "visual_argument": "The curve shows the extra squared representer length added by ridge; the posterior factor is a separate, larger curve.",
+      "segments": [
+        {
+          "line": "In an eigenbasis, every summand is nonnegative",
+          "math": "\\begin{aligned}K v_j&=\\mu_j v_j,\\quad b_j=v_j^\\top k_u\\\\\\widetilde P_\\lambda^2-P_0^2&=\\sum_j\\frac{t^2 b_j^2}{\\mu_j(\\mu_j+t)^2}\\end{aligned}",
+          "say": "Let mu j be a positive eigenvalue of K and let b j be the component of the query kernel vector along its eigenvector. The gap is the sum of t squared b j squared divided by mu j times mu j plus t squared. Read the denominator carefully: only the second factor is squared. Every term is nonnegative. A direction matters when the query has a component in it, and the amount of ridge relative to its eigenvalue determines the shrinkage."
+        },
+        {
+          "line": "For a fixed invertible design, the extra term vanishes with the nugget",
+          "math": "\\lambda\\downarrow0:\\qquad\\widetilde P_\\lambda(u)\\to P_0(u)",
+          "say": "For a fixed finite positive-definite Gram matrix, each eigenvalue is positive and fixed. As lambda tends to zero, every summand tends to zero, so the exact ridge factor tends to the interpolation factor. This is a fixed-design statement. It does not justify exchanging that limit with a growing sample size whose smallest eigenvalue may also approach zero. Ill-conditioning and observation errors can make a positive nugget sensible in practice despite the noiseless worst-case cost shown here."
+        },
+        {
+          "line": "Three factors describe three different geometric quantities",
+          "math": "P_0(u)^2\\le\\widetilde P_\\lambda(u)^2\\le P_\\lambda(u)^2",
+          "say": "The three curves now have distinct meanings. P zero measures the component of the query representer that the design cannot observe. P tilde lambda measures the whole error representer for the ridge rule, including its within-span shrinkage error. P lambda is the posterior factor with the same nugget; it supplies a valid but looser deterministic bound when multiplied by the residual norm. Keeping these three quantities separate prevents a posterior variance from being mistaken for an exact realized prediction error."
+        }
+      ]
+    }
+  ]
+}

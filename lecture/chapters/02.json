@@ -1,0 +1,195 @@
+{
+  "id": "02",
+  "title": "What the neural mean and kernel each do",
+  "boards": [
+    {
+      "key": "c02_mean",
+      "title": "Begin with a map that predicts the whole field",
+      "visual": {
+        "kind": "pipeline_stages",
+        "label": "Structural-mechanics pipeline: fitted stages and their data flow",
+        "source": "paper/method.tex"
+      },
+      "visual_argument": "A load enters the neural mean and leaves as a complete field; the correction is added afterward.",
+      "segments": [
+        {
+          "line": "The neural mean supplies the first prediction",
+          "math": "m:\\mathbb R^{41}\\longrightarrow\\mathbb R^{1681}",
+          "say": "For each load vector, the neural mean predicts a complete stress field. Here the word mean names the baseline function in the correction formula. It does not imply that we know a Bayesian posterior distribution over networks. The mean may itself be an ensemble. What matters for the next stage is that we can evaluate the map, compare its output with a reference field, and use the resulting residual as a new target."
+        },
+        {
+          "line": "Residuals are what remains after that prediction",
+          "math": "r(u)=G(u)-m(u)",
+          "say": "Subtract the mean's field from the reference field at each training input. This residual is another field with the same sixteen hundred and eighty-one coordinates. Some parts may be small, while a narrow region near a material interface may remain difficult. A small residual in Euclidean norm is encouraging, but it does not automatically mean that the residual is easy for a particular kernel. Its variation across input loads matters too."
+        },
+        {
+          "line": "The final estimate adds a fitted residual",
+          "math": "\\widehat G(u)=m(u)+\\widehat r(u)",
+          "say": "The corrected predictor adds the estimated residual to the neural mean. The addition takes place coordinate by coordinate in the output field. This construction has a familiar statistical interpretation: use a flexible first approximation and then fit what it leaves behind. Neither stage is guaranteed to improve the other. The correction must be selected and evaluated, and the paper's ablations separate its contribution from the contribution of the mean."
+        }
+      ]
+    },
+    {
+      "key": "c02_members",
+      "title": "Different neural members learn different approximations",
+      "visual": {
+        "kind": "two_kernel_roles",
+        "label": "Structural-mechanics pipeline: fitted stages and their data flow",
+        "source": "paper/method.tex"
+      },
+      "visual_argument": "The upper route changes the target of kernel regression, whereas the lower route changes its input representation.",
+      "segments": [
+        {
+          "line": "A residual MLP maps the sampled load directly to the field",
+          "math": "u\\longmapsto f_\\theta(u)",
+          "say": "The principal neural member is a residual multilayer perceptron. Its input is the standardized vector of forty-one load samples, and its output is the full stress field. Residual connections are an architectural device inside the network. They should not be confused with the separate residual target G minus m that the kernel will fit later. The paper also uses Fourier and convolutional members, with different ways of representing the load and field."
+        },
+        {
+          "line": "A refiner also receives a kernel prediction",
+          "math": "f_{\\rm ref}\\big(u,\\widehat G_{\\rm KRR}(u)\\big)",
+          "say": "The kernel-conditioned refiner has an additional input: a kernel method's predicted field for the same load. Concatenate that field with the load and feed both to a residual network. The network predicts the whole reference field. Its output is not constrained to be a correction to the kernel input. This distinction matters when reading the architecture: a supplied approximate solution may help the network, but there is no built-in theorem that the refiner can only make a small adjustment."
+        },
+        {
+          "line": "Frozen network features can also define a kernel",
+          "math": "k_\\varphi(u,u')=k\\big(\\varphi(u),\\varphi(u')\\big)",
+          "say": "A trained network can provide a second useful object besides its final prediction. Its internal activations form a feature map. We can freeze those activations and compare inputs by their distances in feature space. Kernel regression on those features is a different use of the network. It changes which inputs the kernel considers nearby. Later, the OCO-2 experiments will show why this distinction between a neural mean and a learned representation is central to the evidence."
+        }
+      ]
+    },
+    {
+      "key": "c02_symmetry",
+      "title": "Use a symmetry by averaging two equivalent views",
+      "visual": {
+        "kind": "reflection_pair",
+        "label": "Actual reference field and its coordinate reflection; not a new solver run",
+        "source": "paper/method.tex"
+      },
+      "visual_argument": "Reflection reverses the boundary load and reflects the predicted field; transforming back permits a coordinatewise average.",
+      "segments": [
+        {
+          "line": "Reflect the input, predict, and transform the field back",
+          "math": "\\widehat f(u)=\\tfrac12\\big(f(u)+T f(Su)\\big)",
+          "say": "The structural-mechanics benchmark has a reflection symmetry. Reverse the sampled load, predict the reflected case, and reflect that predicted field back to the original coordinates. Now average it with the prediction made directly from the original load. The two terms refer to the same physical orientation after the second reflection. If we forgot to transform the output back, the average would mix different spatial locations and would have no such interpretation."
+        },
+        {
+          "line": "The risk statement needs exact symmetry assumptions",
+          "math": "G(Su)=T G(u),\\qquad S_\\#\\mu=\\mu",
+          "say": "The population argument requires two assumptions. The target must be equivariant: reflecting the input reflects the output in the stated way. The distribution of loads must also be unchanged by reflection. For an isometric output reflection and a convex norm loss, averaging cannot increase population risk under these assumptions. Empirical symmetry checks can support the modeling choice, but they do not prove that a numerical solver and a finite dataset satisfy the assumptions exactly."
+        },
+        {
+          "line": "Training augmentation is a separate intervention",
+          "math": "(u,v)\\longmapsto(Su,Tv)",
+          "say": "During training, reflected input-output pairs are also supplied as augmentation. That can change the learned network, so it is a different operation from averaging two predictions after training. The test-time argument holds for a fixed fitted map under the symmetry assumptions. It is not a proof that a particular stochastic training run improves when augmented. The paper measures augmentation and prediction averaging as separate parts of its recipe."
+        }
+      ]
+    },
+    {
+      "key": "c02_stack",
+      "title": "Choose how the members contribute",
+      "visual": {
+        "kind": "architecture_weights",
+        "label": "Illustrative nonnegative weights, grouped for readability",
+        "source": "paper/method.tex"
+      },
+      "visual_argument": "Coloured pieces denote weights; a uniform combination can be reweighted, with nonnegative weights remaining inside a simplex.",
+      "segments": [
+        {
+          "line": "A global convex stack uses one set of weights",
+          "math": "m(u)=\\sum_{a=1}^M w_a f_a(u),\\quad w_a\\ge0,\\quad\\sum_a w_a=1",
+          "say": "A global convex stack uses the same nonnegative member weights at every output coordinate and every query. The weights sum to one, so the predicted field lies in the convex hull of the member fields. The recorded implementation searches these weights by a random hill climb on part of the validation data. It minimizes mean relative error. That search is not the quadratic-program optimum of the second-moment matrix that we analyze in the next chapter."
+        },
+        {
+          "line": "Coordinate-dependent affine weights form a larger class",
+          "math": "m_j(u)=b_j+\\sum_a w_{ja}f_{a,j}(u)",
+          "say": "The deployed variant allows a separate affine readout at each field coordinate. It has an intercept and weights that are not constrained to be nonnegative or sum to one. These readouts are ridge-fitted on one validation half and compared with the global stack on the other half. A global convex lower bound does not apply to this larger class. We should therefore understand the geometry of the convex stack without pretending it exactly describes every deployed coordinatewise readout."
+        },
+        {
+          "line": "Repeated validation use limits the statistical guarantee",
+          "math": "\\text{Selection data}\\ne\\text{fresh independent evidence}",
+          "say": "Validation is used at several points: checkpoints, member choices, stack choices and kernel hyperparameters. Splitting one validation block for one stage does not erase its use in earlier stages. The independent-candidate selection bounds in the supplement explain what could be guaranteed under fresh-sample assumptions. Those assumptions do not hold for the full recorded development process, and the constants do not certify a negligible selection cost here. The numerical comparisons remain measurements on the specified benchmark."
+        }
+      ]
+    },
+    {
+      "key": "c02_kernel",
+      "title": "A kernel combines residual fields across training inputs",
+      "visual": {
+        "kind": "kernel_projection",
+        "label": "Finite-feature illustration of query coefficients; toy vectors, not benchmark data",
+        "source": "lecture/kernel_geometry.py; paper/method.tex"
+      },
+      "visual_argument": "The query receives coefficients determined by similarity to the training design; those coefficients combine all output coordinates.",
+      "segments": [
+        {
+          "line": "Build the Gram matrix from standardized inputs",
+          "math": "K_{ij}=k(u_i,u_j)",
+          "say": "Choose a positive-definite kernel and evaluate it on every pair of training inputs. The result is the Gram matrix K. The structural-mechanics residual correction uses a Mat\u00e9rn five-halves kernel on standardized load vectors. A length scale controls how rapidly similarity decreases with distance. The kernel sees distances in the forty-one-dimensional input space, not distances between pixels in the output field. Keeping those two geometries separate makes the formula much easier to read."
+        },
+        {
+          "line": "Solve one regularized system with many right-hand sides",
+          "math": "\\alpha=(K+n\\lambda I)^{-1}R",
+          "say": "Stack the residual fields into an n by sixteen hundred and eighty-one matrix R. The fitted coefficient matrix alpha solves the same regularized system for every output coordinate. In implementation, factor the n by n matrix once and solve with all the right-hand sides. We write an inverse to express the mathematics, but an explicit inverse is unnecessary. The factor n multiplying lambda is the convention used throughout this paper, and it matters when comparing reported nuggets."
+        },
+        {
+          "line": "At a query, take a weighted sum of residual fields",
+          "math": "\\widehat r(u)=k(u,X)\\alpha",
+          "say": "At a new load, evaluate its kernel similarity to all training loads and multiply by alpha. Equivalently, solve for a query coefficient vector and use it to combine the observed residual fields. The coefficients can be signed; they are not the nonnegative weights of the neural convex stack. This is why the convex-hull picture for member averaging and the projection picture for kernel interpolation are related geometric ideas but not interchangeable formulas."
+        }
+      ]
+    },
+    {
+      "key": "c02_geometry",
+      "title": "A second kernel can use a different notion of distance",
+      "visual": {
+        "kind": "two_kernel_roles",
+        "label": "Structural-mechanics pipeline: fitted stages and their data flow",
+        "source": "paper/method.tex"
+      },
+      "visual_argument": "The network supplies either a baseline output or a feature map; the two arrows change different mathematical objects.",
+      "segments": [
+        {
+          "line": "An input-space correction keeps the original load geometry",
+          "math": "k(u,u')=\\kappa\\big(\\|u-u'\\|/s\\big)",
+          "say": "The first residual kernel compares standardized load vectors directly. Its geometry depends on the input scaling and the length scale. Two loads are close when their sampled values are close under that metric. This can be a useful notion of similarity, but it is not automatically the notion most relevant to the target stress field. A small change in a sensitive input direction may matter more than a larger change in an insensitive one."
+        },
+        {
+          "line": "A feature-space correction compares learned activations",
+          "math": "k_\\varphi(u,u')=\\kappa\\big(\\|\\varphi(u)-\\varphi(u')\\|/s\\big)",
+          "say": "The feature correction instead compares frozen internal activations from the fitted members. In the mechanics pipeline, reflection-averaged features are standardized and concatenated before the kernel is built. The kernel can then regard two loads as similar because the networks represent them similarly, even if their raw Euclidean distance is substantial. This transformation can help or hurt. It changes both the kernel function space and the locations of the design points within that space."
+        },
+        {
+          "line": "OCO-2 uses a direct-target feature head",
+          "math": "\\widehat G_{\\rm feat}(u)=k_\\varphi(u,X)(K_\\varphi+n\\lambda I)^{-1}Y",
+          "say": "The OCO-2 feature head fits the target directly rather than fitting the residual of the network output. The network provides the features, while kernel regression replaces its final prediction head. That is a controlled way to ask whether the learned representation remains useful when the final linear readout is changed. We will compare that head with the original network and with a ridge readout on the same frozen features, so the comparison is about the readout as well as the representation."
+        }
+      ]
+    },
+    {
+      "key": "c02_compatibility",
+      "title": "A theorem must describe the labels actually fitted",
+      "visual": {
+        "kind": "pipeline_stages",
+        "label": "Structural-mechanics pipeline: fitted stages and their data flow",
+        "source": "paper/method.tex"
+      },
+      "visual_argument": "Training-row means and deployed means feed different residual labels unless their values agree at the training design.",
+      "segments": [
+        {
+          "line": "The single-mean theorem uses one residual function",
+          "math": "R=G(X)-m(X)",
+          "say": "The clean theorem assumes that the residual labels come from one function G minus m evaluated at the design. Once m is fixed, those labels and the query residual belong to the same object. The recorded pipeline has a complication: some training-row predictions are foldwise, while the query-time mean uses full-data fits. The refiner also sees a different kernel channel at deployment. These changes mean that the recorded training-row mean need not equal the deployed mean evaluated on the training inputs."
+        },
+        {
+          "line": "Name the discrepancy rather than hide it",
+          "math": "\\Delta=m_{\\rm full}(X)-M_{\\rm tr}",
+          "say": "Call the discrepancy Delta. Then the recorded residual labels equal the residual of the full mean plus Delta. Because kernel regression is linear in its labels, the resulting prediction differs from the compatible single-mean correction by an explicitly computable propagated term. This observation gives a useful diagnostic and an extra term in the deterministic bound. It also tells us exactly what to rerun when checking the implementation, rather than treating a vague concern about leakage as either harmless or fatal without measurement."
+        },
+        {
+          "line": "Use the components to ask separate empirical questions",
+          "math": "\\text{Mean}\\ \\longrightarrow\\ \\text{residual}\\ \\longrightarrow\\ \\text{correction}",
+          "say": "We can now separate the study's questions. Does averaging reduce the neural mean's error, and what limits that reduction? Does the residual kernel add useful information? Does a learned feature map improve the kernel's geometry? Does the training-to-deployment discrepancy materially change the result? And how should uncertainty be calibrated afterward? The remaining chapters connect these questions to proofs, geometric examples and the recorded numerical comparisons."
+        }
+      ]
+    }
+  ]
+}

@@ -13,8 +13,13 @@ import subprocess
 import threading
 import time
 
+import psutil
+
 HERE = Path(__file__).resolve().parent
 PYTHON = Path(r"C:\Users\owner\lecture\venv\Scripts\python.exe")
+GUARD = Path(r"C:\Users\owner\.claude\compute\interactive_guard\state.json")
+BACKGROUND = [4, 5, 6, 7, 8, 9, 14, 15]
+RESERVED = [0, 1, 2, 3, 10, 11, 12, 13]
 
 
 def windows():
@@ -51,7 +56,7 @@ def main():
     parser.add_argument("--chapter", required=True)
     parser.add_argument("--board")
     parser.add_argument("--segment", type=int, default=0)
-    parser.add_argument("--quality", choices=("preview", "draft", "final"), required=True)
+    parser.add_argument("--quality", choices=("preview", "samples", "draft", "final"), required=True)
     args = parser.parse_args()
     if os.name != "nt":
         raise RuntimeError("This launcher implements the Windows environment only")
@@ -63,12 +68,16 @@ def main():
     kernel.SetProcessAffinityMask.argtypes = [wintypes.HANDLE, ctypes.c_size_t]
     handle = kernel.GetCurrentProcess()
     kernel.SetPriorityClass(handle, 0x4000)  # BELOW_NORMAL_PRIORITY_CLASS
-    process_mask, system_mask = ctypes.c_size_t(), ctypes.c_size_t()
-    if not kernel.GetProcessAffinityMask(handle, ctypes.byref(process_mask), ctypes.byref(system_mask)):
-        raise ctypes.WinError()
-    bits = [1 << k for k in range(64) if process_mask.value & (1 << k)]
-    mask = sum(bits[:2])
-    if not kernel.SetProcessAffinityMask(handle, ctypes.c_size_t(mask)):
+    guard = json.loads(GUARD.read_text(encoding="utf-8-sig"))
+    if not 0 <= time.time()-GUARD.stat().st_mtime <= 15:
+        raise RuntimeError("CPU guard is stale")
+    if guard.get("background_cpus") != BACKGROUND or guard.get("reserved_cpus") != RESERVED:
+        raise RuntimeError("CPU partition changed")
+    mask = (1 << 4) | (1 << 5)
+    # The observer stays on the background pool; the render child gets two
+    # explicitly designated background CPUs. Lowest available is NOT safe:
+    # a full inherited mask includes the owner's protected terminal CPUs.
+    if not kernel.SetProcessAffinityMask(handle, ctypes.c_size_t(sum(1 << c for c in BACKGROUND))):
         raise ctypes.WinError()
     env = dict(os.environ, NMKC_CHAPTER=args.chapter, NMKC_SEGMENT=str(args.segment),
                OMP_NUM_THREADS="1", OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1",
@@ -76,12 +85,13 @@ def main():
     if args.board:
         env["NMKC_BOARD"] = args.board
     log_dir = HERE / "logs"; log_dir.mkdir(exist_ok=True)
-    tag = args.board or f"chapter{args.chapter}"
-    quality = ["-s", "-r", "1920,1080"] if args.quality == "preview" else (
+    tag = args.board or f"chapter{args.chapter}_{args.quality}"
+    quality = ["-s", "-r", "1920,1080"] if args.quality in ("preview", "samples") else (
         ["-r", "1280,720", "--fps", "30"] if args.quality == "draft" else ["-r", "1920,1080", "--fps", "30"])
-    target = "BoardPreview" if args.quality == "preview" else "LectureChapter"
+    target = ("BoardPreview" if args.quality == "preview" else
+              "BoardSamples" if args.quality == "samples" else "LectureChapter")
     command = [str(PYTHON), "-B", "-m", "manim", "render", *quality, "--disable_caching",
-               "--media_dir", str(HERE / "media"), "scenes.py", target]
+               "--media_dir", str(HERE / "media"), "-o", tag, "scenes.py", target]
     stop = threading.Event()
     samples = []; observed = []
     baseline = windows()
@@ -97,8 +107,21 @@ def main():
     watcher = threading.Thread(target=poll, daemon=True); watcher.start()
     try:
         with (log_dir / (tag + "_render.log")).open("w", encoding="utf-8") as log:
-            proc = subprocess.run(command, cwd=HERE, env=env, stdout=log, stderr=subprocess.STDOUT,
-                                  creationflags=0x08000000 | 0x4000)
+            proc = subprocess.Popen(command, cwd=HERE, env=env, stdout=log, stderr=subprocess.STDOUT,
+                                    creationflags=0x08000000 | 0x4000 | 0x4)
+            resumed = False
+            try:
+                child = psutil.Process(proc.pid)
+                child.cpu_affinity([4, 5])
+                if child.cpu_affinity() != [4, 5] or child.nice() != psutil.BELOW_NORMAL_PRIORITY_CLASS:
+                    raise RuntimeError("Pre-start affinity or priority verification failed")
+                child.resume()
+                resumed = True
+            finally:
+                if not resumed:
+                    proc.kill()
+                    proc.wait()
+            proc.wait()
     finally:
         stop.set(); watcher.join()
     intervals = samples[1:]

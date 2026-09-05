@@ -1,0 +1,224 @@
+{
+  "id": "11",
+  "title": "Calibration: what coverage does and does not promise",
+  "boards": [
+    {
+      "key": "c11_ball",
+      "title": "Calibrate a ball around the predicted field",
+      "visual": {
+        "kind": "conformal_ball",
+        "label": "Illustrative output-space cross-section; the actual set is one Euclidean ball in 1,681 dimensions",
+        "source": "paper/supp_theory_conf.tex:prop:conf"
+      },
+      "visual_argument": "The radius encloses whole output vectors around one prediction; it is not a separate interval at each grid coordinate.",
+      "segments": [
+        {
+          "line": "Start with a fixed predictor and a positive scale",
+          "math": "\\widehat G(u),\\qquad a(u)>0",
+          "say": "The kernel error bound contains an unknown function-space norm. Calibration asks a different question: can we use past errors to choose a prediction radius with a marginal coverage guarantee? Start with a predictor and a strictly positive scale function, both fixed independently of the calibration and future observations. The scale might be the power function, ensemble disagreement, or simply the constant one. The rank proof does not require the scale to be a good predictor of error."
+        },
+        {
+          "line": "Use a scaled absolute error as the calibration score",
+          "math": "s_i=\\frac{\\|G(\\widetilde u_i)-\\widehat G(\\widetilde u_i)\\|_2}{a(\\widetilde u_i)}",
+          "say": "At each calibration input, compute the absolute Euclidean norm of the field error and divide by its scale. These are absolute output-grid norms. They are not the relative percentages used in the accuracy tables. The scale changes how cases are compared before taking a quantile. A case with a large predicted scale needs a proportionally larger error to have the same score as a case with a small scale."
+        },
+        {
+          "line": "One radius controls the entire output vector",
+          "math": "C(u)=\\{v:\\|v-\\widehat G(u)\\|_2\\le Q a(u)\\}",
+          "say": "Multiply the calibrated threshold Q by the scale at the new input. The prediction set is the Euclidean ball of that radius centered on the predicted field. The circle in the picture is a two-dimensional cross-section of this geometry; the mechanics output has sixteen hundred eighty-one coordinates. Coverage means that the whole target vector lies inside the ball. It is not a statement that each pixel receives its own ninety-percent interval."
+        }
+      ]
+    },
+    {
+      "key": "c11_quantile",
+      "title": "The extra rank is essential",
+      "visual": {
+        "kind": "calibration_ranks",
+        "label": "Illustration with nine calibration scores and one future score; the future rank has ten possible positions",
+        "source": "paper/supp_theory_conf.tex:eq:conf"
+      },
+      "visual_argument": "The future case occupies one of m+1 rank positions, which explains the finite-sample correction rather than an uncorrected percentile.",
+      "segments": [
+        {
+          "line": "Choose the rank using the future case as well",
+          "math": "k=\\lceil(1-\\alpha)(m+1)\\rceil",
+          "say": "With m calibration scores and one future score, there are m plus one possible ranks. Choose k as the ceiling of one minus alpha times m plus one. The extra one is the finite-sample correction. Taking an ordinary empirical percentile of only the m calibration values can miss it. For one thousand calibration cases at nominal ninety-percent coverage, k is nine hundred one."
+        },
+        {
+          "line": "Take that order statistic, with infinity as the extra entry",
+          "math": "\\begin{aligned}Q&=s_{(k)}&&\\text{if }k\\le m,\\\\Q&=+\\infty&&\\text{if }k=m+1.\\end{aligned}",
+          "say": "If k is at most m, use the k-th smallest calibration score. If k equals m plus one, the threshold is positive infinity and the prediction set is the whole output space. The maximum observed finite score is not a substitute for that case. It is possible to demand a coverage level that the available finite calibration sample cannot support with a finite threshold under this distribution-free construction."
+        },
+        {
+          "line": "For the two reported levels, the ranks are finite",
+          "math": "\\begin{aligned}m=1000,\\ \\alpha=.10&:\\ k=901\\\\m=1000,\\ \\alpha=.05&:\\ k=951\\end{aligned}",
+          "say": "The two levels reported in this paper use ranks nine hundred one and nine hundred fifty-one, both within the one thousand calibration scores. We retain the calibration indices and score arrays, so those choices can be reproduced directly by sorting. Verifying the selected order statistic is more informative than checking that a library call returned a number near an expected percentile."
+        }
+      ]
+    },
+    {
+      "key": "c11_rank_proof",
+      "title": "Prove coverage by exchanging the labels of the cases",
+      "visual": {
+        "kind": "calibration_ranks",
+        "label": "Exchangeability makes the future label equally likely at every rank; random tie-breakers preserve that symmetry",
+        "source": "paper/proofs.tex:proof:prop:conf"
+      },
+      "visual_argument": "The score values can be held in order while the identity of the future case moves among equally likely positions.",
+      "segments": [
+        {
+          "line": "Condition on the independently fitted objects",
+          "math": "s_1,\\ldots,s_m,s^\\star\\quad\\text{are exchangeable}",
+          "say": "Here is the complete rank argument. Condition on the fixed predictor, design, and positive scale. By assumption, the calibration cases and the new case are exchangeable and independent of those fitted objects. Applying the same score function to each preserves exchangeability. Attach independent continuous random tie-breakers if equal scores occur. Their only purpose is to assign a unique rank while preserving symmetry among the case labels."
+        },
+        {
+          "line": "The future score has a uniform tie-broken rank",
+          "math": "\\mathbb P(J=j)=\\frac1{m+1},\\qquad j=1,\\ldots,m+1",
+          "say": "Let J be the rank of the future score in the ordered list of all m plus one scores, including the random tie-breakers. Exchangeability makes every case label equally likely to occupy every position. Therefore J is uniform on the integers one through m plus one. This is the entire probability step. It does not use Gaussian errors, a correctly specified kernel, or an estimate of the residual's native-space norm."
+        },
+        {
+          "line": "A low enough rank implies inclusion in the prediction ball",
+          "math": "\\{J\\le k\\}\\subseteq\\{s^\\star\\le s_{(k)}\\}",
+          "say": "If the future score has rank at most k in the full ordering, its numerical value cannot exceed the k-th calibration score. This implication remains true with ties. The right-hand event is exactly inclusion in the prediction ball, because the scale is positive. If scores are distinct, the events coincide: removing the future score from the list changes the calibration ranks in precisely the way captured by this comparison."
+        }
+      ]
+    },
+    {
+      "key": "c11_coverage",
+      "title": "The result is marginal coverage",
+      "visual": {
+        "kind": "conformal_ball",
+        "label": "The rank guarantee averages over a future case and the calibration sample; it does not certify each individual input",
+        "source": "paper/supp_theory_conf.tex:prop:conf"
+      },
+      "visual_argument": "Membership of a new output vector is an event; the theorem controls its probability under the sampling assumptions, rather than every possible location.",
+      "segments": [
+        {
+          "line": "Take probabilities in the rank implication",
+          "math": "\\begin{aligned}\\mathbb P(G(u^\\star)\\in C(u^\\star))&\\ge\\frac{k}{m+1}\\\\&\\ge1-\\alpha.\\end{aligned}",
+          "say": "Take probabilities. Coverage is at least the probability that the uniform rank is at most k, which is k divided by m plus one. The ceiling used to define k makes this at least one minus alpha. If k equals m plus one, coverage is one by the infinity convention already handled. Averaging over independently fitted objects preserves the same inequality. That completes the lower-bound proof."
+        },
+        {
+          "line": "With distinct scores, the rank probability is exact",
+          "math": "\\begin{gathered}\\mathbb P(\\text{covered})=\\frac{k}{m+1}\\\\1-\\alpha\\le\\frac{k}{m+1}\\le1-\\alpha+\\frac1{m+1}\\end{gathered}",
+          "say": "When scores are almost surely distinct, the rank event and the coverage event are identical, so the probability is exactly k over m plus one. It is at most one minus alpha plus one over m plus one. With ties, coverage can be more conservative, and that narrow upper bound is no longer generally available. This distinction is easy to omit when writing a short statement of conformal coverage, but it belongs in a complete proof."
+        },
+        {
+          "line": "Nothing here guarantees coverage at every fixed input",
+          "math": "\\mathbb P(\\text{covered})\\quad\\ne\\quad\\mathbb P(\\text{covered}\\mid u=u_0)",
+          "say": "The guarantee averages over the new case and the calibration sample under the stated assumptions. It is not conditional coverage at every particular input, and it is not a guarantee that small-scale cases will be covered as often as large-scale cases. A method can achieve the advertised marginal rate while systematically under-covering one region. The measured deciles in a moment show exactly that behavior in this benchmark."
+        }
+      ]
+    },
+    {
+      "key": "c11_beta",
+      "title": "Why measured coverage moves around the nominal level",
+      "visual": {
+        "kind": "coverage_reference",
+        "label": "Exact reference model: m=1,000, nominal 90%, N=19,000; additional i.i.d. continuous-score assumptions",
+        "source": "paper/supp_theory_conf.tex:rem:covlaw; lecture/assets/coverage_reference.json"
+      },
+      "visual_argument": "A random calibration quantile produces a random success probability; evaluation adds binomial variation around it.",
+      "segments": [
+        {
+          "line": "A stronger sampling assumption gives an exact reference law",
+          "math": "F(s_i)\\overset{\\rm iid}{\\sim}\\operatorname{Uniform}(0,1)",
+          "say": "To describe the distribution of realized coverage across calibration samples, assume more than exchangeability. Conditional on the frozen predictor and scale, suppose all scores are independent and identically distributed from a continuous cumulative distribution F. The probability integral transform turns their values under F into independent uniform variables. The k-th calibration score therefore maps to the k-th order statistic of m independent uniforms."
+        },
+        {
+          "line": "The conditional coverage itself is random",
+          "math": "p_{\\rm cal}=F(s_{(k)})\\sim\\operatorname{Beta}(k,m+1-k)",
+          "say": "The probability of covering a fresh case after observing this particular calibration sample is F evaluated at its selected score. The uniform order-statistic density is proportional to p to the k minus one times one minus p to the m minus k, which is the Beta density with parameters k and m plus one minus k. At nominal ninety percent with one thousand calibration cases, those parameters are nine hundred one and one hundred. Different calibration samples produce different p values."
+        },
+        {
+          "line": "An independent evaluation block adds binomial sampling",
+          "math": "\\begin{aligned}B\\mid p_{\\rm cal}&\\sim\\operatorname{Binomial}(N,p_{\\rm cal})\\\\B&\\sim\\operatorname{BetaBinomial}(N,k,m+1-k)\\end{aligned}",
+          "say": "Conditional on the calibration sample, an independent evaluation block has a binomial count of covered cases. Integrating over the random Beta success probability gives the Beta-binomial law. With nineteen thousand evaluation cases, the central ninety-five-percent reference interval for the observed fraction at nominal ninety percent is about eighty-eight point zero to ninety-one point eight percent. Exchangeability alone does not imply this stronger law, and agreement with the interval does not prove its assumptions."
+        }
+      ]
+    },
+    {
+      "key": "c11_width",
+      "title": "A constant radius is a serious baseline",
+      "visual": {
+        "kind": "uq_measured",
+        "figure": "radii",
+        "label": "Historical mechanics seed 0: 1,000 calibration and 19,000 evaluation cases; absolute radii, not diameters",
+        "source": "lecture/assets/uq_seed0.json; lecture/assets/uq_figures.json"
+      },
+      "visual_argument": "The three measured mean radii and coverages show that a varying scale can enlarge prediction sets without improving their practical allocation.",
+      "segments": [
+        {
+          "line": "Compare all scales on the same cases",
+          "math": "a(u)\\in\\{1,\\ D(u),\\ P_\\lambda(u)\\}",
+          "say": "The scale function is part of the estimator, so it deserves a baseline. Compare a constant scale, ensemble disagreement, and the kernel power function on the same calibration and evaluation indices. The displayed values use the historical six-member pipeline at seed zero and nominal ninety-percent coverage. They were reconstructed from retained error and scale arrays, with the absolute errors also checked against the saved predictions and reference fields."
+        },
+        {
+          "line": "The constant-radius set is smaller on average here",
+          "math": "\\overline r:\\quad353.6,\\quad402.9,\\quad397.7",
+          "say": "The mean radii are approximately three hundred fifty-three point six for the constant scale, four hundred two point nine for disagreement, and three hundred ninety-seven point seven for the power function. These are absolute Euclidean field units, not percentages. The corresponding empirical coverages are about ninety point nine, ninety point two, and ninety-one point four percent. This one-seed picture is consistent with the paper's multi-seed finding that the constant-radius baseline is narrower on average."
+        },
+        {
+          "line": "Marginal validity and useful adaptation are different properties",
+          "math": "\\begin{gathered}\\text{Coverage}\\qquad\\text{Mean radius}\\\\\\text{Local allocation}\\end{gathered}",
+          "say": "The rank theorem gives all three constructions the same kind of marginal guarantee under its assumptions. It does not say that one scale gives smaller sets, better local coverage, or a useful ranking of difficult inputs. Those are empirical properties. A varying radius can be mathematically valid and still waste width on easy cases while assigning too little to difficult ones. Reporting coverage alone would miss that weakness."
+        }
+      ]
+    },
+    {
+      "key": "c11_deciles",
+      "title": "The overall coverage conceals a large local imbalance",
+      "visual": {
+        "kind": "uq_measured",
+        "figure": "deciles",
+        "label": "Historical seed 0: evaluation cases sorted into ten equally sized power-function groups, 1,900 cases each",
+        "source": "lecture/assets/uq_seed0.json; lecture/assets/uq_figures.json"
+      },
+      "visual_argument": "Coverage rises sharply across scale deciles while mean error stays nearly flat, exposing a mismatch between radius allocation and realized difficulty.",
+      "segments": [
+        {
+          "line": "Group cases by the scale before looking at their coverage",
+          "math": "\\text{Deciles of }P_\\lambda(u)\\text{ on the evaluation block}",
+          "say": "Sort the nineteen thousand evaluation cases by their power-function value and divide them into ten groups of nineteen hundred. Then measure coverage within each group using the single threshold chosen from calibration. These groups are descriptive diagnostics on the fixed public evaluation block. They do not create a new conditional guarantee, but they reveal where the marginal total comes from."
+        },
+        {
+          "line": "Coverage ranges from about 69 percent to almost 100 percent",
+          "math": "69.1\\%\\longrightarrow99.9\\%",
+          "say": "At seed zero, the smallest-power decile has about sixty-nine point one percent coverage. The largest-power decile is covered about ninety-nine point nine percent of the time. Meanwhile, the mean absolute error is nearly flat across those groups compared with the large increase in radius. The scale changes much more than the measured difficulty does. That is a concrete reason to distrust the power function as an input-by-input error indicator here, despite its role in a valid worst-case theorem."
+        },
+        {
+          "line": "A shared error direction can escape disagreement as well",
+          "math": "\\begin{aligned}f_a-G&=b+\\varepsilon_a\\\\f_a-f_c&=\\varepsilon_a-\\varepsilon_c\\end{aligned}",
+          "say": "There is a related limitation for ensemble disagreement. If every predictor shares the same error component b, subtracting predictors cancels that component. Agreement can therefore coexist with substantial common error. This brings us back to the residual geometry at the start of the lecture: a common direction limits averaging and is invisible to spread among members. Calibration can correct an overall quantile, but it cannot make a weak scale identify the missing direction on every case."
+        }
+      ]
+    },
+    {
+      "key": "c11_freshness",
+      "title": "A new split does not erase earlier access to a public test set",
+      "visual": {
+        "kind": "calibration_protocol",
+        "label": "Prospective guarantee: freeze fitted objects before independent calibration and future evaluation",
+        "source": "paper/supp_theory_conf.tex; paper/impl.tex:conformal protocol"
+      },
+      "visual_argument": "The chronology required by the proof separates model development from calibration; a retrospective partition cannot reverse prior information flow.",
+      "segments": [
+        {
+          "line": "The recorded exercise uses a retrospective partition",
+          "math": "\\begin{gathered}20000\\text{ cases}\\\\\\downarrow\\\\1000\\text{ calibration}+19000\\text{ evaluation}\\end{gathered}",
+          "say": "The paper computes these calibration measurements after fitting its reported models, using a random partition of the public test block. Within that calculation, calibration and evaluation indices are disjoint. That separation is useful and reproducible. The broader study, however, had already inspected this public block across campaigns and diagnostics. A new random partition does not undo the influence that earlier results may have had on model development."
+        },
+        {
+          "line": "A prospective claim needs the stated independence conditions",
+          "math": "\\begin{gathered}\\text{Freeze}\\longrightarrow\\text{Fresh calibration}\\\\\\downarrow\\\\\\text{Future case}\\end{gathered}",
+          "say": "For the fresh-population guarantee, fix the predictor and scale before observing an independent, exchangeable calibration-and-evaluation sample. The order in the diagram is part of the mathematical assumption. If the target distribution shifts, or if the calibration cases influence the fitted objects, the rank proof cannot simply be invoked unchanged. The theorem remains correct; the question is whether the particular experiment satisfies its premises."
+        },
+        {
+          "line": "Keep the theorem and the measurement side by side",
+          "math": "\\begin{gathered}\\text{Proved rank statement}\\\\\\text{Measured benchmark behavior}\\end{gathered}",
+          "say": "We therefore report two things separately and precisely: the coverage theorem with its complete proof and assumptions, and the measured radii and coverages on the retained benchmark partition. The observed results can inform a future deployment study without being relabeled as that study. This distinction makes the uncertainty section more useful. It tells a reader which guarantees are available, what the present evidence measures, and what new data would be needed for a prospective claim."
+        }
+      ]
+    }
+  ]
+}

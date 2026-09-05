@@ -1,0 +1,19 @@
+{
+  "source_npz_sha256": "06a77d9543a3ab8df74657d30b42d6649751cb69fa1a216922bd3f1b5d7c7ef3",
+  "source_manifest_sha256": "1ce71d0dd67062141d61db88d6c8d7faccfe8061dbc4a585687c32273af75d4b",
+  "matplotlib_version": "3.10.8",
+  "seed": 0,
+  "nominal_coverage": 0.9,
+  "rows": [
+    {
+      "kind": "radii",
+      "path": "uq_radii.png",
+      "sha256": "0b5befe0e51b1ad08b3d9af59e16385a152b3da618eba6da6309eb25b71cba8d"
+    },
+    {
+      "kind": "deciles",
+      "path": "uq_deciles.png",
+      "sha256": "4a0312711d0e9454fb1736d5e24646f52c6ef1cff95358a55e54a08b5669df6e"
+    }
+  ]
+}

@@ -14,7 +14,7 @@
       "segments": [
         {
           "line": "Keep the actual configurations in view",
-          "math": "6\\text{ configurations}\\times10\\text{ seeds}=60\\text{ predictors}",
+          "math": "\\begin{gathered}6\\text{ configurations}\\times10\\text{ seeds}\\\\=60\\text{ predictors}\\end{gathered}",
           "say": "The empirical pool contains ten fitted instances of each of six configurations. They are the relative-loss MLP, the normalized-MSE MLP, the kernel-conditioned refiner, the Fourier neural operator, the UNet and kernel ridge regression. The paper groups them as architecture blocks, but several are related neural configurations and one is a kernel method. It is more accurate to keep those identities visible than to imagine sixty unrelated neural architectures."
         },
         {
@@ -51,7 +51,7 @@
         },
         {
           "line": "A flatter curve is evidence about shared residuals",
-          "math": "\\text{Remaining gain depends on the residual directions}",
+          "math": "\\begin{gathered}\\text{Remaining gain depends on}\\\\\\text{the residual directions}\\end{gathered}",
           "say": "The initial gains are followed by relatively small changes as more seeds are added. That pattern is consistent with the strong residual alignment visible in the measured matrix. The block-floor theorem makes the connection quantitative without fitting an asymptotic learning curve. A flattened finite-range curve is not by itself proof of a positive limiting error, and we do not draw an unseen infinite-seed point as if it had been measured."
         }
       ]
@@ -105,7 +105,7 @@
         },
         {
           "line": "Repeated seeds share cases and therefore share evaluation variation",
-          "math": "\\text{Ten seeds}\\ne\\text{ten independent test populations}",
+          "math": "\\begin{gathered}\\text{Ten seeds}\\\\\\ne\\text{ten independent populations}\\end{gathered}",
           "say": "The ten training seeds provide useful replication of fitting variation. They do not create ten independent test populations because the same inputs and target fields are reused. Similarly, thousands of overlapping subsets of the same ten predictors are not thousands of independent training runs. Error bars and conclusions should match these dependencies. A visually narrow band can otherwise suggest much more independent evidence than the experiment contains."
         }
       ]
@@ -132,7 +132,7 @@
         },
         {
           "line": "The useful empirical conclusion is narrower and more actionable",
-          "math": "\\text{Change the representation or correction, then measure}",
+          "math": "\\begin{gathered}\\text{New representation or correction}\\\\\\downarrow\\\\\\text{Measure the resulting estimator}\\end{gathered}",
           "say": "The evidence suggests that repeatedly adding similar seeds or improving only the global convex optimizer offers limited gains within this pool. A more promising next experiment changes the residual directions, the coordinatewise readout or the representation supplied to the correction. That is a research decision supported by this dataset, not a theorem that one family of architectures will always win. It gives us a concrete reason to investigate what the kernel can add."
         }
       ]
@@ -159,7 +159,7 @@
         },
         {
           "line": "Use the bound to locate the unresolved question",
-          "math": "\\text{A floor for this pool is not a floor for the problem}",
+          "math": "\\begin{gathered}\\text{A floor for this pool}\\\\\\ne\\text{a floor for the problem}\\end{gathered}",
           "say": "The empirical bound has done something useful without answering every question. It has localized the best global convex risk within this fixed pool and separated that issue from the search for a genuinely different residual direction. The kernel analysis now asks how a mean and a representation change the remaining approximation problem. Its theorems will be conditional on a function class, while the numerical experiments test whether the proposed corrections help on the recorded data."
         }
       ]

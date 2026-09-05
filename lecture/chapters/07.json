@@ -82,7 +82,7 @@
         },
         {
           "line": "The pseudoinverse gives a consistent coefficient vector",
-          "math": "k_u\\in\\operatorname{range}K,\\qquad c=K^+k_u,\\qquad Kc=k_u",
+          "math": "\\begin{gathered}k_u\\in\\operatorname{range}K\\\\c=K^+k_u\\quad\\Longrightarrow\\quad Kc=k_u\\end{gathered}",
           "say": "Use the Moore-Penrose pseudoinverse to choose c. Because k sub u is in the range of K, this coefficient vector satisfies K c equals k sub u exactly. Different coefficient vectors may represent the same fitted RKHS function, but the projection and its error representer are well defined. The norm expansion and sharpness argument therefore continue to hold. This completes the singular zero-nugget case promised in the theorem rather than leaving it as an unexplained inverse symbol."
         }
       ]
@@ -161,7 +161,7 @@
         },
         {
           "line": "Use the defining linear system",
-          "math": "(K+n\\lambda I)c=k_u\\quad\\Longrightarrow\\quad Kc=k_u-n\\lambda c",
+          "math": "\\begin{aligned}(K+n\\lambda I)c&=k_u\\\\Kc&=k_u-n\\lambda c\\end{aligned}",
           "say": "The coefficient vector was defined by a linear system. Rearranging that system gives K c equal to k sub u minus n lambda c. Substitute this into the last term of the norm expansion. One copy of c transpose k sub u cancels. The regularization contributes a negative term, minus n lambda times the squared Euclidean norm of c. This negative sign compares two factors at the same lambda; it does not mean that ridge improves on noiseless interpolation."
         },
         {
@@ -185,17 +185,17 @@
       "segments": [
         {
           "line": "Use one design feature and one query feature",
-          "math": "\\phi(x_1)=(1,0),\\quad\\phi(u)=(3,2),\\quad k(x,y)=\\phi(x)^\\top\\phi(y)",
+          "math": "\\begin{gathered}\\phi(x_1)=(1,0),\\quad\\phi(u)=(3,2)\\\\k(x,y)=\\phi(x)^\\top\\phi(y)\\end{gathered}",
           "say": "Take an exact finite-dimensional example. There is one design feature vector, one zero, and the query feature vector is three two. Use their ordinary dot product as the kernel. The Gram matrix is the one-by-one matrix with entry one. The query kernel vector has entry three, and k of u u is thirteen. These numbers come directly from the displayed vectors, so we can check the abstract formula by elementary geometry."
         },
         {
           "line": "A nugget of one half gives coefficient two",
-          "math": "c=\\frac3{1+1/2}=2,\\qquad g_u=(3,2)-(2,0)=(1,2)",
+          "math": "\\begin{aligned}c&=\\frac3{1+1/2}=2\\\\g_u&=(3,2)-(2,0)=(1,2)\\end{aligned}",
           "say": "With n equal to one and lambda equal to one half, the coefficient is three divided by one and a half, which is two. The approximating feature vector is therefore two zero. Subtract it from the query vector three two and obtain the error representer one two. Its squared length is one plus four, or five. We have computed the exact factor without using the posterior-variance formula at all."
         },
         {
           "line": "The two calculation paths agree",
-          "math": "P_\\lambda^2=13-\\frac9{3/2}=7,\\qquad\\widetilde P_\\lambda^2=7-\\frac12\\,2^2=5",
+          "math": "\\begin{aligned}P_\\lambda^2&=13-\\frac9{3/2}=7\\\\\\widetilde P_\\lambda^2&=7-\\tfrac12\\,2^2=5\\end{aligned}",
           "say": "Now use the matrix formula. The posterior factor squared is thirteen minus nine divided by one and a half, giving seven. Subtract lambda times the coefficient squared: one half times four, or two. The result is five, exactly as the vector calculation gave. At zero nugget, the orthogonal projection is three zero and the remaining vector is zero two, with squared length four. Ridge has increased the exact worst-case factor from two to the square root of five."
         }
       ]
@@ -249,7 +249,7 @@
         },
         {
           "line": "The next result gives a matching lower bound for all recovery rules",
-          "math": "\\text{Same observations}\\quad\\Longrightarrow\\quad\\text{an unavoidable ambiguity}",
+          "math": "\\begin{gathered}\\text{Same observations}\\\\\\Downarrow\\\\\\text{unavoidable ambiguity}\\end{gathered}",
           "say": "The sharpness result so far concerns this particular kernel correction rule. A more ambitious question remains: could some different rule, perhaps nonlinear, use the same residual observations and achieve a smaller worst-case error? At zero nugget the answer is no, for this RKHS ball. The proof will use two residuals that are identical on the design but opposite at the query. Their geometric separation creates an error that no recovery rule can avoid."
         }
       ]

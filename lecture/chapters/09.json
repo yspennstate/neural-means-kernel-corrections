@@ -95,7 +95,7 @@
       "segments": [
         {
           "line": "Out-of-fold prediction still needs a centering convention",
-          "math": "\\mu_P=\\operatorname{mean}_{19000}G,\\qquad\\mu_F=\\operatorname{mean}_{14250}G",
+          "math": "\\begin{aligned}\\mu_P&=\\operatorname{mean}_{19000}G\\\\\\mu_F&=\\operatorname{mean}_{14250}G\\end{aligned}",
           "say": "A separate sensitivity check concerns target centering inside the out-of-fold kernel fits. In the historical recipe, each fold subtracts the target mean over all nineteen thousand training cases. Fold-local centering instead uses only the fourteen thousand two hundred fifty fitting cases for that fold. The held-out targets do not enter this second mean. These alternatives are close numerically here, but they are not the same information flow."
         },
         {
@@ -105,7 +105,7 @@
         },
         {
           "line": "Subtract the two expressions before running anything downstream",
-          "math": "\\widehat G_H(\\mu_F)-\\widehat G_H(\\mu_P)=(\\mathbf1-k_HA^{-1}\\mathbf1)(\\mu_F-\\mu_P)^\\top",
+          "math": "\\begin{aligned}\\widehat G_H(\\mu_F)-\\widehat G_H(\\mu_P)\\\\=(\\mathbf1-k_HA^{-1}\\mathbf1)(\\mu_F-\\mu_P)^\\top\\end{aligned}",
           "say": "Subtracting the affine formulas gives a rank-one product: a coefficient on the held-out rows times the difference in target means. Our implementation checks this identity against separate right-hand-side solves at prespecified output coordinates. It also checks that the pooled arm reproduces the retained historical field. Those checks isolate the centering intervention before retraining the refiner, where optimization randomness would otherwise make a discrepancy harder to diagnose."
         }
       ]
@@ -122,12 +122,12 @@
       "segments": [
         {
           "line": "The centering comparison retrains the refiner",
-          "math": "\\text{Centering}\\longrightarrow\\text{Refiner}\\longrightarrow\\text{Stack}\\longrightarrow\\text{Correction}",
+          "math": "\\begin{gathered}\\text{Centering}\\longrightarrow\\text{Refiner}\\\\\\downarrow\\\\\\text{Stack}\\longrightarrow\\text{Correction}\\end{gathered}",
           "say": "Changing an out-of-fold kernel field also changes the refiner's training input. A comparison that stopped at the kernel field would miss that downstream effect. We therefore train the refiner for the same hundred epochs in each arm, then repeat stacking, the per-pixel decision, residual correction, and calibration. The other fixed predictors are reused. Ten matched seeds let us inspect whether the direction is consistent or simply alternates at a very small scale."
         },
         {
           "line": "The mismatch comparison freezes the estimator except for labels",
-          "math": "\\text{Fixed mean, weights, kernel}\\quad\\longrightarrow\\quad R_{\\rm tr}\\ \\hbox{or}\\ R_{\\rm full}",
+          "math": "\\begin{gathered}\\text{Fixed mean, weights, kernel}\\\\\\downarrow\\\\R_{\\rm tr}\\quad\\hbox{or}\\quad R_{\\rm full}\\end{gathered}",
           "say": "The label-consistency diagnostic is deliberately different. It holds the historical mean, weights, and selected kernel fixed, changing only the labels used by the correction. The two experiments answer different questions and should not be combined into one claim about cross-fitting. Even in the fold-local centering arm, input standardization still uses the full training block, and neural channels are not all cross-fitted."
         },
         {

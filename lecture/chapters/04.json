@@ -234,7 +234,7 @@
         },
         {
           "line": "Measure alignment before adding more seeds",
-          "math": "\\text{Empirical }S\\longrightarrow\\text{scope for convex averaging}",
+          "math": "\\begin{gathered}\\text{Empirical }S\\\\\\downarrow\\\\\\text{scope for convex averaging}\\end{gathered}",
           "say": "The practical lesson is to measure the residual matrix before assuming that more seeds will help. If the empirical lower bound is already close to the simplex optimum, there is little room left for another choice of global convex weights on that measured pool. The next question is then how to change the error directions. The kernel correction and the learned feature representation are two ways to try. In the next chapter, we will put the theorem beside the actual sixty-member matrix and keep the empirical and population claims separate."
         }
       ]

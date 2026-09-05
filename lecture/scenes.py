@@ -21,6 +21,8 @@ BG, INK, DIM = "#111A23", "#F2EEE7", "#AEBBC9"
 GOLD, BLUE, GREEN, RED = "#E5B85C", "#70B7DF", "#94C9A9", "#EC8C86"
 config.background_color = BG
 config.max_inflight_encoders = 1
+from encoder_policy import record as record_encoder_policy
+ENCODER_POLICY = record_encoder_policy(HERE)
 config.tex_dir = str(HERE / "media" / "Tex" / f"p{os.getpid()}")
 config.text_dir = str(HERE / "media" / "texts" / f"p{os.getpid()}")
 TEMPLATE = TexTemplate(tex_compiler="pdflatex", output_format=".pdf")
@@ -87,6 +89,137 @@ def field_image(grid, cmap, low, high, center, size=2.15):
 
 def build_visual(spec):
     kind = spec["kind"]
+    if kind == "uq_measured":
+        receipt=json.loads((HERE/'assets/uq_figures.json').read_text(encoding='utf-8'))
+        row=next(r for r in receipt['rows'] if r['kind']==spec['figure'])
+        path=HERE/'assets'/row['path']
+        if hashlib.sha256(path.read_bytes()).hexdigest()!=row['sha256']:
+            raise ValueError('UQ plot differs from its receipt')
+        plot=ImageMobject(str(path)).set_width(7.1).move_to([2.65,.0,0])
+        top=Rectangle(width=6.45,height=2.15,color=GREEN).move_to([2.9,1.45,0])
+        bottom=Rectangle(width=6.45,height=2.1,color=GOLD).move_to([2.9,-1.15,0])
+        return Group(plot),[lambda:ShowPassingFlash(top),lambda:ShowPassingFlash(bottom),
+                             lambda:ShowPassingFlash(top.copy().set_color(GOLD))]
+    if kind == "conformal_ball":
+        centre=np.array([2.6,.1,0])
+        circle=Circle(radius=1.65,color=BLUE,fill_color=BLUE,fill_opacity=.07).move_to(centre)
+        prediction=Dot(centre,color=GOLD)
+        radius=Arrow(centre,centre+[1.65,0,0],buff=0,color=GREEN)
+        inside=Dot(centre+[-.8,.9,0],color=GREEN,radius=.075)
+        outside=Dot(centre+[1.85,1.25,0],color=RED,radius=.075)
+        labels=VGroup(formula(r"\widehat G(u)",29,GOLD).next_to(prediction,DOWN,buff=.18),
+                      formula(r"Qa(u)",29,GREEN).move_to(centre+[.85,-.4,0]),
+                      small_label("Covered",inside.get_center()+[-.3,.45,0],25,GREEN),
+                      small_label("Outside",outside.get_center()+[.1,.45,0],25,RED),
+                      small_label("One ball for the entire output field",[2.6,-2.35,0],25))
+        return VGroup(circle,prediction,radius,inside,outside,labels),[lambda:Indicate(prediction,color=GOLD),
+                lambda:Indicate(radius,color=GREEN),lambda:Indicate(circle,color=BLUE)]
+    if kind == "calibration_ranks":
+        slots=VGroup();labels=VGroup()
+        for j in range(10):
+            centre=np.array([-.45+j*.68,.45,0])
+            slots.add(Dot(centre,color=BLUE,radius=.07))
+            labels.add(formula(str(j+1),21,DIM).move_to(centre+[0,-.45,0]))
+        future=Circle(radius=.19,color=GOLD,stroke_width=3).move_to(slots[5])
+        threshold=DashedLine([5.25,-.4,0],[5.25,1.15,0],color=GREEN)
+        heads=VGroup(small_label("Rank among all ten cases",[2.6,2.05,0],27),
+                     formula(r"k=9",27,GREEN).move_to([5.25,1.52,0]),
+                     small_label("Gold ring: future case",[2.6,-1.55,0],26,GOLD),
+                     formula(r"\mathbb P(J\le9)=9/10",30,GOLD).move_to([2.6,-2.3,0]))
+        return VGroup(slots,labels,future,threshold,heads),[
+            lambda:future.animate.move_to(slots[2]),lambda:future.animate.move_to(slots[8]),
+            lambda:Indicate(heads[3],color=GOLD)]
+    if kind == "coverage_reference":
+        data=json.loads((HERE/'assets/coverage_reference.json').read_text(encoding='utf-8'))
+        xx=np.array(data['conditional_p'])*100;yy=np.array(data['conditional_density'])/100
+        ymax=float(yy.max())*1.15
+        ax=axes(x=(86,94,2),y=(0,ymax,ymax/2),width=5.1,height=3.9).move_to([2.6,.3,0])
+        curve=VMobject(color=BLUE,stroke_width=3).set_points_as_corners([ax.c2p(x,y) for x,y in zip(xx,yy)])
+        mode=100*(data['k']-1)/(data['m']-1)
+        marker=Dot(ax.c2p(mode,np.interp(mode,xx,yy)),color=GOLD)
+        labels=VGroup(small_label("Density of conditional coverage",[2.6,2.65,0],25),
+                      small_label("Conditional coverage (%)",[2.6,-2.02,0],25),
+                      formula(r"p_{\rm cal}\sim\operatorname{Beta}(901,100)",27,BLUE).move_to([2.6,-2.63,0]))
+        for x in (86,88,90,92,94):labels.add(formula(str(x),20,DIM).next_to(ax.c2p(x,0),DOWN,buff=.1))
+        return VGroup(ax,curve,marker,labels),[lambda:ShowPassingFlash(curve.copy().set_color(GOLD)),
+                lambda:Indicate(marker,color=GOLD),lambda:Indicate(labels[2],color=BLUE)]
+    if kind == "calibration_protocol":
+        boxes=VGroup();arrows=VGroup()
+        for i,(title,sub,color) in enumerate((('Freeze','Predictor + scale',BLUE),
+                ('Calibrate','Independent sample',GOLD),('Evaluate','Future case',GREEN))):
+            x=.05+i*2.52
+            box=RoundedRectangle(width=2.22,height=1.5,corner_radius=.09,color=color).move_to([x,.5,0])
+            label=small_label(title,[x,.82,0],28,color)
+            detail=prose(sub,size=23,width=2.6,color=DIM).move_to([x,.13,0])
+            boxes.add(VGroup(box,label,detail))
+            if i:arrows.add(Arrow([x-1.36,.5,0],[x-1.13,.5,0],buff=0,color=DIM,stroke_width=2))
+        line=Arrow([-.9,-1.6,0],[6.1,-1.6,0],buff=0,color=DIM)
+        label=small_label("The chronology is part of the assumption",[2.6,-2.25,0],25)
+        return VGroup(boxes,arrows,line,label),[lambda:Indicate(boxes[0],color=BLUE),
+                lambda:Indicate(boxes[1],color=GOLD),lambda:Indicate(boxes[2],color=GREEN)]
+    if kind == "oco_state_map":
+        state = RoundedRectangle(width=2.6,height=1.2,corner_radius=.09,color=BLUE).move_to([.55,1.3,0])
+        reduced = RoundedRectangle(width=2.6,height=1.2,corner_radius=.09,color=GOLD).move_to([4.45,1.3,0])
+        spectrum = RoundedRectangle(width=5.6,height=1.45,corner_radius=.09,color=GREEN).move_to([2.5,-1.05,0])
+        labels=VGroup(small_label("Atmospheric state",state.get_center()+[0,.2,0],26,BLUE),
+                      formula(r"20\text{--}24\ \mathrm{coordinates}",24,BLUE).move_to(state.get_center()+[0,-.25,0]),
+                      small_label("Reduced radiance",reduced.get_center()+[0,.2,0],26,GOLD),
+                      formula(r"40\ \mathrm{coefficients}",24,GOLD).move_to(reduced.get_center()+[0,-.25,0]),
+                      formula(r"R(z)=\mu_y+U(\mu_z+D_z z)",30,GREEN).move_to(spectrum.get_center()+[0,.25,0]),
+                      small_label("O2: 10,592 stored spectral channels",spectrum.get_center()+[0,-.35,0],25,GREEN))
+        train=Arrow(state.get_right(),reduced.get_left(),buff=.13,color=GOLD)
+        rebuild=Arrow(reduced.get_bottom(),spectrum.get_top()+[1.9,0,0],buff=.13,color=GREEN)
+        return VGroup(state,reduced,spectrum,labels,train,rebuild),[lambda:Indicate(state,color=BLUE),
+                lambda:Indicate(spectrum,color=GREEN),lambda:Indicate(train,color=GOLD)]
+    if kind == "metric_ellipses":
+        ax=axes(x=(-1.5,1.5,1),y=(-1.5,1.5,1),width=4.2,height=4.2).move_to([2.55,.15,0])
+        centre=ax.c2p(0,0)
+        circle=Circle(1.4,color=BLUE).move_to(centre)
+        ellipse=Ellipse(width=2.8,height=1.4,color=GOLD).move_to(centre)
+        a=Arrow(centre,ax.c2p(1,0),buff=0,color=GREEN)
+        b=Arrow(centre,ax.c2p(0,.65),buff=0,color=RED)
+        labels=VGroup(formula(r"e_1",27,DIM).next_to(ax.c2p(1.5,0),RIGHT,buff=.12),
+                      formula(r"e_2",27,DIM).next_to(ax.c2p(0,1.5),UP,buff=.12),
+                      formula(r"\|e\|_2=1",25,BLUE).move_to([5.,1.5,0]),
+                      formula(r"\|\operatorname{diag}(1,2)e\|_2=1",24,GOLD).move_to([2.6,-2.35,0]),
+                      formula(r"a=(1,0)",24,GREEN).next_to(a.get_end(),DOWN,buff=.2),
+                      formula(r"b=(0,0.65)",24,RED).next_to(b.get_end(),LEFT,buff=.18))
+        return VGroup(ax,circle,ellipse,a,b,labels),[lambda:Indicate(circle,color=BLUE),
+                lambda:Indicate(ellipse,color=GOLD),lambda:Indicate(VGroup(a,b),color=INK)]
+    if kind == "coordinate_selection":
+        values=np.array([[.3,.9,.7,.5],[.8,.2,.6,.4],[.5,.6,.1,.8]])
+        cells=VGroup(); winners=VGroup(); rows=VGroup()
+        for i in range(3):
+            rows.add(small_label(f"Candidate {i+1}",[.15,1.35-i*1.05,0],23))
+            for j in range(4):
+                winner=i==int(np.argmin(values[:,j]))
+                color=GOLD if winner else BLUE
+                cell=Rectangle(width=.8,height=.8,color=color,fill_color=color,fill_opacity=.3 if winner else .05)
+                cell.move_to([1.7+j*1.12,1.35-i*1.05,0])
+                pair=VGroup(cell,formula(f"{values[i,j]:.1f}",26,color).move_to(cell))
+                cells.add(pair)
+                if winner:winners.add(cell.copy())
+        labels=VGroup(small_label("Illustrative validation squared losses",[2.6,2.45,0],25),
+                      small_label("Output coordinate",[3.2,-1.65,0],25),
+                      small_label("Choose one winner in each column",[2.6,-2.45,0],25,GOLD))
+        return VGroup(cells,rows,labels),[lambda:Indicate(winners[0],color=GOLD),
+                lambda:Indicate(winners,color=GOLD),lambda:Indicate(labels[2],color=GOLD)]
+    if kind == "kernel_grid":
+        ax=axes(x=(-2.5,4.5,1),y=(-10.6,-2.5,1),width=5.3,height=4.6).move_to([2.7,.1,0])
+        expanded=VGroup(); recorded=VGroup()
+        for x in range(-2,5):
+            for y in range(-10,-2):
+                expanded.add(Dot(ax.c2p(x,y),radius=.032,color=BLUE))
+                if x in (-1,0,1,2) and y in (-8,-6,-4):
+                    recorded.add(Circle(radius=.085,color=GOLD,stroke_width=2).move_to(ax.c2p(x,y)))
+        labels=VGroup(formula(r"\log_2(s/s_{\rm med})",25,DIM).move_to([2.7,-2.78,0]),
+                      formula(r"\log_{10}\lambda",25,DIM).move_to([-.25,2.3,0]),
+                      small_label("Recorded: 12",[1.3,2.62,0],24,GOLD),
+                      small_label("Expanded: 56",[4.6,2.62,0],24,BLUE))
+        for x in (-2,0,2,4):labels.add(formula(str(x),18,DIM).next_to(ax.c2p(x,-10.6),DOWN,buff=.08))
+        for y in (-10,-8,-6,-4):labels.add(formula(str(y),18,DIM).next_to(ax.c2p(-2.5,y),LEFT,buff=.08))
+        return VGroup(ax,expanded,recorded,labels),[lambda:Indicate(recorded,color=GOLD),
+                lambda:Indicate(expanded,color=BLUE),lambda:Indicate(labels[3],color=BLUE)]
     if kind == "oco_spectrum":
         receipt = json.loads((HERE/"assets/oco_spectrum_figures.json").read_text(encoding="utf-8"))
         row = next(x for x in receipt["rows"] if x["case"] == spec["case"])

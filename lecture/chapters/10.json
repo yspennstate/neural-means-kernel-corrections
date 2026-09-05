@@ -161,7 +161,7 @@
         },
         {
           "line": "Keep the measurement chain visible",
-          "math": "\\text{Stored coefficients}\\to\\text{reconstruction}\\to\\text{case error}",
+          "math": "\\begin{gathered}\\text{Stored coefficients}\\\\\\downarrow\\ \\text{reconstruction}\\\\\\downarrow\\ \\text{case error}\\end{gathered}",
           "say": "Both spectra were reconstructed from saved coefficients using the released means, scales, and principal components. The extraction checks that the targets match the source test block, verifies input hashes before and after reading, and independently recomputes the case errors from reconstructed vectors. This matters because a plotting transposition, a missing offset, or a different denominator could produce a plausible-looking figure with the wrong interpretation. The picture and the number must come from the same case."
         }
       ]

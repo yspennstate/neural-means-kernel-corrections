@@ -1,0 +1,181 @@
+{
+  "seed": 0,
+  "predictor": "historical six-member hpix_corr",
+  "units": "absolute Euclidean output-grid norms",
+  "sources": {
+    "source_npz": {
+      "path": "seeds/sm_s0/runs/hpix_uq.npz",
+      "sha256": "c5ccb1cf375a72c9eedabf6aec4eb817e1040ec130cb069b3e33b848601171d5"
+    },
+    "raw_record": {
+      "path": "seeds/sm_s0/runs/hpix_uq.json",
+      "sha256": "b7f47af871aefc79d5cd6ef315aedc562726ae24fc6e8dca4b4603f8cb6e6a38"
+    },
+    "power_record": {
+      "path": "seeds/sm_s0/runs/hpix_uq_plam.json",
+      "sha256": "a3f4e6783214981bd269f011992e89ecd8843dca4a756193e4d43a676842fa85"
+    },
+    "power": {
+      "path": "seeds/sm_s0/runs/hpix_plam_test.npy",
+      "sha256": "448f5e788f31ab612b3e9bece2155c40667226d8ab3ccad18f55aab31d80f5d5"
+    },
+    "prediction": {
+      "path": "seeds/sm_s0/runs/hpix_corr_pred_test.npy",
+      "sha256": "d353ab06666ccf176a7b70a946d57362a1452d3d080f7c01f1fc8277fe3a5d90"
+    },
+    "stress": {
+      "path": "data/structmech/stress.npy",
+      "sha256": "a3c060c4f58aaefa36947b1cd7b0ab002c1cf8894cf1a47efdfabc67f2d9b3ac"
+    },
+    "indices": {
+      "path": "data/structmech/idx_test.npy",
+      "sha256": "b5181aaef47f8ec6bbfad10d17b0d44e8313032f8b11a6f3bff8284c3f38cc0a"
+    }
+  },
+  "source_power_precision": "retained float32 values converted to float64; no kernel refactorization",
+  "absolute_error_max_recomputation_difference": 0.0,
+  "levels": {
+    "a0.1": {
+      "rank": 901,
+      "rows": {
+        "constant": {
+          "q": 353.6239669653087,
+          "coverage": 0.9087894736842105,
+          "mean_radius": 353.6239669653087,
+          "recorded_coverage": 0.9087894736842105,
+          "recorded_mean_radius": 353.6239669653087,
+          "q_relative_difference": 0.0
+        },
+        "disagreement": {
+          "q": 279.29275114526456,
+          "coverage": 0.9016315789473685,
+          "mean_radius": 402.9014871033229,
+          "recorded_coverage": 0.9016315789473685,
+          "recorded_mean_radius": 402.9014871033229,
+          "q_relative_difference": 0.0
+        },
+        "power": {
+          "q": 2201.3633765712966,
+          "coverage": 0.914,
+          "mean_radius": 397.65532350837333,
+          "recorded_coverage": 0.914,
+          "recorded_mean_radius": 397.6553384117375,
+          "q_relative_difference": 3.7411425668325555e-08
+        }
+      }
+    },
+    "a0.05": {
+      "rank": 951,
+      "rows": {
+        "constant": {
+          "q": 403.8855239821657,
+          "coverage": 0.9617894736842105,
+          "mean_radius": 403.8855239821657,
+          "recorded_coverage": 0.9617894736842105,
+          "recorded_mean_radius": 403.8855239821657,
+          "q_relative_difference": 0.0
+        },
+        "disagreement": {
+          "q": 330.6531174512389,
+          "coverage": 0.9597368421052631,
+          "mean_radius": 476.99280482637266,
+          "recorded_coverage": 0.9597368421052631,
+          "recorded_mean_radius": 476.9928048263727,
+          "q_relative_difference": 0.0
+        },
+        "power": {
+          "q": 2462.7728681554427,
+          "coverage": 0.9532105263157895,
+          "mean_radius": 444.8764579427802,
+          "recorded_coverage": 0.9532105263157895,
+          "recorded_mean_radius": 444.8764823832299,
+          "q_relative_difference": 5.487093957616257e-08
+        }
+      }
+    }
+  },
+  "power_deciles": [
+    {
+      "decile": 1,
+      "n": 1900,
+      "mean_power": 0.1269896421189371,
+      "coverage": 0.6910526315789474,
+      "mean_radius": 279.55034736452393,
+      "mean_error": 249.11664333913984
+    },
+    {
+      "decile": 2,
+      "n": 1900,
+      "mean_power": 0.14195602892260803,
+      "coverage": 0.8331578947368421,
+      "mean_radius": 312.49680315372507,
+      "mean_error": 245.44236671914513
+    },
+    {
+      "decile": 3,
+      "n": 1900,
+      "mean_power": 0.15152643062566457,
+      "coverage": 0.8826315789473684,
+      "mean_radius": 333.56473496190927,
+      "mean_error": 248.29746588309854
+    },
+    {
+      "decile": 4,
+      "n": 1900,
+      "mean_power": 0.15997079901005093,
+      "coverage": 0.9105263157894737,
+      "mean_radius": 352.15385826157393,
+      "mean_error": 247.53135486335088
+    },
+    {
+      "decile": 5,
+      "n": 1900,
+      "mean_power": 0.1684839741336672,
+      "coverage": 0.9294736842105263,
+      "mean_radius": 370.89445019704056,
+      "mean_error": 245.53428106910107
+    },
+    {
+      "decile": 6,
+      "n": 1900,
+      "mean_power": 0.17753650740573282,
+      "coverage": 0.9547368421052631,
+      "mean_radius": 390.822365407359,
+      "mean_error": 246.4556321288774
+    },
+    {
+      "decile": 7,
+      "n": 1900,
+      "mean_power": 0.1879086457349752,
+      "coverage": 0.9663157894736842,
+      "mean_radius": 413.65521086208463,
+      "mean_error": 248.49417512191417
+    },
+    {
+      "decile": 8,
+      "n": 1900,
+      "mean_power": 0.2005324999909652,
+      "coverage": 0.978421052631579,
+      "mean_radius": 441.44490129239466,
+      "mean_error": 248.13551811631686
+    },
+    {
+      "decile": 9,
+      "n": 1900,
+      "mean_power": 0.21977411288964122,
+      "coverage": 0.9947368421052631,
+      "mean_radius": 483.8026832337019,
+      "mean_error": 251.86698336884731
+    },
+    {
+      "decile": 10,
+      "n": 1900,
+      "mean_power": 0.2717260978880682,
+      "coverage": 0.9989473684210526,
+      "mean_radius": 598.1678803494203,
+      "mean_error": 258.694424399771
+    }
+  ],
+  "npz_sha256": "06a77d9543a3ab8df74657d30b42d6649751cb69fa1a216922bd3f1b5d7c7ef3",
+  "extractor_sha256": "e45b0f9cb8f921194171c225221e04b1cafedc5c8e211a57710d8e2af2f25009"
+}

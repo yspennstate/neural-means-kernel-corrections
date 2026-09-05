@@ -186,7 +186,7 @@
         },
         {
           "line": "The next proof turns the picture into an exact bound",
-          "math": "\\text{Error}=\\text{an inner product with a known representer}",
+          "math": "\\begin{gathered}\\text{Error}=\\langle r,g_u\\rangle_K\\\\\\text{Known representer }g_u\\end{gathered}",
           "say": "We now have all the objects needed for the main kernel result: the residual function, the design sections, the query coefficient vector and the error representer. The proof will express prediction error as an inner product, apply Cauchy-Schwarz, calculate the representer's norm exactly, and construct a residual attaining the bound. After that, two indistinguishable residuals will show why no different recovery rule can beat interpolation over the same ball."
         }
       ]

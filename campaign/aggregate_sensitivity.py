@@ -118,8 +118,37 @@ def validate_independent_checks(root):
             or not np.allclose(matrix, matrix.T, rtol=0, atol=1e-14)
             or np.linalg.eigvalsh(matrix)[0] < -1e-12):
         raise ValueError("Independent pool matrix identity or positivity failed")
+    centering = read(root / "centering_prediction_check.json")
+    if (centering["kind"] != "completed_centering_prediction_recomputation"
+            or centering["seeds"] != list(range(10)) or not centering["complete_seed_set"]
+            or centering["driver_sha256"] != sha(root / "check_completed_centering.py")):
+        raise ValueError("Centering raw-field check is incomplete or stale")
+    expected_centering = {(seed, arm) for seed in range(10) for arm in ("pooled", "local")}
+    checked_centering = set()
+    for row in centering["rows"]:
+        key = row["seed"], row["arm"]
+        if key not in expected_centering or key in checked_centering or row["cases"] != 20000 or row["members"] != 6:
+            raise ValueError("Centering raw-field coverage failed")
+        checked_centering.add(key)
+        summary = read(root / "seeds" / f"sm_s{row['seed']}" / "summary.json")
+        if not math.isclose(row["mean_relative_l2"], summary["metrics"][row["arm"]]["mean_relative_l2"], rel_tol=2e-11, abs_tol=2e-12):
+            raise ValueError("Raw-field and collected centering means disagree")
+        limits = dict(relative=2e-12, absolute=1e-8, disagreement=1e-9, scalar_control=2e-12)
+        if set(row["maximum_absolute_gaps"]) != set(limits) or any(
+                not 0 <= row["maximum_absolute_gaps"][name] <= limit for name, limit in limits.items()):
+            raise ValueError("Centering raw-field numerical control failed")
+    if checked_centering != expected_centering:
+        raise ValueError("Centering raw-field check omitted a seed/arm")
+    for remote, identity in centering["input_sha256"].items():
+        marker = "/nmkc_paper1_20260905/"
+        if marker in remote:
+            local = root / remote.split(marker, 1)[1]
+            if local.is_file() and sha(local) != identity:
+                raise ValueError("Raw centering check and collected inputs have different identities")
     return dict(grid_check_sha256=sha(root / "grid_prediction_check.json"),
                 metric_check_sha256=sha(root / "benchmark_metric_check.json"),
+                centering_check_sha256=sha(root / "centering_prediction_check.json"),
+                centering_arms=len(checked_centering),
                 scenarios=len(seen), models_per_scenario=14, cases_per_scenario=2000)
 
 

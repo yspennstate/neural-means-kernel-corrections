@@ -8,7 +8,8 @@
       "visual": {
         "kind": "ensemble_segment",
         "label": "Illustrative residual geometry; lengths are not benchmark percentages",
-        "source": "paper/theory.tex:prop:secmom; lecture/ensemble_geometry.py"
+        "source": "paper/theory.tex:prop:secmom; lecture/ensemble_geometry.py",
+        "intro": true
       },
       "visual_argument": "The origin is zero error; every member contributes a vector from that common origin.",
       "segments": [

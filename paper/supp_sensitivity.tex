@@ -39,7 +39,7 @@ downstream fitting steps, rather than merely comparing two kernel fields.
 \centering
 \caption{Target-centering comparison on the fixed 20000-case mechanics test
 block, ten paired seeds. The historical pipeline is shown as a reference;
-the two rerun arms use matched compute and training settings.}
+the two rerun arms use the same training schedule and CPU-thread setting.}
 \label{tab:centering-sensitivity}
 \begin{adjustbox}{max width=\linewidth}
 \input{table_centering_sensitivity}
@@ -183,7 +183,17 @@ complete kernel-grid records. The table generator first checks the
 archive's exact file set and hashes, the completed run list, case counts
 and ordering, paired signs, calibration quantiles, and validation winners.
 It recomputes reported means from the per-case arrays by a separate
-summation path. The OCO-2 prediction check rebuilds all fourteen predictors'
+summation path. For each of the twenty completed centering arms, a second
+check rebuilds the relative and absolute errors from the saved fields.
+It also recomputes the six-member disagreement scale using the identity
+\[
+ \frac1M\sum_{a=1}^M(x_a-\bar x)^2
+ =\frac1{M^2}\sum_{a<b}(x_a-x_b)^2
+\]
+at every output coordinate, followed by the same coordinate average of
+the standard deviations. This checks the scale through pairwise
+differences rather than subtraction of the ensemble mean.
+The OCO-2 prediction check rebuilds all fourteen predictors'
 scores under both grids in all nine band--seed combinations. It uses a
 spectral Gram quadratic form, cross-checks selected cases by direct
 full-spectrum summation, and reconstructs the coordinate selectors from

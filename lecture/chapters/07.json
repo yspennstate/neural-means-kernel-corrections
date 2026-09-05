@@ -66,7 +66,8 @@
         "kind": "kernel_projection",
         "ridge": 0,
         "label": "Repeated horizontal design sections span the same one-dimensional space",
-        "source": "paper/theory.tex:thm:or, singular-design case"
+        "source": "paper/theory.tex:thm:or, singular-design case",
+        "repeated": true
       },
       "visual_argument": "A zero-norm combination of design sections is the zero function, so its inner product with the query section vanishes.",
       "segments": [

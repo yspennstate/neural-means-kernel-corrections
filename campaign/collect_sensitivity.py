@@ -38,14 +38,19 @@ def main():
         "followup_plan.json", "capacity.jsonl",
         "numerical_controls/driver_controls.json",
         "check_completed_grids.py", "grid_prediction_check.json",
-        "benchmark_metric_check.py", "benchmark_metric_check.json")]
+        "benchmark_metric_check.py", "benchmark_metric_check.json",
+        "check_completed_centering.py", "centering_prediction_check.json")]
     grid_check = json.loads((root / "grid_prediction_check.json").read_text(encoding="utf-8"))
     metric_check = json.loads((root / "benchmark_metric_check.json").read_text(encoding="utf-8"))
+    centering_check = json.loads((root / "centering_prediction_check.json").read_text(encoding="utf-8"))
     if (grid_check["seeds"] != [0, 1, 2] or len(grid_check["rows"]) != 18
             or grid_check["driver_sha256"] != sha(root / "check_completed_grids.py")
             or metric_check["seeds"] != list(range(10))
             or len(metric_check["member_rows"]) != 60 or metric_check["pool"] is None
-            or metric_check["driver_sha256"] != sha(root / "benchmark_metric_check.py")):
+            or metric_check["driver_sha256"] != sha(root / "benchmark_metric_check.py")
+            or centering_check["seeds"] != list(range(10)) or len(centering_check["rows"]) != 20
+            or not centering_check["complete_seed_set"]
+            or centering_check["driver_sha256"] != sha(root / "check_completed_centering.py")):
         raise ValueError("Independent prediction verification is incomplete or stale")
     for name in ("scheduling_amendment.json", "followup_capacity.jsonl"):
         if (root / name).exists():

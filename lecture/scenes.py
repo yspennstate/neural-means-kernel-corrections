@@ -758,6 +758,24 @@ def build_visual(spec):
                         formula(rf"t^\star={result['weight']:.3f}", 28, GREEN).move_to([4.8, -.4, 0]),
                         formula(rf"\min\|\rho_w\|^2={result['squared_error']:.3f}", 28, RED).move_to([2.6, -2.5, 0]))
         group = VGroup(ax, segment, v1, v2, error, dot, labels)
+        if spec.get("intro"):
+            group.remove(error, dot)
+            labels[2].set_opacity(0); labels[3].set_opacity(0)
+            return group, [lambda: Indicate(v1, color=BLUE), lambda: Indicate(v2, color=GOLD),
+                           lambda: Indicate(segment, color=GREEN)]
+        if spec.get("variant") == "aligned":
+            tangent_end = ax.c2p(1, 1.2)
+            tangent_vector = Arrow(origin, tangent_end, buff=0, color=GOLD, stroke_width=4)
+            tangent_segment = Line(ax.c2p(*first), tangent_end, color=GREEN, stroke_width=3)
+            zero_segment = Line(origin, tangent_end, color=GREEN, stroke_width=3)
+            zero_error = formula(r"\min\|\rho_w\|^2=0", 28, RED).move_to(labels[3])
+            zero_member = formula(r"\rho_1=0", 28, BLUE).next_to(origin, DOWN, buff=.2)
+            return group, [lambda: Indicate(v2, color=GOLD),
+                lambda: AnimationGroup(Transform(v2, tangent_vector), Transform(segment, tangent_segment),
+                    labels[1].animate.next_to(tangent_end, UP, buff=.17)),
+                lambda: AnimationGroup(FadeOut(v1), FadeOut(error), dot.animate.move_to(origin),
+                    Transform(segment, zero_segment), Transform(labels[0], zero_member),
+                    Transform(labels[3], zero_error))]
         if kind == "ensemble_hull":
             third = ax.c2p(2, 1)
             hull = Polygon(ax.c2p(*first), ax.c2p(*second), third, color=GREEN,
@@ -815,8 +833,9 @@ def build_visual(spec):
     if kind == "kernel_projection":
         from kernel_geometry import geometry
         ridge = spec.get("ridge", 0.)
-        result = geometry([[1, 0]], [3, 2], ridge)
-        coefficient = result["coefficients"][0]
+        repeated = spec.get("repeated", False)
+        result = geometry([[1, 0], [1, 0]] if repeated else [[1, 0]], [3, 2], ridge)
+        coefficient = sum(result["coefficients"])
         ax = axes(x=(-.3, 4, 1), y=(-.3, 3, 1), width=5.16, height=3.96).move_to([2.7, .15, 0])
         origin = ax.c2p(0, 0)
         train = Arrow(origin, ax.c2p(1, 0), buff=0, color=BLUE, stroke_width=5)
@@ -830,6 +849,9 @@ def build_visual(spec):
                         formula(r"g_u", 30, RED).next_to(gap.get_center(), RIGHT, buff=.12),
                         formula(rf"\|g_u\|^2={result['exact_squared']:g}", 29, RED).move_to([2.6, 2.5, 0]),
                         small_label("The horizontal line is the observed span", [2.6, -2.62, 0], 21))
+        if repeated:
+            labels[1].become(formula(r"\phi(x_1)=\phi(x_2)=(1,0)", 22, BLUE, 6.2).move_to([2.6,-1.78,0]))
+            labels[2].become(formula(rf"\sum_i c_i\phi(x_i)=({coefficient:g},0)", 22, GREEN, 6.2).move_to([2.6,-2.20,0]))
         group = VGroup(ax, projection, train, fitted, query, gap, labels)
         if spec.get("focus") == "coefficients":
             gap.set_opacity(0); labels[3].set_opacity(0); labels[4].set_opacity(0)
@@ -896,6 +918,7 @@ def build_visual(spec):
         group = VGroup(line, a, b, psi, dist_left, dist_right, total, labels)
         return group, [lambda: Indicate(psi, color=RED), lambda: Indicate(total),
                        lambda: AnimationGroup(psi.animate.move_to(mid),
+                           labels[2].animate.next_to(mid, DOWN, buff=.25),
                            Transform(dist_left, DoubleArrow(left+[0,-.65,0], mid+[0,-.65,0], buff=.04, color=GREEN)),
                            Transform(dist_right, DoubleArrow(mid+[0,.65,0], right+[0,.65,0], buff=.04, color=GOLD)))]
     if kind == "nugget_factors":

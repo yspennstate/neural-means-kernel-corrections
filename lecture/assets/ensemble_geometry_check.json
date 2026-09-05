@@ -37,6 +37,68 @@
     "correlation": -1.0,
     "threshold": 0.5
   },
+  "tangent": {
+    "weight": -0.0,
+    "point": [
+      1.0,
+      0.0
+    ],
+    "squared_error": 1.0,
+    "first_error": 1.0,
+    "second_error": 1.5620499351813308,
+    "correlation": 0.6401843996644799,
+    "threshold": 0.6401843996644799
+  },
+  "zero_member_cases": [
+    {
+      "weight": -0.0,
+      "point": [
+        0.0,
+        0.0
+      ],
+      "squared_error": 0.0,
+      "first_error": 0.0,
+      "second_error": 1.5620499351813308,
+      "correlation": null,
+      "threshold": null
+    },
+    {
+      "weight": 1.0,
+      "point": [
+        0.0,
+        0.0
+      ],
+      "squared_error": 0.0,
+      "first_error": 1.5620499351813308,
+      "second_error": 0.0,
+      "correlation": null,
+      "threshold": null
+    },
+    {
+      "weight": 0.0,
+      "point": [
+        0.0,
+        0.0
+      ],
+      "squared_error": 0.0,
+      "first_error": 0.0,
+      "second_error": 0.0,
+      "correlation": null,
+      "threshold": null
+    }
+  ],
+  "identical": {
+    "weight": 0.0,
+    "point": [
+      1.0,
+      2.0
+    ],
+    "squared_error": 5.0,
+    "first_error": 2.23606797749979,
+    "second_error": 2.23606797749979,
+    "correlation": 0.9999999999999998,
+    "threshold": 1.0
+  },
   "gram_identity": {
     "direct": 0.5226666666666667,
     "quadratic": 0.5226666666666666

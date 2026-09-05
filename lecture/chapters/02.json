@@ -88,7 +88,7 @@
       "title": "Choose how the members contribute",
       "visual": {
         "kind": "stacking_classes",
-        "label": "Two-output illustration: coordinate-specific combinations can leave the global convex hull",
+        "label": "Global and coordinate-dependent combinations; both are fitted using validation observations",
         "source": "paper/method.tex"
       },
       "visual_argument": "Coloured pieces denote weights; a uniform combination can be reweighted, with nonnegative weights remaining inside a simplex.",
@@ -145,7 +145,7 @@
         "label": "Illustrative two-coordinate feature map; the learned maps used in the paper have more coordinates",
         "source": "paper/method.tex"
       },
-      "visual_argument": "The network supplies either a baseline output or a feature map; the two arrows change different mathematical objects.",
+      "visual_argument": "Two equal input distances become unequal under the displayed feature map, changing the similarities used by the kernel.",
       "segments": [
         {
           "line": "An input-space correction keeps the original load geometry",

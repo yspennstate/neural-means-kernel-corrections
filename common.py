@@ -29,8 +29,8 @@ def canonical_split(n_val=1000, seed=0):
     return tr, val, ite
 
 def rel_l2(yhat, ytrue):
-    """Mean relative L2 error over samples; plain grid norm, the convention of
-    de Hoop et al. Computed in float64."""
+    """Mean relative L2 error using this repository's unweighted grid norm.
+    Computed in float64; published comparators may use other quadrature."""
     yhat = np.asarray(yhat, dtype=np.float64).reshape(len(yhat), -1)
     ytrue = np.asarray(ytrue, dtype=np.float64).reshape(len(ytrue), -1)
     num = np.linalg.norm(yhat - ytrue, axis=1)

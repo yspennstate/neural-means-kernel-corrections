@@ -56,7 +56,7 @@ so the squared-metric risk of every convex stack is determined by $S$, and
 the best achievable is $\min_{w\in\Delta^{M-1}}w^\top Sw$. In particular:
 \begin{enumerate}
 \item[(i)] (two members) if $S$ has diagonal $(e_1^2,e_2^2)$ with $0<e_1\le e_2$
-and correlation $\varrho=S_{12}/(e_1e_2)$, mixing in the weaker member
+and uncentered correlation $\varrho=S_{12}/(e_1e_2)$, mixing in the weaker member
 strictly helps if and only if $\varrho<e_1/e_2$, in which case the optimum is
 interior with value $e_1^2e_2^2(1-\varrho^2)/(e_1^2+e_2^2-2\varrho e_1e_2)$;
 \item[(ii)] (equicorrelated family) if $S_{mm}=e^2$ and $S_{mk}=\varrho\,e^2$
@@ -153,7 +153,7 @@ Then
 \bar\varrho\;\le\;\frac{1}{\bar e^{\,2}}\min_{w\in\Delta^{M-1}}w^\top Sw
 \;\le\;\bar\varrho+\delta_\varrho+\frac{1+\delta_e-\bar\varrho-\delta_\varrho}{M}.
 \]
-The width of the bracket is the measured correlation spread
+The width of the bracket is the normalized off-diagonal entry spread
 $\delta_\varrho$ plus a $1/M$ term: when these entrywise spreads are small, the optimal convex risk is localized. The upper bound is obtained by evaluating uniform weights; it does not upper-bound an arbitrary fitted convex combination.
 \end{corollary}
 \noindent\emph{Proof.} See Supplement~\ref{proof:cor:floorpinch}.

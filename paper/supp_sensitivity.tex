@@ -1,0 +1,164 @@
+These experiments address three implementation choices left open by the
+historical campaigns: target centering in out-of-fold kernel fits,
+consistency of correction labels with the query-time mean, and the extent
+of the OCO-2 kernel search. The run lists and grids were fixed before these
+follow-ups started. The study had already inspected the public test blocks,
+so this is a retrospective sensitivity analysis. The $\pm$ values below
+are sample standard deviations over the stated seeds, not confidence
+intervals for fresh cases.
+
+\subsection{Paired target-centering reruns}
+For each mechanics seed, the four kernel folds contain 14250 fitting rows
+and 4750 held-out rows. The pooled arm subtracts the mean target over all
+19000 training rows. The fold-local arm instead subtracts the mean over
+that fold's fitting rows. Input standardization, kernel scale, nugget
+$10^{-6}$, and fold assignment remain fixed. In particular, ``fold-local''
+here specifies target centering; input standardization still uses the full
+training block.
+
+The two predictions can be calculated from the same factorization. If
+$A=K_{FF}+|F|\lambda I$, $k_H=k(X_H,X_F)$, and $\mu_F,\mu_P$ are the
+fold and pooled target means, their difference on held-out rows is
+\[
+ (\mathbf 1-k_HA^{-1}\mathbf 1)(\mu_F-\mu_P)^\top.
+\]
+The implementation checks this identity against a separate right-hand-side
+solve at eight prespecified output coordinates. It also checks that the
+pooled predictions reproduce the historical out-of-fold field before
+allowing downstream training. The complete per-fold discrepancies are
+retained in the evidence package.
+
+Each arm retrains the refiner for the same 100 epochs, seed, and eight-thread
+CPU setting, then repeats global stacking, the held-out decision about
+per-pixel weights, full-validation refitting, kernel selection, and
+calibration. The other four neural predictors and the full-training kernel
+predictor are reused. Thus the contrast includes propagation through the
+downstream fitting steps, rather than merely comparing two kernel fields.
+
+\begin{table}[t]
+\centering
+\caption{Target-centering comparison on the fixed 20000-case mechanics test
+block, ten paired seeds. The historical pipeline is shown as a reference;
+the two rerun arms use matched compute and training settings.}
+\label{tab:centering-sensitivity}
+\begin{adjustbox}{max width=\linewidth}
+\input{table_centering_sensitivity}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Calibration after the centering reruns, ten seeds. The same 1000
+calibration cases and 19000 evaluation cases are used in each paired arm.
+Radii are absolute Euclidean norms on the output grid, not percentages or
+diameters. ``Constant'' uses scale one; ``disagreement'' uses the retained
+ensemble spread. These are measurements on the public test block, subject
+to the independence qualification in Supplement~\ref{supp:conf}.}
+\label{tab:centering-uq}
+\begin{adjustbox}{max width=\linewidth}
+\input{table_centering_uq}
+\end{adjustbox}
+\end{table}
+
+\subsection{Correction-label consistency with a fixed estimator}
+For each historical six-member pipeline, we reconstruct the training-row
+mean and evaluate its query-time counterpart on those same rows. The
+selected kernel, its hyperparameters, and the fitted stack weights remain
+fixed. We then solve for two sets of coefficients: one from the historical
+residual labels, the other from $G(X)-m_{\rm full}(X)$. The difference of
+their predictions is exactly the propagated term in \eqref{eq:mismatch}.
+The driver checks this coefficient identity and reproduction of the
+retained validation and test predictions. The aggregation independently
+checks the reverse-triangle bound on every reported case.
+
+Table~\ref{tab:mismatch-sensitivity} also reports a two-candidate decision:
+retain the uncorrected mean or use its inference-consistent correction,
+according to validation error. This decision does not retune the kernel
+grid. The separate correction row records the correction whether or not
+that decision would retain it. The largest propagated relative norm over
+all test cases and ten seeds is $\sensMismatchMax\%$; this maximum is a
+finite-sample diagnostic, not an upper bound at unseen inputs.
+
+\begin{table}[t]
+\centering
+\caption{Correction-label sensitivity, ten historical mechanics pipelines.
+No neural training or stack-weight fitting is repeated. The kernel is the
+one selected in the historical run.}
+\label{tab:mismatch-sensitivity}
+\begin{adjustbox}{max width=\linewidth}
+\input{table_mismatch_sensitivity}
+\end{adjustbox}
+\end{table}
+
+\subsection{A wider OCO-2 kernel search}
+The grid comparison uses seeds 0, 1, and 2 in each of the three bands.
+At each band-seed, the three networks are trained for 250 epochs with width
+384, then their predictions and features are held fixed for both searches.
+Both grids use the same training/validation split, the same 6000-row tuning
+subsample, the same objective for each head, and a refit at the selected
+hyperparameters on all 18000 training rows.
+
+The recorded grid has scale multipliers $\{0.5,1,2,4\}$ and nuggets
+$\{10^{-8},10^{-6},10^{-4}\}$, for 12 cells per kernel. The expanded grid
+has multipliers $\{0.25,0.5,1,2,4,8,16\}$ and all eight powers
+$10^{-10},\ldots,10^{-3}$, for 56 cells. Scales multiply the median
+distance in the representation being fitted. The isotropic raw-input
+kernel, ARD-input kernel, and three feature heads all receive these same
+candidate grids. A Cholesky failure or nonfinite score is recorded as a
+failed cell; only finite successful validation scores can be selected.
+The full cell records include selected-boundary flags.
+
+The frozen linear readouts retain their original ridge search, and the
+source emulator's predictions are unchanged. The coordinate selector is
+refitted on validation for each grid because its candidate kernel heads
+change. The tables report every candidate, including the additional
+selector that also admits the linear readouts. Both errors refer to the
+retained forty-component representation, as in the main OCO-2 study.
+
+\begin{table}[t]
+\centering
+\caption{O2 grid comparison, three paired seeds. The errors are means and
+sample standard deviations over seeds. Of the 15 selected kernels (five
+per seed), $\sensOtwoOldBoundary$ meet a boundary of the recorded grid and
+$\sensOtwoNewBoundary$ meet a boundary of the expanded grid. The respective
+failed-cell counts are $\sensOtwoOldFailed$ and $\sensOtwoNewFailed$.}
+\label{tab:grid-o2-full}
+\begin{adjustbox}{max width=\linewidth}
+\input{table_grid_o2_full}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{WCO2 grid comparison, three paired seeds, with the same protocol
+as Table~\ref{tab:grid-o2-full}. Boundary selections: $\sensWcoOldBoundary$
+and $\sensWcoNewBoundary$ out of 15; failed cells: $\sensWcoOldFailed$ and
+$\sensWcoNewFailed$, for the recorded and expanded grids respectively.}
+\label{tab:grid-wco2-full}
+\begin{adjustbox}{max width=\linewidth}
+\input{table_grid_wco2_full}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{SCO2 grid comparison, three paired seeds, with the same protocol
+as Table~\ref{tab:grid-o2-full}. Boundary selections: $\sensScoOldBoundary$
+and $\sensScoNewBoundary$ out of 15; failed cells: $\sensScoOldFailed$ and
+$\sensScoNewFailed$, for the recorded and expanded grids respectively.}
+\label{tab:grid-sco2-full}
+\begin{adjustbox}{max width=\linewidth}
+\input{table_grid_sco2_full}
+\end{adjustbox}
+\end{table}
+
+\subsection{Evidence and recomputation}
+The evidence archive contains executed source files, input hashes, stage
+receipts, per-case error arrays, calibration scores and partitions, and
+complete kernel-grid records. The table generator first checks the
+archive's exact file set and hashes, the completed run list, case counts
+and ordering, paired signs, calibration quantiles, and validation winners.
+It recomputes reported means from the per-case arrays by a separate
+summation path. Checkpoints and large prediction fields remain in the
+retained run directories. Scripts for collection, verification, and table
+generation are under \texttt{campaign/} in the code release.

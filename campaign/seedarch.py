@@ -3,8 +3,8 @@
 Every predictor of the complete-schedule campaign has a test prediction array, and the
 test block never moved, so the sixty of them can be compared on identical samples:
 residual correlations within an architecture (seed to seed) and between architectures,
-seed-ensemble curves, convex optima fitted on a held-out calibration half of the test
-block and scored on the other half, hindsight oracles over all sixty, per-pixel affine
+seed-ensemble curves, convex optima fitted on 1000 cases of the public test
+block and scored on the other 19000, hindsight oracles over all sixty, per-pixel affine
 stacks, and the block-correlation prediction of the floor. Writes results/seedarch.json.
 Environment: NMKC_ROOT (default ~/nmkc2), NMKC_THREADS.
 """
@@ -38,8 +38,9 @@ def path(a, s):
     return g[0]
 
 
-# calibration / evaluation halves of the test block; neither was ever used by any training,
-# checkpoint, stack or tuning step, and the split is fixed here once
+# Fixed fitting/evaluation subsets for retrospective pooling. These cases were
+# not used by the original model-fitting stages, but the public test block had
+# already been inspected in the broader study.
 rng = np.random.default_rng(20260902)
 perm = rng.permutation(len(te))
 cal, ev = np.sort(perm[:1000]), np.sort(perm[1000:])
@@ -185,12 +186,12 @@ out["sixty_equal"] = dict(e1=e1(w_all, ev), e2=e2(w_all, S_ev), e1_full_test=e1(
 ii50 = [i for i in range(N) if not names[i].startswith("unet")]
 out["fifty_equal_no_unet"] = dict(e1=e1(uniform(ii50), ev), e2=e2(uniform(ii50), S_ev))
 
-# convex optima: fitted on the calibration half, realized on the evaluation half
+# Convex optima: fitted on the 1000-case subset, scored on the 19000-case subset.
 w_cal = simplex_min(S_cal)
 out["sixty_convex_cal_to_ev"] = dict(e1=e1(w_cal, ev), e2_pred_cal=e2(w_cal, S_cal), e2_ev=e2(w_cal, S_ev),
                                      weights={names[i]: float(w_cal[i]) for i in range(N) if w_cal[i] > 1e-4},
                                      n_nonzero=int((w_cal > 1e-4).sum()))
-# hindsight oracle over the evaluation half itself (a lower bound for any convex mixture on ev)
+# Hindsight optimizer on evaluation itself; objective optimality must be checked.
 w_or = simplex_min(S_ev)
 out["sixty_convex_oracle_ev"] = dict(e1=e1(w_or, ev), e2=e2(w_or, S_ev),
                                      weights={names[i]: float(w_or[i]) for i in range(N) if w_or[i] > 1e-4},
@@ -226,7 +227,7 @@ out["block_model"] = dict(ebar2=ebar2, rho_w_S=rw, rho_b_S=rb,
                           floor_inf_arch_inf_seeds=float(np.sqrt(ebar2 * rb)),
                           floor_six_arch_inf_seeds=float(np.sqrt(ebar2 * (rb + (rw - rb) / M))))
 
-# per-pixel affine stacks fitted on the calibration half, scored on the evaluation half
+# Per-pixel affine stacks fitted on the 1000-case subset, scored on evaluation.
 def perpixel_affine(member_rows, ridge=1e-3):
     """member_rows: list of (n, D) prediction arrays in original units (not residuals)."""
     Pc = np.stack([m[cal] for m in member_rows]).astype(np.float64)        # (m, n_cal, D)

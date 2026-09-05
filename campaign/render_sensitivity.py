@@ -54,6 +54,21 @@ def render(root, paper, summary_path):
     outputs["table_mismatch_sensitivity.tex"] = "\n".join(lines) + "\n"
 
     lines = [r"\begin{tabular}{llcccc}", r"\toprule",
+             r"& & \multicolumn{2}{c}{Coverage (\%)} & \multicolumn{2}{c}{Mean radius} \\",
+             r"\cmidrule(lr){3-4}\cmidrule(lr){5-6}",
+             r"Target & Scale & Pooled & Fold-local & Pooled & Fold-local \\", r"\midrule"]
+    uq = data["centering"]["uq"]
+    for alpha, title in ((.1, r"$90\%$"), (.05, r"$95\%$")):
+        for mode, label in (("raw", "Constant"), ("scaled", "Disagreement")):
+            key = f"a{alpha:g}_" + mode
+            cells = [pm(uq[arm][key][metric], 2 if metric == "coverage" else 1,
+                        100 if metric == "coverage" else 1)
+                     for metric in ("coverage", "mean_radius") for arm in ("pooled", "local")]
+            lines.append(" & ".join([title, label] + cells) + r" \\")
+    lines.extend([r"\bottomrule", r"\end{tabular}"])
+    outputs["table_centering_uq.tex"] = "\n".join(lines) + "\n"
+
+    lines = [r"\begin{tabular}{llcccc}", r"\toprule",
              r"& & \multicolumn{2}{c}{Reduced error (\%)} & \multicolumn{2}{c}{Radiance error (\%)} \\",
              r"\cmidrule(lr){3-4}\cmidrule(lr){5-6}",
              r"Band & Model & Recorded grid & Expanded grid & Recorded grid & Expanded grid \\", r"\midrule"]
@@ -74,6 +89,29 @@ def render(root, paper, summary_path):
                     macro("sens"+command+name+suffix+end, group[scenario][model][metric]["mean"], 3 if metric == "reduced" else 4)
     lines.extend([r"\bottomrule", r"\end{tabular}"])
     outputs["table_grid_sensitivity.tex"] = "\n".join(lines) + "\n"
+
+    all_models = (("kernel_flow", "Source emulator"), ("kernel_raw", "Raw input"),
+                  ("kernel_ard", "ARD input")) + tuple(
+        (prefix + "_" + mode, title + " " + label)
+        for mode, title in (("flat", "Flat"), ("wnum", "Weighted"), ("radx", "Radiance"))
+        for prefix, label in (("mean", "network"), ("ridge", "linear readout"), ("dkr", "kernel head"))) + (
+        ("combined", "Coordinate combination"), ("combined_plus_ridge", "Combination with linear readouts"))
+    for band, command in (("o2", "Otwo"), ("wco2", "Wco"), ("sco2", "Sco")):
+        group = data["oco_grids"][band]
+        lines = [r"\begin{tabular}{lcccc}", r"\toprule",
+                 r"& \multicolumn{2}{c}{Reduced error (\%)} & \multicolumn{2}{c}{Radiance error (\%)} \\",
+                 r"\cmidrule(lr){2-3}\cmidrule(lr){4-5}",
+                 r"Model & Recorded grid & Expanded grid & Recorded grid & Expanded grid \\", r"\midrule"]
+        for model, label in all_models:
+            cells = [pm(group["aggregate"][scenario][model][metric], 3 if metric == "reduced" else 4)
+                     for metric in ("reduced", "radiance") for scenario in ("recorded_grid", "expanded_grid")]
+            lines.append(" & ".join([label] + cells) + r" \\")
+        lines.extend([r"\bottomrule", r"\end{tabular}"])
+        outputs["table_grid_" + band + "_full.tex"] = "\n".join(lines) + "\n"
+        for suffix, scenario in (("Old", "recorded_grid"), ("New", "expanded_grid")):
+            for field, ending in (("boundary_heads", "Boundary"), ("failed_cells", "Failed")):
+                macro("sens" + command + suffix + ending,
+                      sum(row["scenarios"][scenario][field] for row in group["rows"]), 0, 1)
     outputs["sensitivity_macros.tex"] = "\n".join(macro_lines) + "\n"
 
     # Every dot is one paired seed comparison on the same public test block.

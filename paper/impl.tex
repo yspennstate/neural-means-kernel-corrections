@@ -4,7 +4,7 @@ from scratch on CPU-only cloud instances under the seed protocol below, in
 single precision for network training and double precision for all kernel
 solves and error computations, and it is those recomputed values that the
 tables report; the second campaign of Section~\ref{sec:seeds} ran on one
-40-core CPU host (Intel Xeon E5-2698 v4) under the same protocol. The run
+Intel Xeon E5-2698 v4 host (20 physical cores, 40 hardware threads) under the same protocol. The run
 records carry no device field, but each
 network trainer prints the device it selected when it starts, and the ten
 structural-mechanics pipeline logs hold that line for every launch, restarts
@@ -173,7 +173,7 @@ alternative), and
 four seeds hit the task limit during stack stages and were completed on a
 larger instance afterwards.
 
-The second chain ran the same ten seeds on one 40-core CPU host. It trained
+The second chain ran the same ten seeds on one host with 20 physical cores and 40 hardware threads. It trained
 the kernel ridge and the three MLP-family members again under the same seeds
 --- their test errors agree with
 the first campaign's to within $6\times10^{-8}$ in the relative-error unit
@@ -354,7 +354,7 @@ schedules, rather than intrinsic costs of the architecture families.
 
 \begin{table}[t]
 \centering
-\caption{Cost record of the second campaign on a shared 40-core CPU host,
+\caption{Cost record of the second campaign on a shared CPU host with 20 physical cores and 40 hardware threads,
 every member trained to the end of its schedule; ranges over the ten seeds.
 Wall minutes are the trainer's own elapsed record; thread-minutes is wall clock
 times the thread count (10 for the convolutional members, 10 to 16 for the

@@ -20,6 +20,11 @@ and final tables await completion of the entire campaign.
 Editorial checks have corrected the refiner description, optional
 kernel-flow implementation scope, cost units, conformal-ball radius
 terminology, and the scope of the retained half-precision archives.
+The hardware description now distinguishes 20 physical cores from 40
+hardware threads. A second matrix optimizer, using active-set solves and
+explicit optimality bounds, reproduces the sixty-member hindsight optimum
+and all twenty five-/six-member validation optima checked. This verifies
+saved matrices, not their field-array construction.
 An intermediate prose build completed at 31 main-text pages and 46 supplement
 pages with no unresolved references or citations; later edits and new results
 will receive a fresh build and visual check.
@@ -27,3 +32,9 @@ will receive a fresh build and visual check.
 Ten independent publication reviews will inspect the completed manuscript
 and its pinned evidence. They have not started. The twenty older reviews in
 paper/reviews concern an earlier version and are not votes on this work.
+
+The new sensitivity-section source files are drafts awaiting generated
+tables and macros; they are not yet included by main.tex or supplement.tex.
+The prepared metric check will rescore all sixty retained members and ten
+pipelines, compare plain and trapezoidal norms, and reconstruct the pool's
+evaluation matrix by streaming float64 residual blocks. It has not run yet.

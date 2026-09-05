@@ -13,6 +13,7 @@ from pathlib import Path
 import subprocess
 import threading
 import time
+import xml.etree.ElementTree as ET
 
 import psutil
 
@@ -60,8 +61,12 @@ def main():
     parser.add_argument("--encoder", choices=("libx264", "h264_nvenc"), default="libx264")
     parser.add_argument("--reuse-tex-from", type=Path,
                         help="Reuse exact TeX/SVG asset pairs from a completed owned build")
+    parser.add_argument("--reuse-incomplete-tex", action="store_true",
+                        help="Recover completed typesetting pairs from an interrupted owned build; does not certify its chapter")
     parser.add_argument("--quality", choices=("preview", "samples", "notation", "draft", "final"), required=True)
     args = parser.parse_args()
+    if args.reuse_incomplete_tex and not args.reuse_tex_from:
+        raise ValueError('Incomplete cache recovery requires an explicit owned donor')
     if args.encoder == 'h264_nvenc':
         if args.quality not in ('draft', 'final'):
             raise ValueError('Still frames have no video encoding stage')
@@ -122,18 +127,20 @@ def main():
         old = args.reuse_tex_from.resolve()
         if old.parent != (HERE / "builds").resolve() or not (old / "input_manifest.json").is_file():
             raise ValueError("TeX reuse requires an owned build in this lecture directory")
-        # A complete sample manifest proves the render reached its final board;
-        # a running or failed build is never used as a cache donor.
+        # Normally the donor must have reached its final board. After a crash,
+        # an explicit recovery mode may reuse individually complete TeX/SVG
+        # pairs. That does not mark the donor chapter complete or reviewed.
         manifests = list((old / "media/board_samples").glob("*/manifest.json"))
-        if len(manifests) != 1:
+        if len(manifests) > 1 or (not manifests and not args.reuse_incomplete_tex):
             raise ValueError("TeX donor has no unique completed board manifest")
-        old_manifest = json.loads(manifests[0].read_text(encoding="utf-8"))
-        if not old_manifest.get("rows"):
-            raise ValueError("TeX donor has no completed boards")
-        for row in old_manifest["rows"]:
-            frame = manifests[0].parent / row["path"]
-            if hashlib.sha256(frame.read_bytes()).hexdigest() != row["sha256"]:
-                raise ValueError("TeX donor board identity has changed")
+        if manifests:
+            old_manifest = json.loads(manifests[0].read_text(encoding="utf-8"))
+            if not old_manifest.get("rows"):
+                raise ValueError("TeX donor has no completed boards")
+            for row in old_manifest["rows"]:
+                frame = manifests[0].parent / row["path"]
+                if hashlib.sha256(frame.read_bytes()).hexdigest() != row["sha256"]:
+                    raise ValueError("TeX donor board identity has changed")
         for tex in sorted((old / "media/Tex").glob("p*/*.tex")):
             svg = tex.with_suffix(".svg")
             if not svg.is_file():
@@ -143,18 +150,26 @@ def main():
             source_text = tex.read_text(encoding="utf-8")
             if hashlib.sha256(source_text.encode("utf-8")).hexdigest()[:16] != tex.stem:
                 raise ValueError("TeX donor source no longer matches its content key")
+            svg_payload = svg.read_bytes()
+            ET.fromstring(svg_payload)  # A partially written SVG is not reusable.
             for asset in (tex, svg):
                 relative = Path("tex_seed") / asset.name
                 destination = build / relative
                 destination.parent.mkdir(exist_ok=True)
                 payload = asset.read_bytes()
+                if asset == svg and payload != svg_payload:
+                    raise ValueError('SVG changed during cache recovery')
                 if destination.exists() and destination.read_bytes() != payload:
                     raise ValueError("Conflicting TeX cache keys")
                 destination.write_bytes(payload)
+                if asset.read_bytes() != payload:
+                    raise ValueError('Donor changed while freezing the cache pair')
                 inputs[relative.as_posix()] = hashlib.sha256(payload).hexdigest()
         provenance = dict(source_build=old.name,
                           source_input_manifest_sha256=hashlib.sha256((old/"input_manifest.json").read_bytes()).hexdigest(),
                           pairs=sum(name.endswith(".svg") for name in inputs if name.startswith("tex_seed/")),
+                          donor_has_completed_board_manifest=bool(manifests),
+                          recovery_mode=args.reuse_incomplete_tex,
                           scope="Exact previously typeset vector assets; new or changed TeX compiles normally")
         cache_record = build / "tex_cache_provenance.json"
         cache_record.write_text(json.dumps(provenance, indent=2), encoding="utf-8")

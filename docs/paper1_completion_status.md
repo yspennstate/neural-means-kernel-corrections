@@ -5,10 +5,10 @@ The current main branch contains the recovered earlier release. The PDF files
 in this branch are still that earlier release; the edited TeX is the working
 manuscript and will be rebuilt with the completed sensitivity results.
 
-At 15:32 local time (UTC+03), all ten correction-label mismatch probes, all
-ten paired centering seeds, and six of nine OCO-2 grid comparisons had
-completed. The O2 comparison at seed 2 was running; the WCO2 and SCO2
-comparisons at that seed remained in the fixed queue. The centering lane
+At 16:10 local time (UTC+03), all ten correction-label mismatch probes, all
+ten paired centering seeds, and eight of nine OCO-2 grid comparisons had
+completed. The SCO2 comparison at seed 2 was running as the final item
+in the fixed queue. The centering lane
 has finished. The remaining training lane uses eight CPU threads, subject
 to measured capacity; no jobs are appended at runtime.
 
@@ -37,7 +37,7 @@ error was 4.45e-16 or less. The complete OCO-2 reconstruction and final
 archive aggregation remain pending.
 
 An intermediate prose build completed at 32 main-text pages and 46 supplement
-pages with no unresolved references or citations. Later edits include
+pages with no unresolved references or citations. The working manuscript contains
 explicit main-text proofs of the ensemble floor, sharp kernel bound and
 minimax result, with the singular-Gram argument written out. The final
 manuscript will receive a fresh build and visual check after integration.

@@ -1,0 +1,33 @@
+\subsection{Sensitivity to the kernel search grid}
+\label{sec:oco-grid-sensitivity}
+The boundary selections in Table~\ref{tab:oco2} motivate a direct check of
+the search range. We train three new paired runs in each band, at seeds
+0, 1, and 2, then compare two kernel grids on each fixed set of neural
+predictions and features. The recorded grid has 12 scale--nugget pairs;
+the expanded grid has 56. Both searches use the same validation objective,
+6000-row tuning subset, and full-training refit. The raw-input, ARD-input
+and three feature kernels receive the same expanded candidates. Network
+training remains at 250 epochs. These runs form a separate sensitivity
+comparison; they do not replace the ten-seed historical table.
+
+Table~\ref{tab:oco-grid-sensitivity} reports representative predictors
+under both searches. The per-seed records include both improvements and
+deteriorations on test. The grids are nested, but the validation winner
+need not improve test error. Supplement~\ref{supp:sensitivity}
+reports all fourteen predictors, the paired records, boundary selections
+and failed-cell counts. The finite grid and training budget still limit
+the comparison. Because the study had already inspected these public
+test states, the follow-up remains retrospective.
+
+\begin{table}[t]
+\centering
+\caption{OCO-2 search-grid sensitivity, three paired seeds per band.
+Entries are mean $\pm$ sample standard deviation, in percent. Each pair
+uses the same trained networks and validation split. The source emulator
+and linear-readout controls, together with every feature head and both
+coordinate selectors, appear in Supplement~\ref{supp:sensitivity}.}
+\label{tab:oco-grid-sensitivity}
+\begin{adjustbox}{max width=\linewidth}
+\input{table_grid_sensitivity}
+\end{adjustbox}
+\end{table}

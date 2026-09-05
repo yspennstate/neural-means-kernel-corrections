@@ -72,7 +72,7 @@ def main():
             raise ValueError('Still frames have no video encoding stage')
         mesh = Path(r'C:\Users\owner\ai-memories-and-functionality\12_cognitive_architecture\agent_mesh\agent_mesh.py')
         subprocess.run([r'C:\Python314\python.exe', '-B', str(mesh), 'assert', '--agent',
-                        'codex-nmkc-resume-20260905', '--resource', 'topic:gpu/MATH-ROSS20'],
+                        'codex-nmkc-resume-20260905', '--resource', 'topic:gpu-workload/MATH-ROSS20/codex-nmkc-resume-20260905'],
                        check=True, creationflags=0x08000000)
     if os.name != "nt":
         raise RuntimeError("This launcher implements the Windows environment only")

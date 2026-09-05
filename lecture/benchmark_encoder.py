@@ -1,7 +1,7 @@
 """Encode an actual lecture board through Manim's adapted writer.
 
 One codec per process. Compare encoder throughput, not end-to-end scene speed.
-Run only within the owner's current compute policy and the GPU lease for NVENC.
+Run only within the owner's current compute policy and the NMKC GPU lease for NVENC.
 """
 import argparse
 import ctypes
@@ -36,7 +36,7 @@ def main():
     if args.encoder == 'h264_nvenc':
         subprocess.run([r'C:\Python314\python.exe', '-B',
                         r'C:\Users\owner\ai-memories-and-functionality\12_cognitive_architecture\agent_mesh\agent_mesh.py',
-                        'assert', '--agent', 'codex-nmkc-resume-20260905', '--resource', 'topic:gpu/MATH-ROSS20'],
+                        'assert', '--agent', 'codex-nmkc-resume-20260905', '--resource', 'topic:gpu-workload/MATH-ROSS20/codex-nmkc-resume-20260905'],
                        check=True, creationflags=0x08000000)
     os.environ['NMKC_ENCODER'] = args.encoder
     import av
@@ -54,29 +54,33 @@ def main():
     config.max_inflight_encoders = 1
     args.out.mkdir(parents=True)
     output = args.out / 'board.mp4'
-    samples, stop = [], threading.Event()
+    from gpu_telemetry import Telemetry
+    telemetry=Telemetry()
+    samples, errors, stop = [telemetry.snapshot()], [], threading.Event()
     def poll_gpu():
         while not stop.is_set():
-            start = time.time()
-            result = subprocess.run(['nvidia-smi', '--query-gpu=name,driver_version,utilization.gpu,utilization.encoder,memory.used,temperature.gpu',
-                                     '--format=csv,noheader,nounits'], capture_output=True, text=True,
-                                    timeout=8, creationflags=0x08000000)
-            samples.append(dict(at=start, returncode=result.returncode, output=result.stdout.strip(), error=result.stderr.strip()))
-            stop.wait(.5)
+            try:samples.append(telemetry.snapshot())
+            except Exception as error:
+                errors.append({'at':time.time(),'error':str(error)});break
+            stop.wait(.1)
     watcher = threading.Thread(target=poll_gpu)
     watcher.start()
     try:
         writer = object.__new__(SceneFileWriter)
         writer._inflight_by_path = {}
         writer.renderer = SimpleNamespace(num_plays=0)
+        encode_started_at=time.time()
         start = time.perf_counter()
         writer.open_partial_movie_stream(str(output))
         job = writer._current_encode_job
         job.put(args.frames, frame)
         job.seal(); job.join()
         elapsed = time.perf_counter()-start
+        encode_ended_at=time.time()
     finally:
         stop.set(); watcher.join()
+        try:samples.append(telemetry.snapshot())
+        finally:telemetry.close()
     decoded = 0
     with av.open(output) as container:
         stream = container.streams.video[0]
@@ -95,7 +99,10 @@ def main():
                   encoder_seconds=elapsed, decoded_codec=codec,
                   mean_absolute_rgb_difference=float(error),
                   output_sha256=hashlib.sha256(output.read_bytes()).hexdigest(),
-                  gpu_samples=samples, human_visual_review='PENDING',
+                  gpu_samples=samples,gpu_sampling_errors=errors,
+                  encode_started_at=encode_started_at,encode_ended_at=encode_ended_at,
+                  gpu_telemetry_status='INCOMPLETE' if errors else 'SAMPLED_DEVICE_WIDE',
+                  human_visual_review='PENDING',
                   scope='Measured encoding and decoding of a fixed lecture board; excludes scene construction and typesetting')
     (args.out / 'receipt.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
     print(json.dumps(report, indent=2), flush=True)

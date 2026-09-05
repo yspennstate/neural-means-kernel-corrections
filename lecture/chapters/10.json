@@ -1,0 +1,197 @@
+{
+  "id": "10",
+  "title": "Learned geometry for radiative-transfer emulation",
+  "boards": [
+    {
+      "key": "c10_map",
+      "title": "From an atmospheric state to a radiance spectrum",
+      "visual": {
+        "kind": "oco_state_map",
+        "label": "OCO-2 benchmark: reduced atmospheric inputs, 40 retained coefficients, reconstructed O2 spectrum",
+        "source": "paper/oco2.tex; lecture/assets/oco_o2_examples.json"
+      },
+      "visual_argument": "The arrows distinguish the emulator's reduced output from the high-dimensional spectrum reconstructed from it.",
+      "segments": [
+        {
+          "line": "The target is a numerical radiative-transfer map",
+          "math": "u\\in\\mathbb R^{20\\text{--}24}\\longmapsto z\\in\\mathbb R^{40}",
+          "say": "The second application predicts a spectrum from an atmospheric state. We use the published radiative-transfer emulation benchmark associated with the three OCO-2 spectral bands. Its inputs have already been reduced to twenty through twenty-four dimensions, depending on the band. The output is forty standardized principal-component coefficients. These are simulator targets from a released benchmark, not a collection of satellite observations that we are treating as ground truth."
+        },
+        {
+          "line": "The released affine map reconstructs the spectrum",
+          "math": "R(z)=\\mu_y+U(\\mu_z+D_z z)",
+          "say": "To recover a spectrum from those forty numbers, undo the coefficient standardization, multiply by the retained principal components, and restore the spectral mean. The offsets matter. They disappear when we subtract two reconstructions, but they remain in the size of the reference spectrum used to normalize an error. The O2 examples shown here have ten thousand five hundred ninety-two stored spectral channels. We plot their stored channel index, without inventing a wavelength calibration."
+        },
+        {
+          "line": "Use the same public test states for every comparison",
+          "math": "20000=18000+2000,\\qquad N_{\\rm test}=2000",
+          "say": "The source release provides twenty thousand training-pool pairs and a separate two thousand-state test block, together with the source kernel-flow emulator's own predictions. Our recorded split takes eighteen thousand pool cases for fitting and two thousand for validation. Checkpoints, kernel settings, and coordinate choices use validation within each run. Comparisons with the source emulator use its saved predictions on exactly the same public test states. Repeated use during study development makes the overall analysis retrospective."
+        }
+      ]
+    },
+    {
+      "key": "c10_metrics",
+      "title": "Changing the metric changes which errors matter",
+      "visual": {
+        "kind": "metric_ellipses",
+        "label": "Illustrative two-coordinate geometry: a diagonal scale turns equal-error circles into ellipses",
+        "source": "paper/oco2.tex:eq:oco-reduced,eq:oco-radiance"
+      },
+      "visual_argument": "A coefficient displacement has different lengths before and after diagonal spectral scaling; a model's ranking can therefore change with the metric.",
+      "segments": [
+        {
+          "line": "Reduced error treats standardized coordinates equally",
+          "math": "E_{\\rm red}=\\frac1N\\sum_i\\frac{\\|\\widehat z_i-z_i\\|_2}{\\|z_i\\|_2}",
+          "say": "The first criterion measures the length of the error vector in standardized coefficient space, divided by the length of the reference coefficient vector. Average that ratio over cases. A unit error in a weak spectral component is as large in this coordinate system as a unit error in a strong component. This can be useful if every standardized coordinate is an object of interest, but it is not the same question as how much the reconstructed radiance changes."
+        },
+        {
+          "line": "Radiance error restores the component scales",
+          "math": "E_{\\rm rad}=\\frac1N\\sum_i\\frac{\\|D_z(\\widehat z_i-z_i)\\|_2}{\\|R(z_i)\\|_2}",
+          "say": "The radiance criterion rescales each coefficient error by its stored physical variation before taking the Euclidean norm. Because the principal-component columns are orthonormal, this norm equals the difference between the two reconstructed spectra. The picture shows a two-coordinate illustration. Stretching one coordinate makes displacements in that direction more expensive, so equal-error contours become ellipses. A model that wins in one geometry can lose in the other without any numerical inconsistency."
+        },
+        {
+          "line": "The reconstruction metric has a stated scope",
+          "math": "\\|R(\\widehat z)-R(z)\\|_2=\\|D_z(\\widehat z-z)\\|_2",
+          "say": "The equality concerns two reconstructions in the retained forty-dimensional subspace. It does not include the truncation error of principal-component reduction, the instrument line shape, or the source study's measurement-noise model. A small percentage here is therefore not automatically a retrieval-accuracy claim. We keep both criteria visible because a single favorable number would hide which coordinates and which downstream question the method actually serves."
+        }
+      ]
+    },
+    {
+      "key": "c10_features",
+      "title": "The network can learn where the kernel should measure distance",
+      "visual": {
+        "kind": "feature_circle",
+        "label": "Exact illustrative feature map: input distance and feature distance need not describe the same neighbours",
+        "source": "paper/oco2.tex; lecture/kernel_geometry.py"
+      },
+      "visual_argument": "The feature map changes the locations of inputs before the kernel compares them; it changes the geometry of interpolation.",
+      "segments": [
+        {
+          "line": "Freeze a learned feature map and fit the kernel there",
+          "math": "k_\\varphi(u,u')=\\kappa\\!\\left(\\frac{\\|\\varphi(u)-\\varphi(u')\\|}{s}\\right)",
+          "say": "In mechanics, the kernel corrected the residual of a strong mean. Here we also ask the neural network to provide a geometry for the kernel. Train the network, freeze its penultimate activations, and evaluate a Matérn kernel between those feature vectors. Inputs that are far apart in the original coordinates can become close in the learned representation, or the reverse. The circular feature example illustrates that change of geometry; it is not an embedding of the atmospheric data."
+        },
+        {
+          "line": "These feature heads fit the target coefficients directly",
+          "math": "\\begin{aligned}\\alpha_\\varphi&=(K_\\varphi+n\\lambda I)^{-1}Y\\\\\\widehat z(u)&=k_\\varphi(u,X)\\alpha_\\varphi\\end{aligned}",
+          "say": "The feature-head experiment fits the target coefficients directly. It should not be described as the same residual correction used in the mechanics pipeline. The algebra of the exact kernel solve is shared, but the response matrix here contains the targets themselves. We train three representations using a flat coefficient loss, a weighted coefficient loss, and an exact radiance loss. Their features preserve different aspects of the target, which gives the later combination something useful to choose between."
+        },
+        {
+          "line": "Separate the representation from the choice of readout",
+          "math": "\\varphi(u)\\longrightarrow\\left\\{\\begin{array}{l}\\text{trained linear layer}\\\\\\text{refitted ridge readout}\\\\\\text{Mat\\'ern kernel head}\\end{array}\\right.",
+          "say": "A neural feature map followed by a kernel has spent more total computation than a raw-input kernel. Matching the kernel grid alone does not remove that difference. We therefore include a readout control: on the same frozen features, compare the trained output layer, a ridge regression refit, and the Matérn head. That comparison helps distinguish the value of the representation from the value of replacing its final linear readout by a nonlinear kernel fit."
+        }
+      ]
+    },
+    {
+      "key": "c10_selector",
+      "title": "Coordinate choices exploit different strengths",
+      "visual": {
+        "kind": "coordinate_selection",
+        "label": "Schematic validation losses: each output coordinate selects among a fixed set of fitted candidates",
+        "source": "paper/oco2.tex:coordinatewise squared objectives"
+      },
+      "visual_argument": "The sum of coordinate losses separates across columns, allowing a different candidate in each column; taking a norm before averaging removes that simple separation.",
+      "segments": [
+        {
+          "line": "A squared coordinate objective separates into columns",
+          "math": "\\sum_j\\sum_i\\omega_i a_j(\\widehat z_{ij}-z_{ij})^2",
+          "say": "Different models can be useful on different output coordinates. If the objective is a sum of weighted squared coordinate errors with fixed nonnegative weights, every column can choose its own winner. Minimizing one column does not alter another column's contribution. The small grid illustrates this separation: each column has its own lowest validation loss. Ordinary coordinatewise root-mean-square selection uses unit weights, while squared relative objectives require case-dependent denominator weights."
+        },
+        {
+          "line": "The reported mean norms do not separate in the same way",
+          "math": "\\sum_i\\sqrt{\\sum_j a_j(\\widehat z_{ij}-z_{ij})^2}",
+          "say": "Our reported scores average norms, with a square root inside the sum over cases. That square root couples the coordinates on each case. Choosing every coordinate by its own squared error therefore need not minimize the reported mean norm. It also need not optimize both coefficient and radiance errors simultaneously. The per-coordinate combination is a concrete validation-selected estimator, not a proof that the two reported objectives have both been globally minimized."
+        },
+        {
+          "line": "Measure the combination on held-out cases after choosing it",
+          "math": "\\widehat z_j(u)=\\widehat z^{(a_j^*)}_j(u)",
+          "say": "Once validation has selected a candidate for each coordinate, freeze those choices and assemble the predicted vector on every test state. Compute both reported metrics from the assembled vector itself. Do not average the winning models' aggregate scores or splice together their already-averaged errors. Those shortcuts would describe a different object. The stored per-case predictions let us reconstruct the chosen vector and then verify the score directly."
+        }
+      ]
+    },
+    {
+      "key": "c10_median",
+      "title": "The spectrum looks close; inspect the residual as well",
+      "visual": {
+        "kind": "oco_spectrum",
+        "case": "median",
+        "label": "Actual O2 test row 1872; median-ranked combined radiance error in the seed-0 recorded-grid rerun",
+        "source": "lecture/assets/oco_o2_examples.json; lecture/assets/oco_spectrum_figures.json"
+      },
+      "visual_argument": "Nearly overlapping spectra hide systematic errors that become visible on a separate, explicitly normalized residual axis.",
+      "segments": [
+        {
+          "line": "This is a saved test spectrum, chosen by an explicit rank",
+          "math": "\\text{Rank }1000\\text{ of }2000\\text{, zero-based}",
+          "say": "Here is an actual O2 test example from the recorded-grid branch of the seed-zero follow-up. We ordered cases by the combined model's radiance error and selected the middle rank, using zero-based rank one thousand out of two thousand cases. The top panel plots the reference, the combined prediction, and the source kernel-flow prediction across all stored channels. Their agreement at this scale is encouraging, but it conceals most of the differences we need to evaluate."
+        },
+        {
+          "line": "The lower panel shows signed error on a common scale",
+          "math": "\\frac{R(\\widehat z)-R(z)}{\\max_\\ell|R(z)_\\ell|}",
+          "say": "The lower panel subtracts the reference spectrum and divides both errors by the same reference peak. This display normalization makes the curves comparable within this case. It is not the relative L two score used in the table. The scientific plot labels that distinction explicitly. At the median-ranked case, the combined residual is smaller than the source emulator's residual in much of the spectrum, while the signs and spectral structure remain visible."
+        },
+        {
+          "line": "Report the case error without turning it into an average",
+          "math": "E_{\\rm case}=0.0231\\%\\quad\\text{versus}\\quad0.0415\\%",
+          "say": "The combined model's relative radiance error for this case is about zero point zero two three one percent, compared with zero point zero four one five percent for the source kernel-flow emulator. These are case-level values from the saved vectors. They are not the mean over two thousand states or over multiple seeds. A representative image helps us understand the kind of error being made, but a distributional conclusion still requires all the cases."
+        }
+      ]
+    },
+    {
+      "key": "c10_tail",
+      "title": "A difficult case reverses the comparison",
+      "visual": {
+        "kind": "oco_spectrum",
+        "case": "p98",
+        "label": "Actual O2 test row 259; rank 1960 by combined radiance error, with the same plotting convention",
+        "source": "lecture/assets/oco_o2_examples.json; lecture/assets/oco_spectrum_figures.json"
+      },
+      "visual_argument": "A tail case exposes a coherent spectral error in the combined model, while the source emulator is more accurate on this individual state.",
+      "segments": [
+        {
+          "line": "Use the same selection rule to inspect the tail",
+          "math": "\\text{Rank }1960\\text{ of }2000\\text{, zero-based}",
+          "say": "Now move to rank nineteen hundred sixty in the same ordering, near the ninety-eighth percentile of the combined model's error. The spectral shape remains visually convincing in the top panel. In the lower panel, however, the combined residual has a substantial coherent component. This is the kind of failure an attractive overlay can hide. The source kernel-flow emulator is more accurate on this particular atmospheric state."
+        },
+        {
+          "line": "The source emulator wins this individual case",
+          "math": "E_{\\rm case}=0.0836\\%\\quad\\text{versus}\\quad0.0214\\%",
+          "say": "The combined relative radiance error is about zero point zero eight three six percent, while the source kernel-flow error is about zero point zero two one four percent. That reversal is part of the evidence, not an exception to remove from a presentation. A method can improve an average and still fail badly on some members of the evaluation set. Looking at both the middle and the tail keeps the aggregate claim tied to the objects actually being predicted."
+        },
+        {
+          "line": "Keep the measurement chain visible",
+          "math": "\\text{Stored coefficients}\\to\\text{reconstruction}\\to\\text{case error}",
+          "say": "Both spectra were reconstructed from saved coefficients using the released means, scales, and principal components. The extraction checks that the targets match the source test block, verifies input hashes before and after reading, and independently recomputes the case errors from reconstructed vectors. This matters because a plotting transposition, a missing offset, or a different denominator could produce a plausible-looking figure with the wrong interpretation. The picture and the number must come from the same case."
+        }
+      ]
+    },
+    {
+      "key": "c10_grid",
+      "title": "A boundary winner asks for a wider search",
+      "visual": {
+        "kind": "kernel_grid",
+        "label": "Actual candidate coordinates: 12 recorded cells and 56 expanded cells per kernel; colours indicate grid membership, not scores",
+        "source": "paper/supp_sensitivity.tex:A wider OCO-2 kernel search"
+      },
+      "visual_argument": "The old grid occupies a small rectangle inside the wider scale-nugget plane; a boundary selection leaves unexplored directions.",
+      "segments": [
+        {
+          "line": "The original grid had twelve candidate settings",
+          "math": "\\begin{gathered}s/s_{\\rm med}\\in\\{0.5,1,2,4\\}\\\\\\lambda\\in\\{10^{-8},10^{-6},10^{-4}\\}\\end{gathered}",
+          "say": "The historical feature heads repeatedly selected the largest scale and the smallest nugget in the recorded grid. That does not establish an optimum. It tells us the validation surface was still favoring the edge of the region we searched. The original grid had four scale multipliers and three nuggets, giving twelve candidates per kernel. A fair description of those results must name that finite search."
+        },
+        {
+          "line": "The follow-up expands both directions while freezing the networks",
+          "math": "\\begin{gathered}s/s_{\\rm med}\\in\\{0.25,0.5,1,2,4,8,16\\}\\\\\\lambda\\in\\{10^{-10},\\ldots,10^{-3}\\}\\end{gathered}",
+          "say": "The follow-up uses seven scale multipliers and eight powers of ten for the nugget, making fifty-six candidates. At each band and seed, the networks and their features are shared by the two grid comparisons. Both searches use the same six-thousand-row tuning subset, followed by a refit on all eighteen thousand training rows. This design isolates the candidate search while keeping the neural representation and data split fixed."
+        },
+        {
+          "line": "A broader search can worsen the test score",
+          "math": "\\operatorname*{argmin}_{h\\in\\mathcal H}E_{\\rm val}(h)\\quad\\ne\\quad\\operatorname*{argmin}_{h\\in\\mathcal H}E_{\\rm test}(h)",
+          "say": "Expanding the grid can only improve or preserve the minimum successful tuning-validation objective when the old candidates remain available. It need not improve the refitted validation score or the public test score. The tuning subset, full refit, and evaluation distribution are different objects. We therefore retain failed cells, selected settings, boundary flags, and all final candidate scores. The completed sensitivity tables show whether the original conclusions survive this broader search, including any deterioration."
+        }
+      ]
+    }
+  ]
+}

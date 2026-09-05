@@ -87,6 +87,77 @@ def field_image(grid, cmap, low, high, center, size=2.15):
 
 def build_visual(spec):
     kind = spec["kind"]
+    if kind == "oco_spectrum":
+        receipt = json.loads((HERE/"assets/oco_spectrum_figures.json").read_text(encoding="utf-8"))
+        row = next(x for x in receipt["rows"] if x["case"] == spec["case"])
+        path = HERE/"assets"/row["path"]
+        if hashlib.sha256(path.read_bytes()).hexdigest() != row["sha256"]:
+            raise ValueError("OCO-2 figure does not match its receipt")
+        plot = ImageMobject(str(path)).set_width(7.15).move_to([2.63, .0, 0])
+        # The data, labels and normalized units live in the checked scientific plot.
+        top = Rectangle(width=6.6, height=2.3, color=GOLD).move_to([2.85, 1.35, 0])
+        bottom = Rectangle(width=6.6, height=1.9, color=BLUE).move_to([2.85, -1.15, 0])
+        scores = row["radiance_relative_errors"]
+        score = formula(rf"E_{{\rm case}}:\ {100*scores['combined']:.4f}\%\quad"
+                        rf"({100*scores['kernel_flow']:.4f}\%\ \mathrm{{KF}})",
+                        23, GOLD, 7).move_to([2.7, -2.9, 0])
+        return Group(plot, score), [lambda: ShowPassingFlash(top), lambda: ShowPassingFlash(bottom),
+                                     lambda: Indicate(score, color=GOLD)]
+    if kind == "mean_mismatch":
+        ax = axes(x=(0, 3.6, 1), y=(0, 2.8, 1), width=5.4, height=4.2).move_to([2.65, .1, 0])
+        a, b, y = ax.c2p(.7, .5), ax.c2p(1.7, .85), ax.c2p(2.8, 2.05)
+        dots = VGroup(Dot(a, color=BLUE), Dot(b, color=GREEN), Dot(y, color=INK))
+        delta = Arrow(a, b, buff=.07, color=GOLD)
+        old = Arrow(a, y, buff=.08, color=BLUE)
+        new = Arrow(b, y, buff=.08, color=GREEN)
+        labels = VGroup(formula(r"M_{\rm tr}", 28, BLUE).next_to(a, DOWN, buff=.18),
+                        formula(r"m_{\rm full}(X)", 27, GREEN).next_to(b, DOWN, buff=.18),
+                        formula(r"G(X)", 29, INK).next_to(y, UP, buff=.18),
+                        formula(r"\Delta", 27, GOLD).move_to((a+b)/2+[0,-.48,0]),
+                        small_label("One schematic training row", [2.6,-2.55,0], 24))
+        return VGroup(ax, old, new, delta, dots, labels), [lambda: Indicate(dots, color=INK),
+                lambda: Indicate(delta, color=GOLD), lambda: Indicate(new, color=GREEN)]
+    if kind == "triangle_error":
+        a, b, c = np.array([.1,-1.2,0]), np.array([3.9,-.2,0]), np.array([4.8,1.55,0])
+        first = Arrow(a,b,buff=0,color=BLUE)
+        second = Arrow(b,c,buff=0,color=GOLD)
+        total = Arrow(a,c,buff=0,color=RED)
+        labels = VGroup(formula(r"e_{\rm full}",29,BLUE).move_to([2.,-1.12,0]),
+                        formula(r"-c^\top\Delta",29,GOLD).move_to([5.2,.45,0]),
+                        formula(r"e_{\rm tr}",29,RED).move_to([1.7,.8,0]),
+                        small_label("Output space; lengths are error norms",[2.6,-2.3,0],24))
+        return VGroup(first,second,total,labels), [lambda: Indicate(first,color=BLUE),
+                lambda: Indicate(second,color=GOLD),lambda: Indicate(total,color=RED)]
+    if kind == "fold_centering":
+        cells = VGroup()
+        for i in range(4):
+            color = GOLD if i == 3 else BLUE
+            cell = Rectangle(width=1.3,height=1.2,color=color,fill_color=color,fill_opacity=.2).move_to([.35+1.48*i,.65,0])
+            cells.add(VGroup(cell,formula("4750",24,color).move_to(cell)))
+        fitting = Brace(VGroup(*cells[:3]),DOWN,color=BLUE)
+        pooled = Brace(cells,UP,color=GREEN)
+        labels = VGroup(formula(r"\mu_F:\ 14250",29,BLUE).next_to(fitting,DOWN,buff=.15),
+                        formula(r"\mu_P:\ 19000",29,GREEN).next_to(pooled,UP,buff=.15),
+                        small_label("Held out",[4.8,-.55,0],24,GOLD),
+                        small_label("Target centering only; other data paths remain as stated",[2.65,-2.25,0],21))
+        return VGroup(cells,fitting,pooled,labels),[lambda:Indicate(pooled,color=GREEN),
+                lambda:Indicate(fitting,color=BLUE),lambda:Indicate(cells[3],color=GOLD)]
+    if kind == "paired_protocol":
+        parts=VGroup(); stages=[]
+        for y,label,color in ((.95,"Pooled",BLUE),(-.75,"Fold-local",GOLD)):
+            parts.add(small_label(label,[2.65,y+.75,0],27,color))
+            row=VGroup()
+            for i,name in enumerate(("Field","Refiner","Stack","Kernel")):
+                x=.05+i*1.65
+                box=RoundedRectangle(width=1.42,height=.7,corner_radius=.07,color=color)
+                box.move_to([x,y,0]); txt=small_label(name,box.get_center(),23,color)
+                row.add(VGroup(box,txt))
+                if i:parts.add(Arrow([x-.99,y,0],[x-.78,y,0],buff=0,color=DIM,stroke_width=2))
+            parts.add(row); stages.append(row)
+        labels=VGroup(small_label("Same seed, epochs and downstream choices",[2.65,-2.2,0],24),
+                      formula(r"d_s=E_{s,\rm local}-E_{s,\rm pooled}",30,GOLD).move_to([2.65,-2.78,0]))
+        return VGroup(parts,labels),[lambda:Indicate(stages[0],color=BLUE),
+                lambda:Indicate(stages[1],color=GOLD),lambda:Indicate(labels[1],color=GOLD)]
     if kind == "elastic_domain":
         square = Square(3.0, color=BLUE, fill_color=BLUE, fill_opacity=.09).move_to([2.5, .0, 0])
         fibre = Circle(.72, color=GOLD, fill_color=GOLD, fill_opacity=.22).move_to(square)
@@ -644,6 +715,9 @@ class BoardSamples(BoardMixin, Scene):
 class LectureChapter(BoardMixin, Scene):
     def construct(self):
         timing = []
+        samples = HERE / "media" / "board_samples" / CHAPTER
+        samples.mkdir(parents=True, exist_ok=True)
+        sample_rows = []
         # Fail before spending render time if any recording is stale or missing.
         durations = {}
         for board in DATA["boards"]:
@@ -663,6 +737,11 @@ class LectureChapter(BoardMixin, Scene):
                 else:
                     self.play(ReplacementTransform(text, current), run_time=.45)
                 text = current
+                self.renderer.update_frame(self)
+                sample_path = samples / (key + ".png")
+                self.renderer.camera.get_image().save(sample_path)
+                sample_rows.append({"key": key, "path": sample_path.name,
+                                    "sha256": hashlib.sha256(sample_path.read_bytes()).hexdigest()})
                 # All voice duration remains available; animation never truncates speech.
                 self.add_sound(str(HERE / "audio" / CHAPTER / (key + ".wav")))
                 voice_start = self.renderer.time
@@ -684,3 +763,6 @@ class LectureChapter(BoardMixin, Scene):
             "chapter": CHAPTER, "script_sha256": hashlib.sha256(
                 (HERE/"chapters"/(CHAPTER+".json")).read_bytes()).hexdigest(),
             "segments": timing, "seconds": self.renderer.time}, indent=2), encoding="utf-8")
+        (samples / "manifest.json").write_text(json.dumps({
+            "kind": "frames_from_narrated_render", "chapter": CHAPTER,
+            "human_visual_review": "PENDING", "rows": sample_rows}, indent=2), encoding="utf-8")

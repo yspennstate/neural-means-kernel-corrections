@@ -95,7 +95,7 @@
       "segments": [
         {
           "line": "A global convex stack uses one set of weights",
-          "math": "m(u)=\\sum_{a=1}^M w_a f_a(u),\\quad w_a\\ge0,\\quad\\sum_a w_a=1",
+          "math": "\\begin{aligned}m(u)&=\\sum_{a=1}^M w_a f_a(u)\\\\w_a&\\ge0,\\quad\\sum_a w_a=1\\end{aligned}",
           "say": "A global convex stack uses the same nonnegative member weights at every output coordinate and every query. The weights sum to one, so the predicted field lies in the convex hull of the member fields. The recorded implementation searches these weights by a random hill climb on part of the validation data. It minimizes mean relative error. That search is not the quadratic-program optimum of the second-moment matrix that we analyze in the next chapter."
         },
         {
@@ -105,7 +105,7 @@
         },
         {
           "line": "Repeated validation use limits the statistical guarantee",
-          "math": "\\text{Selection data}\\ne\\text{fresh independent evidence}",
+          "math": "\\begin{gathered}\\text{Selection data}\\\\\\ne\\text{fresh independent evidence}\\end{gathered}",
           "say": "Validation is used at several points: checkpoints, member choices, stack choices and kernel hyperparameters. Splitting one validation block for one stage does not erase its use in earlier stages. The independent-candidate selection bounds in the supplement explain what could be guaranteed under fresh-sample assumptions. Those assumptions do not hold for the full recorded development process, and the constants do not certify a negligible selection cost here. The numerical comparisons remain measurements on the specified benchmark."
         }
       ]
@@ -159,7 +159,7 @@
         },
         {
           "line": "OCO-2 uses a direct-target feature head",
-          "math": "\\widehat G_{\\rm feat}(u)=k_\\varphi(u,X)(K_\\varphi+n\\lambda I)^{-1}Y",
+          "math": "\\begin{aligned}\\alpha_\\varphi&=(K_\\varphi+n\\lambda I)^{-1}Y\\\\\\widehat G_{\\rm feat}(u)&=k_\\varphi(u,X)\\alpha_\\varphi\\end{aligned}",
           "say": "The OCO-2 feature head fits the target directly rather than fitting the residual of the network output. The network provides the features, while kernel regression replaces its final prediction head. That is a controlled way to ask whether the learned representation remains useful when the final linear readout is changed. We will compare that head with the original network and with a ridge readout on the same frozen features, so the comparison is about the readout as well as the representation."
         }
       ]

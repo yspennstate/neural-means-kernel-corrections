@@ -1,0 +1,141 @@
+{
+  "id": "09",
+  "title": "When the training mean and the deployed mean differ",
+  "boards": [
+    {
+      "key": "c09_two_means",
+      "title": "A theorem about one residual needs one mean function",
+      "visual": {
+        "kind": "mean_mismatch",
+        "label": "Illustrative output vectors: training-row and query-time means can differ",
+        "source": "paper/theory.tex:eq:mismatch"
+      },
+      "visual_argument": "A shift in the mean changes the residual labels by the opposite displacement; the kernel propagates that displacement to the query.",
+      "segments": [
+        {
+          "line": "Distinguish the stored training rows from the deployed function",
+          "math": "M_{\\rm tr}\\quad\\hbox{and}\\quad m_{\\rm full}(X)",
+          "say": "The sharp bound was proved for residual values sampled from one function. The mechanics implementation requires one more step before that theorem describes its correction. On training rows, its kernel channel uses out-of-fold predictions. At a new input, that channel uses the fit on all training rows. The refiner also sees a different kernel input. We should therefore give the stored training mean and the deployed mean different names, even though both belong to the same prediction pipeline."
+        },
+        {
+          "line": "Measure the difference on the same training inputs",
+          "math": "\\Delta=m_{\\rm full}(X)-M_{\\rm tr}",
+          "say": "Evaluate the deployed mean back on the training inputs and subtract the mean rows originally stored there. Call the resulting matrix Delta. It has one row per training case and one column per output coordinate. This definition involves no statistical approximation. Both terms can be evaluated from the saved models. In the picture, the two blue points represent the two means; their separation is the displacement we need to track."
+        },
+        {
+          "line": "The correction labels contain that extra displacement",
+          "math": "\\begin{aligned}R_{\\rm tr}&=G(X)-M_{\\rm tr}\\\\&=(G-m_{\\rm full})(X)+\\Delta.\\end{aligned}",
+          "say": "Add and subtract the deployed mean inside the stored residual labels. The result is the residual of the deployed function, plus Delta. Check the sign directly: deployed mean minus training mean must be added to target minus deployed mean to recover target minus training mean. A sign error here would reverse the predicted change. This identity tells us exactly which part is covered by the single-residual theorem and which part is an implementation mismatch."
+        }
+      ]
+    },
+    {
+      "key": "c09_propagation",
+      "title": "Propagate the mismatch through the same kernel solve",
+      "visual": {
+        "kind": "mean_mismatch",
+        "label": "The same fixed coefficient vector transports both the residual and the mismatch",
+        "source": "paper/theory.tex:eq:mismatch; campaign/correction_mismatch.py"
+      },
+      "visual_argument": "Linearity of the fitted correction separates its compatible-residual component from the propagated displacement.",
+      "segments": [
+        {
+          "line": "Keep the deployed mean and selected kernel fixed",
+          "math": "\\begin{aligned}\\widehat G_{\\rm tr}(u)&=m_{\\rm full}(u)\\\\&\\quad+c_\\lambda(u)^\\top R_{\\rm tr}\\end{aligned}",
+          "say": "Write the implemented prediction as the deployed mean plus the kernel coefficient vector applied to the stored labels. For this diagnostic we freeze the selected kernel and the stack weights. We are not comparing two newly trained networks, and we are not retuning hyperparameters after looking at a result. Keeping these objects fixed isolates the effect of replacing the labels in one linear solve."
+        },
+        {
+          "line": "Compare with labels from the deployed mean itself",
+          "math": "\\widehat G_{\\rm tr}(u)-\\widehat G_{\\rm full}(u)=c_\\lambda(u)^\\top\\Delta",
+          "say": "Now form a second correction from target minus the deployed mean on the training rows. Subtract its prediction from the historical-label prediction. The mean terms cancel, and the compatible residual terms cancel. What remains is c transpose Delta. This is an equality between two finite-design predictors. It can be checked from their outputs without estimating an RKHS norm or assuming that the true physical map belongs to a chosen function space."
+        },
+        {
+          "line": "A small prediction change cannot change the error norm by more",
+          "math": "\\big|\\|e_{\\rm tr}(u)\\|_2-\\|e_{\\rm full}(u)\\|_2\\big|\\le\\|c_\\lambda(u)^\\top\\Delta\\|_2",
+          "say": "Apply the reverse triangle inequality to the two error vectors. The difference between their lengths cannot exceed the length of their separation. This gives a direct audit for every test case. It does not say that removing the mismatch must improve the error. The extra displacement might accidentally move the prediction toward the target on some cases. The sign of the observed change is therefore a result to measure, not a consequence of the theorem."
+        }
+      ]
+    },
+    {
+      "key": "c09_bound",
+      "title": "The implemented predictor has a two-term bound",
+      "visual": {
+        "kind": "triangle_error",
+        "label": "Schematic error vectors: the triangle inequality bounds the length of their sum",
+        "source": "paper/theory.tex:eq:mismatch"
+      },
+      "visual_argument": "The compatible residual error and the propagated label mismatch form a triangle in output space.",
+      "segments": [
+        {
+          "line": "Apply the sharp theorem to the compatible residual",
+          "math": "\\|e_{\\rm full}(u)\\|_2\\le\\|G-m_{\\rm full}\\|_K\\widetilde P_\\lambda(u)",
+          "say": "Assume, conditionally, that target minus deployed mean lies in the stated vector-valued RKHS. The sharp theorem then bounds the error of the correction using compatible labels. Its multiplier is the norm of that residual function, and its design factor is the exact representer norm we derived. The learned mean can be arbitrary once frozen. What matters for this step is the membership assumption on its residual."
+        },
+        {
+          "line": "Add the propagated mismatch by the triangle inequality",
+          "math": "\\begin{aligned}\\|e_{\\rm tr}(u)\\|_2&\\le\\|G-m_{\\rm full}\\|_K\\widetilde P_\\lambda(u)\\\\&\\quad+\\|c_\\lambda(u)^\\top\\Delta\\|_2.\\end{aligned}",
+          "say": "The implemented error differs from the compatible error by the propagated mismatch. The triangle inequality therefore adds its norm to the sharp residual bound. The two arrows in the picture need not point in the same direction; adding their lengths is a worst-case step. This is why a measured mismatch term can be larger than the actual change in error. Cancellation is allowed in the observed vector even though the bound discards it."
+        },
+        {
+          "line": "Only one of these terms is directly measured here",
+          "math": "\\|c_\\lambda(u)^\\top\\Delta\\|_2\\le\\|c_\\lambda(u)\\|_2\\|\\Delta\\|_F",
+          "say": "Cauchy--Schwarz gives a further, usually looser bound using the coefficient norm and the Frobenius norm of Delta. We prefer to measure the propagated vector itself when saved predictions make that possible. Neither measurement supplies the unknown native-space norm in the first term. Thus the follow-up experiment closes an implementation question, but it does not turn the conditional theorem into a certified numerical error bar for an unseen physical input."
+        }
+      ]
+    },
+    {
+      "key": "c09_centering",
+      "title": "A second question: which rows determine the target mean?",
+      "visual": {
+        "kind": "fold_centering",
+        "label": "Four folds: 14,250 fitting rows and 4,750 held-out rows within the training block",
+        "source": "paper/supp_sensitivity.tex:Paired target-centering reruns"
+      },
+      "visual_argument": "Pooled target centering reaches across the held-out fold; fold-local target centering uses only the fitting rows.",
+      "segments": [
+        {
+          "line": "Out-of-fold prediction still needs a centering convention",
+          "math": "\\mu_P=\\operatorname{mean}_{19000}G,\\qquad\\mu_F=\\operatorname{mean}_{14250}G",
+          "say": "A separate sensitivity check concerns target centering inside the out-of-fold kernel fits. In the historical recipe, each fold subtracts the target mean over all nineteen thousand training cases. Fold-local centering instead uses only the fourteen thousand two hundred fifty fitting cases for that fold. The held-out targets do not enter this second mean. These alternatives are close numerically here, but they are not the same information flow."
+        },
+        {
+          "line": "The difference follows from one affine kernel formula",
+          "math": "\\widehat G_H(\\mu)=\\mathbf1\\mu^\\top+k_HA^{-1}(Y_F-\\mathbf1\\mu^\\top)",
+          "say": "For a chosen centering vector, subtract it from the fitting labels, perform the kernel solve, and add it back to every prediction. Write A for the regularized fitting Gram matrix and k H for the cross-kernel matrix to the held-out inputs. The prediction is affine in the centering vector. We can therefore compare the two choices using the same factorization, avoiding an unnecessary second factorization of a large matrix."
+        },
+        {
+          "line": "Subtract the two expressions before running anything downstream",
+          "math": "\\widehat G_H(\\mu_F)-\\widehat G_H(\\mu_P)=(\\mathbf1-k_HA^{-1}\\mathbf1)(\\mu_F-\\mu_P)^\\top",
+          "say": "Subtracting the affine formulas gives a rank-one product: a coefficient on the held-out rows times the difference in target means. Our implementation checks this identity against separate right-hand-side solves at prespecified output coordinates. It also checks that the pooled arm reproduces the retained historical field. Those checks isolate the centering intervention before retraining the refiner, where optimization randomness would otherwise make a discrepancy harder to diagnose."
+        }
+      ]
+    },
+    {
+      "key": "c09_paired",
+      "title": "Retrain the downstream stages in matched pairs",
+      "visual": {
+        "kind": "paired_protocol",
+        "label": "Two centering arms at each of ten fixed seeds; downstream refitting is repeated in both",
+        "source": "paper/implementation_sensitivity.tex; campaign/run_centering_campaign.py"
+      },
+      "visual_argument": "Parallel paths differ at one declared intervention, then pass through the same downstream fitting stages.",
+      "segments": [
+        {
+          "line": "The centering comparison retrains the refiner",
+          "math": "\\text{Centering}\\longrightarrow\\text{Refiner}\\longrightarrow\\text{Stack}\\longrightarrow\\text{Correction}",
+          "say": "Changing an out-of-fold kernel field also changes the refiner's training input. A comparison that stopped at the kernel field would miss that downstream effect. We therefore train the refiner for the same hundred epochs in each arm, then repeat stacking, the per-pixel decision, residual correction, and calibration. The other fixed predictors are reused. Ten matched seeds let us inspect whether the direction is consistent or simply alternates at a very small scale."
+        },
+        {
+          "line": "The mismatch comparison freezes the estimator except for labels",
+          "math": "\\text{Fixed mean, weights, kernel}\\quad\\longrightarrow\\quad R_{\\rm tr}\\ \\hbox{or}\\ R_{\\rm full}",
+          "say": "The label-consistency diagnostic is deliberately different. It holds the historical mean, weights, and selected kernel fixed, changing only the labels used by the correction. The two experiments answer different questions and should not be combined into one claim about cross-fitting. Even in the fold-local centering arm, input standardization still uses the full training block, and neural channels are not all cross-fitted."
+        },
+        {
+          "line": "Interpret these reruns as retrospective sensitivity evidence",
+          "math": "d_s=\\operatorname{MRE}_{s,\\rm changed}-\\operatorname{MRE}_{s,\\rm reference}",
+          "say": "For each seed, report changed minus reference error, with positive values meaning worse performance after the intervention. Keep the pairing visible instead of presenting only two rounded averages. These public test cases had already been examined during the study. A newly frozen run list improves reproducibility, but it does not make that test block untouched. The reruns measure sensitivity of the recorded recipe; they are not a replacement for a prospective evaluation on new data."
+        }
+      ]
+    }
+  ]
+}

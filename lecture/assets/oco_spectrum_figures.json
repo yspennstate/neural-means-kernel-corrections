@@ -1,0 +1,35 @@
+{
+  "source_npz_sha256": "6c63f44f2da7df441590f93d6926cd50174355bda348e1748b8d690756b9df3a",
+  "matplotlib_version": "3.10.8",
+  "display": "Every stored channel is plotted; common reference-peak scaling for each case.",
+  "rows": [
+    {
+      "case": "median",
+      "path": "oco_o2_median_spectrum.png",
+      "sha256": "5b9ee83b7c27ce096a279c46a38cdc091ea3870b8bef66fc7186fba4384eef9e",
+      "test_row": 1872,
+      "display_reference_peak": 0.08760680771478327,
+      "all_channels_plotted": 10592,
+      "radiance_relative_errors": {
+        "mean_flat": 0.0024349021728208267,
+        "dkr_flat": 0.0007294331916496101,
+        "combined": 0.0002312061494151066,
+        "kernel_flow": 0.0004148764660440208
+      }
+    },
+    {
+      "case": "p98",
+      "path": "oco_o2_p98_spectrum.png",
+      "sha256": "eb2ba0050fe9bf2f8bce958a939e71815022e77f47875d6a55d22680a067f5df",
+      "test_row": 259,
+      "display_reference_peak": 0.09604265573373734,
+      "all_channels_plotted": 10592,
+      "radiance_relative_errors": {
+        "mean_flat": 0.0030706418224542066,
+        "dkr_flat": 0.001092076782289032,
+        "combined": 0.0008358167644265064,
+        "kernel_flow": 0.00021439724162191078
+      }
+    }
+  ]
+}

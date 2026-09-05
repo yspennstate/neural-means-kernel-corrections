@@ -1,0 +1,59 @@
+{
+  "kind": "source_bound_lecture_examples",
+  "band": "o2",
+  "seed": 0,
+  "branch": "recorded_grid in September5 sensitivity campaign",
+  "sources": {
+    "variables": {
+      "file": "dimred_variables_4_mono.jld",
+      "sha256": "d979ef32270ac4d72565c5eaad27d0d937e9da21512e15eb7c4a7b84c614da8b"
+    },
+    "reconstruction": {
+      "file": "dimred_data_4_mono.jld",
+      "sha256": "01a1e8fe3a60e8d4f6e73b90b2d67794fbcc01c82e56d73a7a6da1fc502d5efa"
+    },
+    "predictions": {
+      "file": "recorded_grid_predictions.npz",
+      "sha256": "a224a486f371880c7b8d4707790c2822250b913bbbb2efe52f6844cf5c43e926"
+    },
+    "errors": {
+      "file": "recorded_grid_errors.npz",
+      "sha256": "e1d3ddc47c907fe36f97a4d23d7a84ca1b787b1ee130bc88d534bef43cd3ab3f"
+    },
+    "summary": {
+      "file": "grid_sensitivity.json",
+      "sha256": "2e039a3392108c7efa76c3391c5ba610c231628bae4b63ada2c87805576ef492"
+    }
+  },
+  "reconstruction": "(z*s_z+m_z)@P+m; original stored channel order",
+  "axis": "Spectral channel index; no wavelength coordinates inferred",
+  "cases": {
+    "median": {
+      "test_row": 1872,
+      "zero_based_sorted_error_rank": 1000,
+      "selection_metric": "combined_radiance",
+      "radiance_relative_errors": {
+        "mean_flat": 0.0024349021728208267,
+        "dkr_flat": 0.0007294331916496101,
+        "combined": 0.0002312061494151066,
+        "kernel_flow": 0.0004148764660440208
+      },
+      "spectral_channels": 10592
+    },
+    "p98": {
+      "test_row": 259,
+      "zero_based_sorted_error_rank": 1960,
+      "selection_metric": "combined_radiance",
+      "radiance_relative_errors": {
+        "mean_flat": 0.0030706418224542066,
+        "dkr_flat": 0.001092076782289032,
+        "combined": 0.0008358167644265064,
+        "kernel_flow": 0.00021439724162191078
+      },
+      "spectral_channels": 10592
+    }
+  },
+  "npz_sha256": "6c63f44f2da7df441590f93d6926cd50174355bda348e1748b8d690756b9df3a",
+  "extractor_sha256": "1f140a54de3f9a015e1285ae8c4366128b74ee05b317c066a05834abba91ca28",
+  "scope": "Selected case illustrations, not an aggregate result or fresh evaluation"
+}

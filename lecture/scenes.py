@@ -36,7 +36,8 @@ if (HERE / "tex_seed").exists():
         shutil.copyfile(asset, Path(config.tex_dir) / asset.name)
 config.text_dir = str(HERE / "media" / "texts" / f"p{os.getpid()}")
 TEMPLATE = TexTemplate(tex_compiler="pdflatex", output_format=".pdf")
-TEMPLATE.add_to_preamble(r"\usepackage[T1]{fontenc}\usepackage{amsmath,amssymb,bm,newtxtext,newtxmath}")
+from tex_style import PREAMBLE
+TEMPLATE.add_to_preamble(PREAMBLE)
 from tex_rules import install as install_tex_rules
 install_tex_rules(HERE)
 
@@ -54,9 +55,11 @@ def prose(text, size=31, color=INK, width=None):
     return Tex(body, tex_template=TEMPLATE, font_size=size, color=color)
 
 
-def formula(text, size=35, color=GOLD, max_width=5.0):
+def formula(text, size=35, color=GOLD, max_width=5.0, shrink=True):
     obj = MathTex(text, tex_template=TEMPLATE, font_size=size, color=color)
     if obj.width > max_width:
+        if not shrink:
+            raise ValueError(f"Break this equation into readable lines: width {obj.width:.3f} > {max_width}: {text}")
         factor = max_width / obj.width
         if factor < .56:
             raise ValueError(f"Equation too dense for the board: {text}")
@@ -964,7 +967,7 @@ class BoardMixin:
         line = prose(segment["line"], size=31, width=6.0)
         if line.width > 4.75: line.scale(4.75/line.width)
         line.move_to([-3.85, 1.0, 0])
-        equation = formula(segment["math"], size=35, max_width=4.8).move_to([-3.85, -.45, 0])
+        equation = formula(segment["math"], size=35, max_width=4.8, shrink=False).move_to([-3.85, -.65, 0])
         return VGroup(line, equation)
 
 

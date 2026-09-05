@@ -68,7 +68,7 @@
       "segments": [
         {
           "line": "Reflect the input, predict, and transform the field back",
-          "math": "\\widehat f(u)=\\tfrac12\\big(f(u)+T f(Su)\\big)",
+          "math": "\\widehat f(u)=\\frac12\\big(f(u)+T f(Su)\\big)",
           "say": "The structural-mechanics benchmark has a reflection symmetry. Reverse the sampled load, predict the reflected case, and reflect that predicted field back to the original coordinates. Now average it with the prediction made directly from the original load. The two terms refer to the same physical orientation after the second reflection. If we forgot to transform the output back, the average would mix different spatial locations and would have no such interpretation."
         },
         {
@@ -154,7 +154,7 @@
         },
         {
           "line": "A feature-space correction compares learned activations",
-          "math": "k_\\varphi(u,u')=\\kappa\\big(\\|\\varphi(u)-\\varphi(u')\\|/s\\big)",
+          "math": "\\begin{gathered}k_\\varphi(u,u')\\\\=\\kappa\\big(\\|\\varphi(u)-\\varphi(u')\\|/s\\big)\\end{gathered}",
           "say": "The feature correction instead compares frozen internal activations from the fitted members. In the mechanics pipeline, reflection-averaged features are standardized and concatenated before the kernel is built. The kernel can then regard two loads as similar because the networks represent them similarly, even if their raw Euclidean distance is substantial. This transformation can help or hurt. It changes both the kernel function space and the locations of the design points within that space."
         },
         {
@@ -186,7 +186,7 @@
         },
         {
           "line": "Use the components to ask separate empirical questions",
-          "math": "\\text{Mean}\\ \\longrightarrow\\ \\text{residual}\\ \\longrightarrow\\ \\text{correction}",
+          "math": "\\begin{gathered}\\text{Mean}\\longrightarrow\\text{residual}\\\\\\downarrow\\\\\\text{correction}\\end{gathered}",
           "say": "We can now separate the study's questions. Does averaging reduce the neural mean's error, and what limits that reduction? Does the residual kernel add useful information? Does a learned feature map improve the kernel's geometry? Does the training-to-deployment discrepancy materially change the result? And how should uncertainty be calibrated afterward? The remaining chapters connect these questions to proofs, geometric examples and the recorded numerical comparisons."
         }
       ]

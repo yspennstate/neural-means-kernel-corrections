@@ -388,9 +388,12 @@ This proves both inequalities. If $\|g_u\|>0$, take
 $r_1=\rho g_u/\|g_u\|$ and $r_j=0$ for $j>1$, for any prescribed
 radius $\rho$. Its norm is $\rho$ and its error is exactly $\rho\|g_u\|$,
 which proves sharpness. If $g_u=0$, every residual has zero error.
-For $\lambda=0$ and singular $K$, positive semidefiniteness of the augmented
-Gram matrix implies $k(X,u)\in\operatorname{range}K$; hence $c=K^+k(X,u)$
-satisfies $Kc=k(X,u)$ and the same argument applies.
+For $\lambda=0$ and singular $K$, take $z\in\ker K$. The function
+$h_z=\sum_i z_i k(u_i,\cdot)$ has squared norm $z^\top Kz=0$, so
+$z^\top k(X,u)=\langle h_z,k(u,\cdot)\rangle=0$.
+Thus $k(X,u)$ is orthogonal to $\ker K$ and belongs to
+$\operatorname{range}K$. Consequently $c=K^+k(X,u)$ satisfies
+$Kc=k(X,u)$, and the same argument applies.
 \end{proof}
 
 

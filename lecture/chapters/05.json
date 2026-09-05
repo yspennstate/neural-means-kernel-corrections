@@ -19,7 +19,7 @@
         },
         {
           "line": "Separate weight-fitting cases from evaluation cases",
-          "math": "1{,}000\\text{ calibration},\\qquad19{,}000\\text{ evaluation}",
+          "math": "\\begin{gathered}1{,}000\\text{ calibration}\\\\19{,}000\\text{ evaluation}\\end{gathered}",
           "say": "For this analysis, the public test block is split into one thousand cases used to fit some ensemble weights and nineteen thousand used to evaluate them. The same evaluation cases are shared across all sixty predictors. Some rows are explicitly hindsight optima computed directly on the evaluation matrix. They answer what this fixed pool could achieve on these cases, and are not estimates of the error of a weight-selection rule tested on fresh data."
         },
         {
@@ -132,7 +132,7 @@
         },
         {
           "line": "The useful empirical conclusion is narrower and more actionable",
-          "math": "\\begin{gathered}\\text{New representation or correction}\\\\\\downarrow\\\\\\text{Measure the resulting estimator}\\end{gathered}",
+          "math": "\\begin{gathered}\\text{New representation}\\\\\\text{or correction}\\\\\\downarrow\\\\\\text{Measure the new estimator}\\end{gathered}",
           "say": "The evidence suggests that repeatedly adding similar seeds or improving only the global convex optimizer offers limited gains within this pool. A more promising next experiment changes the residual directions, the coordinatewise readout or the representation supplied to the correction. That is a research decision supported by this dataset, not a theorem that one family of architectures will always win. It gives us a concrete reason to investigate what the kernel can add."
         }
       ]

@@ -78,7 +78,7 @@
         },
         {
           "line": "The query vector is orthogonal to every null vector",
-          "math": "z^\\top k_u=\\left\\langle\\sum_i z_i k(u_i,\\cdot),k(u,\\cdot)\\right\\rangle=0",
+          "math": "\\begin{gathered}z^\\top k_u\\\\=\\left\\langle\\sum_i z_i k(u_i,\\cdot),k(u,\\cdot)\\right\\rangle\\\\=0\\end{gathered}",
           "say": "Take the inner product of that zero function with the query section. The result is zero. Expanding the inner product gives z transpose k sub u. Thus the query kernel vector is orthogonal to every vector in the nullspace of K. Since K is symmetric, the orthogonal complement of its nullspace is its range. Therefore k sub u lies in the range of K. No arbitrary extension of the query vector is required."
         },
         {
@@ -133,12 +133,12 @@
         },
         {
           "line": "Square and add across output coordinates",
-          "math": "\\sum_j|r_j(u)-\\widehat r_{\\lambda,j}(u)|^2\\le\\|g_u\\|^2\\sum_j\\|r_j\\|^2",
+          "math": "\\begin{gathered}\\sum_j|r_j(u)-\\widehat r_{\\lambda,j}(u)|^2\\\\\\le\\|g_u\\|^2\\sum_j\\|r_j\\|^2\\end{gathered}",
           "say": "Now square the componentwise inequalities and add them. The factor involving g sub u is the same for every component, so it comes outside the sum. The sum on the left is the squared Euclidean norm of the output error. The sum on the right is the squared product-space norm of r. No factor equal to the output dimension appears, because the component norms were combined by this sum of squares from the beginning."
         },
         {
           "line": "The remaining task is to compute one norm",
-          "math": "\\|r(u)-\\widehat r_\\lambda(u)\\|_2\\le\\|r\\|_K\\,\\|g_u\\|_{\\mathcal H_k}",
+          "math": "\\begin{gathered}\\|r(u)-\\widehat r_\\lambda(u)\\|_2\\\\\\le\\|r\\|_K\\,\\|g_u\\|_{\\mathcal H_k}\\end{gathered}",
           "say": "Take square roots. The output error is bounded by the residual norm times the norm of g sub u. We have isolated the unknown quantity, the residual's RKHS norm, from a completely computable geometric factor. The next step is to expand that geometric norm using the Gram matrix. This will also reveal why the usual Gaussian-process posterior standard deviation is a valid but slightly larger factor when the nugget is positive."
         }
       ]
@@ -157,7 +157,7 @@
       "segments": [
         {
           "line": "Expand the squared norm of the difference",
-          "math": "\\|g_u\\|^2=k(u,u)-2c^\\top k_u+c^\\top Kc",
+          "math": "\\begin{gathered}\\|g_u\\|^2\\\\=k(u,u)-2c^\\top k_u+c^\\top Kc\\end{gathered}",
           "say": "Expand the squared norm of g sub u. The squared norm of the query kernel section is k of u u. The cross term is minus twice c transpose k sub u. The squared norm of the linear combination of design sections is c transpose K c. Each term follows directly from the identity that the inner product of two kernel sections is the kernel evaluated at their two points. This formula is also easy to check in a finite feature representation."
         },
         {
@@ -167,7 +167,7 @@
         },
         {
           "line": "The exact factor is smaller than the posterior factor",
-          "math": "\\begin{aligned}\\widetilde P_\\lambda(u)^2&=P_\\lambda(u)^2-n\\lambda\\|c\\|_2^2\\\\P_\\lambda(u)^2&=k(u,u)-k_u^\\top(K+n\\lambda I)^{-1}k_u\\end{aligned}",
+          "math": "\\begin{gathered}\\widetilde P_\\lambda(u)^2=P_\\lambda(u)^2-n\\lambda\\|c\\|_2^2\\\\P_\\lambda(u)^2=k(u,u)\\\\{}-k_u^\\top(K+n\\lambda I)^{-1}k_u\\end{gathered}",
           "say": "Call the exact norm of g sub u P tilde lambda. Its square equals P lambda squared minus n lambda times the squared coefficient norm. P lambda is the familiar posterior standard-deviation factor with the same nugget. The exact factor cannot be negative because it was derived as a squared norm. It is no larger than P lambda. We have therefore proved both inequalities in the theorem: the sharp representer bound and the slightly looser posterior-factor bound."
         }
       ]
@@ -196,7 +196,7 @@
         },
         {
           "line": "The two calculation paths agree",
-          "math": "\\begin{aligned}P_\\lambda^2&=13-\\frac9{3/2}=7\\\\\\widetilde P_\\lambda^2&=7-\\tfrac12\\,2^2=5\\end{aligned}",
+          "math": "\\begin{aligned}P_\\lambda^2&=13-\\frac9{3/2}=7\\\\\\widetilde P_\\lambda^2&=7-\\frac12\\,2^2=5\\end{aligned}",
           "say": "Now use the matrix formula. The posterior factor squared is thirteen minus nine divided by one and a half, giving seven. Subtract lambda times the coefficient squared: one half times four, or two. The result is five, exactly as the vector calculation gave. At zero nugget, the orthogonal projection is three zero and the remaining vector is zero two, with squared length four. Ridge has increased the exact worst-case factor from two to the square root of five."
         }
       ]
@@ -213,7 +213,7 @@
       "segments": [
         {
           "line": "Choose any radius rho and align the first component",
-          "math": "r_1=\\rho\\frac{g_u}{\\|g_u\\|},\\qquad r_j=0\\quad(j>1)",
+          "math": "\\begin{gathered}r_1=\\rho\\frac{g_u}{\\|g_u\\|}\\\\r_j=0\\quad(j>1)\\end{gathered}",
           "say": "To prove sharpness, we must produce a residual that attains the bound, not just show that the inequalities look tight. Suppose g sub u is nonzero. Choose any radius rho. Put all the residual norm in the first output component, and choose that component to be rho times the unit vector in the direction of g sub u. Set the other components to zero. This is allowed by the product-space ball in the theorem."
         },
         {
@@ -240,7 +240,7 @@
       "segments": [
         {
           "line": "The geometric factor is computable",
-          "math": "\\sup_{\\|r\\|_K\\le\\rho}\\|r(u)-\\widehat r_\\lambda(u)\\|_2=\\rho\\widetilde P_\\lambda(u)",
+          "math": "\\begin{gathered}\\sup_{\\|r\\|_K\\le\\rho}\\|r(u)-\\widehat r_\\lambda(u)\\|_2\\\\=\\rho\\widetilde P_\\lambda(u)\\end{gathered}",
           "say": "We have proved an exact worst-case statement over a specified RKHS ball. The geometric factor can be computed from the kernel matrix and the query. The radius rho describes the class of residuals we allow. In the actual benchmark, the target's residual norm is not known, and its RKHS membership is not established. The theorem is therefore an interpretation of the method, not a numerical certificate that the fitted surrogate's next error will be below a known value."
         },
         {

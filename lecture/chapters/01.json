@@ -75,7 +75,7 @@
         },
         {
           "line": "Normalize by the size of this reference field",
-          "math": "\\ell(\\widehat G(u),G(u))=\\frac{\\|\\widehat G(u)-G(u)\\|_2}{\\|G(u)\\|_2}",
+          "math": "\\begin{gathered}\\ell(\\widehat G(u),G(u))\\\\=\\frac{\\|\\widehat G(u)-G(u)\\|_2}{\\|G(u)\\|_2}\\end{gathered}",
           "say": "The paper divides the Euclidean norm of the error by the Euclidean norm of the reference field for the same case. This gives a relative error. The denominator matters. Without it, cases with larger stress values would tend to contribute more simply because their outputs are larger. The norm here is the unweighted norm of the grid vector. Some published comparisons use trapezoidal weights, so a close pair of published percentages should not be interpreted as an exact tie to every decimal place."
         },
         {
@@ -98,12 +98,12 @@
       "segments": [
         {
           "line": "This case was selected by its error rank",
-          "math": "\\text{Selection: near the 98th error percentile}",
+          "math": "\\begin{gathered}\\text{Selection: near the}\\\\\\text{98th error percentile}\\end{gathered}",
           "say": "Now look at a more difficult case. We selected it near the ninety-eighth percentile of the historical seed-zero model's error distribution. That selection is deliberate and disclosed. It is not a typical test case, and it is not an independent test of a new hypothesis. It shows a part of the distribution that an average can hide. Compare the reference stress and the residual pattern with the previous example."
         },
         {
           "line": "A mean does not describe the tail",
-          "math": "\\text{Case errors}\\longrightarrow\\text{an error distribution}",
+          "math": "\\begin{gathered}\\text{Case errors}\\\\\\downarrow\\\\\\text{an error distribution}\\end{gathered}",
           "say": "A model's performance is a distribution over inputs. A reported mean compresses that distribution into one number. It cannot tell us where the largest errors occur, whether two models fail on the same cases, or whether an uncertainty score identifies those cases. We will return to all three questions. The pictures are useful here because they keep the statistical summary attached to a concrete physical prediction. The stored reference field even contains a small negative value. We preserve these numerical labels; an exact von Mises stress is nonnegative."
         },
         {
@@ -125,17 +125,17 @@
       "segments": [
         {
           "line": "40,000 recorded input-output pairs",
-          "math": "20{,}000\\text{ development}+20{,}000\\text{ test}",
+          "math": "\\begin{gathered}20{,}000\\text{ development}\\\\+20{,}000\\text{ test}\\end{gathered}",
           "say": "The benchmark contains forty thousand pairs. The first twenty thousand form the available development pool. The last twenty thousand form the public test block. Within the development pool, a fixed seeded permutation assigns one thousand examples to validation and nineteen thousand to training. Different campaign seeds change this internal split and the stochastic training, while the public test block stays the same."
         },
         {
           "line": "Validation influences several fitted stages",
-          "math": "19{,}000\\text{ training}+1{,}000\\text{ validation}",
+          "math": "\\begin{gathered}19{,}000\\text{ training}\\\\+1{,}000\\text{ validation}\\end{gathered}",
           "say": "Validation is used for several decisions: choosing checkpoints, fitting the stack, and selecting kernel settings. Those uses make the pipeline practical, but they also limit which textbook validation bounds apply directly. A theorem that assumes a family fixed before an independent validation sample is drawn cannot automatically certify a pipeline that has adapted the family using that same sample. We will state those assumptions when they are needed."
         },
         {
           "line": "Repeated seeds share the public test cases",
-          "math": "\\text{Ten runs}\\ne\\text{ten independent test datasets}",
+          "math": "\\begin{gathered}\\text{Ten runs}\\\\\\ne\\text{ten independent}\\\\\\text{test datasets}\\end{gathered}",
           "say": "Repeating training at ten seeds tells us how sensitive the procedure is to those training and split choices. It does not create ten independent collections of test inputs. When we report a mean and standard deviation over seeds, the standard deviation describes variation across those runs. For a change to the implementation, a paired comparison is especially useful: run both versions at the same seed, on the same examples, and examine the difference directly."
         }
       ]
@@ -162,7 +162,7 @@
         },
         {
           "line": "Residuals and features answer different questions",
-          "math": "\\text{What remains?}\\qquad\\text{Which inputs are close?}",
+          "math": "\\begin{gathered}\\text{What remains?}\\\\\\text{Which inputs are close?}\\end{gathered}",
           "say": "Keep these two pictures separate. Residual correction changes the function that the kernel must fit. A learned feature map changes the geometry in which it fits that function. Both can matter, and neither guarantees an improvement by itself. Our mathematical bounds will expose two factors: the size of a function in the chosen kernel space, and a geometric factor determined by the design. The experiments show which changes help on these particular datasets."
         }
       ]

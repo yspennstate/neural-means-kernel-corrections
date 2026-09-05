@@ -16,6 +16,11 @@ The narration uses Microsoft `en-US-AndrewMultilingualNeural`, rate `+10%`,
 following the owner's September 5 preference. Text is sent to Microsoft's
 speech service. Mathematical notation is authored as explicit LaTeX and
 rendered with `pdflatex` and the PDF route of `dvisvgm`.
+Latin Modern matches the Computer Modern family used in the manuscript.
+The main displayed equations use a fixed font size; long expressions must
+be broken into lines instead of being shrunk to fit. Preflight and rendering
+import the same LaTeX preamble from `tex_style.py`. A preamble change creates
+new TeX cache keys; frozen earlier font assets are retained as evidence.
 
 Record narration before rendering. Each audio receipt binds the current text,
 voice, settings and actual WAV hash. Changed text or settings invalidate the

@@ -11,6 +11,7 @@ import shutil
 import subprocess
 
 import psutil
+from tex_style import PREAMBLE
 
 HERE=Path(__file__).resolve().parent
 
@@ -21,8 +22,7 @@ def main():
     out=HERE.parent/'.local-verification/lecture_equations'
     out.mkdir(parents=True,exist_ok=True)
     rows={};sources={}
-    tex=[r'\documentclass{article}',r'\usepackage[T1]{fontenc}',
-         r'\usepackage{amsmath,amssymb,bm,newtxtext,newtxmath}',
+    tex=[r'\documentclass{article}',PREAMBLE,
          r'\newwrite\measureout',r'\immediate\openout\measureout=dimensions.txt',r'\begin{document}']
     for p in sorted((HERE/'chapters').glob('*.json')):
         sources[p.name]=hashlib.sha256(p.read_bytes()).hexdigest()

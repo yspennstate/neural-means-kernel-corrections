@@ -24,7 +24,7 @@
         },
         {
           "line": "One radius controls the entire output vector",
-          "math": "C(u)=\\{v:\\|v-\\widehat G(u)\\|_2\\le Q a(u)\\}",
+          "math": "\\begin{gathered}C(u)=\\big\\{v:\\|v-\\widehat G(u)\\|_2\\\\\\le Q a(u)\\big\\}\\end{gathered}",
           "say": "Multiply the calibrated threshold Q by the scale at the new input. The prediction set is the Euclidean ball of that radius centered on the predicted field. The circle in the picture is a two-dimensional cross-section of this geometry; the mechanics output has sixteen hundred eighty-one coordinates. Coverage means that the whole target vector lies inside the ball. It is not a statement that each pixel receives its own ninety-percent interval."
         }
       ]
@@ -68,12 +68,12 @@
       "segments": [
         {
           "line": "Condition on the independently fitted objects",
-          "math": "s_1,\\ldots,s_m,s^\\star\\quad\\text{are exchangeable}",
+          "math": "\\begin{gathered}s_1,\\ldots,s_m,s^\\star\\\\\\text{are exchangeable}\\end{gathered}",
           "say": "Here is the complete rank argument. Condition on the fixed predictor, design, and positive scale. By assumption, the calibration cases and the new case are exchangeable and independent of those fitted objects. Applying the same score function to each preserves exchangeability. Attach independent continuous random tie-breakers if equal scores occur. Their only purpose is to assign a unique rank while preserving symmetry among the case labels."
         },
         {
           "line": "The future score has a uniform tie-broken rank",
-          "math": "\\mathbb P(J=j)=\\frac1{m+1},\\qquad j=1,\\ldots,m+1",
+          "math": "\\begin{gathered}\\mathbb P(J=j)=\\frac1{m+1}\\\\j=1,\\ldots,m+1\\end{gathered}",
           "say": "Let J be the rank of the future score in the ordered list of all m plus one scores, including the random tie-breakers. Exchangeability makes every case label equally likely to occupy every position. Therefore J is uniform on the integers one through m plus one. This is the entire probability step. It does not use Gaussian errors, a correctly specified kernel, or an estimate of the residual's native-space norm."
         },
         {
@@ -100,12 +100,12 @@
         },
         {
           "line": "With distinct scores, the rank probability is exact",
-          "math": "\\begin{gathered}\\mathbb P(\\text{covered})=\\frac{k}{m+1}\\\\1-\\alpha\\le\\frac{k}{m+1}\\le1-\\alpha+\\frac1{m+1}\\end{gathered}",
+          "math": "\\begin{gathered}\\mathbb P(\\text{covered})=\\frac{k}{m+1}\\\\\\frac{k}{m+1}\\ge1-\\alpha\\\\\\frac{k}{m+1}\\le1-\\alpha+\\frac1{m+1}\\end{gathered}",
           "say": "When scores are almost surely distinct, the rank event and the coverage event are identical, so the probability is exactly k over m plus one. It is at most one minus alpha plus one over m plus one. With ties, coverage can be more conservative, and that narrow upper bound is no longer generally available. This distinction is easy to omit when writing a short statement of conformal coverage, but it belongs in a complete proof."
         },
         {
           "line": "Nothing here guarantees coverage at every fixed input",
-          "math": "\\mathbb P(\\text{covered})\\quad\\ne\\quad\\mathbb P(\\text{covered}\\mid u=u_0)",
+          "math": "\\begin{gathered}\\text{Marginal coverage}\\\\\\not\\Rightarrow\\\\\\text{coverage at every input}\\end{gathered}",
           "say": "The guarantee averages over the new case and the calibration sample under the stated assumptions. It is not conditional coverage at every particular input, and it is not a guarantee that small-scale cases will be covered as often as large-scale cases. A method can achieve the advertised marginal rate while systematically under-covering one region. The measured deciles in a moment show exactly that behavior in this benchmark."
         }
       ]
@@ -127,12 +127,12 @@
         },
         {
           "line": "The conditional coverage itself is random",
-          "math": "p_{\\rm cal}=F(s_{(k)})\\sim\\operatorname{Beta}(k,m+1-k)",
+          "math": "\\begin{gathered}p_{\\rm cal}=F(s_{(k)})\\\\\\sim\\operatorname{Beta}(k,m+1-k)\\end{gathered}",
           "say": "The probability of covering a fresh case after observing this particular calibration sample is F evaluated at its selected score. The uniform order-statistic density is proportional to p to the k minus one times one minus p to the m minus k, which is the Beta density with parameters k and m plus one minus k. At nominal ninety percent with one thousand calibration cases, those parameters are nine hundred one and one hundred. Different calibration samples produce different p values."
         },
         {
           "line": "An independent evaluation block adds binomial sampling",
-          "math": "\\begin{aligned}B\\mid p_{\\rm cal}&\\sim\\operatorname{Binomial}(N,p_{\\rm cal})\\\\B&\\sim\\operatorname{BetaBinomial}(N,k,m+1-k)\\end{aligned}",
+          "math": "\\begin{gathered}B\\mid p_{\\rm cal}\\sim\\operatorname{Bin}(N,p_{\\rm cal})\\\\B\\sim\\operatorname{BetaBin}(N,k,m+1-k)\\end{gathered}",
           "say": "Conditional on the calibration sample, an independent evaluation block has a binomial count of covered cases. Integrating over the random Beta success probability gives the Beta-binomial law. With nineteen thousand evaluation cases, the central ninety-five-percent reference interval for the observed fraction at nominal ninety percent is about eighty-eight point zero to ninety-one point eight percent. Exchangeability alone does not imply this stronger law, and agreement with the interval does not prove its assumptions."
         }
       ]
@@ -178,7 +178,7 @@
       "segments": [
         {
           "line": "Group cases by the scale before looking at their coverage",
-          "math": "\\text{Deciles of }P_\\lambda(u)\\text{ on the evaluation block}",
+          "math": "\\begin{gathered}\\text{Deciles of }P_\\lambda(u)\\\\\\text{on the evaluation block}\\end{gathered}",
           "say": "Sort the nineteen thousand evaluation cases by their power-function value and divide them into ten groups of nineteen hundred. Then measure coverage within each group using the single threshold chosen from calibration. These groups are descriptive diagnostics on the fixed public evaluation block. They do not create a new conditional guarantee, but they reveal where the marginal total comes from."
         },
         {
@@ -205,7 +205,7 @@
       "segments": [
         {
           "line": "The recorded exercise uses a retrospective partition",
-          "math": "\\begin{gathered}20000\\text{ cases}\\\\\\downarrow\\\\1000\\text{ calibration}+19000\\text{ evaluation}\\end{gathered}",
+          "math": "\\begin{gathered}20000\\text{ cases}\\\\\\downarrow\\\\1000\\text{ calibration}\\\\+19000\\text{ evaluation}\\end{gathered}",
           "say": "The paper computes these calibration measurements after fitting its reported models, using a random partition of the public test block. Within that calculation, calibration and evaluation indices are disjoint. That separation is useful and reproducible. The broader study, however, had already inspected this public block across campaigns and diagnostics. A new random partition does not undo the influence that earlier results may have had on model development."
         },
         {

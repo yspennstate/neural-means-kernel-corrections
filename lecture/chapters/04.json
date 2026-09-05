@@ -20,7 +20,7 @@
         },
         {
           "line": "Averaging seeds leaves the architecture component",
-          "math": "\\frac1K\\sum_k\\rho_{a,k}=c+b_a+\\frac1K\\sum_k\\varepsilon_{a,k}",
+          "math": "\\begin{gathered}\\frac1K\\sum_k\\rho_{a,k}\\\\=c+b_a+\\frac1K\\sum_k\\varepsilon_{a,k}\\end{gathered}",
           "say": "Average the seeds of one architecture. The common vector remains unchanged. So does the architecture component. Only the individual seed components can cancel or become smaller through averaging. Training more seeds can therefore keep reducing one part of the error while leaving a much larger shared part untouched. This is the geometry behind a plateau. It is also why counting models is a poor substitute for measuring their residuals."
         },
         {
@@ -51,12 +51,12 @@
         },
         {
           "line": "Seeds of the same architecture remain aligned",
-          "math": "S_{ij}\\ge\\varrho_w\\bar e^{\\,2}\\quad\\text{within an architecture}",
+          "math": "\\begin{gathered}S_{ij}\\ge\\varrho_w\\bar e^{\\,2}\\\\\\text{within an architecture}\\end{gathered}",
           "say": "The second assumption concerns two different seeds of the same architecture. Their second-moment entry is at least rho w times e bar squared. The subscript w stands for within. In the matrix, these are the off-diagonal cells inside each square block. This is an entrywise lower bound. It is stronger and more specific than saying that the average correlation looks large. Every pair covered by the assumption must satisfy it."
         },
         {
           "line": "Different architectures can still share error",
-          "math": "S_{ij}\\ge\\varrho_b\\bar e^{\\,2},\\qquad 0\\le\\varrho_b\\le\\varrho_w\\le1",
+          "math": "\\begin{gathered}S_{ij}\\ge\\varrho_b\\bar e^{\\,2}\\\\0\\le\\varrho_b\\le\\varrho_w\\le1\\end{gathered}",
           "say": "The third assumption gives a lower bound between architectures, rho b times e bar squared. We assume the between-architecture level is no larger than the within-architecture level, and both lie between zero and one. Those inequalities will make two coefficients nonnegative in the proof. The displayed matrix uses three architectures and four seeds to make the blocks visible. Its numbers are illustrative. The theorem itself applies to any finite M and K satisfying the stated assumptions."
         }
       ]
@@ -111,7 +111,7 @@
         },
         {
           "line": "Within each block, subtract its diagonal",
-          "math": "\\sum_a\\sum_{k\\ne l}w_{a,k}w_{a,l}=\\sum_aW_a^2-\\|w\\|_2^2",
+          "math": "\\begin{gathered}\\sum_a\\sum_{k\\ne l}w_{a,k}w_{a,l}\\\\=\\sum_aW_a^2-\\|w\\|_2^2\\end{gathered}",
           "say": "Second come distinct seeds inside one architecture. Square W sub a. The expansion includes every ordered seed pair in that architecture, including the diagonal pairs. Subtract the individual squares and only the off-diagonal pairs remain. Add this identity over architectures. This gives the sum of the squared capital W values minus the sum of the individual squared weights. Notice that both orders of a distinct pair are included, exactly as they are in the quadratic form."
         },
         {
@@ -137,12 +137,12 @@
       "segments": [
         {
           "line": "Replace each matrix entry by its allowed minimum",
-          "math": "\\frac{w^\\top Sw}{\\bar e^{\\,2}}\\ge A+\\varrho_w(B-A)+\\varrho_b(1-B)",
+          "math": "\\begin{gathered}\\frac{w^\\top Sw}{\\bar e^{\\,2}}\\\\\\ge A+\\varrho_w(B-A)+\\varrho_b(1-B)\\end{gathered}",
           "say": "To keep the line readable, write A for the sum of the individual squared weights and B for the sum of the squared architecture totals. The diagonal terms contribute at least e bar squared times A. The within-architecture terms contribute at least rho w times e bar squared times B minus A. The between-architecture terms contribute at least rho b times e bar squared times one minus B. Add these three bounds and divide by e bar squared, assuming for the moment that e bar is positive."
         },
         {
           "line": "Collect the coefficients of the two concentration measures",
-          "math": "\\frac{w^\\top Sw}{\\bar e^{\\,2}}\\ge\\varrho_b+(\\varrho_w-\\varrho_b)B+(1-\\varrho_w)A",
+          "math": "\\begin{aligned}\\frac{w^\\top Sw}{\\bar e^{\\,2}}&\\ge\\varrho_b+(\\varrho_w-\\varrho_b)B\\\\&\\quad+(1-\\varrho_w)A\\end{aligned}",
           "say": "Now collect terms. The constant term is rho b. The coefficient of B is rho w minus rho b. The coefficient of A is one minus rho w. This line is the algebraic version of the geometric picture at the beginning of the chapter. The between-architecture component survives every convex average. The architecture component is multiplied by how concentrated the architecture weights are. The individual component is multiplied by how concentrated the member weights are."
         },
         {

@@ -498,8 +498,16 @@ design and any stated nugget, including the pseudoinverse convention at zero.
 \subsection{Proof of Theorem~\ref{thm:or}}
 \label{proof:thm:or}
 
-Fix $u$ and write $k_u=k(X,u)\in\mathbb R^n$, $A=K+n\lambda I$,
-$w=A^{-1}k_u$. For each component $j$, membership $r_j\in\mathcal H_k$ and
+Fix $u$ and write $k_u=k(X,u)\in\mathbb R^n$.
+At $\lambda=0$, interpret the inverse as $K^+$ if $K$ is singular.
+For $z\in\ker K$, the RKHS function $h_z=\sum_i z_i k(u_i,\cdot)$
+has squared norm $z^\top Kz=0$. Hence
+$z^\top k_u=\langle h_z,k(u,\cdot)\rangle=0$, which places $k_u$ in
+$\operatorname{range}K$. In particular, $KK^+k_u=k_u$, so the algebra
+below also applies under the pseudoinverse convention.
+
+Put $A=K+n\lambda I$ and $w=A^{-1}k_u$.
+For each component $j$, membership $r_j\in\mathcal H_k$ and
 the reproducing property give
 \[
 r_j(u)-\widehat r_{\lambda,j}(u)

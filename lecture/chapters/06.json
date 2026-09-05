@@ -46,7 +46,7 @@
         },
         {
           "line": "A kernel value is a feature inner product",
-          "math": "k(x,z)=\\varphi(x)^\\top\\varphi(z)=\\cos(x-z)",
+          "math": "\\begin{aligned}k(x,z)&=\\varphi(x)^\\top\\varphi(z)\\\\&=\\cos(x-z)\\end{aligned}",
           "say": "The kernel matrix is now visibly a Gram matrix of vectors. For any coefficients, the kernel quadratic form equals the squared length of the same weighted sum of feature vectors, so it is nonnegative. If many input points are used, the matrix can still have rank at most two. Positive semidefiniteness of a kernel does not require every possible finite Gram matrix to be invertible. Distinct input labels can carry redundant feature information."
         },
         {
@@ -149,7 +149,7 @@
       "segments": [
         {
           "line": "Penalize the fitted function's RKHS norm",
-          "math": "\\min_f\\ \\frac1n\\sum_i|f(u_i)-y_i|^2+\\lambda\\|f\\|_{\\mathcal H_k}^2",
+          "math": "\\begin{gathered}\\min_f\\Big[\\frac1n\\sum_i|f(u_i)-y_i|^2\\\\+\\lambda\\|f\\|_{\\mathcal H_k}^2\\Big]\\end{gathered}",
           "say": "Kernel ridge regression balances fit to the observations against the RKHS norm of the fitted function. The loss is divided by n, which explains the n lambda in the coefficient system. The minimizing function lies in the observed span. Any orthogonal component would leave all fitted observation values unchanged while increasing the norm penalty, so such a component cannot help the objective when lambda is positive."
         },
         {
@@ -181,7 +181,7 @@
         },
         {
           "line": "Membership in the chosen RKHS is a hypothesis",
-          "math": "r_j\\in\\mathcal H_k\\quad\\text{for each output coordinate}",
+          "math": "\\begin{gathered}r_j\\in\\mathcal H_k\\\\\\text{for each output coordinate}\\end{gathered}",
           "say": "The deterministic theorem assumes that each component of the residual belongs to the chosen RKHS with finite norm. This is a real restriction. A function can be approximated well on a finite dataset without establishing that membership. Nor does a fitted kernel norm automatically equal the norm of the unknown residual. In the paper, these facts keep the theorem's explanatory role separate from a numerical certificate."
         },
         {

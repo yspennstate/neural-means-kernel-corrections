@@ -5,12 +5,12 @@ The current main branch contains the recovered earlier release. The PDF files
 in this branch are still that earlier release; the edited TeX is the working
 manuscript and will be rebuilt with the completed sensitivity results.
 
-At 11:22 local time (UTC+03), all ten correction-label mismatch probes and
-three paired centering seeds had completed. The fourth centering seed and
-the first OCO-2 grid comparison were running. The fixed design is ten
-centering pairs, ten mismatch probes, and three seeds in each of three OCO-2
-bands. The two active lanes use eight CPU threads each, subject to measured
-capacity; no jobs are appended to their queues at runtime.
+At 15:32 local time (UTC+03), all ten correction-label mismatch probes, all
+ten paired centering seeds, and six of nine OCO-2 grid comparisons had
+completed. The O2 comparison at seed 2 was running; the WCO2 and SCO2
+comparisons at that seed remained in the fixed queue. The centering lane
+has finished. The remaining training lane uses eight CPU threads, subject
+to measured capacity; no jobs are appended at runtime.
 
 The code now recomputes per-case metrics, conformal ranks and coverage,
 checks the exact planned predictor set and case counts, and verifies kernel
@@ -23,11 +23,24 @@ terminology, and the scope of the retained half-precision archives.
 The hardware description now distinguishes 20 physical cores from 40
 hardware threads. A second matrix optimizer, using active-set solves and
 explicit optimality bounds, reproduces the sixty-member hindsight optimum
-and all twenty five-/six-member validation optima checked. This verifies
-saved matrices, not their field-array construction.
-An intermediate prose build completed at 31 main-text pages and 46 supplement
-pages with no unresolved references or citations; later edits and new results
-will receive a fresh build and visual check.
+and all twenty five-/six-member validation optima checked. A separate float64
+reconstruction from all sixty saved prediction fields also agrees with the
+retained pool floor and optimum to four decimal places in percentage units.
+The ten historical pipelines were rescored under plain and trapezoidal grid
+norms; those are distinct metrics, not interchangeable comparison tables.
+
+The independent centering checker has recomputed all twenty arms from the
+saved 20000-case prediction fields. It checks relative and absolute errors,
+the disagreement scale through pairwise member differences, and scalar
+summation controls. The largest absolute difference in a per-case relative
+error was 4.45e-16 or less. The complete OCO-2 reconstruction and final
+archive aggregation remain pending.
+
+An intermediate prose build completed at 32 main-text pages and 46 supplement
+pages with no unresolved references or citations. Later edits include
+explicit main-text proofs of the ensemble floor, sharp kernel bound and
+minimax result, with the singular-Gram argument written out. The final
+manuscript will receive a fresh build and visual check after integration.
 
 Ten independent publication reviews will inspect the completed manuscript
 and its pinned evidence. They have not started. The twenty older reviews in
@@ -35,6 +48,9 @@ paper/reviews concern an earlier version and are not votes on this work.
 
 The new sensitivity-section source files are drafts awaiting generated
 tables and macros; they are not yet included by main.tex or supplement.tex.
-The prepared metric check will rescore all sixty retained members and ten
-pipelines, compare plain and trapezoidal norms, and reconstruct the pool's
-evaluation matrix by streaming float64 residual blocks. It has not run yet.
+The lecture is also in production. It uses Microsoft Andrew narration and
+Latin Modern mathematics, with complete proof chapters and actual benchmark
+images. Earlier previews are superseded: a LaTeX-to-SVG import defect hid
+fraction bars. The process-local repair has a native notation probe and
+rule-removal regression controls. Neither those checks nor the source
+compilation establish complete audiovisual approval.

@@ -74,7 +74,7 @@
         },
         {
           "line": "Expand the squared length of the weighted sum",
-          "math": "\\begin{aligned}\\mathbb E\\|\\textstyle\\sum_a w_a\\rho_{f_a}\\|_2^2\\\\&=\\textstyle\\sum_{a,b}w_aw_bS_{ab}\\\\&=w^\\top S w\\end{aligned}",
+          "math": "\\begin{gathered}\\mathbb E\\|\\textstyle\\sum_a w_a\\rho_{f_a}\\|_2^2\\\\=\\textstyle\\sum_{a,b}w_aw_bS_{ab}\\\\=w^\\top S w\\end{gathered}",
           "say": "Expand the inner product of the weighted sum with itself. Distribute both sums, pull the scalar weights outside, and then take expectation. Each remaining expected inner product is one entry of S. That proves the identity: the ensemble's expected squared relative error is w transpose S w. There is no approximation in this calculation. Estimating S later is a statistical step, but the relationship between the population quantities is exact."
         },
         {
@@ -96,12 +96,12 @@
       "segments": [
         {
           "line": "Write the mixture using one scalar",
-          "math": "f_t=(1-t)f_1+t f_2,\\qquad0\\le t\\le1",
+          "math": "\\begin{gathered}f_t=(1-t)f_1+t f_2\\\\0\\le t\\le1\\end{gathered}",
           "say": "Order the two members so that the first has no larger RMS error than the second. Let e one and e two be their positive RMS errors, and let varrho be their uncentered correlation. Use t as the weight on the weaker second member. At t equal to zero, the stack is just the first member. To decide whether any mixing helps, inspect the squared error as we begin moving along the segment toward the second residual."
         },
         {
           "line": "Its squared risk is a quadratic",
-          "math": "V(t)=(1-t)^2e_1^2+2t(1-t)\\varrho e_1e_2+t^2e_2^2",
+          "math": "\\begin{aligned}V(t)&=(1-t)^2e_1^2\\\\&\\quad+2t(1-t)\\varrho e_1e_2\\\\&\\quad+t^2e_2^2\\end{aligned}",
           "say": "Substitute the two weights into the second-moment identity. The first term is the squared first-member contribution, the last is the squared second-member contribution, and the middle term is their alignment. This middle term decides whether averaging cancels or reinforces error. The coefficient of t squared is the squared distance between the two residual vectors. It is nonnegative, so the objective is convex along the segment."
         },
         {
@@ -133,7 +133,7 @@
         },
         {
           "line": "A numerical example makes the direction effect visible",
-          "math": "\\rho_1=(1,0),\\quad\\rho_2=(0,2),\\quad t^\\star=\\tfrac15",
+          "math": "\\begin{gathered}\\rho_1=(1,0),\\quad\\rho_2=(0,2)\\\\t^\\star=\\frac15\\end{gathered}",
           "say": "Take the first residual to be one zero and the second to be zero two. Their errors are one and two, and their correlation is zero. The second member is twice as bad individually, yet its orthogonal error direction is useful. Its optimal weight is one fifth. The combined residual is four fifths, two fifths, with squared length four fifths. The RMS error is the square root of four fifths, about point eight nine four, below the first member's error of one."
         }
       ]
@@ -178,12 +178,12 @@
       "segments": [
         {
           "line": "Assume equal diagonal entries and one common off-diagonal value",
-          "math": "S_{aa}=e^2,\\qquad S_{ab}=\\varrho e^2\\quad(a\\ne b)",
+          "math": "\\begin{gathered}S_{aa}=e^2\\\\S_{ab}=\\varrho e^2\\quad(a\\ne b)\\end{gathered}",
           "say": "Consider a family in which every member has RMS error e and every distinct pair has the same uncentered correlation varrho. This is a restrictive model, but its calculation exposes the common-error mechanism clearly. We use a nonnegative varrho, as in the proposition. The matrix consists of a shared all-ones component plus a diagonal component. The shared part represents alignment that averaging cannot remove."
         },
         {
           "line": "The quadratic form separates into two pieces",
-          "math": "w^\\top S w=e^2\\left[\\varrho+(1-\\varrho)\\sum_a w_a^2\\right]",
+          "math": "\\begin{gathered}w^\\top S w\\\\=e^2\\left[\\varrho+(1-\\varrho)\\sum_a w_a^2\\right]\\end{gathered}",
           "say": "Expand the matrix into varrho e squared times the all-ones matrix and one minus varrho times e squared times the identity. The all-ones contribution is fixed because the weights sum to one. Only the sum of squared weights can be reduced. Cauchy-Schwarz gives that sum at least one over M, with equality at uniform weights. Thus equal weighting is optimal for this exact symmetric model."
         },
         {
@@ -215,7 +215,7 @@
         },
         {
           "line": "Even a two-case example prevents the wrong inference",
-          "math": "\\begin{gathered}\\mathbb P(X=0)=\\mathbb P(X=2)=\\tfrac12\\\\\\mathcal E_1=1,\\qquad\\mathcal E_2=\\sqrt2\\end{gathered}",
+          "math": "\\begin{gathered}\\mathbb P(X=0)=\\mathbb P(X=2)=\\frac12\\\\\\mathcal E_1=1,\\qquad\\mathcal E_2=\\sqrt2\\end{gathered}",
           "say": "Take two equally likely errors, zero and two. Their mean is one, but their RMS is the square root of two. A lower bound near one point four on the RMS would tell us nothing like a one point four lower bound on the mean. In the actual data, the gap is smaller, but it varies by predictor. We will keep the empirical floor, the quadratic optimum and the table metric separately labelled rather than use one conversion factor for every model."
         }
       ]

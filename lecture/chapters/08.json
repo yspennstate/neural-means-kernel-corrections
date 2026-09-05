@@ -24,7 +24,7 @@
         },
         {
           "line": "Find two residuals the observations cannot tell apart",
-          "math": "r^+(X)=r^-(X),\\qquad r^+(u)\\ne r^-(u)",
+          "math": "\\begin{gathered}r^+(X)=r^-(X)\\\\r^+(u)\\ne r^-(u)\\end{gathered}",
           "say": "The proof starts by looking for ambiguity. If two possible residual functions agree at every observed input but disagree at the query, the rule receives the same information in both cases. It must therefore return the same answer. It cannot be very close to both query values if those values are far apart. We will construct such a pair using the orthogonal component of the query kernel section. The picture shows the simplest instance: horizontal observations reveal nothing about a vertical component."
         }
       ]
@@ -106,7 +106,7 @@
         },
         {
           "line": "This proves a lower bound for every recovery rule",
-          "math": "\\sup_{\\|r\\|_K\\le\\rho}\\|r(u)-\\Psi(r(X))\\|_2\\ge\\rho P_0(u)",
+          "math": "\\begin{gathered}\\sup_{\\|r\\|_K\\le\\rho}\\|r(u)-\\Psi(r(X))\\|_2\\\\\\ge\\rho P_0(u)\\end{gathered}",
           "say": "Both constructed functions belong to the allowed ball, so the largest error over the ball is at least the larger error on this pair. That gives the desired lower bound for every rule. Notice how little we needed to know about the rule itself. Its linearity, training algorithm and parameter count never entered. The only decisive fact was that identical observations produce one answer. This is why the lower-bound construction is stronger than comparing a few specific estimators numerically."
         }
       ]
@@ -123,17 +123,17 @@
       "segments": [
         {
           "line": "The sharp-bound theorem supplies the upper bound",
-          "math": "\\|r(u)-k(u,X)K^{-1}r(X)\\|_2\\le\\rho P_0(u)",
+          "math": "\\begin{gathered}\\|r(u)-k(u,X)K^{-1}r(X)\\|_2\\\\\\le\\rho P_0(u)\\end{gathered}",
           "say": "Return to the previous theorem and set lambda to zero. The exact representer factor is then P zero. For every residual in the ball, kernel interpolation has error at most rho P zero. This statement is uniform over the ball, not merely a calculation on our two special functions. Combining it with the lower bound shows that the best achievable worst-case error is exactly rho P zero and that interpolation attains it."
         },
         {
           "line": "The minimax value is now determined exactly",
-          "math": "\\inf_\\Psi\\sup_{\\|r\\|_K\\le\\rho}\\|r(u)-\\Psi(r(X))\\|_2=\\rho P_0(u)",
+          "math": "\\begin{gathered}\\inf_\\Psi\\sup_{\\|r\\|_K\\le\\rho}\\|r(u)-\\Psi(r(X))\\|_2\\\\=\\rho P_0(u)\\end{gathered}",
           "say": "The infimum over recovery rules cannot be below the lower bound we proved for every rule. It cannot be above that bound because the interpolant achieves it. The two sides meet. This establishes minimax optimality at the fixed query for the specified native-space ball and exact observations. It does not establish that kernel interpolation is the best method for every scientific problem, every distribution of targets, or every noisy observation model."
         },
         {
           "line": "If the query representer is already observed, the value is zero",
-          "math": "P_0(u)=0\\quad\\Longrightarrow\\quad\\text{exact recovery}",
+          "math": "\\begin{gathered}P_0(u)=0\\\\\\Longrightarrow\\text{exact recovery}\\end{gathered}",
           "say": "There is one boundary case left. If P zero is zero, the query kernel section belongs to the span of the observed sections. Then every compatible RKHS function has its query value determined by the observed values, and interpolation recovers it exactly. The lower bound is simply zero, and no division by P zero is needed. This includes a query at an observed design point when the Gram matrix is invertible, but other kernels and designs can also produce exact dependence."
         }
       ]
@@ -161,7 +161,7 @@
         },
         {
           "line": "Factor the matrix to expose its sign",
-          "math": "\\widetilde P_\\lambda^2-P_0^2=t^2 k_u^\\top A^{-2}K^{-1}k_u\\ge0",
+          "math": "\\begin{gathered}\\widetilde P_\\lambda^2-P_0^2\\\\=t^2 k_u^\\top A^{-2}K^{-1}k_u\\ge0\\end{gathered}",
           "say": "Use the common eigenbasis, or multiply out directly, to factor the matrix as A inverse squared times K inverse times A minus K squared. Since A minus K is t times the identity, the result is t squared times k sub u transpose A inverse squared K inverse k sub u. Every eigenvalue of A inverse squared K inverse is positive. The gap is therefore nonnegative. This calculation gives the exact nugget cost for the fixed design and query, not just its sign."
         }
       ]

@@ -26,15 +26,16 @@ REGIONS = {
     'table_horizontal': ((695,855,900,875), 160, 1),
     'table_vertical': ((790,785,805,945), 125, 0),
 }
+LM_REGIONS = dict(REGIONS, table_vertical=((774,785,792,945), 125, 0))
 
 
-def pixel_checks(pixels):
+def pixel_checks(pixels, regions=REGIONS):
     if pixels.shape != (1080,1920,3):
         raise ValueError('Notation probe must be native 1920x1080 RGB')
     mask = ((pixels[:,:,0] > 170) & (pixels[:,:,1] > 120)
             & (pixels[:,:,2] < 140))
     result = {}
-    for name, (box, minimum, axis) in REGIONS.items():
+    for name, (box, minimum, axis) in regions.items():
         x0,y0,x1,y1 = box
         measured = int(mask[y0:y1,x0:x1].sum(axis=axis).max())
         result[name] = dict(minimum=minimum, measured=measured, present=measured>=minimum)
@@ -45,6 +46,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--probe', required=True, type=Path)
     parser.add_argument('--out', required=True, type=Path)
+    parser.add_argument('--font-profile', choices=('newtx','lmodern'), default='newtx')
     args = parser.parse_args()
     if args.out.exists():
         raise ValueError('Refuse to overwrite an earlier check')
@@ -63,18 +65,20 @@ def main():
     if not unsupported:
         raise ValueError('Unsupported curve was silently changed')
     pixels = np.asarray(Image.open(args.probe).convert('RGB'))
-    checks = pixel_checks(pixels)
+    regions = LM_REGIONS if args.font_profile == 'lmodern' else REGIONS
+    checks = pixel_checks(pixels, regions)
     if not all(r['present'] for r in checks.values()):
         raise ValueError('Rendered notation has a missing rule: '+json.dumps(checks))
     rejected = []
-    for name,(box,_,_) in REGIONS.items():
+    for name,(box,_,_) in regions.items():
         damaged = pixels.copy()
         x0,y0,x1,y1 = box
         damaged[y0:y1,x0:x1] = [17,26,35]
-        if pixel_checks(damaged)[name]['present']:
+        if pixel_checks(damaged, regions)[name]['present']:
             raise ValueError('Pixel check missed an intentionally removed rule: '+name)
         rejected.append(name)
     result = dict(kind='notation_rule_regression',
+        font_profile=args.font_profile,
         probe_sha256=hashlib.sha256(args.probe.read_bytes()).hexdigest(),
         driver_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         repair_sha256=hashlib.sha256(Path(__file__).with_name('tex_rules.py').read_bytes()).hexdigest(),

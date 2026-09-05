@@ -24,7 +24,7 @@
         },
         {
           "line": "Use the same public test states for every comparison",
-          "math": "20000=18000+2000,\\qquad N_{\\rm test}=2000",
+          "math": "\\begin{gathered}20000=18000+2000\\\\N_{\\rm test}=2000\\end{gathered}",
           "say": "The source release provides twenty thousand training-pool pairs and a separate two thousand-state test block, together with the source kernel-flow emulator's own predictions. Our recorded split takes eighteen thousand pool cases for fitting and two thousand for validation. Checkpoints, kernel settings, and coordinate choices use validation within each run. Comparisons with the source emulator use its saved predictions on exactly the same public test states. Repeated use during study development makes the overall analysis retrospective."
         }
       ]
@@ -51,7 +51,7 @@
         },
         {
           "line": "The reconstruction metric has a stated scope",
-          "math": "\\|R(\\widehat z)-R(z)\\|_2=\\|D_z(\\widehat z-z)\\|_2",
+          "math": "\\begin{gathered}\\|R(\\widehat z)-R(z)\\|_2\\\\=\\|D_z(\\widehat z-z)\\|_2\\end{gathered}",
           "say": "The equality concerns two reconstructions in the retained forty-dimensional subspace. It does not include the truncation error of principal-component reduction, the instrument line shape, or the source study's measurement-noise model. A small percentage here is therefore not automatically a retrieval-accuracy claim. We keep both criteria visible because a single favorable number would hide which coordinates and which downstream question the method actually serves."
         }
       ]
@@ -68,7 +68,7 @@
       "segments": [
         {
           "line": "Freeze a learned feature map and fit the kernel there",
-          "math": "k_\\varphi(u,u')=\\kappa\\!\\left(\\frac{\\|\\varphi(u)-\\varphi(u')\\|}{s}\\right)",
+          "math": "\\begin{gathered}k_\\varphi(u,u')\\\\=\\kappa\\!\\left(\\frac{\\|\\varphi(u)-\\varphi(u')\\|}{s}\\right)\\end{gathered}",
           "say": "In mechanics, the kernel corrected the residual of a strong mean. Here we also ask the neural network to provide a geometry for the kernel. Train the network, freeze its penultimate activations, and evaluate a Matérn kernel between those feature vectors. Inputs that are far apart in the original coordinates can become close in the learned representation, or the reverse. The circular feature example illustrates that change of geometry; it is not an embedding of the atmospheric data."
         },
         {
@@ -78,7 +78,7 @@
         },
         {
           "line": "Separate the representation from the choice of readout",
-          "math": "\\varphi(u)\\longrightarrow\\left\\{\\begin{array}{l}\\text{trained linear layer}\\\\\\text{refitted ridge readout}\\\\\\text{Mat\\'ern kernel head}\\end{array}\\right.",
+          "math": "\\begin{gathered}\\varphi(u)\\\\\\downarrow\\\\\\left\\{\\begin{array}{l}\\text{trained linear layer}\\\\\\text{refitted ridge readout}\\\\\\text{Mat\\'ern kernel head}\\end{array}\\right.\\end{gathered}",
           "say": "A neural feature map followed by a kernel has spent more total computation than a raw-input kernel. Matching the kernel grid alone does not remove that difference. We therefore include a readout control: on the same frozen features, compare the trained output layer, a ridge regression refit, and the Matérn head. That comparison helps distinguish the value of the representation from the value of replacing its final linear readout by a nonlinear kernel fit."
         }
       ]
@@ -133,7 +133,7 @@
         },
         {
           "line": "Report the case error without turning it into an average",
-          "math": "E_{\\rm case}=0.0231\\%\\quad\\text{versus}\\quad0.0415\\%",
+          "math": "\\begin{gathered}E_{\\rm case}=0.0231\\%\\\\\\text{versus }0.0415\\%\\end{gathered}",
           "say": "The combined model's relative radiance error for this case is about zero point zero two three one percent, compared with zero point zero four one five percent for the source kernel-flow emulator. These are case-level values from the saved vectors. They are not the mean over two thousand states or over multiple seeds. A representative image helps us understand the kind of error being made, but a distributional conclusion still requires all the cases."
         }
       ]
@@ -156,7 +156,7 @@
         },
         {
           "line": "The source emulator wins this individual case",
-          "math": "E_{\\rm case}=0.0836\\%\\quad\\text{versus}\\quad0.0214\\%",
+          "math": "\\begin{gathered}E_{\\rm case}=0.0836\\%\\\\\\text{versus }0.0214\\%\\end{gathered}",
           "say": "The combined relative radiance error is about zero point zero eight three six percent, while the source kernel-flow error is about zero point zero two one four percent. That reversal is part of the evidence, not an exception to remove from a presentation. A method can improve an average and still fail badly on some members of the evaluation set. Looking at both the middle and the tail keeps the aggregate claim tied to the objects actually being predicted."
         },
         {
@@ -183,12 +183,12 @@
         },
         {
           "line": "The follow-up expands both directions while freezing the networks",
-          "math": "\\begin{gathered}s/s_{\\rm med}\\in\\{0.25,0.5,1,2,4,8,16\\}\\\\\\lambda\\in\\{10^{-10},\\ldots,10^{-3}\\}\\end{gathered}",
+          "math": "\\begin{gathered}s/s_{\\rm med}\\in\\mathcal S\\\\\\mathcal S=\\{0.25,0.5,1,2,4,8,16\\}\\\\\\lambda\\in\\{10^{-10},\\ldots,10^{-3}\\}\\end{gathered}",
           "say": "The follow-up uses seven scale multipliers and eight powers of ten for the nugget, making fifty-six candidates. At each band and seed, the networks and their features are shared by the two grid comparisons. Both searches use the same six-thousand-row tuning subset, followed by a refit on all eighteen thousand training rows. This design isolates the candidate search while keeping the neural representation and data split fixed."
         },
         {
           "line": "A broader search can worsen the test score",
-          "math": "\\operatorname*{argmin}_{h\\in\\mathcal H}E_{\\rm val}(h)\\quad\\ne\\quad\\operatorname*{argmin}_{h\\in\\mathcal H}E_{\\rm test}(h)",
+          "math": "\\begin{gathered}\\operatorname*{argmin}_{h\\in\\mathcal H}E_{\\rm val}(h)\\\\\\text{need not minimize}\\\\E_{\\rm test}(h)\\end{gathered}",
           "say": "Expanding the grid can only improve or preserve the minimum successful tuning-validation objective when the old candidates remain available. It need not improve the refitted validation score or the public test score. The tuning subset, full refit, and evaluation distribution are different objects. We therefore retain failed cells, selected settings, boundary flags, and all final candidate scores. The completed sensitivity tables show whether the original conclusions survive this broader search, including any deterioration."
         }
       ]

@@ -46,10 +46,9 @@ argument is standard; \citet{lyle2020benefits} give a general account.
 
 The kernel-flow (KF) loss of Owhadi and Yoo \citep{owhadi2019kernel}, in the
 $\ell^2$ variant used by \citet{yoo2021deep} to regularize deep networks,
-enters our ablation study as an optional term in the training of the neural
-means. Its motivation is often stated informally (``a kernel is good if
-half the data predicts the rest''). The following observation makes the
-statement exact. Let $z_i=\phi_\theta(u_i)$ be the features of a batch
+motivates the optional regularizer in our ablation study. We first state
+the identity for exact interpolation, then describe the implementation's
+regularization and differentiation choices. Let $z_i=\phi_\theta(u_i)$ be the features of a batch
 $B=\{1,\dots,b\}$ ($b$ even), let $k$ be a positive definite kernel on feature
 space, and for $C\subset B$, $|C|=b/2$, let $I_C$ denote the $k$-interpolant
 of $\{(z_j,v_j):j\in C\}$. The batch KF loss is
@@ -77,13 +76,18 @@ derivative commute (e.g.\ under local Lipschitz domination).
 \noindent\emph{Proof.} See Supplement~\ref{proof:prop:kf}.
 
 
-The training loss we minimize for a neural mean is a sum of an empirical risk
-term and, optionally, $\beta\,e_2$: the first term is a linear functional of
-the empirical measure of the batch and measures fit, while
-Proposition~\ref{prop:kf} identifies the second as held-out-within-batch
-interpolation error. This motivates learning features for a later kernel
-stage; it is not an unbiased population-risk estimate for the adaptively
-trained network or its kernel head.
+The implemented ablation uses normalized targets and the mean squared loss
+over all $bq$ batch-output entries, with predictor
+$K_{BC}(K_{CC}+10^{-3}I)^{-1}Y_C$. Its errors on $C$ need not vanish:
+on those rows the residual is
+$10^{-3}(K_{CC}+10^{-3}I)^{-1}Y_C$. Consequently the exact leave-half-out
+identity above does not apply to the regularized loss. The learned Gaussian
+bandwidth multiplier is combined with a batch median distance computed
+under \texttt{no\_grad}; the resulting gradient also omits the dependence
+of that median on the features. It is a stop-gradient training rule, not
+the full derivative in Proposition~\ref{prop:kf}. These choices are fixed
+in the reported ablation. Neither the ideal identity nor its regularized
+analogue estimates the population risk of the adaptively trained network.
 
 
 \subsection{Capacity of stacking with fixed members}
@@ -276,7 +280,7 @@ is the right kind of constant for the corollary: it depends on nothing that
 is estimated. It is also why the corollary is a capacity bound and not a
 certificate. The excess term carries $(1+\kappa)^2$, so at
 $\kappa_{\mathrm{an}}=500$ the corollary's right-hand side is, like that of
-Proposition~\ref{prop:affine} before it, vacuous at the shipped constants by
+Proposition~\ref{prop:affine} before it, vacuous at the stated constants by
 many orders of magnitude. The realized scale of the weights is far smaller:
 on a test probe of five hundred points the largest $\ell^1$ norm over the
 grid averages $\kappaTen$ over the ten seeds
@@ -289,7 +293,7 @@ establishes is conditional: for candidates fixed independently of the
 validation sample, in the coordinatewise mean-squared metric, an oracle
 inequality of the ordinary $m^{-1/2}$ form holds with constants that are
 assumed as population bounds or, for $\kappa$, given in closed form. It is not a bound on the estimator
-the pipeline ships: that estimator is selected by mean relative $L^2$ error
+the pipeline fits: that estimator is selected by mean relative $L^2$ error
 rather than by squared coordinate risk, its kernel stages are tuned on an
 $8000$-row subsample and the winner is refit on all $19000$ rows, and the
 same validation split selects checkpoints and members --- none of which the
@@ -299,7 +303,7 @@ of the validation sample, which the deployed pipeline does not satisfy,
 since the same split selects checkpoints, members and, on OCO-2,
 coordinates; and the constants $B$, $b$, $L$, $W$ are population bounds,
 for which the text substitutes observed maxima, so the evaluated values are
-conditional capacity calculations and not guarantees for the shipped
+conditional capacity calculations and not guarantees for the fitted
 estimator. The split-conformal result of Section~\ref{supp:conf} gives marginal
 coverage when its separate calibration assumptions hold; Theorem~\ref{thm:or} is a
 conditional worst-case bound whose constant is not observed.

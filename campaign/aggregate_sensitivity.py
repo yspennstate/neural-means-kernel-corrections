@@ -53,6 +53,44 @@ def validate_indices(values, expected_size, label):
         raise ValueError("Invalid case indices: " + label)
 
 
+GRIDS = {
+    "recorded_grid": dict(scales="0.5,1,2,4", nuggets="1e-8,1e-6,1e-4"),
+    "expanded_grid": dict(scales="0.25,0.5,1,2,4,8,16", nuggets="1e-10,1e-9,1e-8,1e-7,1e-6,1e-5,1e-4,1e-3"),
+}
+GRID_MODELS = {"kernel_flow", "kernel_raw", "kernel_ard", "combined", "combined_plus_ridge"} | {
+    prefix + "_" + mode for prefix in ("mean", "ridge", "dkr") for mode in ("flat", "wnum", "radx")}
+
+
+def validate_grid_report(report, errors, scenario):
+    if report["scenario"] != scenario or set(report["metrics"]) != GRID_MODELS:
+        raise ValueError("Unexpected grid scenario or predictor set")
+    expected_keys = {model + "_" + metric for model in GRID_MODELS for metric in ("reduced", "radiance")}
+    if set(errors) != expected_keys:
+        raise ValueError("Grid error arrays omit or add a predictor/metric")
+    for name, values in errors.items():
+        if values.shape != (2000,) or not np.isfinite(values).all() or np.any(values < 0):
+            raise ValueError("Grid errors must cover exactly 2000 finite nonnegative cases: " + name)
+    scales = list(map(float, GRIDS[scenario]["scales"].split(",")))
+    nuggets = list(map(float, GRIDS[scenario]["nuggets"].split(",")))
+    expected_cells = [(s, n) for s in scales for n in nuggets]
+    for name in ("kernel_raw", "kernel_ard", "dkr_flat", "dkr_wnum", "dkr_radx"):
+        h = report["hyper"][name]
+        cells = h["cells"]
+        if [(c["scale"], c["nugget"]) for c in cells] != expected_cells:
+            raise ValueError("Kernel grid contains missing, reordered, or duplicate cells")
+        if any(c["status"] not in ("OK", "CHOLESKY_FAILED", "NONFINITE") for c in cells):
+            raise ValueError("Unknown kernel cell outcome")
+        successful = [c for c in cells if c["status"] == "OK"]
+        if not successful or any(not math.isfinite(c["validation"]) for c in successful):
+            raise ValueError("Kernel selection has no finite successful candidates")
+        winner = min(successful, key=lambda c: c["validation"])
+        if (h["scale"], h["nugget"], h["validation"]) != (winner["scale"], winner["nugget"], winner["validation"]):
+            raise ValueError("Kernel winner is not the recorded validation minimum")
+        if (h["scale_boundary"] != (h["scale"] in (min(scales), max(scales)))
+                or h["nugget_boundary"] != (h["nugget"] in (min(nuggets), max(nuggets)))):
+            raise ValueError("Kernel boundary flag is incorrect")
+
+
 def aggregate(root):
     root = root.resolve()
     manifest = read(root / "evidence_manifest.json")
@@ -79,6 +117,8 @@ def aggregate(root):
             raise ValueError("Centering seed identity failed")
         with np.load(sr / "paired_errors.npz", allow_pickle=False) as z:
             validate_indices(z["test_indices"], 20000, f"centering {seed}")
+            if not np.array_equal(z["test_indices"], np.arange(20000, 40000)):
+                raise ValueError("Unexpected structural test block")
             test_reference = z["test_indices"].copy()
             row = dict(seed=seed)
             for arm in ("historical", "pooled", "local"):
@@ -97,6 +137,13 @@ def aggregate(root):
         fold = read(sr / "runs/fold_centering.json")
         if fold["seed"] != seed or len(fold["folds"]) != 4 or fold["ntrain"] != 19000:
             raise ValueError("Fold configuration mismatch")
+        if fold["driver_sha256"] != sha(root / "code/campaign/fold_centering_sensitivity.py") or fold["lam"] != 1e-6:
+            raise ValueError("Fold source or nugget mismatch")
+        for f in fold["folds"]:
+            if (f["nfit"], f["nhold"]) != (14250, 4750):
+                raise ValueError("Unexpected fold sizes")
+            if not 0 <= f["historical_relative_frobenius"] <= 1e-5 or not 0 <= f["historical_max_sample_relative_error"] <= 1e-4:
+                raise ValueError("Historical centering reproduction failed")
         folds.extend(fold["folds"])
         row["uq"] = {}
         cal_reference = None
@@ -135,6 +182,9 @@ def aggregate(root):
         rec = read(mr / "summary.json")
         if rec["seed"] != seed or sha(mr / "paired_errors.npz") != rec["errors_sha256"]:
             raise ValueError("Mismatch seed identity failed")
+        if (rec["driver_sha256"] != sha(root / "diagnostics/correction_mismatch.py")
+                or not rec["kernel_frozen"] or not rec["weights_frozen"] or rec["neural_retraining"]):
+            raise ValueError("Mismatch source or frozen-estimator protocol changed")
         row = dict(seed=seed, controls=rec["controls"])
         with np.load(mr / "paired_errors.npz", allow_pickle=False) as z:
             for split, size in (("validation", 1000), ("test", 20000)):
@@ -164,11 +214,21 @@ def aggregate(root):
     grids = {}
     for band in ("o2", "wco2", "sco2"):
         rows = []
+        fixed_test_hashes = None
         for seed in range(3):
             br = root / "oco_grid" / "seeds" / f"oco_{band}_s{seed}"
             rec = read(br / "grid_sensitivity.json")
             if rec["identity"]["seed"] != seed or rec["identity"]["band"] != band:
                 raise ValueError("Grid identity mismatch")
+            identity = rec["identity"]
+            if (identity != read(br / "experiment_identity.json") or identity["grids"] != GRIDS
+                    or (identity["epochs"], identity["width"], identity["threads"]) != (250, 384, 8)
+                    or identity["driver_sha256"] != sha(root / "diagnostics/jpl_grid_sensitivity.py")):
+                raise ValueError("Grid source, cache identity, or fixed design changed")
+            test_hashes = {k: identity["data_sha256"][k] for k in ("Xte", "Yte")}
+            if fixed_test_hashes is not None and test_hashes != fixed_test_hashes:
+                raise ValueError("Grid seeds do not share the same test cases")
+            fixed_test_hashes = test_hashes
             row = dict(seed=seed, scenarios={})
             errors = {}
             for scenario in ("recorded_grid", "expanded_grid"):
@@ -177,6 +237,7 @@ def aggregate(root):
                     raise ValueError("Grid report/array identity failed")
                 with np.load(br / f"{scenario}_errors.npz", allow_pickle=False) as z:
                     errors[scenario] = {name: z[name] for name in z.files}
+                validate_grid_report(report, errors[scenario], scenario)
                 metrics = {}
                 for model, scores in report["metrics"].items():
                     metrics[model] = {metric: checked_mean(errors[scenario][model + "_" + metric], expected, model + metric) for metric, expected in scores.items()}
@@ -188,6 +249,10 @@ def aggregate(root):
             for name, old in errors["recorded_grid"].items():
                 delta = errors["expanded_grid"][name] - old
                 row["expanded_minus_recorded"][name] = checked_mean(delta, rec["expanded_minus_recorded"][name]["mean"], name + " grid contrast")
+                for key, value in (("p05", np.quantile(delta, .05)), ("p95", np.quantile(delta, .95)),
+                                   ("improved_fraction", np.count_nonzero(delta < 0) / len(delta))):
+                    if not math.isclose(float(value), rec["expanded_minus_recorded"][name][key], rel_tol=1e-10, abs_tol=1e-12):
+                        raise ValueError("Grid paired distribution summary failed")
                 if name.startswith(("mean_", "ridge_", "kernel_flow_")) and np.any(delta != 0):
                     raise ValueError("A frozen control changed between grids: " + name)
             rows.append(row)

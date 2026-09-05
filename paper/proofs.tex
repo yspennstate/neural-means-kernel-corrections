@@ -450,11 +450,14 @@ depend on $w$, so one event serves every diagonal metric. \qed
 Let $T:\mathcal H_k\to\mathbb R^{\mathcal X}$ be the composition map
 $Tf=f\circ\varphi$. For $x\in\mathcal X$ the reproducing property gives
 $(Tf)(x)=f(\varphi(x))=\langle f,k(\cdot,\varphi(x))\rangle_{\mathcal H_k}$,
-so evaluation of $Tf$ at $x$ is a bounded functional, and the image
+so evaluation of $Tf$ at $x$ is a bounded functional. The kernel of $T$ is
+the intersection of the kernels of these bounded evaluations and is closed.
+Its orthogonal complement therefore contains a unique minimum-norm preimage
+of every element in the image. Thus the image
 $\mathcal H_{k_\varphi}:=T(\mathcal H_k)$ carries the quotient norm
 $\|g\|_{\mathcal H_{k_\varphi}}=\min\{\|f\|_{\mathcal H_k}:Tf=g\}$, the minimum
 over the affine subspace $T^{-1}(g)$ (nonempty exactly when $g$ is a pullback).
-This normed space is an RKHS: its reproducing kernel is
+The quotient by this closed subspace is complete. It is an RKHS, with reproducing kernel
 $k_\varphi(x,x')=\langle k(\cdot,\varphi(x)),k(\cdot,\varphi(x'))\rangle_{\mathcal H_k}
 =k(\varphi(x),\varphi(x'))$, since the minimum-norm representer of evaluation
 at $x$ is $k(\cdot,\varphi(x))$. Taking $f=h$ in the minimum gives
@@ -533,10 +536,10 @@ training values $r_1(X)=(\|G-m\|_K/\rho(u))g_u(X)$, the first display gives
 $r_1(u)-\widehat r_{\lambda,1}(u)=\langle r_1,g_u\rangle_{\mathcal
 H_k}=\|G-m\|_K\,\rho(u)$, equality in Cauchy--Schwarz. \qed
 
-Note that the argument does not use interpolation: it holds for every
-$\lambda\ge0$, with the (slightly sharper) factor $\widetilde P_\lambda$
-showing that smoothing can only tighten this particular bound relative to the
-posterior standard deviation $P_\lambda$ that we report.
+The argument applies for every $\lambda\ge0$. The inequality between
+$\widetilde P_\lambda$ and $P_\lambda$ compares the two factors at the same
+ridge value; Theorem~\ref{thm:minimax} describes how that value affects the
+worst-case error.
 
 \subsection{Proof of Theorem~\ref{thm:minimax}}
 \label{proof:thm:minimax}
@@ -582,15 +585,15 @@ difference vanishes as $\lambda\to0$ by dominated convergence. \qed
 
 Condition on the fixed fitted predictor, scale function and design. The
 calibration scores $s_1,\ldots,s_m$ and the new score $s^\star$ are
-exchangeable, and coverage is the event $s^\star\le q$. If $k=m+1$ then
-$q=+\infty$ and coverage is one. Suppose therefore that $k\le m$.
+exchangeable, and coverage is the event $s^\star\le Q$. If $k=m+1$ then
+$Q=+\infty$ and coverage is one. Suppose therefore that $k\le m$.
 
 Assign independent continuous random tie breakers to the $m+1$ scores and
 let $J$ be the rank of the new score in this augmented ordering. By
 exchangeability, $J$ is uniform on $\{1,\ldots,m+1\}$. The event $J\le k$
 implies $s^\star\le s_{(k)}$, including in the presence of ties, so
 \[
-\mathbb P(s^\star\le q)\ge\mathbb P(J\le k)
+\mathbb P(s^\star\le Q)\ge\mathbb P(J\le k)
 =\frac{k}{m+1}\ge1-\alpha.
 \]
 When the scores are almost surely distinct the two events coincide; their

@@ -154,10 +154,10 @@ The deployed six-member corrected pipeline has mean error $\saDeployedEv\pm\saDe
 \begin{table}[t]
 \centering
 \caption{Sixty predictors, ten seeds of six architectures, on the evaluation
-half of the test block ($19000$ cases). Mean relative $L^2$ error, and the
+subset of the test block ($19000$ cases). Mean relative $L^2$ error, and the
 root mean square where the theory speaks in that metric. Convex weights are
-fitted on the disjoint calibration half ($1000$ cases) unless marked
-hindsight, where they are chosen on the evaluation half itself. Rows with
+fitted on the disjoint calibration subset ($1000$ cases) unless marked
+hindsight, where they are chosen on the evaluation subset itself. Rows with
 $\pm$ are means over the ten seeds.}
 \label{tab:seedarch}
 \begin{adjustbox}{max width=\linewidth}
@@ -190,4 +190,4 @@ The power function has weak correlation with the absolute error ($\uqCorrAbs$) a
 
 For the six-member pipeline, conformal calibration on 1000 cases and evaluation on the disjoint 19000 give $\uqPlamSix\pm\uqPlamSixSd\%$ coverage at nominal 90\% and $\uqPlamSixHi\pm\uqPlamSixHiSd\%$ at nominal 95\%. Under the frozen-predictor i.i.d. continuous-score assumptions of Remark~\ref{rem:covlaw}, the corresponding central 95\% reference intervals are $[88.0\%,91.8\%]$ and $[93.5\%,96.3\%]$; all ten recorded seeds lie inside each. These are conditional-model reference intervals, not evidence that study-level adaptation satisfies the theorem's independence assumptions.
 
-A constant-width conformal set gives $\uqRawSix\pm\uqRawSixSd\%$ and $\uqRawSixHi\pm\uqRawSixHiSd\%$ coverage and is narrower on average: the power-function set has mean width $\uqWidthRatio$ times as large. The power-function set also varies markedly across deciles, from 69\% to 99.9\% coverage at seed zero. Thus marginal coverage is compatible with poor local coverage and weak error ranking. Supplement~\ref{supp:experiments} includes all three scales and the five-member comparisons. The formal guarantee is stated with its hypotheses and proof pointer in Section~\ref{sec:theory-conf}.
+A constant-radius conformal set gives $\uqRawSix\pm\uqRawSixSd\%$ and $\uqRawSixHi\pm\uqRawSixHiSd\%$ coverage and is narrower on average: the power-function set has mean radius $\uqWidthRatio$ times as large. The power-function set also varies markedly across deciles, from 69\% to 99.9\% coverage at seed zero. Thus marginal coverage is compatible with poor local coverage and weak error ranking. Supplement~\ref{supp:experiments} includes all three scales and the five-member comparisons. The formal guarantee is stated with its hypotheses and proof pointer in Section~\ref{sec:theory-conf}.

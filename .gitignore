@@ -1,4 +1,5 @@
 __pycache__/
+.local-verification/
 *.pyc
 data/
 runs/*.npy

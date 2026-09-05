@@ -34,7 +34,26 @@
 \maketitle
 
 \begin{abstract}
-A kernel fitted after a neural network can correct its residuals or replace its output layer. We study these two roles on public operator-learning problems, repeating the main experiments at ten seeds. On structural mechanics, a residual kernel correction of a six-member stack reaches $\errSix\pm\errSixSd\%$ mean relative test error, close to the published PARA-Net score of $\pubBestHi\%$, without establishing statistical equivalence. In the 1250-label regime, the pipeline reaches $\errBestLow\pm\errBestLowSd\%$ against a published $\pubBestLo\%$. On OCO-2, the same Mat\'ern regression scores approximately $40\%$ reduced error on raw inputs and $4.1\%$ on frozen neural features in the O2 band. A per-coordinate combination improves on the source emulator's stored predictions in the ten-seed means under both retained-representation rescoring criteria on all three bands; full-spectrum and retrieval accuracy are outside this comparison. Residual alignment explains the limited gains from averaging the trained mechanics predictors: a block lower bound of $\saBound\%$ lies close to the hindsight-optimal global convex RMS error of $\saSixtyOracleRms\%$ for the sixty-member pool. Supporting ensemble identities and conditional native-space bounds clarify the scope of these measurements. Calibrated uncertainty sets are also compared; a constant-width set is narrower on average than one scaled by the kernel power function. The public test blocks were examined across several campaigns, so the results constitute retrospective benchmark evidence.
+Kernel regression can serve two roles after neural training: fitting prediction
+residuals or reading out learned features. We compare these roles on
+structural-mechanics and OCO-2 benchmarks, repeating the main experiments at
+ten seeds. On structural mechanics, a corrected six-member stack reaches
+$\errSix\pm\errSixSd\%$ mean relative test error, close to PARA-Net's published
+$\pubBestHi\%$, although statistical equivalence cannot be established. With
+1250 labels, the pipeline reaches $\errBestLow\pm\errBestLowSd\%$ against a
+published $\pubBestLo\%$. An analysis of sixty trained predictors finds little
+remaining scope for global convex averaging: an empirical RMS lower bound of
+$\saBound\%$ is close to the hindsight optimum of $\saSixtyOracleRms\%$.
+On the O2 band, Mat\'ern regression has approximately $40\%$ reduced error on
+raw inputs and $4.1\%$ on frozen neural features. Coordinatewise selection
+improves on the source emulator's stored predictions in the ten-seed means
+under both retained-representation criteria on all three bands. This comparison
+does not evaluate full-spectrum or retrieval accuracy. Ensemble identities
+and conditional native-space bounds delimit the interpretation of the results.
+For uncertainty quantification, a constant-radius conformal set is narrower on
+average than a set scaled by the kernel power function. The public test blocks
+were examined across several campaigns; these are retrospective benchmark
+comparisons.
 \end{abstract}
 
 \begin{keywords}
@@ -122,7 +141,7 @@ uncertainty-quantification and cost detail on structural mechanics, the
 uncontrolled survey of the remaining suite problems and the mirror-symmetry
 check, the OCO-2 input-metric study with the data-scaling and ClimSim
 results, the implementation and compute record, and the numerical
-verification of every stated result. Both documents and their editable sources are also included in the accompanying Overleaf package.
+checks of the stated identities and inequalities. Both documents and their editable sources are also included in the accompanying Overleaf package.
 
 \bibliography{refs}
 

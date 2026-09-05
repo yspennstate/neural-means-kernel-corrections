@@ -73,12 +73,12 @@
 % Split-conformal coverage on the complete-schedule campaign (ten seeds, 1000 calibration / 19000
 % evaluation cases of the test block). Three scores on the same split: ||e||/P_lambda (the band of
 % Section S3, P_lambda rebuilt from each seed's correction kernel; campaign/uq_conformal_plam.py),
-% the raw ||e|| (constant width) and ||e||/disagreement (campaign/conformal_seeded.py).
+% the raw ||e|| (constant radius) and ||e||/disagreement (campaign/conformal_seeded.py).
 \newcommand{\uqPlamSix}{89.9}        % six-member pipeline, P_lambda-scaled band, 90% level
 \newcommand{\uqPlamSixSd}{0.8}
 \newcommand{\uqPlamSixHi}{95.0}      % 95% level
 \newcommand{\uqPlamSixHiSd}{0.6}
-\newcommand{\uqRawSix}{90.4}         % six-member, constant-width band
+\newcommand{\uqRawSix}{90.4}         % six-member, constant-radius band
 \newcommand{\uqRawSixSd}{0.8}
 \newcommand{\uqRawSixHi}{95.4}
 \newcommand{\uqRawSixHiSd}{0.5}
@@ -90,11 +90,11 @@
 \newcommand{\uqPlamFiveSd}{0.9}
 \newcommand{\uqPlamFiveHi}{95.1}
 \newcommand{\uqPlamFiveHiSd}{0.8}
-\newcommand{\uqRawFive}{90.6}        % five-member, constant-width band
+\newcommand{\uqRawFive}{90.6}        % five-member, constant-radius band
 \newcommand{\uqRawFiveSd}{0.4}
 \newcommand{\uqRawFiveHi}{95.4}
 \newcommand{\uqRawFiveHiSd}{0.6}
-\newcommand{\uqWidthRatio}{1.11}     % mean width of the P_lambda band over the constant-width band, 90% level, six-member
+\newcommand{\uqWidthRatio}{1.11}     % mean radius of the P_lambda band over the constant-radius band, 90% level, six-member
 \newcommand{\uqSpearman}{0.03}       % Spearman correlation of P_lambda with the corrected error on the test set, ten-seed mean
 % The two-member optimum of the MSE network and the FNO (Proposition exchange), RMS metric on validation
 \newcommand{\fnoRmsA}{5.047}         % FNO member RMS error, early-stopped checkpoints, ten-seed mean
@@ -218,8 +218,8 @@
 \newcommand{\uqCorrNorm}{0.65}       % corr(power fn, output norm) -- the confound
 \newcommand{\uqDisAbs}{0.074}        % corr(disagreement, abs err), five members, ten seeds
 \newcommand{\uqDisAbsFour}{0.083}    % same for four members, ten seeds
-\newcommand{\pubBestHi}{4.55}        % best published high-data (PARA-Net)
-\newcommand{\pubBestLo}{6.49}        % best published low-data (FNO-mean GP)
+\newcommand{\pubBestHi}{4.55}        % quoted high-data reference (PARA-Net)
+\newcommand{\pubBestLo}{6.49}        % quoted low-data reference (FNO-mean GP)
 \newcommand{\pubKernelHi}{5.18}      % published kernel method, high data
 \newcommand{\ttaGainMLP}{0.16}       % MLP reflection-averaging gain, ten-seed mean
 % after-campaign checks on the DGX (campaign/collected/dgx/p1_members_eval.json, sm_ens_rmt.json): same calibration/evaluation split as seedarch
@@ -280,9 +280,9 @@
 % Xeon E5-2698 v4): collected/dgx/cost_check.json
 \newcommand{\costCoefM}{31.9}           % stored coefficients per kernel stage, millions (19000 x 1681)
 \newcommand{\costGramS}{27}             % block-filled Gram build, seconds
-\newcommand{\costCholS}{22}             % in-place Cholesky, seconds
+\newcommand{\costCholS}{22}             % Cholesky factorization, seconds
 \newcommand{\costSolveS}{11}            % triangular solves with 1681 right-hand sides, seconds
-\newcommand{\costPeakBlockGb}{6.0}      % peak resident memory of the block-filled path, GB
-\newcommand{\costPeakNaiveGb}{19.2}     % peak resident memory after the naive full-matrix build, GB
+\newcommand{\costPeakBlockGb}{6.0}      % peak resident memory of the block-filled path, GiB
+\newcommand{\costPeakNaiveGb}{19.2}     % peak resident memory after the naive full-matrix build, GiB
 \newcommand{\costQueryOneMs}{14}        % kernel-stage latency, single query, milliseconds
 \newcommand{\costQueryBatchMs}{1.7}     % kernel-stage latency per query at a batch of 1000, milliseconds

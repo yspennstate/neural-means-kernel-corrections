@@ -12,8 +12,10 @@ penultimate features used by the feature-space kernel stage.
 
 \emph{Kernel-conditioned refiner.} The second mean is the same residual network
 given an extra input channel: the kernel method's predicted stress field for
-the same load, concatenated with the load. It therefore learns to correct the
-kernel predictor rather than to reproduce the map from scratch; its test error is close to that of the normalized-MSE network (Table~\ref{tab:members}). During training the refiner reads four-fold kernel predictions. The kernel weights are fitted excluding the held-out fold, but the recorded runs centered targets using the mean over the full fitting pool. Consequently a held-out row can affect its kernel channel through that pooled target mean. This is training-label reuse, not strict cross-fitting. At query time the refiner receives the full-data kernel prediction. The tables describe that recorded implementation; the effect of later fold-local centering has not been rerun here.
+the same load, concatenated with the load. The network predicts the full stress
+field from these two inputs; it has no explicit residual-output constraint.
+Its test error is close to that of the normalized-MSE network
+(Table~\ref{tab:members}). During training the refiner reads four-fold kernel predictions. The kernel weights are fitted excluding the held-out fold, but the recorded runs centered targets using the mean over the full fitting pool. Consequently a held-out row can affect its kernel channel through that pooled target mean. This is training-label reuse, not strict cross-fitting. At query time the refiner receives the full-data kernel prediction. The tables describe that recorded implementation; the effect of later fold-local centering has not been rerun here.
 
 \emph{Other instances.} The mean slot is not tied to a particular
 architecture. We also use a Fourier neural operator \citep{li2021fourier}
@@ -36,10 +38,12 @@ During training each batch is reflected with probability $1/2$ (load reversed,
 target field reflected along the first grid coordinate); at test time each
 model is evaluated as $\frac12(f(u)+T f(Su))$. Proposition~\ref{prop:sym}
 shows the test-time step cannot increase population risk under exact target equivariance and distribution invariance (proof in Supplement~\ref{app:proofs}); the empirical symmetry checks do not prove those assumptions exactly. Training augmentation is a separate heuristic whose effect is measured in the ablation. Optionally, the training
-loss carries a kernel-flow term $\beta\,e_2$ computed from the batch
-(Section~\ref{sec:theory-kf}) with a Gaussian kernel on pooled penultimate
-features whose log-bandwidth is trained jointly; this variant appears in the
-ablation.
+loss includes a regularized kernel-flow term computed from the batch
+with a Gaussian kernel on penultimate features and a learned bandwidth
+multiplier. The implementation adds $10^{-3}I$ to the half-batch Gram matrix
+and treats the batch median distance as constant in differentiation.
+Section~\ref{sec:theory-kf} distinguishes this ablation from the ideal
+interpolation loss analyzed there.
 
 \subsection{Stacking}
 With $M$ trained models $f_1,\dots,f_M$ we form the convex combination
@@ -80,19 +84,17 @@ frozen last-layer features, tuned and refit by the same routine, in place of
 a residual correction of the network; the two uses are named separately
 where they appear. At $n=19000$ the exact solve is a single Cholesky factorization
 of a $19000\times19000$ matrix, under half a minute in double precision on a
-laptop CPU (measured in Section~\ref{sec:cost}), and prediction is two matrix
-products; no inducing points, preconditioners, or stochastic solvers are
+campaign CPU host (factorization alone; Section~\ref{sec:cost}). Prediction
+evaluates the kernel against the training inputs and multiplies by $\alpha$;
+no inducing points, preconditioners, or stochastic solvers are
 involved. The Gaussian process
 reading of the same formulas supplies the posterior standard deviation
 $P_\lambda(u)$ of \eqref{eq:power} by a triangular solve per evaluation batch, which is the design factor in the residual
 bound of Theorem~\ref{thm:or} and the uncertainty signal studied in
 Section~\ref{sec:uq}.
 
-Two remarks on scope. Nothing in the construction uses properties of this
-particular PDE beyond its assumed reflection symmetry, so the recipe
-(native input parametrization, symmetrized accurate means, validated kernel
-correction of the residual, a conformal band built on the posterior standard
-deviation) can be applied to other operator-learning problems with
-low-dimensional input parametrizations. And the pipeline degrades gracefully: dropping the feature
-stage, the stacking, or the corrections recovers progressively simpler
-methods whose individual numbers appear in the ablation table.
+The construction uses the benchmark's reflection symmetry but no other
+specific property of its governing equation. It can therefore be implemented
+for other low-dimensional input parametrizations, with symmetry averaging
+where appropriate. The ablations measure the contribution of the feature
+stage, stacking, and residual correction separately.

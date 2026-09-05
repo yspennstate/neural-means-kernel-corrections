@@ -12,7 +12,8 @@ $\Gamma_t=[0,1]\times\{1\}$. The quantity of interest is the von Mises
 stress field $\sigma_v$ on $D$. The learning task is
 the map $G:\bar t\mapsto\sigma_v$. Loads are drawn from the Gaussian field
 $\mathcal{GP}\big(100,\,400^2(-\Delta+3^2 I)^{-1}\big)$ with homogeneous
-Neumann boundary conditions for the Laplacian. In the source study the
+Neumann boundary conditions for the Laplacian on spatial-mean-zero
+fluctuations. In the source study the
 solver is a mesh of $189$ quadratic quadrilateral elements (the NNFEM
 library) with the stress evaluated at its Gaussian quadrature points and
 transferred to a regular $41\times41$ grid by radial basis function
@@ -29,16 +30,18 @@ Errors are mean relative $L^2$ errors over the test set,
 \frac1{N_{\mathrm{test}}}\sum_{n}\frac{\|\widehat
 G(u_n)-G(u_n)\|_2}{\|G(u_n)\|_2},
 \]
-computed on grid values in double precision. Quadrature weighting
-(trapezoidal instead of plain vector norms) changes our reported numbers by
-less than 0.02 percentage points, and we report the plain-norm convention of
-the prior work.
+computed on grid values in double precision using unweighted vector norms.
+Published comparisons retain their source values; for example,
+\citet{batlle2024kernel} describe trapezoidal quadrature for their
+discretized $L^2$ norm. The numerical proximity of two quoted errors should
+therefore not be read as agreement to every reported decimal.
 
 \subsection{Protocols and published results}
 Two regimes appear in the literature, and we follow both. In the
 \emph{high-data} protocol the first 20000 samples are available for training
-and the last 20000 form the test set; \citet{dehoop2022cost} report, at 20000
-training samples, 4.55\% (PARA-Net), 4.67\% (PCA-Net), 4.76\% (FNO) and 5.20\%
+and the last 20000 form the test set. The neural-network results of
+\citet{dehoop2022cost}, collected in Table~3 of \citet{batlle2024kernel},
+include, at 20000 training samples, 4.55\% (PARA-Net), 4.67\% (PCA-Net), 4.76\% (FNO) and 5.20\%
 (DeepONet), and \citet{batlle2024kernel} report 5.18\% for their
 optimal-recovery kernel method (Mat\'ern/rational quadratic; 27.11\% for the
 linear kernel) on the same task. Within the 20000-sample budget we hold out
@@ -50,96 +53,73 @@ protocol of \citet{mora2025operator}, 1250 samples are available and the same
 (FNO), 6.95\% (the kernel method of \citealt{batlle2024kernel}), 6.74\% (their
 zero-mean GP), 7.12\% (DeepONet-mean GP) and 6.49\% (FNO-mean GP). In this
 regime we carve the validation split (250 samples) out of the 1250, so
-training uses 1000 samples and every choice made by the pipeline is informed
-by the 1250 available labels only.
+training uses 1000 samples. Fitting and selection within each low-data run
+use those 1250 labels; the recipe itself was developed through the wider
+benchmark study.
 
 \subsection{The rest of the suite, and a check of the mirror symmetry}
 \label{sec:suite-summary}
-Two observations belong to the setting rather than to the results, and
-both are reported in Supplement~\ref{supp:benchmark}. The same fixed
-recipe was run once, unchanged, on the other problems of the
-operator-learning suite that \citet{batlle2024kernel} assembled from
-\citet{dehoop2022cost} and \citet{lu2022comprehensive}. That survey is
-uncontrolled --- single runs, no seed replication, and in two cases
-training splits or grids that differ from the baselines' --- so nothing is
-drawn from it beyond orientation: where the map is smooth and data are
-plentiful the kernel stage wins the recipe's own selection and lands
-within a factor of two of the tuned per-problem kernels. The two problems
-studied in depth, with replication, are the subject of the rest of the
-paper. Separately, the mirror symmetry that Proposition~\ref{prop:sym}
-assumes is tested on the data rather than taken on faith: outputs of
-near-mirror inputs are some three times closer to one another than the
-inputs are, the correct reflection axis is singled out against the
-alternative, and the empirical mean and covariance of the training loads
-are reflection-invariant to within $1.1\%$ and $1.5\%$.
+Supplement~\ref{supp:benchmark} reports an exploratory survey of the other
+operator-learning problems and a check of reflection symmetry. The survey
+uses a largely fixed recipe but has unequal splits or grids and limited seed
+replication, so it provides context rather than a controlled comparison.
+For structural mechanics, reflected near-neighbor pairs, the reflection
+axis, and empirical load moments are consistent with the symmetry used by
+Proposition~\ref{prop:sym}. These finite-data checks support that modeling
+assumption without establishing exact equivariance of the numerical solver.
+The replicated mechanics and OCO-2 experiments are the focus of the paper.
 
 \subsection{Related work}
 \label{sec:related}
-The benchmark sits at the meeting point of three lines of work. \emph{Neural
-operators} learn maps between function spaces: DeepONet \citep{lu2021deeponet}
-with its branch/trunk factorization, the Fourier neural operator
-\citep{li2021fourier} and the broader neural-operator framework
-\citep{kovachki2023neural}, and the reduced-basis PCA-Net and PARA-Net
-architectures assembled for the cost--accuracy study of
-\citet{dehoop2022cost}. These methods are fast and mesh-flexible but do not by
-themselves come with error control, and it is their numbers on this problem
-that define the plateau we start from. \emph{Kernel and Gaussian process
-methods} for operator learning approach the same maps through reproducing
-kernels: the optimal-recovery framework of \citet{batlle2024kernel}, with its
-convergence theory and a-priori bounds, is the most direct comparison, and it
-is competitive with neural operators on most of the benchmarks it considers.
-Data-adapted kernels learned by cross-validation \citep{darcy2023one} and
-vector-valued kernel formulations extend the reach of this family. \emph{Hybrids}
-that place a neural network and a kernel in the same estimator are the closest
-relatives of our pipeline: \citet{mora2025operator} use a neural operator as
-the mean of a Gaussian process and fit the two together, and this is the work
-we most directly build on, differing in that we fit the mean first and the
-kernel after, tune by cross-validation rather than marginal likelihood, and
-solve the correction exactly at nineteen thousand points. Kernels on learned
-representations are likewise established: deep kernel learning
-\citep{wilson2016deep,calandra2016manifold} places a Gaussian process on the
-features of a network and trains through it, and the recent REEF-GP of
-\citet{vendrell2026geometry} places a Gaussian process on the residuals of a
-trained neural operator in its learned feature space, post hoc, for
-uncertainty quantification. Our feature-space stage is the post-hoc form of
-the same construction, with the exact solve and validation tuning used
-everywhere else in the pipeline; it differs from REEF-GP in what it is used
-for and how it is judged --- as a predictor, scored against the same kernel
-on the raw input under one tuning routine and budget
-(Section~\ref{sec:oco2}), with coverage supplied by split-conformal
-calibration rather than by the posterior --- and what we add is not the
-construction but that controlled comparison. The residual construction
-itself is older than any of these: it is the discrepancy model of
-\citet{kennedy2000predicting}, in which a Gaussian process corrects a cheap
-approximation, and the reduced-order-model error surrogates of
-\citet{drohmann2015romes} put a Gaussian process on the error of a
-physics-based surrogate in the same way; universal kriging with a trained
-mean is the same estimator in geostatistical dress. Within operator
-learning, \citet{kumar2024neural} induce a Gaussian process from a neural
-operator, \citet{magnani2025linearization} linearize a trained neural
-operator into a function-valued Gaussian process, and
-\citet{ma2024calibrated} calibrate operator predictions by split conformal
-prediction, the same coverage device we use in Section~\ref{sec:uq}.
-\citet{ober2021promises} document how deep kernel learning overfits when
-the feature map and the kernel are trained together and the same data
-select both, which is one reason our feature-space stage trains the
-network first and tunes the kernel by validation afterwards.
+Our comparisons draw on neural operators and kernel methods for learning
+maps between function spaces. DeepONet \citep{lu2021deeponet}, the Fourier
+neural operator \citep{li2021fourier}, and the PCA-Net and PARA-Net models
+in \citet{dehoop2022cost} provide the structural-mechanics reference
+results; \citet{kovachki2023neural} reviews the broader framework.
+The optimal-recovery kernel method of \citet{batlle2024kernel} provides a
+competitive alternative with native-space error bounds. Data-adapted
+kernels \citep{darcy2023one} extend this approach beyond a fixed input metric.
 
-Two further threads inform the design. The kernel-flow method
-\citep{owhadi2019kernel} learns a kernel from data by minimizing a
-half-sample cross-validation loss, and its use as a regularizer for the inner
-layers of a network \citep{yoo2021deep} is exactly the term we analyze in
-Proposition~\ref{prop:kf}; kernel flows have since been used at scale as
-emulators for physical forward models, for instance in atmospheric radiative
-transfer retrievals \citep{susiluoto2025radiative} and in the inference of
-convective-storm structure from satellite observations
-\citep{prasanth2021kernel}, where presenting the input in its physical
-parametrization and adapting the kernel to data are what make the emulator
-accurate. Our pipeline follows the same instinct, with the smoothing of the
-target performed by a neural ensemble rather than by a hand-chosen reduction.
-Finally, the effective-dimension reading of the kernel solve
-(Lemma~\ref{lem:deff}) draws on the random-matrix description of kernel Gram
-spectra \citep{koltchinskii2000random} and on the classical
-Mar\v{c}enko--Pastur \citep{marchenko1967distribution} and spiked-covariance
-\citep{baik2005phase} laws; the same effective dimension governs the
-generalization of kernel ridge regression \citep{caponnetto2007optimal}.
+Neural means with Gaussian-process corrections are already established.
+\citet{mora2025operator} optimize neural-operator means through a
+Gaussian-process likelihood, keeping the kernel parameters fixed in their
+neural-mean experiments. We fit the mean first, select the kernel on
+validation, and solve
+the correction at all $19000$ training points. The underlying discrepancy
+construction also appears in multifidelity modeling
+\citep{kennedy2000predicting} and reduced-order-model error surrogates
+\citep{drohmann2015romes}. A frozen trained mean gives ordinary Gaussian
+conditioning on its residuals; this differs from universal kriging when
+the trend coefficients are estimated jointly from the same observations.
+
+Kernels on learned representations are likewise not new. Deep kernel
+learning \citep{wilson2016deep,calandra2016manifold} trains through a
+Gaussian process on network features. REEF-GP \citep{vendrell2026geometry}
+fits a Gaussian process post hoc to a neural operator's residuals in its
+feature space. Our contribution here is an empirical comparison of raw
+inputs and frozen features under the same kernel family, search grid,
+tuning subsample, and full refit, with a linear readout control. This
+matches the kernel computation, not the extra cost of learning features.
+Separating network training from kernel selection also avoids joint
+optimization, whose overfitting behavior is examined by
+\citet{ober2021promises}; it does not make repeated validation use independent.
+
+Other uncertainty constructions induce a Gaussian process from a neural
+operator \citep{kumar2024neural} or from its linearization
+\citep{magnani2025linearization}. \citet{ma2024calibrated} apply split
+conformal calibration to operator predictions. We use the same rank-based
+calibration principle for an $L^2$ ball around the whole output, a different
+coverage event from their spatial-coverage formulation. Our reported
+coverage is a retrospective benchmark measurement.
+
+Two further connections help interpret the experiments. Kernel flows
+\citep{owhadi2019kernel} learn kernels by half-sample cross-validation;
+\citet{yoo2021deep} use this loss to regularize network features, as analyzed
+in Proposition~\ref{prop:kf}. Applications include radiative-transfer
+emulation \citep{susiluoto2025radiative} and satellite inference of storm
+structure \citep{prasanth2021kernel}. Effective dimension links the kernel
+solve to classical Gram-spectrum and random-matrix results
+\citep{koltchinskii2000random,marchenko1967distribution,baik2005phase}
+and to kernel-ridge generalization theory \citep{caponnetto2007optimal}.
+We use these results as conditional reference models, without asserting
+that trained nonlinear features satisfy an i.i.d. random-matrix model.

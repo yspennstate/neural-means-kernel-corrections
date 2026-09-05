@@ -5,8 +5,8 @@ problems of the operator-learning suite that \citet{batlle2024kernel}
 assembled from \citet{dehoop2022cost} and \citet{lu2022comprehensive}: a
 Mat\'ern kernel at the median length scale with the fit capped at 6000
 points, a residual MLP mean, outputs reduced by PCA, and the stage selected on
-validation. Table~\ref{tab:suite} lists the results next to the best
-published number on each problem. The comparison is not controlled, and we
+validation. Table~\ref{tab:suite} lists the results next to the reference
+values collected in that study. The comparison is not controlled, and we
 draw nothing from it beyond orientation: the published numbers are
 per-problem methods tuned by their authors; our rows are single runs without
 seed replication, except Helmholtz and Navier--Stokes, which were rerun at
@@ -31,8 +31,8 @@ subject of the rest of the paper.
 
 \begin{table}[t]
 \centering
-\caption{The remaining problems of the suite: an uncontrolled survey. Best
-published mean relative $L^2$ test error on each problem (per-problem
+\caption{The remaining problems of the suite: an uncontrolled survey. Published
+reference mean relative $L^2$ test error on each problem (per-problem
 methods tuned by their authors), against one recipe run unchanged, on
 training splits and grids that differ from the baselines' in the cases noted
 in the text: single runs, except the two rows marked three seeds (mean
@@ -41,7 +41,7 @@ $\pm$ standard deviation, exact solve on 19{,}000 pairs, output rank 400).}
 \begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{llcc}
 \toprule
-Problem & Map & Best published & This work \\
+Problem & Map & Published reference & This work \\
 \midrule
 Burgers & initial condition $\to$ solution & 1.93\% (FNO) & 2.38\% \\
 Darcy flow & permeability $\to$ pressure & 2.32\% (POD-DeepONet) & 2.01\% \\

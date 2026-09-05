@@ -98,9 +98,9 @@ exception, and deliberately so: that benchmark fixes no test split of its own,
 so the seed there also draws the $20000$-row test block out of the full set
 (\texttt{campaign/climsim\_seeded.py}). Its seed spreads therefore include
 test-sampling variation, which the structural-mechanics and OCO-2 spreads
-exclude by construction; that makes them the more conservative of the two
-conventions where ClimSim is concerned, and it is why the ClimSim seed scatter
-is quoted as a check on the crossing rather than as a precision claim. Tables report the
+exclude by construction. These standard deviations describe different
+sources of variation and should not be compared as if they estimated the
+same uncertainty. Tables report the
 mean and standard deviation across seeds. What the repository carries is the
 per-seed result record for every stage of every run --- the JSON files the
 tables and this appendix are computed from, together with the scripts that
@@ -110,7 +110,7 @@ compute them. The network checkpoints and full prediction/residual arrays are no
 review of the manuscript, each from the stored campaign arrays or the
 campaign's own scripts, and each is recorded under \texttt{collected/dgx}.
 First, the conformal band of Section~\ref{sec:theory-conf}: the released
-scripts had computed the constant-width and the disagreement-scaled bands,
+scripts had computed the constant-radius and the disagreement-scaled bands,
 and the text had described the reported band as the $P_\lambda$-scaled one;
 \texttt{campaign/uq\_conformal\_plam.py} now computes that band at every
 seed, rebuilding $P_\lambda$ from each seed's own correction kernel and using
@@ -133,15 +133,18 @@ precision), and evaluates a kernel row against the $19000$ training loads
 for every query. Measured at the campaign's shapes on the campaign host
 (\texttt{campaign/dgx\_checks/cost\_check.py}, eight threads, synthetic values
 so that only the arithmetic is timed): the block-filled Gram build takes
-$\costGramS$\,s and the in-place Cholesky $\costCholS$\,s, the triangular
+$\costGramS$\,s and the Cholesky factorization $\costCholS$\,s, the triangular
 solves with $1681$ right-hand sides $\costSolveS$\,s, and the peak resident
-memory of that path is $\costPeakBlockGb$\,GB against $\costPeakNaiveGb$\,GB
-for the naive full-matrix build, which is why the released memory-safe path
-matters on a $31$\,GB host. At inference one kernel stage costs
+memory of that diagnostic path is $\costPeakBlockGb$\,GiB against
+$\costPeakNaiveGb$\,GiB after the naive full-matrix build. The timing
+diagnostic demonstrates this memory reduction; the campaign's
+\texttt{correct\_stack.py} still forms full-size temporaries.
+At inference one kernel stage costs
 $\costQueryOneMs$\,ms for a single query and $\costQueryBatchMs$\,ms per
-query in batches of a thousand; the pipeline runs two such stages plus the
-six network members with reflection averaging, so a batched query of the
-complete surrogate is dominated by the networks, not by the kernels.
+query in batches of a thousand. These timings measure one kernel stage.
+The full six-member pipeline evaluates two such stages plus five neural
+members with reflection averaging; its total inference latency was not
+measured by this diagnostic.
 
 \paragraph{What the two campaigns completed.} The first structural-mechanics
 chain was enqueued at ten seeds on four CPU instances. The kernel ridge, the
@@ -156,21 +159,23 @@ curves bound what the early stop cost: the best validation epoch falls
 between 10 and 70 of the scheduled 200, and at every seed validation was
 rising again by the last epoch reached, in several cases sharply (seed 3,
 $0.0489$ at its best against $0.0550$ at epoch 150; seed 5, $0.0483$ against
-$0.0557$), so the member is the early-stopped optimum a full run would also
-have kept, short of the anneal. The UNet, scheduled after the FNO, did not
+$0.0557$). These curves justify retaining the best observed checkpoint, but
+cannot establish which checkpoint a completed schedule would have selected.
+The UNet, scheduled after the FNO, did not
 run inside that limit. With the FNO finalized, all ten seeds carry the
 five-member stack, the residual correction, the second-moment measurement and
 the conformal calibration; the four-member versions of each are retained and
 reported so that the FNO's contribution is a measurement rather than an
 assumption. One instance was killed by the operating system while forming
 the $19000\times19000$ Gram matrix through full-size temporaries (the
-released code fills it in row blocks instead, Section~\ref{sec:cost}), and
+block-filled diagnostic in Section~\ref{sec:cost} measures a lower-memory
+alternative), and
 four seeds hit the task limit during stack stages and were completed on a
 larger instance afterwards.
 
 The second chain ran the same ten seeds on one 40-core CPU host. It trained
 the kernel ridge and the three MLP-family members again under the same seeds
---- seeded CPU training is deterministic, and their test errors agree with
+--- their test errors agree with
 the first campaign's to within $6\times10^{-8}$ in the relative-error unit
 for the two MLPs and the kernel ridge and $6\times10^{-6}$ for the refiner
 --- and then the FNO and the UNet under a
@@ -234,8 +239,10 @@ validation and test error from the half-precision residual and compares it
 with the stage record the tables are built from: over all 110 arrays the two
 agree to within $5.4\times10^{-8}$ in the relative-error unit, and the largest
 residual in any array is $192$ against target norms of $3.7\times10^3$ to
-$1.7\times10^4$, so the rounding is far below the seed-to-seed spread of any
-quantity in the paper. At $384$\,MB per seed, $3.84$\,GB in all, the archives
+$1.7\times10^4$. The measured rounding effect on these mean errors is far
+below their seed spread; this check does not establish the same tolerance
+for every downstream statistic or fitted weight. At $384$\,MB per seed,
+$3.84$\,GB in all, the archives
 exceed what the code repository can carry. They are not part of this
 release: they are retained on the campaign host, available on request, and
 are to be deposited under a persistent identifier with the published
@@ -245,22 +252,25 @@ member, split, shape, dtype, the SHA-256 of its bytes, the largest residual
 and the three errors just described; per archive its size and SHA-256), so a
 deposited file can be checked byte for byte against the version the paper was
 computed from. From these files alone, without the dataset, a reader can
-recompute every member error of Table~\ref{tab:members} as the mean of
+recompute the first campaign's member errors in Table~\ref{tab:members} as the mean of
 $\|r_m\|/\|y\|$ over samples; the second-moment matrix $S$, the simplex
 weights, the predicted and realized risks and the dispersion factor of
 Proposition~\ref{prop:secmom} (\texttt{campaign/secmom\_seeded5.py} does
 nothing else with the arrays than form $r_m/\|y\|$ on the validation split
-and evaluate $\|\sum_m w_m r_m\|/\|y\|$ on test, which is exact because the
-weights sum to one); the pairwise residual correlations and the
+and evaluate $\|\sum_m w_m r_m\|/\|y\|$ on test, using the sum-to-one
+weight identity on the stored residuals); the pairwise residual correlations and the
 equicorrelated floor; the equal-weight and fitted ensembles, the spatial error
 maps and the hard-sample comparison of Section~\ref{sec:diversity}; and the
 raw conformal scores $\|r\|$ of the pipeline, calibrated on the same
-seed-drawn subset of the test block. The per-pixel affine refit and the
+seed-drawn subset of the test block. Such recomputation uses the rounded
+residuals; it is not a bitwise reproduction of the full-precision analysis.
+The per-pixel affine refit and the
 kernel correction need the predictions themselves, $f_m=y+r_m$, and the
 kernel's posterior scale needs the Gram matrix; both follow from the
 distributed dataset and the released code. The network checkpoints, the
-training-split predictions and the OCO-2 and ClimSim arrays remain with the
-runs, as stated where they arise.
+training-split predictions, second-campaign member arrays, and OCO-2 and
+ClimSim arrays remain with their respective runs. The five-member archive
+does not contain the second campaign's completed FNO or added UNet.
 
 \paragraph{Compute record.} The campaign recorded wall clock but not memory,
 and Table~\ref{tab:compute} reports what it recorded; nothing in it is a new
@@ -329,22 +339,24 @@ Kernel ridge, grid and refit & --- & 17.0--26.0 min & 6.1--7.4 min \\
 \paragraph{What the members cost.} Table~\ref{tab:memcost} is the second
 campaign's cost record at all ten seeds, every member trained to the end of
 its schedule on one host. Thread counts differ across members because the
-host was shared with the rest of the campaign, so the comparable unit is
-core-minutes, wall clock times threads. At about $7900$ core-minutes against
-$54$ for the MSE MLP, the FNO costs roughly $150$ times the cheapest neural
-member and returns $0.03$ points of relative test error for it; the UNet
-costs about $115$ times as much and is beaten by the MSE MLP and the refiner.
-That ratio is not a capacity effect: at 6.45M parameters the FNO is 1.3 times
-the size of the MLP and smaller than the 6.64M-parameter refiner, and the
-UNet is the smallest member of the six at 4.38M. What separates them is the
-cost of a spectral or spatial convolution over a $41\times41$ field against
-that of a dense layer.
+host was shared with the rest of the campaign. We report thread-minutes,
+elapsed wall time multiplied by the configured thread count. This records
+allocated parallelism, not measured CPU utilization, and remains sensitive
+to contention on the shared host. The FNO uses about $7900$ thread-minutes
+against $54$ for the MSE MLP while improving single-member error by about
+$0.03$ percentage points. The UNet uses about $115$ times the MSE MLP's
+thread-minutes and has higher single-member error, although it improves the
+ensemble. Parameter counts alone do not explain these differences: the FNO
+has 6.45M parameters, the refiner 6.64M, and the UNet 4.38M. Convolution over
+the full field and dense prediction from the load vector have different
+computational costs; the table measures their implementations at the stated
+schedules, rather than intrinsic costs of the architecture families.
 
 \begin{table}[t]
 \centering
 \caption{Cost record of the second campaign on a shared 40-core CPU host,
 every member trained to the end of its schedule; ranges over the ten seeds.
-Wall minutes are the trainer's own elapsed record; core-minutes is wall clock
+Wall minutes are the trainer's own elapsed record; thread-minutes is wall clock
 times the thread count (10 for the convolutional members, 10 to 16 for the
 MLPs, which is why those ranges are wide); the kernel stage does not write a
 thread count. Test errors are reflection-averaged where the member has a
@@ -357,7 +369,7 @@ reflection, as in Table~\ref{tab:members}. The harvest is
 \begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{lccccc}
 \toprule
-Member & Parameters & Epochs & Wall (min) & Core-min & Test error (\%) \\
+Member & Parameters & Epochs & Wall (min) & Thread-min & Test error (\%) \\
 \midrule
 Kernel ridge, grid and refit & --- & --- & 5.8--10.0 & --- & 5.193--5.200 \\
 Metric-loss MLP & 4.91M & 400 & 8.8--19.2 & 132--192 & 4.809--4.858 \\

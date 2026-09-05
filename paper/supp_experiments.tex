@@ -134,27 +134,27 @@ marked.}
 \subsection{Cost and reproducibility}
 \label{sec:cost}
 The pipeline was built on a single laptop and replicated on four cloud CPU
-instances. The kernel stages are exact: one Cholesky factorization of the
-$19000\times19000$ Mat\'ern Gram matrix in double precision takes $24$ seconds
-on the laptop's CPU ($16$ threads, OpenBLAS; the matrix itself is $2.9$\,GB),
-and between $18$ and $32$ seconds on the campaign instances, on which it ran
-ten times, once per seed. Prediction is two matrix products; there are no
-inducing points, stochastic solvers, or preconditioners, and no GPU is needed
-for the correction. The factorization performs the full
-$n^3/3\approx2.3\times10^{12}$ floating-point operations --- numerical low rank
-does not reduce the work of a dense Cholesky --- and the measured rate, about
-$100$ gigaflops per second, is simply what a current multicore CPU delivers;
-exactness at this $n$ costs half a minute, not a cluster. What the low effective
-dimension of Section~\ref{sec:spectra} buys is statistical rather than
-computational: it describes where the solve's information concentrates at the
-working nugget, not its flop count.
+instances. The kernel stages use dense, exact linear solves. At the campaign's
+shapes, an eight-thread timing diagnostic measured $\costGramS$ seconds to
+build a $19000\times19000$ Gram matrix in blocks, $\costCholS$ seconds for its
+Cholesky factorization, and $\costSolveS$ seconds to solve for 1681 output
+coordinates. The roughly one-minute total excludes hyperparameter search,
+network training and prediction. Values in this timing experiment are
+synthetic; the dimensions and operations match the campaign. The factorization
+performs $n^3/3\approx2.3\times10^{12}$ floating-point operations. Low effective
+dimension describes the regularized spectrum but does not reduce this dense
+factorization's arithmetic cost. No GPU, inducing points, preconditioner or
+stochastic linear solver is used in the correction.
 
 Building the Gram matrix, not factoring it, is the stage that needs care at
 this size: forming it through a full squared-distance matrix and its
 elementwise transforms allocates several $2.9$\,GB temporaries at once, which
-exhausted a $31$\,GB instance during the campaign. Filling it in row blocks into
-a single preallocated array holds the peak at the matrix itself and is what the
-released code does. The neural means have a few million parameters and include both metric-loss
+exhausted a $31$\,GB instance during the campaign. The block-filled timing
+diagnostic has a measured peak of $\costPeakBlockGb$\,GiB, including the
+factorization and solves, compared with $\costPeakNaiveGb$\,GiB after the
+full-matrix construction. This is a demonstrated implementation option:
+the main correction driver still forms full-size temporaries and needs
+the corresponding memory. The neural means have a few million parameters and include both metric-loss
 and normalized-MSE training. Splits are specified by permutation seeds and
 inputs are the 41-dimensional loads described in Section~\ref{sec:benchmark}.
 The recorded fitting stages use validation-based choices, but this paper is a
@@ -199,7 +199,7 @@ observed here.
 
 Three bands are calibrated on $1000$ cases selected from the test block and
 scored on the other $19000$: the scores are $\|e\|_2/P_\lambda$, $\|e\|_2$
-(constant width), and $\|e\|_2$ divided by ensemble disagreement. Each seed's
+(constant radius), and $\|e\|_2$ divided by ensemble disagreement. Each seed's
 $P_\lambda$ uses its own selected correction kernel and training design.
 These cases are disjoint for this calibration exercise. Disjointness alone
 does not establish exchangeability or undo earlier inspection of the test
@@ -221,7 +221,7 @@ $[88.0\%,91.8\%]$. The analogous $95\%$ interval is $[93.5\%,96.3\%]$.
 All ten recorded six-member coverages fall inside these intervals at each
 level. This comparison does not verify the reference model's assumptions.
 
-The constant-width band covers $\uqRawSix\pm\uqRawSixSd\%$ and
+The constant-radius band covers $\uqRawSix\pm\uqRawSixSd\%$ and
 $\uqRawSixHi\pm\uqRawSixHiSd\%$, inside the reference intervals at ten of
 ten seeds at both levels; the $P_\lambda$ band is on average
 \uqWidthRatio{} times as wide. The disagreement-scaled band covers
@@ -230,12 +230,12 @@ one seed on the upper edge of the $95\%$ reference interval. The five-member
 pipeline gives $\uqPlamFive\pm\uqPlamFiveSd\%$ and
 $\uqPlamFiveHi\pm\uqPlamFiveHiSd\%$ for the $P_\lambda$ band (ten and nine
 seeds inside), and $\uqRawFive\pm\uqRawFiveSd\%$ and
-$\uqRawFiveHi\pm\uqRawFiveHiSd\%$ for the constant-width band (ten inside
+$\uqRawFiveHi\pm\uqRawFiveHiSd\%$ for the constant-radius band (ten inside
 at both levels). The records are
 \texttt{collected/dgx/uq\_plam\_seeded.json} and the \texttt{uq} field of
 each seed's pipeline record, produced by
 \texttt{campaign/uq\_conformal\_plam.py} and
-\texttt{campaign/conformal\_seeded.py}. Here the constant-width band is
+\texttt{campaign/conformal\_seeded.py}. Here the constant-radius band is
 narrower, and the kernel design factor provides no measured efficiency gain.
 
 \begin{table}[t]
@@ -250,8 +250,7 @@ the energy of the fitted label array. The residual labels mix foldwise
 kernel predictions and in-sample neural predictions, so these numbers are
 not identified as lower bounds for the native-space norm of the deployed
 residual. The ratios depend on the nugget and the scale
-the correction selected (an earlier draft quoted $271$ at a different
-nugget), and most of the raw ratio is amplitude: per unit energy the
+the correction selected, and most of the raw ratio is amplitude: per unit energy the
 residual's fitted norm is \normRatioNorm{} times smaller at this seed, not
 \normRatio{}; at seeds $1$ and $2$, whose corrections chose scale
 multipliers $1$ and $2$, the raw ratios are \normRatioLo{} and $4300$ and the
@@ -289,7 +288,7 @@ so coverage varies strongly with the design factor despite an overall
 value close to the nominal level. Across the ten seeds the same band
 records $\uqPlamSix\pm\uqPlamSixSd\%$ at the nominal \uqCoverNom\% level,
 inside the i.i.d.-continuous Beta--binomial reference interval at ten
-seeds of ten; the constant-width band
+seeds of ten; the constant-radius band
 is the narrower of the two (Section~\ref{sec:uq}).}
 \label{fig:uq}
 \end{figure}
@@ -303,7 +302,7 @@ block): mean relative test error of the normalized-MSE network, mean and
 standard deviation over ten seeds, and of the deterministic Mat\'ern kernel
 ridge on loads, against the number of training samples, both axes
 logarithmic. The horizontal lines mark the six-member pipeline at $19000$
-samples and the best published result. Error bars are smaller than the
+samples and the quoted PARA-Net result. Error bars are smaller than the
 markers above $4000$.}
 \label{fig:scaling}
 \end{figure}

@@ -173,7 +173,8 @@ their three feature-kernel heads. It takes each reduced
 coordinate from the model with the smallest validation root-mean-square
 error on that coordinate; the campaign script also runs a selector
 weighted by the inverse squared norm of each validation state, the exact
-optimizer of the squared relative error that Proposition~S2.2 covers, and
+optimizer over the coordinatewise candidate choices of the empirical
+squared relative error described by Corollary~\ref{cor:percoordw}, and
 it chooses different winners at three seeds on O2 and four on WCO2 yet
 changes each band's mean reduced error by less than $0.001$ percentage
 points, with unchanged radiance means at the reported precision (both

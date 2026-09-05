@@ -6,37 +6,36 @@ sampling noise in the usual sense, coming from a deterministic solver, though
 Section~\ref{sec:diversity} discusses solver error. Assume $\|G(u)\|_2>0$ almost surely and that all displayed expectations are finite. We write
 $\ell(w,v)=\|w-v\|_2/\|v\|_2$ for the relative error and
 $R(\widehat G)=\mathbb E_{u\sim\mu}\,\ell(\widehat G(u),G(u))$ for the risk, which is
-the quantity reported in Section~\ref{sec:experiments}. The results below are
-largely elementary, but each one motivates a specific design decision in the
-pipeline of Section~\ref{sec:method}, and each has a measurable footprint in
-the experiments: one statement per stage, from the symmetry handling and the
-kernel-flow term through stacking, the residual correction, its coverage
-guarantee, and the choice of nugget. Proofs are collected in
+the quantity reported in Section~\ref{sec:experiments}. The results below connect
+residual alignment to the scope for averaging, and kernel corrections to
+conditional error bounds. Most are standard identities or direct extensions
+of classical results; their role is to interpret the measurements in this
+study. Proofs are collected in
 Supplement~\ref{app:proofs}.
 
 \subsection{Guarantees for the fitted stages}
 \label{sec:theory-stages-summary}
 
-Every fitted stage of the pipeline has an elementary finite-sample
-bound, stated and proved in the online supplement (Section~S1). Their
-status should be read exactly: they are conditional capacity calculations
-for candidates fixed before the validation sample is drawn, and the
-pipeline as deployed does not satisfy that hypothesis, because the same
-validation split that scores the stacks and the kernel grids also selects
-the network checkpoints, the member set and, on OCO-2, the coordinate
-winners. We therefore present them as the scaling behind each design
-decision, with constants measured on the runs, and not as guarantees for
-the shipped estimator; as Section~S1 notes, several are numerically vacuous
-at the campaign's sizes in any case. Split-conformal coverage has a different independence requirement: the predictor and scale must be fixed independently of the calibration and evaluation data. The retrospective experiment is interpreted under that requirement, not as protection against unrestricted reuse of its public test block. The bounds are: a symmetrization inequality behind the reflection
-averaging (Proposition~\ref{prop:sym}), the leave-half-out reading of
-the kernel-flow regularizer (Proposition~\ref{prop:kf}), capacity
-bounds for the validated stack, the honesty comparison, the
-per-coordinate affine stack, and the grid-tuned correction
-(Propositions~\ref{prop:stack} and~\ref{prop:affine},
-Lemma~\ref{lem:select}, Corollary~\ref{cor:certificate}), the last
-with an analytic uniform bound on the correction weights
-(Lemma~\ref{lem:kappa}, $\kappa_{\mathrm{an}}=500$, sharp over kernels and
-designs). The statistical capacity bounds are reported for their scaling. Theorems~\ref{thm:or} and~\ref{thm:minimax} give deterministic conditional bounds, whose unknown norm factors prevent numerical error certification.
+Section~S1 states finite-sample bounds for reflection averaging
+(Proposition~\ref{prop:sym}), the kernel-flow regularizer
+(Proposition~\ref{prop:kf}), and the stack, affine readout, and kernel
+selection stages (Propositions~\ref{prop:stack} and~\ref{prop:affine},
+Lemma~\ref{lem:select}, and Corollary~\ref{cor:certificate}). The statistical
+selection bounds require candidates fixed before an independent validation
+sample is drawn. The deployed pipeline reuses validation for checkpoint,
+member, and kernel selection, so those bounds do not certify its risk.
+They describe the dependence on class size, sample size, and correction
+weights; several are numerically vacuous at our sample sizes.
+Lemma~\ref{lem:kappa} gives the uniform correction-weight bound
+$\kappa_{\mathrm{an}}=500$ for the stated kernel normalization and nugget.
+Theorems~\ref{thm:or} and~\ref{thm:minimax} are deterministic conditional
+bounds, whose unknown native-space norms prevent numerical certification.
+
+Split-conformal coverage has a separate requirement: the predictor and
+scale must be fixed independently of exchangeable calibration and
+evaluation observations. Splitting a repeatedly inspected public benchmark
+does not by itself establish that independence.
+
 \subsection{What the stack can achieve}
 \label{sec:theory-secmom}
 
@@ -100,21 +99,19 @@ consequences are used in this paper. The floor belongs in $\mathcal E_2$,
 because only $\mathcal E_2$ is determined by $S$: the map
 $w\mapsto w^\top Sw$ is a quadratic form in second moments, whereas
 $w\mapsto\mathbb E\|\sum_m w_m\rho_{f_m}(u)\|_2$ depends on the full joint law
-of the residuals. And upper bounds transfer downward for free, since
+of the residuals. Upper bounds transfer downward, since
 $\mathcal E_1\le\mathcal E_2$, while lower bounds do not --- so a floor read
 off $S$ says nothing about a table entry without the dispersion of the same
-predictor. Comparing the two directly is biased in favour of the table entry
-by $(1+c_f^2)^{-1/2}$, which is about six percent on the structural-mechanics
-stack and ten to eleven percent on the O2 objects of
-Section~\ref{sec:oco2}; the dispersion is a property of the predictor and not
+predictor. For the structural-mechanics stack the mean is about six percent
+below the RMS; for the O2 predictors of Section~\ref{sec:oco2}, the difference
+is ten to eleven percent. The dispersion is a property of the predictor and not
 a constant of the problem, so a single conversion factor should not be reused
 across objects.
 \end{remark}
 
-Part~(i) is an exact criterion, but it is used as a decision rule and a
-decision rule is applied to estimates, so what governs it in practice is
-not the criterion but the gap it has to resolve relative to the noise in
-that estimation. A margin law for threshold rules of this shape
+Applying part~(i) requires estimating the errors and their correlation.
+The reliability of that decision depends on its distance from the threshold
+relative to the estimation error. A margin law for threshold rules of this shape
 (Proposition~\ref{prop:margin}, Supplement~\ref{supp:rules}) bounds the
 probability that a decision is both wrong and taken at an observed margin
 of at least $\tau$ by $\exp(-\tau^{2}/2\sigma^{2})$, with $\sigma$ the
@@ -125,9 +122,8 @@ $\mathbb P(|\widehat D|\ge\tau)$, on which the proposition says nothing.
 Accuracy inside a margin bin is therefore an empirical calibration of the
 rule, and Section~\ref{sec:secmom-margin} reports it that way.
 
-Exact equicorrelation never holds in practice, but for convex weights the
-floor survives one-sided bounds on the entries of $S$, which are what one
-actually measures.
+The equicorrelated model is restrictive. A lower bound for convex weights
+needs only one-sided bounds on the entries of $S$.
 
 \begin{corollary}[ensembling floor]\label{cor:floor}
 If every member satisfies $S_{mm}\ge\bar e^{\,2}$ and every pair satisfies
@@ -145,9 +141,8 @@ $\bar e\sqrt{\bar\varrho}$.
 \noindent\emph{Proof.} See Supplement~\ref{proof:cor:floor}.
 
 
-The floor is a lower bound; a matching upper bound follows from the same
-entrywise information, and together they pin the achievable window from both
-sides by measured quantities alone.
+Upper bounds on the same entries give an upper bound on the optimum by
+evaluating uniform weights.
 
 \begin{corollary}[the floor is nearly achieved]\label{cor:floorpinch}
 Suppose $\bar e>0$ and, in addition to the hypotheses of Corollary~\ref{cor:floor}, that
@@ -214,9 +209,8 @@ takes it below $\bar e\sqrt{\varrho_b}$.
 
 At fixed $M$, increasing $K$ reduces only the term $(1-\varrho_w)/(MK)$ in the lower bound. The within-architecture contribution $(\varrho_w-\varrho_b)/M$ persists. Section~\ref{sec:seeds-arch} applies the formula empirically to sixty trained predictors; it does not assume the same inequalities for untrained members.
 
-The two-member rule of Proposition~\ref{prop:secmom}(i) can be read the same
-way, as a statement about what a member's accuracy is worth against its
-correlation, and the exchange rate is explicit.
+Differentiating the two-member optimum in Proposition~\ref{prop:secmom}(i)
+quantifies the local trade-off between accuracy and correlation.
 
 \begin{proposition}[the price of accuracy in correlation]\label{prop:exchange}
 In the setting of Proposition~\ref{prop:secmom}(i) write $t=e_2/e_1$ and
@@ -246,11 +240,10 @@ For coordinate-dependent combinations, squared losses with a fixed diagonal metr
 \subsection{Metric and representation: when a fixed kernel loses to a network}
 \label{sec:theory-aniso}
 
-The structural-mechanics benchmark has the neural mean and the isotropic
-kernel within half a point of each other. On the OCO-2 emulation problem of
-Section~\ref{sec:oco2} the same fixed kernel is an order of magnitude behind
-the same network. Two mechanisms can produce such a gap, and they separate
-cleanly.
+On structural mechanics, the neural mean and the isotropic kernel differ by
+less than half a percentage point. On the O2 band, raw-input kernel error is
+roughly nine times the network's error. We examine input scaling and learned
+features as two possible explanations for this difference.
 
 The first is input geometry. A sensitivity-based linear transformation improves the raw-input kernel by a factor of about $1.1$--$1.5$ in this study. The learning-curve sweep does not establish a general rate improvement. Proposition~\ref{prop:aniso} in Supplement~\ref{supp:rules} gives a finite-design bound for a Lipschitz target after a rank-$r$ truncation, with its approximation error explicit; its proof is in Supplement~\ref{app:proofs}. It makes no assertion that a measured approximate rank changes an asymptotic rate.
 
@@ -270,15 +263,14 @@ function is smaller at the median scale, its median $\alignRatioP$ times
 below the raw kernel's, and equal to it ($\alignRatioPSel$) at the
 multiplier $4$ that the campaign selected for every feature head. The
 fitted-norm diagnostic moves far more: regressing the same outputs through
-the two kernels, the squared native-space norm of the fitted interpolant,
+the two kernels, the squared native-space norm of the kernel fit,
 $\operatorname{tr}(\alpha^\top K\alpha)$, is $\alignRatioNorm$ times
 smaller on the features than on the raw input at the median scale
 ($\alignRatioFull$ times on the full $18000$-row block) and
 $\alignRatioSel$ times smaller at the selected multiplier ($\alignRatioFullSel$ times on the
-full block). (An earlier
-draft quoted $42$ from $\alpha^\top Y$, which adds the term
-$n\lambda\|\alpha\|^2$; at this nugget the two agree to three digits, and
-the network retrained for the check lands at $38$.) Both numbers are
+full block). We use $\operatorname{tr}(\alpha^\top K\alpha)$ rather than
+$\operatorname{tr}(\alpha^\top Y)$, which also includes
+$n\lambda\|\alpha\|_F^2$. These ratios are
 finite-design diagnostics of the interpolating regime: for a target in the corresponding RKHS with compatible labels, the fitted norm is a lower bound on its norm, the ratio grows with the kernel
 scale --- $\alignRatioLo$ at half the median length scale, $\alignRatioHi$
 at twice it --- and at a $10^{-4}$ nugget, where the ridge no longer
@@ -286,7 +278,7 @@ interpolates, it collapses and at the selected multiplier inverts
 ($\alignRatioHeavy$). Both designs are standardized by their training
 moments before the kernel is formed, as the campaign's heads are, and the
 check is at one seed. Read as diagnostics, they say that the learned features hand
-the same kernel a target it interpolates with a much smaller fitted RKHS norm, and a somewhat smaller pointwise design factor at the median scale; they do not identify a causal
+the same kernel a target it fits with a much smaller fitted RKHS norm, and a somewhat smaller pointwise design factor at the median scale; they do not identify a causal
 decomposition into a fixed design factor and a moving norm.
 
 The associated feature-kernel function space has a standard pullback description.
@@ -376,10 +368,10 @@ Indeed, $R_{\rm tr}=(G-m_{\rm full})(X)+\Delta$; substituting this identity and 
 
 The RKHS assumption is also unverified for these targets and the norm is unknown. For labels sampled from one compatible $r\in H_k^q$, ridge contraction gives $\|\widehat r_\lambda\|_K\le\|r\|_K$. With the recorded mixed training labels, the fitted norm need not lower-bound $\|G-m_{\rm full}\|_K$. Table~\ref{tab:norms} therefore describes fitted functions only: its squared-norm ratio is about 4900 before energy normalization and 8.8 after it. Neither ratio proves a corresponding reduction in an unknown residual norm or smoothness. The design factor is a worst-case error factor and need not rank realized errors well; Section~\ref{sec:uq} measures that ranking directly.
 
-The design factor cannot be improved by a better estimator either. Among
-all rules that see the same training residuals, the interpolant is optimal
-in the worst case over the ball, and the price of a positive nugget in that
-worst case is explicit.
+The interpolant also minimizes worst-case error among all rules using the
+same residual observations. The next result states that classical recovery
+property and gives the increase in the worst-case constant caused by ridge
+regularization.
 
 \begin{theorem}[minimax optimality over the native-space ball]\label{thm:minimax}
 Fix a design $X$ with $K$ positive definite, a point $u$ and a radius
@@ -412,20 +404,20 @@ the worst-case constant $\|G-m\|_K\,P_0(u)$ over the native-space ball is
 the smallest any rule can attain from these data, and at the validated
 nugget the gap to it is the displayed correction term, evaluable from the
 Gram matrix alone. The statement is about the worst case over a ball whose
-radius is not known; it is not an operational error bar for the shipped
+radius is not known; it is not an operational error bar for the fitted
 surrogate, which is the split-conformal set of the next subsection.
 
-\subsection{Distribution-free coverage for the reported band}
+\subsection{Coverage of calibrated prediction balls}
 \label{sec:theory-conf}
 Theorem~\ref{thm:or} controls the error by $\|G-m\|_K\,P_\lambda(u)$, but
 the constant $\|G-m\|_K$ is not known a priori and
 Section~\ref{sec:uq} shows that $P_\lambda$ alone ranks the error weakly.
 What the surrogate reports as uncertainty is therefore a rescaling
-$q\,P_\lambda(u)$, whose multiplier is the split-conformal quantile of the
+$Q\,P_\lambda(u)$, whose multiplier is the split-conformal quantile of the
 scores $\|e(\tilde u_i)\|_2/P_\lambda(\tilde u_i)$ on a calibration split of
 the test block, drawn after every selection in the pipeline has been made
 on the validation split; Section~\ref{sec:uq} reports this band beside a
-constant-width band calibrated the same way from the raw scores
+constant-radius band calibrated the same way from the raw scores
 $\|e(\tilde u_i)\|_2$. Coverage does not require the RKHS bound or a useful error ranking. For a predictor and positive scale fixed independently of exchangeable calibration and future inputs, Proposition~\ref{prop:conf} gives marginal coverage at least $1-\alpha$. Its proof is in Supplement~\ref{app:proofs}. The upper bound $1-\alpha+1/(m+1)$ additionally requires almost surely distinct scores. Define the conformal quantile using the $k=\lceil(1-\alpha)(m+1)\rceil$-th order statistic of the $m$ scores augmented by $+\infty$, which also covers $k=m+1$.
 
 If, conditional on the fitted predictor and scale, the calibration and evaluation scores are i.i.d. with a continuous distribution and $k\le m$, the random conditional coverage over calibration draws has law $\mathrm{Beta}(k,m+1-k)$. The number covered among $N$ fresh evaluation cases is Beta--binomial. Remark~\ref{rem:covlaw} states and derives this law in Supplement~\ref{supp:conf}. At $m=1000$ and $N=19000$ its nominal-90\% central reference interval is $[88.0\%,91.8\%]$. A random split alone does not establish continuity or undo study-level adaptation to an already inspected test block. The recorded coverage experiment is compared with this reference law under those conditions; it is not a guarantee conditional on each input or on arbitrary prior test-driven selection.

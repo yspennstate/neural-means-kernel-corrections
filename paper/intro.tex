@@ -7,16 +7,16 @@ Operator learning approximates solution maps of partial differential equations a
 \caption{The two problems studied in depth. OCO-2 rows compare against the
 Gaussian-process emulator of \citet{susiluoto2025radiative}, scored from its
 own stored predictions on the same $2000$ test points, under the two retained-representation rescoring criteria defined here (Section~\ref{sec:oco2}); ours are mean $\pm$ standard
-deviation over ten seeds per band. Structural-mechanics rows quote the best
-published mean relative $L^2$ test error at each training size
+deviation over ten seeds per band. Structural-mechanics rows quote the
+reference mean relative $L^2$ test error at each training size
 \citep{dehoop2022cost,mora2025operator}, reported without uncertainties in
-the original work; ours are mean $\pm$ standard deviation over ten seeds,
+the original work; ours are mean $\pm$ standard deviation over ten seeds.
 The 20000-sample scores are numerically close, but the available results do not establish statistical equivalence (Section~\ref{sec:uncertainty-budget}).}
 \label{tab:twoproblems}
 \begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{llcc}
 \toprule
-Problem & Metric & Source predictions, rescored & This work \\
+Problem & Metric & Reference result & This work \\
 \midrule
 OCO-2, O2 band & reduced & 16.89\% & $4.12\pm0.05\%$ \\
  & radiance & 0.0448\% & $0.0294\pm0.0020\%$ \\
@@ -38,6 +38,6 @@ The structural-mechanics experiments also show why adding predictors yields dimi
 
 On OCO-2, the kernel's useful role changes. On the O2 band, the raw-input Mat\'ern regression has approximately $40\%$ reduced error, the flat-loss network $4.4\%$, and the same kernel on its frozen features $4.1\%$, under a common kernel grid and solve routine. The learned representation makes a substantial difference to the fitted kernel. Finite-design RKHS norms and power functions describe aspects of that difference, while the pullback identity supplies the relevant function-space interpretation; it does not predict a gain over raw inputs. A per-coordinate combination improves on the source emulator's stored predictions in both mean rescoring criteria on all three bands, with the weak-CO$_2$ radiance comparison winning at nine of ten seeds. These criteria concern the retained PCA representation, not full-spectrum instrument-noise acceptance or atmospheric retrieval.
 
-The experiments distinguish several kinds of evidence. Seed replication measures variability within the specified procedures, and paired evaluation measures differences on a common test block. Those public blocks have been examined across successive campaigns, so the comparisons remain retrospective. The theoretical identities describe global convex ensembles exactly; the capacity and RKHS bounds require additional assumptions that need not hold for the fitted pipeline. Split-conformal prediction gives marginal coverage under its independence and exchangeability conditions, while the coverage measurements here assess performance on the repeatedly studied blocks. Among the calibrated sets examined, the constant-width set is narrower on average than the power-function-scaled set.
+The experiments distinguish several kinds of evidence. Seed replication measures variability within the specified procedures, and paired evaluation measures differences on a common test block. Those public blocks have been examined across successive campaigns, so the comparisons remain retrospective. The theoretical identities describe global convex ensembles exactly; the capacity and RKHS bounds require additional assumptions that need not hold for the fitted pipeline. Split-conformal prediction gives marginal coverage under its independence and exchangeability conditions, while the coverage measurements here assess performance on the repeatedly studied blocks. Among the calibrated sets examined, the constant-radius set is narrower on average than the power-function-scaled set.
 
 Section~\ref{sec:benchmark} describes the data and comparison protocols. Section~\ref{sec:method} specifies the implementation, including pooled training-target centering in the foldwise kernel channel and in-sample neural predictions in the correction labels. Sections~\ref{sec:experiments}--\ref{sec:oco2} present the experiments, and Section~\ref{sec:theory} develops the ensemble and kernel bounds, including the correction-label mismatch term. Proofs, implementation details, and additional measurements are provided in the accompanying supplement. Section~\ref{sec:discussion} considers the implications and remaining questions.

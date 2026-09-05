@@ -5,67 +5,166 @@
     {
       "key": "c01_load",
       "title": "A load goes in. A stress field comes out.",
-      "visual": {"kind": "elastic_domain", "label": "Schematic of the benchmark geometry", "source": "paper/benchmark.tex"},
+      "visual": {
+        "kind": "elastic_domain",
+        "label": "Schematic of the benchmark geometry",
+        "source": "paper/benchmark.tex"
+      },
       "visual_argument": "Top-edge arrows represent the input traction; the circular inclusion marks the material interface; the lower boundary is clamped.",
       "segments": [
-        {"line": "A composite with two materials", "math": "D=(0,1)^2", "say": "Imagine pulling on the upper edge of this square. The bottom edge is fixed. Inside the square sits a circular fibre, surrounded by a different material. The load need not be the same everywhere along the upper edge. It can be stronger on the left, weaker on the right, or concentrated near the middle. For each load, an elasticity solver computes the stress throughout the body. The picture is a schematic of the benchmark geometry. The data we will look at next come from the recorded numerical solutions."},
-        {"line": "The input is a function along the upper edge", "math": "u=\\bar t(x_1)", "say": "The input is therefore more than a single force. It is a whole curve along the boundary. Move one part of that curve and the stress changes across the interior. The central fibre also changes how the load is transmitted. Near the interface, the stress can vary sharply because the material law changes. Those spatial features make this a useful test for a learned surrogate: an accurate average stress is not enough. We want the field in the right places."},
-        {"line": "The output is the von Mises stress field", "math": "G:u\\longmapsto\\sigma_v", "say": "The map from the boundary load to the resulting stress field is our target operator, G. A surrogate tries to evaluate this map quickly after learning from examples. We will build it from a neural prediction and a kernel correction. The central question is where the remaining error lives. Is it different from one network to another, so averaging can remove it? Is it a shared error that survives averaging? Or is it a pattern that a kernel can learn from the residuals?"}
+        {
+          "line": "A composite with two materials",
+          "math": "D=(0,1)^2",
+          "say": "Imagine pulling on the upper edge of this square. The bottom edge is fixed. Inside the square sits a circular fibre, surrounded by a different material. The load need not be the same everywhere along the upper edge. It can be stronger on the left, weaker on the right, or concentrated near the middle. For each load, an elasticity solver computes the stress throughout the body. The picture is a schematic of the benchmark geometry. The data we will look at next come from the recorded numerical solutions."
+        },
+        {
+          "line": "The input is a function along the upper edge",
+          "math": "u=\\bar t(x_1)",
+          "say": "The input is therefore more than a single force. It is a whole curve along the boundary. Move one part of that curve and the stress changes across the interior. The central fibre also changes how the load is transmitted. Near the interface, the stress can vary sharply because the material law changes. Those spatial features make this a useful test for a learned surrogate: an accurate average stress is not enough. We want the field in the right places."
+        },
+        {
+          "line": "The output is the von Mises stress field",
+          "math": "G:u\\longmapsto\\sigma_v",
+          "say": "The map from the boundary load to the resulting stress field is our target operator, G. A surrogate tries to evaluate this map quickly after learning from examples. We will build it from a neural prediction and a kernel correction. The central question is where the remaining error lives. Is it different from one network to another, so averaging can remove it? Is it a shared error that survives averaging? Or is it a pattern that a kernel can learn from the residuals?"
+        }
       ]
     },
     {
       "key": "c01_data",
       "title": "Look at the object being predicted",
-      "visual": {"kind": "field_pair", "case": "median", "label": "Recorded structural-mechanics case; historical seed 0", "source": "assets/mechanics_examples.npz"},
+      "visual": {
+        "kind": "field_pair",
+        "case": "median",
+        "label": "Recorded structural-mechanics case; historical seed 0",
+        "source": "assets/mechanics_examples.npz"
+      },
       "visual_argument": "The load curve is paired with its recorded stress grid; identical spatial coordinates are maintained across the reference and prediction.",
       "segments": [
-        {"line": "41 load values describe the boundary input", "math": "u\\in\\mathbb R^{41}", "say": "Here is one actual input from the benchmark, together with its stress field. The boundary load is sampled at forty-one locations. The output is a forty-one by forty-one grid, so it has sixteen hundred and eighty-one entries. These dimensions describe the stored arrays. They do not say that the physics has only forty-one degrees of freedom, or that the numerical solver used this same regular grid internally. The solver output was transferred onto this grid before the learning problem was distributed."},
-        {"line": "The image contains 1,681 output values", "math": "G(u)\\in\\mathbb R^{1681}", "say": "Read the colour bar as part of the picture. A bright region means a larger value of the stored stress quantity, not greater confidence in the prediction. When we compare a reference field with a predicted field, they must share a colour scale. Otherwise two different fields can look deceptively similar. The error image will use its own clearly labelled scale, because the differences are much smaller than the fields themselves."},
-        {"line": "The surrogate learns the recorded numerical map", "math": "(u_i,v_i),\\qquad v_i=G(u_i)", "say": "For this study, G means the map represented by the numerical dataset. Its values already include the effects of the finite element solver and the transfer onto the regular grid. A discrepancy between the surrogate and these values is a surrogate error on the benchmark. It is not, by itself, an error against an unknown exact continuum solution. Keeping that distinction in view will help later when we ask why several quite different predictors can make similar mistakes."}
+        {
+          "line": "41 load values describe the boundary input",
+          "math": "u\\in\\mathbb R^{41}",
+          "say": "Here is one actual input from the benchmark, together with its stress field. The boundary load is sampled at forty-one locations. The output is a forty-one by forty-one grid, so it has sixteen hundred and eighty-one entries. These dimensions describe the stored arrays. They do not say that the physics has only forty-one degrees of freedom, or that the numerical solver used this same regular grid internally. The solver output was transferred onto this grid before the learning problem was distributed."
+        },
+        {
+          "line": "The image contains 1,681 output values",
+          "math": "G(u)\\in\\mathbb R^{1681}",
+          "say": "Read the colour bar as part of the picture. A bright region means a larger value of the stored stress quantity, not greater confidence in the prediction. When we compare a reference field with a predicted field, they must share a colour scale. Otherwise two different fields can look deceptively similar. The error image will use its own clearly labelled scale, because the differences are much smaller than the fields themselves."
+        },
+        {
+          "line": "The surrogate learns the recorded numerical map",
+          "math": "(u_i,v_i),\\qquad v_i=G(u_i)",
+          "say": "For this study, G means the map represented by the numerical dataset. Its values already include the effects of the finite element solver and the transfer onto the regular grid. A discrepancy between the surrogate and these values is a surrogate error on the benchmark. It is not, by itself, an error against an unknown exact continuum solution. Keeping that distinction in view will help later when we ask why several quite different predictors can make similar mistakes."
+        }
       ]
     },
     {
       "key": "c01_error",
       "title": "A good-looking image can still be wrong",
-      "visual": {"kind": "field_error", "case": "median", "label": "Reference, prediction and absolute error; historical seed 0", "source": "assets/mechanics_examples.npz"},
+      "visual": {
+        "kind": "field_error",
+        "case": "median",
+        "label": "Reference, prediction and absolute error; historical seed 0",
+        "source": "assets/mechanics_examples.npz"
+      },
       "visual_argument": "Aligned reference and prediction fields are followed by the absolute residual on a separately labelled scale.",
       "segments": [
-        {"line": "Compare the fields point by point", "math": "e(u)=\\widehat G(u)-G(u)", "say": "Place the prediction beside the reference. At first glance they may look almost identical. Subtract them, however, and a spatial pattern appears. The residual is a vector with one entry for each output location. Some errors may be spread across the body; others may be concentrated around the interface. The magnitude of the residual gives an overall score, while its direction tells us something different: which spatial pattern the model gets wrong."},
-        {"line": "Normalize by the size of this reference field", "math": "\\ell(\\widehat G(u),G(u))=\\frac{\\|\\widehat G(u)-G(u)\\|_2}{\\|G(u)\\|_2}", "say": "The paper divides the Euclidean norm of the error by the Euclidean norm of the reference field for the same case. This gives a relative error. The denominator matters. Without it, cases with larger stress values would tend to contribute more simply because their outputs are larger. The norm here is the unweighted norm of the grid vector. Some published comparisons use trapezoidal weights, so a close pair of published percentages should not be interpreted as an exact tie to every decimal place."},
-        {"line": "Keep the spatial pattern as well as the score", "math": "\\rho_f(u)=\\frac{f(u)-G(u)}{\\|G(u)\\|_2}", "say": "We will call this normalized residual rho sub f. Its length is the relative error. Its inner product with another model's normalized residual measures their alignment. Two models can have different architectures and still point in almost the same error direction. If that happens, averaging them makes very little progress. This is why the error image belongs next to the numerical score: the score gives a length, while the image suggests the direction behind that length."}
+        {
+          "line": "Compare the fields point by point",
+          "math": "e(u)=\\widehat G(u)-G(u)",
+          "say": "Place the prediction beside the reference. At first glance they may look almost identical. Subtract them, however, and a spatial pattern appears. The residual is a vector with one entry for each output location. Some errors may be spread across the body; others may be concentrated around the interface. The magnitude of the residual gives an overall score, while its direction tells us something different: which spatial pattern the model gets wrong."
+        },
+        {
+          "line": "Normalize by the size of this reference field",
+          "math": "\\ell(\\widehat G(u),G(u))=\\frac{\\|\\widehat G(u)-G(u)\\|_2}{\\|G(u)\\|_2}",
+          "say": "The paper divides the Euclidean norm of the error by the Euclidean norm of the reference field for the same case. This gives a relative error. The denominator matters. Without it, cases with larger stress values would tend to contribute more simply because their outputs are larger. The norm here is the unweighted norm of the grid vector. Some published comparisons use trapezoidal weights, so a close pair of published percentages should not be interpreted as an exact tie to every decimal place."
+        },
+        {
+          "line": "Keep the spatial pattern as well as the score",
+          "math": "\\rho_f(u)=\\frac{f(u)-G(u)}{\\|G(u)\\|_2}",
+          "say": "We will call this normalized residual rho sub f. Its length is the relative error. Its inner product with another model's normalized residual measures their alignment. Two models can have different architectures and still point in almost the same error direction. If that happens, averaging them makes very little progress. This is why the error image belongs next to the numerical score: the score gives a length, while the image suggests the direction behind that length."
+        }
       ]
     },
     {
       "key": "c01_difficult",
       "title": "The difficult cases matter too",
-      "visual": {"kind": "field_error", "case": "p98", "label": "Recorded case near the 98th percentile of seed-0 relative error", "source": "assets/mechanics_examples.npz"},
+      "visual": {
+        "kind": "field_error",
+        "case": "p98",
+        "label": "Recorded case near the 98th percentile of seed-0 relative error",
+        "source": "assets/mechanics_examples.npz"
+      },
       "visual_argument": "A disclosed error-quantile case is shown with the same comparison layout; it is not presented as a typical case.",
       "segments": [
-        {"line": "This case was selected by its error rank", "math": "\\text{Selection: near the 98th error percentile}", "say": "Now look at a more difficult case. We selected it near the ninety-eighth percentile of the historical seed-zero model's error distribution. That selection is deliberate and disclosed. It is not a typical test case, and it is not an independent test of a new hypothesis. It shows a part of the distribution that an average can hide. Compare the load shape, the reference stress, and the residual pattern with the previous example."},
-        {"line": "A mean does not describe the tail", "math": "\\text{Case errors}\\longrightarrow\\text{an error distribution}", "say": "A model's performance is a distribution over inputs. A reported mean compresses that distribution into one number. It cannot tell us where the largest errors occur, whether two models fail on the same cases, or whether an uncertainty score identifies those cases. We will return to all three questions. The pictures are useful here because they keep the statistical summary attached to a concrete physical prediction."},
-        {"line": "Use hard cases to understand, not to change the test", "math": "\\text{Inspection}\\ne\\text{fresh evaluation}", "say": "Once we have inspected these test cases, we have learned something from them. That is useful for understanding the benchmark, but it changes what we can claim about future model development on the same test block. The paper describes its comparisons as retrospective. We can still report exactly what happened on the recorded cases. We cannot pretend that repeated inspection leaves us with an untouched final test. The same issue will appear again when we discuss conformal coverage."}
+        {
+          "line": "This case was selected by its error rank",
+          "math": "\\text{Selection: near the 98th error percentile}",
+          "say": "Now look at a more difficult case. We selected it near the ninety-eighth percentile of the historical seed-zero model's error distribution. That selection is deliberate and disclosed. It is not a typical test case, and it is not an independent test of a new hypothesis. It shows a part of the distribution that an average can hide. Compare the load shape, the reference stress, and the residual pattern with the previous example."
+        },
+        {
+          "line": "A mean does not describe the tail",
+          "math": "\\text{Case errors}\\longrightarrow\\text{an error distribution}",
+          "say": "A model's performance is a distribution over inputs. A reported mean compresses that distribution into one number. It cannot tell us where the largest errors occur, whether two models fail on the same cases, or whether an uncertainty score identifies those cases. We will return to all three questions. The pictures are useful here because they keep the statistical summary attached to a concrete physical prediction. The stored reference field even contains a small negative value. We preserve these numerical labels; an exact von Mises stress is nonnegative."
+        },
+        {
+          "line": "Use hard cases to understand, not to change the test",
+          "math": "\\text{Inspection}\\ne\\text{fresh evaluation}",
+          "say": "Once we have inspected these test cases, we have learned something from them. That is useful for understanding the benchmark, but it changes what we can claim about future model development on the same test block. The paper describes its comparisons as retrospective. We can still report exactly what happened on the recorded cases. We cannot pretend that repeated inspection leaves us with an untouched final test. The same issue will appear again when we discuss conformal coverage."
+        }
       ]
     },
     {
       "key": "c01_split",
       "title": "Which examples can influence which choices?",
-      "visual": {"kind": "data_split", "label": "High-data mechanics protocol", "source": "common.py:canonical_split; paper/benchmark.tex"},
+      "visual": {
+        "kind": "data_split",
+        "label": "High-data mechanics protocol",
+        "source": "common.py:canonical_split; paper/benchmark.tex"
+      },
       "visual_argument": "A 40,000-case strip is divided into the 20,000-case development pool and 20,000-case test block; the development pool divides into 19,000 training and 1,000 validation cases.",
       "segments": [
-        {"line": "40,000 recorded input-output pairs", "math": "20{,}000\\text{ development}+20{,}000\\text{ test}", "say": "The benchmark contains forty thousand pairs. The first twenty thousand form the available development pool. The last twenty thousand form the public test block. Within the development pool, a fixed seeded permutation assigns one thousand examples to validation and nineteen thousand to training. Different campaign seeds change this internal split and the stochastic training, while the public test block stays the same."},
-        {"line": "Validation influences several fitted stages", "math": "19{,}000\\text{ training}+1{,}000\\text{ validation}", "say": "Validation is used for several decisions: choosing checkpoints, fitting the stack, and selecting kernel settings. Those uses make the pipeline practical, but they also limit which textbook validation bounds apply directly. A theorem that assumes a family fixed before an independent validation sample is drawn cannot automatically certify a pipeline that has adapted the family using that same sample. We will state those assumptions when they are needed."},
-        {"line": "Repeated seeds share the public test cases", "math": "\\text{Ten runs}\\ne\\text{ten independent test datasets}", "say": "Repeating training at ten seeds tells us how sensitive the procedure is to those training and split choices. It does not create ten independent collections of test inputs. When we report a mean and standard deviation over seeds, the standard deviation describes variation across those runs. For a change to the implementation, a paired comparison is especially useful: run both versions at the same seed, on the same examples, and examine the difference directly."}
+        {
+          "line": "40,000 recorded input-output pairs",
+          "math": "20{,}000\\text{ development}+20{,}000\\text{ test}",
+          "say": "The benchmark contains forty thousand pairs. The first twenty thousand form the available development pool. The last twenty thousand form the public test block. Within the development pool, a fixed seeded permutation assigns one thousand examples to validation and nineteen thousand to training. Different campaign seeds change this internal split and the stochastic training, while the public test block stays the same."
+        },
+        {
+          "line": "Validation influences several fitted stages",
+          "math": "19{,}000\\text{ training}+1{,}000\\text{ validation}",
+          "say": "Validation is used for several decisions: choosing checkpoints, fitting the stack, and selecting kernel settings. Those uses make the pipeline practical, but they also limit which textbook validation bounds apply directly. A theorem that assumes a family fixed before an independent validation sample is drawn cannot automatically certify a pipeline that has adapted the family using that same sample. We will state those assumptions when they are needed."
+        },
+        {
+          "line": "Repeated seeds share the public test cases",
+          "math": "\\text{Ten runs}\\ne\\text{ten independent test datasets}",
+          "say": "Repeating training at ten seeds tells us how sensitive the procedure is to those training and split choices. It does not create ten independent collections of test inputs. When we report a mean and standard deviation over seeds, the standard deviation describes variation across those runs. For a change to the implementation, a paired comparison is especially useful: run both versions at the same seed, on the same examples, and examine the difference directly."
+        }
       ]
     },
     {
       "key": "c01_two_roles",
       "title": "Two ways a kernel can help a network",
-      "visual": {"kind": "two_kernel_roles", "label": "Method diagram", "source": "paper/method.tex; paper/oco2.tex"},
+      "visual": {
+        "kind": "two_kernel_roles",
+        "label": "Method diagram",
+        "source": "paper/method.tex; paper/oco2.tex"
+      },
       "visual_argument": "One branch fits output residuals after a neural mean; the other builds a kernel on a frozen learned feature representation.",
       "segments": [
-        {"line": "Role one: fit what the neural mean leaves behind", "math": "\\widehat G(u)=m(u)+\\widehat r(u)", "say": "The first role is residual correction. Train a neural mean, compare that mean with the available outputs, and fit a kernel to what remains. At a new input, add the predicted residual to the neural mean. The kernel is not asked to learn the whole field from zero. It is asked to learn a smaller, and perhaps more regular, remainder. The word perhaps is essential: a smaller training residual does not prove that the unknown residual function has a smaller kernel norm."},
-        {"line": "Role two: use learned coordinates for similarity", "math": "k_\\phi(u,u')=k\\big(\\phi(u),\\phi(u')\\big)", "say": "The second role is a feature readout. A neural network maps an input into a learned representation, phi. We freeze that representation and place the kernel on those features. Two inputs are then judged similar in the coordinates learned by the network, rather than in the original raw coordinates. On the OCO-2 benchmark, this change of geometry is much more consequential than merely tuning an isotropic kernel on the raw input."},
-        {"line": "Residuals and features answer different questions", "math": "\\text{What remains?}\\qquad\\text{Which inputs are close?}", "say": "Keep these two pictures separate. Residual correction changes the function that the kernel must fit. A learned feature map changes the geometry in which it fits that function. Both can matter, and neither guarantees an improvement by itself. Our mathematical bounds will expose two factors: the size of a function in the chosen kernel space, and a geometric factor determined by the design. The experiments show which changes help on these particular datasets."}
+        {
+          "line": "Role one: fit what the neural mean leaves behind",
+          "math": "\\widehat G(u)=m(u)+\\widehat r(u)",
+          "say": "The first role is residual correction. Train a neural mean, compare that mean with the available outputs, and fit a kernel to what remains. At a new input, add the predicted residual to the neural mean. The kernel is not asked to learn the whole field from zero. It is asked to learn a smaller, and perhaps more regular, remainder. The word perhaps is essential: a smaller training residual does not prove that the unknown residual function has a smaller kernel norm."
+        },
+        {
+          "line": "Role two: use learned coordinates for similarity",
+          "math": "k_\\phi(u,u')=k\\big(\\phi(u),\\phi(u')\\big)",
+          "say": "The second role is a feature readout. A neural network maps an input into a learned representation, phi. We freeze that representation and place the kernel on those features. Two inputs are then judged similar in the coordinates learned by the network, rather than in the original raw coordinates. On the OCO-2 benchmark, this change of geometry is much more consequential than merely tuning an isotropic kernel on the raw input."
+        },
+        {
+          "line": "Residuals and features answer different questions",
+          "math": "\\text{What remains?}\\qquad\\text{Which inputs are close?}",
+          "say": "Keep these two pictures separate. Residual correction changes the function that the kernel must fit. A learned feature map changes the geometry in which it fits that function. Both can matter, and neither guarantees an improvement by itself. Our mathematical bounds will expose two factors: the size of a function in the chosen kernel space, and a geometric factor determined by the design. The experiments show which changes help on these particular datasets."
+        }
       ]
     }
   ]

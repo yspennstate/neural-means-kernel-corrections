@@ -1,0 +1,195 @@
+{
+  "id": "06",
+  "title": "Kernel regression as projection",
+  "boards": [
+    {
+      "key": "c06_section",
+      "title": "A kernel section is a function with one input fixed",
+      "visual": {
+        "kind": "kernel_sections",
+        "label": "Illustrative function-space geometry; not a benchmark fit",
+        "source": "paper/theory.tex:thm:or; lecture/kernel_geometry.py"
+      },
+      "visual_argument": "Fixing one kernel argument gives a curve over the other input; different design points give different curves.",
+      "segments": [
+        {
+          "line": "Fix a point and let the second argument vary",
+          "math": "k_x(\\,\\cdot\\,)=k(x,\\,\\cdot\\,)",
+          "say": "Start with a kernel k of two inputs. Hold the first input x fixed and regard the second input as a variable. The result is a function, called a kernel section. The curves on the right show sections centered at several points on a one-dimensional input line. In the actual mechanics problem, an input is a forty-one-dimensional load vector, so these curves are an illustration of the same construction rather than slices from the dataset."
+        },
+        {
+          "line": "Compare sections using the kernel's inner product",
+          "math": "\\langle k_x,k_z\\rangle_{\\mathcal H_k}=k(x,z)",
+          "say": "The reproducing kernel Hilbert space assigns an inner product to functions. Its defining kernel-section identity says that the inner product of the section at x with the section at z equals k of x z. That inner product is not generally the area under the product of the two drawn curves. The graph shows how a section varies with its input; its length in the RKHS is determined by the kernel's function-space geometry."
+        },
+        {
+          "line": "The diagonal gives a section's squared length",
+          "math": "\\|k_x\\|_{\\mathcal H_k}^2=k(x,x)",
+          "say": "Put z equal to x. The squared RKHS norm of the section is k of x x. For a kernel normalized to have diagonal one, every section has unit norm even though the corresponding curves may be centered at different inputs. Their mutual angles encode similarity. Sections at similar inputs have large inner products and point in similar directions in function space. This is the bridge from a similarity function to a geometric model."
+        }
+      ]
+    },
+    {
+      "key": "c06_features",
+      "title": "A finite feature map makes that geometry familiar",
+      "visual": {
+        "kind": "feature_circle",
+        "label": "Illustrative function-space geometry; not a benchmark fit",
+        "source": "paper/theory.tex:thm:or; lecture/kernel_geometry.py"
+      },
+      "visual_argument": "Points on a circle represent the two-dimensional features (cos x, sin x), whose dot products define an exact kernel.",
+      "segments": [
+        {
+          "line": "Map an input to a feature vector",
+          "math": "\\varphi(x)=(\\cos x,\\sin x)",
+          "say": "Consider an exact finite-dimensional example. Map a scalar angle x to the unit vector cosine x, sine x. Now an input is represented by a point on the unit circle. Define the kernel by the ordinary dot product of the two feature vectors. Using the cosine difference identity, this kernel is cosine of x minus z. It is a simple rank-two kernel, useful for understanding the formulas even though it is not the Matérn kernel used in the mechanics experiment."
+        },
+        {
+          "line": "A kernel value is a feature inner product",
+          "math": "k(x,z)=\\varphi(x)^\\top\\varphi(z)=\\cos(x-z)",
+          "say": "The kernel matrix is now visibly a Gram matrix of vectors. For any coefficients, the kernel quadratic form equals the squared length of the same weighted sum of feature vectors, so it is nonnegative. If many input points are used, the matrix can still have rank at most two. Positive semidefiniteness of a kernel does not require every possible finite Gram matrix to be invertible. Distinct input labels can carry redundant feature information."
+        },
+        {
+          "line": "Functions become linear combinations of the features",
+          "math": "f(x)=a\\cos x+b\\sin x",
+          "say": "The functions in this example are linear combinations of cosine and sine. A coefficient vector a b defines a function, and evaluating it at x takes its dot product with the feature vector at x. This finite example captures the reproducing property in ordinary Euclidean coordinates. For other kernels, the analogous feature representation may be infinite-dimensional, but the inner-product identities we will use remain the same."
+        }
+      ]
+    },
+    {
+      "key": "c06_reproduce",
+      "title": "Evaluation is an inner product",
+      "visual": {
+        "kind": "feature_circle",
+        "label": "Illustrative function-space geometry; not a benchmark fit",
+        "source": "paper/theory.tex:thm:or; lecture/kernel_geometry.py"
+      },
+      "visual_argument": "The value of a function is the projection of its coefficient vector onto the input's feature vector.",
+      "segments": [
+        {
+          "line": "A function's value can be recovered from its kernel section",
+          "math": "f(u)=\\langle f,k_u\\rangle_{\\mathcal H_k}",
+          "say": "The reproducing property is the key identity: the value of f at u equals its inner product with the section k sub u. The section represents the operation of evaluating a function at that input. In the finite-feature example, this is simply the dot product between the function's coefficient vector and the query feature vector. We use the function-space notation because it also covers kernels without a small explicit feature map."
+        },
+        {
+          "line": "Each observation reveals an inner product",
+          "math": "f(u_i)=\\langle f,k_{u_i}\\rangle_{\\mathcal H_k}",
+          "say": "An observation at a training input reveals one inner product of the unknown function with a known section. Several observations reveal its relationships to several sections. They determine the part of the function lying in the span of those sections, provided we solve the associated linear system. Components orthogonal to that span are invisible at every observed input. This is the information gap that will later drive the minimax lower bound."
+        },
+        {
+          "line": "The available information spans a subspace",
+          "math": "V_X=\\operatorname{span}\\{k_{u_1},\\ldots,k_{u_n}\\}",
+          "say": "Call the observed span V sub X. It is the collection of all linear combinations of the design sections. Its dimension is at most n and may be smaller when sections are dependent. The important object is this span, not merely the number of labels in a file. Repeated or geometrically redundant observations may add little new direction. For a noisy statistical problem, repeated observations can have other value, but the deterministic exact-observation geometry is about the span."
+        }
+      ]
+    },
+    {
+      "key": "c06_interpolant",
+      "title": "Interpolation finds the function in the observed span",
+      "visual": {
+        "kind": "kernel_projection",
+        "label": "Illustrative function-space geometry; not a benchmark fit",
+        "source": "paper/theory.tex:thm:or; lecture/kernel_geometry.py"
+      },
+      "visual_argument": "The query section is projected onto the span of the design sections; observation coefficients follow from the Gram system.",
+      "segments": [
+        {
+          "line": "Represent the fitted function in the design span",
+          "math": "\\widehat f=\\sum_i\\alpha_i k_{u_i}",
+          "say": "Seek a fitted function in the observed span, written as a linear combination of the design sections. Evaluate that expression at the training inputs. The resulting vector is K alpha, where K is the Gram matrix. To interpolate the observed values y, solve K alpha equals y. When K is positive definite, there is a unique coefficient vector and therefore a unique interpolant in the span."
+        },
+        {
+          "line": "Match the observed values exactly",
+          "math": "K\\alpha=y,\\qquad\\alpha=K^{-1}y",
+          "say": "Why does interpolation correspond to an orthogonal projection of a compatible true function? The error f minus f hat is zero at every design point. By the reproducing property, it is therefore orthogonal to every design section and hence to their span. Since f hat lies in that span, we have the defining decomposition of an orthogonal projection: a within-span part plus an orthogonal remainder."
+        },
+        {
+          "line": "The remainder is invisible to the design",
+          "math": "f-\\widehat f\\ \\perp\\ V_X",
+          "say": "The observations determine the projected part but say nothing about the orthogonal remainder beyond the assumptions imposed on the function class. At a query, that remainder may matter. If the query section itself lies in the observed span, its inner product with the remainder is zero and the value is recovered exactly. Otherwise, the query section has an unobserved component, and a function aligned with that component can produce error."
+        }
+      ]
+    },
+    {
+      "key": "c06_query",
+      "title": "Project the query rather than the unknown function",
+      "visual": {
+        "kind": "kernel_projection",
+        "label": "Illustrative function-space geometry; not a benchmark fit",
+        "source": "paper/theory.tex:thm:or; lecture/kernel_geometry.py"
+      },
+      "visual_argument": "The red query remainder measures how much the evaluation functional lies outside the observed span.",
+      "segments": [
+        {
+          "line": "Approximate the query section using the design sections",
+          "math": "\\Pi_X k_u=\\sum_i c_i k_{u_i}",
+          "say": "There are two equivalent ways to view the prediction. We can project the unknown function onto the observed span and then evaluate it. Or we can project the query section onto that span and take an inner product with the unknown function. The second view is especially useful for error bounds because it produces one geometric vector determined by the design and the query, without needing to know the target function."
+        },
+        {
+          "line": "Orthogonality gives the query coefficient system",
+          "math": "Kc=k(X,u)",
+          "say": "Require the query approximation's remainder to be orthogonal to every design section. Taking those inner products yields K c equals k of X u. These are the query coefficients. The predicted value is the weighted sum of observed function values using c. For a vector-valued target, the same coefficient vector acts on every output coordinate because the kernel and design do not change with the coordinate."
+        },
+        {
+          "line": "The power function is the length of the unobserved query component",
+          "math": "P_0(u)=\\|k_u-\\Pi_X k_u\\|_{\\mathcal H_k}",
+          "say": "The classical power function is the norm of the query section left after projection. It depends on the kernel, the design and the query. It does not depend on the observed target values. That makes it an informative measure of design geometry, but also explains why it may fail to rank realized errors: the actual residual function can align strongly or weakly with that remainder. The sharp bound will multiply its length by the unknown residual norm."
+        }
+      ]
+    },
+    {
+      "key": "c06_ridge",
+      "title": "Ridge shrinks the fit along observed directions",
+      "visual": {
+        "kind": "nugget_factors",
+        "label": "Illustrative function-space geometry; not a benchmark fit",
+        "source": "paper/theory.tex:thm:or; lecture/kernel_geometry.py"
+      },
+      "visual_argument": "A positive nugget increases the exact representer error in the noiseless toy model while stabilizing the solve.",
+      "segments": [
+        {
+          "line": "Penalize the fitted function's RKHS norm",
+          "math": "\\min_f\\ \\frac1n\\sum_i|f(u_i)-y_i|^2+\\lambda\\|f\\|_{\\mathcal H_k}^2",
+          "say": "Kernel ridge regression balances fit to the observations against the RKHS norm of the fitted function. The loss is divided by n, which explains the n lambda in the coefficient system. The minimizing function lies in the observed span. Any orthogonal component would leave all fitted observation values unchanged while increasing the norm penalty, so such a component cannot help the objective when lambda is positive."
+        },
+        {
+          "line": "The coefficient equation gains a diagonal term",
+          "math": "(K+n\\lambda I)\\alpha=y",
+          "say": "On a nonsingular design, differentiate the finite-dimensional objective to obtain K plus n lambda times the identity, multiplying alpha, equal to y. The same function formula extends to singular positive-semidefinite K, and a positive nugget makes this displayed system invertible. The fitted values need not equal y, so this is no longer exact interpolation. The error can retain a component within the observed span."
+        },
+        {
+          "line": "The nugget changes a worst-case constant, not every realized error in the same direction",
+          "math": "P_0\\le\\widetilde P_\\lambda\\le P_\\lambda",
+          "say": "For exact data and a fixed RKHS ball, interpolation has the smallest possible worst-case constant. Ridge incurs an additional representer error, which we will calculate exactly. That does not mean a positive nugget must worsen every observed prediction error. It may reduce sensitivity to numerical conditioning, noise or unsuitable interpolation behavior for a particular target. The empirical choice and the worst-case theorem address different aspects of the method."
+        }
+      ]
+    },
+    {
+      "key": "c06_bridge",
+      "title": "Return to the neural residual",
+      "visual": {
+        "kind": "pipeline_stages",
+        "label": "Illustrative function-space geometry; not a benchmark fit",
+        "source": "paper/theory.tex:thm:or; lecture/kernel_geometry.py"
+      },
+      "visual_argument": "The neural mean changes the function being recovered; the kernel and query geometry determine how its remaining error is controlled.",
+      "segments": [
+        {
+          "line": "Apply the same recovery problem to G minus m",
+          "math": "r=G-m",
+          "say": "Nothing in the projection argument requires that the unknown function be the original target. We can apply it to the residual left by a fitted neural mean. The geometric factor is unchanged if the same kernel and design are used. What changes is the function whose norm multiplies that factor. A useful neural mean may leave a residual with a smaller relevant norm, but a small ordinary training error does not prove that norm reduction."
+        },
+        {
+          "line": "Membership in the chosen RKHS is a hypothesis",
+          "math": "r_j\\in\\mathcal H_k\\quad\\text{for each output coordinate}",
+          "say": "The deterministic theorem assumes that each component of the residual belongs to the chosen RKHS with finite norm. This is a real restriction. A function can be approximated well on a finite dataset without establishing that membership. Nor does a fitted kernel norm automatically equal the norm of the unknown residual. In the paper, these facts keep the theorem's explanatory role separate from a numerical certificate."
+        },
+        {
+          "line": "The next proof turns the picture into an exact bound",
+          "math": "\\text{Error}=\\text{an inner product with a known representer}",
+          "say": "We now have all the objects needed for the main kernel result: the residual function, the design sections, the query coefficient vector and the error representer. The proof will express prediction error as an inner product, apply Cauchy-Schwarz, calculate the representer's norm exactly, and construct a residual attaining the bound. After that, two indistinguishable residuals will show why no different recovery rule can beat interpolation over the same ball."
+        }
+      ]
+    }
+  ]
+}

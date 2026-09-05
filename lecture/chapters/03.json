@@ -1,0 +1,223 @@
+{
+  "id": "03",
+  "title": "The geometry of averaging errors",
+  "boards": [
+    {
+      "key": "c03_residual",
+      "title": "Think of each prediction error as a vector",
+      "visual": {
+        "kind": "ensemble_segment",
+        "label": "Illustrative residual geometry; lengths are not benchmark percentages",
+        "source": "paper/theory.tex:prop:secmom; lecture/ensemble_geometry.py"
+      },
+      "visual_argument": "The origin is zero error; every member contributes a vector from that common origin.",
+      "segments": [
+        {
+          "line": "Normalize each error by the size of its own target",
+          "math": "\\rho_f(u)=\\frac{f(u)-G(u)}{\\|G(u)\\|_2}",
+          "say": "At a particular input, subtract the target field from the predicted field. Divide that error vector by the Euclidean norm of the target. The length of the resulting vector is the relative error for that sample. The normalization is shared by all predictors on the same input, so averaging predictions also averages these normalized residual vectors. We assume the target norm is positive; a zero denominator would require a different metric definition."
+        },
+        {
+          "line": "Use one common space for all members",
+          "math": "\\mathcal H=L^2(\\mu;\\mathbb R^q)",
+          "say": "For a population statement, do not think of the drawing as just two pixels from one field. Treat the entire normalized residual function as a vector in an L two space over the input distribution. Its squared length is the expected squared relative error. The plane is an illustration of that Hilbert-space geometry. Inner products and convex combinations behave in the same way in the full function space, even when its dimension is much larger than two."
+        },
+        {
+          "line": "The target cancels correctly because the weights sum to one",
+          "math": "\\rho_{f_w}(u)=\\sum_a w_a\\rho_{f_a}(u)",
+          "say": "If the member weights sum to one, subtracting G from their weighted prediction equals the same weighted sum of their individual errors. Dividing by the common target norm preserves that identity. This simple cancellation is what makes the ensemble geometry exact. For weights that do not sum to one, an additional target term remains. An affine coordinatewise readout with an intercept belongs to a different class and needs its own analysis."
+        }
+      ]
+    },
+    {
+      "key": "c03_hull",
+      "title": "Convex weights move the error inside a convex hull",
+      "visual": {
+        "kind": "ensemble_hull",
+        "label": "Illustrative residual geometry; lengths are not benchmark percentages",
+        "source": "paper/theory.tex:prop:secmom; lecture/ensemble_geometry.py"
+      },
+      "visual_argument": "The feasible residuals fill the convex hull of the member residuals; the smallest RMS error is its closest point to the origin.",
+      "segments": [
+        {
+          "line": "Nonnegative weights restrict the feasible error vectors",
+          "math": "w_a\\ge0,\\qquad \\sum_a w_a=1",
+          "say": "With two predictors, nonnegative weights move the combined residual along the line segment joining their residual vectors. With three predictors, the feasible combinations fill a triangle. With more predictors, they fill a convex hull. The goal is to find the point in that hull closest to the origin. The picture makes clear why adding a member cannot worsen the ideal convex optimum: the old hull is still available, with zero weight on the new member."
+        },
+        {
+          "line": "A farther individual predictor can enlarge the hull usefully",
+          "math": "\\|\\rho_2\\|>\\|\\rho_1\\|\\quad\\text{can still help}",
+          "say": "A new residual vector can be farther from the origin than the best existing vector and still bend the feasible hull toward the origin. Its individual error is worse, but its direction is useful. Conversely, a very accurate new predictor may point almost exactly along the existing error direction and add little room for cancellation. Ensemble diversity is therefore not the number of different architecture names. It is a statement about the errors those trained predictors actually make."
+        },
+        {
+          "line": "The ideal optimum and the fitted stack are different objects",
+          "math": "\\min_{w\\in\\Delta}w^\\top S w",
+          "say": "The geometric optimum presumes that the relevant inner products are known and that we minimize the squared-risk objective exactly. In an experiment, we estimate them from a finite set of cases. A deployed stacking procedure may optimize another metric or use a heuristic search. The paper distinguishes its convex second-moment analysis from its actual validation-selected readout. Without that distinction, a plot of the ideal hull could be mistaken for a guarantee about the fitted stack."
+        }
+      ]
+    },
+    {
+      "key": "c03_gram",
+      "title": "One Gram matrix records the geometry",
+      "visual": {
+        "kind": "second_moment_toy",
+        "label": "Illustrative residual geometry; lengths are not benchmark percentages",
+        "source": "paper/theory.tex:prop:secmom; lecture/ensemble_geometry.py"
+      },
+      "visual_argument": "Each matrix entry is a dot product of two residual vectors; the quadratic form computes the length of their weighted sum.",
+      "segments": [
+        {
+          "line": "Record every residual inner product",
+          "math": "S_{ab}=\\mathbb E\\langle\\rho_{f_a}(u),\\rho_{f_b}(u)\\rangle",
+          "say": "Define S a b as the expected inner product of the two normalized residuals. Diagonal entries are the members' expected squared relative errors. Off-diagonal entries measure alignment, including systematic common bias. This is an uncentered second-moment matrix. Subtracting each residual's mean would remove part of the error we are trying to predict and cancel, so a centered covariance matrix is not the same object."
+        },
+        {
+          "line": "Expand the squared length of the weighted sum",
+          "math": "\\begin{aligned}\\mathbb E\\left\\|\\sum_a w_a\\rho_{f_a}\\right\\|_2^2\n&=\\sum_{a,b}w_aw_bS_{ab}\\\\&=w^\\top S w\\end{aligned}",
+          "say": "Expand the inner product of the weighted sum with itself. Distribute both sums, pull the scalar weights outside, and then take expectation. Each remaining expected inner product is one entry of S. That proves the identity: the ensemble's expected squared relative error is w transpose S w. There is no approximation in this calculation. Estimating S later is a statistical step, but the relationship between the population quantities is exact."
+        },
+        {
+          "line": "The matrix is positive semidefinite",
+          "math": "z^\\top S z=\\mathbb E\\left\\|\\sum_a z_a\\rho_{f_a}\\right\\|_2^2\\ge0",
+          "say": "The same expansion works for any real coefficient vector z, including signed coefficients. A squared norm is nonnegative, so S is positive semidefinite. This is a useful diagnostic when computing the matrix from stored residuals: substantial negative eigenvalues would signal a construction or numerical problem. Small roundoff errors near zero require numerical judgment. Positive semidefiniteness alone does not establish that the data split or normalization was correct."
+        }
+      ]
+    },
+    {
+      "key": "c03_two",
+      "title": "When does a weaker second member help?",
+      "visual": {
+        "kind": "ensemble_segment",
+        "label": "Illustrative residual geometry; lengths are not benchmark percentages",
+        "source": "paper/theory.tex:prop:secmom; lecture/ensemble_geometry.py"
+      },
+      "visual_argument": "Move from the best member toward a second member and inspect whether squared distance initially decreases.",
+      "segments": [
+        {
+          "line": "Write the mixture using one scalar",
+          "math": "f_t=(1-t)f_1+t f_2,\\qquad0\\le t\\le1",
+          "say": "Order the two members so that the first has no larger RMS error than the second. Let e one and e two be their positive RMS errors, and let varrho be their uncentered correlation. Use t as the weight on the weaker second member. At t equal to zero, the stack is just the first member. To decide whether any mixing helps, inspect the squared error as we begin moving along the segment toward the second residual."
+        },
+        {
+          "line": "Its squared risk is a quadratic",
+          "math": "V(t)=(1-t)^2e_1^2+2t(1-t)\\varrho e_1e_2+t^2e_2^2",
+          "say": "Substitute the two weights into the second-moment identity. The first term is the squared first-member contribution, the last is the squared second-member contribution, and the middle term is their alignment. This middle term decides whether averaging cancels or reinforces error. The coefficient of t squared is the squared distance between the two residual vectors. It is nonnegative, so the objective is convex along the segment."
+        },
+        {
+          "line": "The initial derivative gives the exact admission rule",
+          "math": "\\begin{aligned}V'(0)&=2(\\varrho e_1e_2-e_1^2)\\\\\nV'(0)<0&\\iff\\varrho<e_1/e_2\\end{aligned}",
+          "say": "Differentiate at t equal to zero. The derivative is twice varrho e one e two minus e one squared. It is negative exactly when varrho is less than the ratio e one over e two. Because the objective is convex and the first member is at least as good individually, this is the exact condition for a strict improvement from adding the second member. A weaker member needs a correspondingly lower correlation to earn positive weight."
+        }
+      ]
+    },
+    {
+      "key": "c03_optimum",
+      "title": "The closest point on the segment has an explicit weight",
+      "visual": {
+        "kind": "ensemble_segment",
+        "label": "Illustrative residual geometry; lengths are not benchmark percentages",
+        "source": "paper/theory.tex:prop:secmom; lecture/ensemble_geometry.py"
+      },
+      "visual_argument": "The minimizing residual is the perpendicular foot from the origin onto the segment when that foot lies in its interior.",
+      "segments": [
+        {
+          "line": "Set the derivative to zero",
+          "math": "t^\\star=\\frac{e_1^2-\\varrho e_1e_2}{e_1^2+e_2^2-2\\varrho e_1e_2}",
+          "say": "When the admission inequality is strict, set the derivative of the quadratic to zero. The numerator is the amount by which the second residual's projection onto the first falls short of the first residual's squared length. The denominator is the squared distance between the two residual vectors. Their ratio gives the optimal second-member weight. Under the stated ordering and strict admission condition, that weight lies strictly between zero and one."
+        },
+        {
+          "line": "Substitution gives the optimal squared risk",
+          "math": "V(t^\\star)=\\frac{e_1^2e_2^2(1-\\varrho^2)}{e_1^2+e_2^2-2\\varrho e_1e_2}",
+          "say": "Substitute the minimizing weight into the quadratic and simplify. The numerator contains one minus the squared correlation, which is the familiar area or perpendicular-component factor. The denominator contains the squared distance between the residual vectors. The result is the squared distance from the origin to the line through them, provided the minimizing point lies on the segment. If the admission condition fails, the convex optimum stays at the first member instead."
+        },
+        {
+          "line": "A numerical example makes the direction effect visible",
+          "math": "\\rho_1=(1,0),\\quad\\rho_2=(0,2),\\quad t^\\star=\\tfrac15",
+          "say": "Take the first residual to be one zero and the second to be zero two. Their errors are one and two, and their correlation is zero. The second member is twice as bad individually, yet its orthogonal error direction is useful. Its optimal weight is one fifth. The combined residual is four fifths, two fifths, with squared length four fifths. The RMS error is the square root of four fifths, about point eight nine four, below the first member's error of one."
+        }
+      ]
+    },
+    {
+      "key": "c03_reject",
+      "title": "A new member can point in the wrong direction",
+      "visual": {
+        "kind": "ensemble_segment",
+        "label": "Illustrative residual geometry; lengths are not benchmark percentages",
+        "source": "paper/theory.tex:prop:secmom; lecture/ensemble_geometry.py",
+        "variant": "aligned"
+      },
+      "visual_argument": "If the entire segment initially moves away from the origin, the constrained optimum stays at the better endpoint.",
+      "segments": [
+        {
+          "line": "A nearly aligned weaker member receives zero optimal weight",
+          "math": "\\rho_1=(1,0),\\quad\\rho_2=(1.2,0.4)",
+          "say": "Now keep the first residual at one zero and move the second to one point two, point four. The new vector is farther from the origin and points almost in the same direction. Its dot product with the first residual is one point two, already larger than the first residual's squared length of one. The initial derivative is positive. Every admissible movement toward this member makes the squared risk worse, so the optimum gives it zero weight."
+        },
+        {
+          "line": "At the threshold there is no strict gain",
+          "math": "\\varrho=e_1/e_2\\quad\\Longrightarrow\\quad V'(0)=0",
+          "say": "At the threshold, the segment is tangent to the sphere through the first residual. The initial derivative is zero, and convexity prevents a strict decrease afterward. If the vectors are distinct, the squared distance increases quadratically away from that endpoint. If they coincide, the objective is constant. This boundary case explains why a strict inequality is needed in the admission rule rather than a less-than-or-equal sign."
+        },
+        {
+          "line": "Degenerate cases should be handled without dividing by zero",
+          "math": "e_1=0\\ \\Longrightarrow\\ \\min V=0",
+          "say": "If one member already has zero error, the minimum is zero and no correlation ratio is needed. If two residuals are identical, the squared-distance denominator vanishes and every mixture gives the same residual. At perfect anticorrelation, a suitable convex combination can cancel both residuals exactly. These are ordinary geometric possibilities, not reasons to hide a failed denominator with a small arbitrary constant in an implementation."
+        }
+      ]
+    },
+    {
+      "key": "c03_equal",
+      "title": "Equal-quality correlated members have a common error floor",
+      "visual": {
+        "kind": "equicorrelation_curve",
+        "label": "Illustrative residual geometry; lengths are not benchmark percentages",
+        "source": "paper/theory.tex:prop:secmom; lecture/ensemble_geometry.py"
+      },
+      "visual_argument": "The independent component shrinks with member count, while the shared component remains.",
+      "segments": [
+        {
+          "line": "Assume equal diagonal entries and one common off-diagonal value",
+          "math": "S_{aa}=e^2,\\qquad S_{ab}=\\varrho e^2\\quad(a\\ne b)",
+          "say": "Consider a family in which every member has RMS error e and every distinct pair has the same uncentered correlation varrho. This is a restrictive model, but its calculation exposes the common-error mechanism clearly. We use a nonnegative varrho, as in the proposition. The matrix consists of a shared all-ones component plus a diagonal component. The shared part represents alignment that averaging cannot remove."
+        },
+        {
+          "line": "The quadratic form separates into two pieces",
+          "math": "w^\\top S w=e^2\\left[\\varrho+(1-\\varrho)\\sum_a w_a^2\\right]",
+          "say": "Expand the matrix into varrho e squared times the all-ones matrix and one minus varrho times e squared times the identity. The all-ones contribution is fixed because the weights sum to one. Only the sum of squared weights can be reduced. Cauchy-Schwarz gives that sum at least one over M, with equality at uniform weights. Thus equal weighting is optimal for this exact symmetric model."
+        },
+        {
+          "line": "More members remove only the unshared component",
+          "math": "\\min_w w^\\top S w=e^2\\left(\\varrho+\\frac{1-\\varrho}{M}\\right)",
+          "say": "The optimum is e squared times varrho plus one minus varrho divided by M. As M grows, the second term vanishes and the shared term remains. The RMS floor is e times the square root of varrho. This limit presumes that the same quality and correlation model continues to hold as members are added. It is not evidence that every future architecture must share the same error. The next chapter replaces exact equal correlation with entrywise lower bounds."
+        }
+      ]
+    },
+    {
+      "key": "c03_metrics",
+      "title": "Mean error and RMS error answer different questions",
+      "visual": {
+        "kind": "error_metric_geometry",
+        "label": "Illustrative residual geometry; lengths are not benchmark percentages",
+        "source": "paper/theory.tex:prop:secmom; lecture/ensemble_geometry.py"
+      },
+      "visual_argument": "A two-case example shows how squaring emphasizes dispersed errors and why an RMS lower bound need not bound the mean.",
+      "segments": [
+        {
+          "line": "The tables average lengths; the Gram matrix averages squared lengths",
+          "math": "\\mathcal E_1=\\mathbb E X,\\qquad\\mathcal E_2=\\sqrt{\\mathbb E X^2}",
+          "say": "Let X be the per-sample relative error, a nonnegative scalar. The paper's headline tables report its mean. The second-moment matrix determines the square root of its mean square, or RMS. These two quantities are often close, but they are not identical. Squaring first puts more weight on difficult cases. A proof about the quadratic form therefore belongs to RMS error, unless we have additional information about the error distribution."
+        },
+        {
+          "line": "Their difference is exactly the error variance",
+          "math": "\\mathcal E_2^2-\\mathcal E_1^2=\\operatorname{Var}(X)",
+          "say": "Use the defining identity for variance: mean square minus squared mean. That gives an exact relation between the two metrics. The mean is no larger than the RMS, with equality only when the error is constant almost surely. An upper bound on RMS also bounds the mean. A lower bound on RMS does not transfer downward: the mean can be much smaller when a few large errors account for much of the second moment."
+        },
+        {
+          "line": "Even a two-case example prevents the wrong inference",
+          "math": "X\\in\\{0,2\\}\\text{ equally likely}:\\quad\\mathcal E_1=1,\\quad\\mathcal E_2=\\sqrt2",
+          "say": "Take two equally likely errors, zero and two. Their mean is one, but their RMS is the square root of two. A lower bound near one point four on the RMS would tell us nothing like a one point four lower bound on the mean. In the actual data, the gap is smaller, but it varies by predictor. We will keep the empirical floor, the quadratic optimum and the table metric separately labelled rather than use one conversion factor for every model."
+        }
+      ]
+    }
+  ]
+}

@@ -6,6 +6,7 @@ No scheduler, queue, daemon, or automatic duplicate retry is installed.
 import argparse
 import ctypes
 from ctypes import wintypes
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -86,12 +87,34 @@ def main():
         env["NMKC_BOARD"] = args.board
     log_dir = HERE / "logs"; log_dir.mkdir(exist_ok=True)
     tag = args.board or f"chapter{args.chapter}_{args.quality}"
+    # A long render reads a frozen source/audio/asset snapshot. Continued
+    # authoring of other chapters cannot change its inputs halfway through.
+    build = HERE / "builds" / (time.strftime("%Y%m%dT%H%M%S")+"_"+tag)
+    build.mkdir(parents=True, exist_ok=False)
+    (build / "chapters").mkdir()
+    sources = list(HERE.glob("*.py"))+[HERE / "chapters" / (args.chapter+".json")]
+    sources += [p for p in (HERE/"assets").glob("*") if p.is_file()]
+    if args.quality in ("draft", "final"):
+        sources += list((HERE/"audio"/args.chapter).glob("*.wav"))
+        sources += list((HERE/"audio"/args.chapter).glob("*.json"))
+    inputs = {}
+    for source in sources:
+        relative = source.relative_to(HERE)
+        destination = build / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        payload = source.read_bytes()
+        destination.write_bytes(payload)
+        digest = hashlib.sha256(payload).hexdigest()
+        if hashlib.sha256(source.read_bytes()).hexdigest() != digest:
+            raise RuntimeError(f"Source changed while freezing: {relative}")
+        inputs[relative.as_posix()] = digest
+    (build/"input_manifest.json").write_text(json.dumps(inputs, indent=2), encoding="utf-8")
     quality = ["-s", "-r", "1920,1080"] if args.quality in ("preview", "samples") else (
         ["-r", "1280,720", "--fps", "30"] if args.quality == "draft" else ["-r", "1920,1080", "--fps", "30"])
     target = ("BoardPreview" if args.quality == "preview" else
               "BoardSamples" if args.quality == "samples" else "LectureChapter")
     command = [str(PYTHON), "-B", "-m", "manim", "render", *quality, "--disable_caching",
-               "--media_dir", str(HERE / "media"), "-o", tag, "scenes.py", target]
+               "--media_dir", str(build / "media"), "-o", tag, "scenes.py", target]
     stop = threading.Event()
     samples = []; observed = []
     baseline = windows()
@@ -107,7 +130,7 @@ def main():
     watcher = threading.Thread(target=poll, daemon=True); watcher.start()
     try:
         with (log_dir / (tag + "_render.log")).open("w", encoding="utf-8") as log:
-            proc = subprocess.Popen(command, cwd=HERE, env=env, stdout=log, stderr=subprocess.STDOUT,
+            proc = subprocess.Popen(command, cwd=build, env=env, stdout=log, stderr=subprocess.STDOUT,
                                     creationflags=0x08000000 | 0x4000 | 0x4)
             resumed = False
             try:
@@ -126,6 +149,8 @@ def main():
         stop.set(); watcher.join()
     intervals = samples[1:]
     receipt = {"command": command, "returncode": proc.returncode, "affinity_mask": mask,
+               "build_directory": str(build), "input_manifest_sha256": hashlib.sha256(
+                   (build/"input_manifest.json").read_bytes()).hexdigest(),
                "elapsed_seconds": time.perf_counter()-start, "visibility_samples": len(samples),
                "max_poll_interval_ms": max(intervals, default=0)*1000,
                "mean_poll_interval_ms": sum(intervals)/max(1, len(intervals))*1000,

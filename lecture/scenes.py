@@ -115,12 +115,15 @@ def build_visual(spec):
             curve = VMobject(color=GOLD, stroke_width=3).set_points_as_corners(points)
             labels = VGroup(small_label("Boundary load", [.7, 2.0, 0], 27),
                             formula(r"x_1", 24, DIM).next_to(ax, DOWN, buff=.12),
+                            formula("0", 18, DIM).next_to(ax.c2p(0, 0), DOWN, buff=.12),
+                            formula("1", 18, DIM).next_to(ax.c2p(1, 0), DOWN, buff=.12),
                             formula(f"{ymin:.1f}", 18, DIM).next_to(ax.c2p(0, ymin), LEFT, buff=.1),
                             formula(f"{ymax:.1f}", 18, DIM).next_to(ax.c2p(0, ymax), LEFT, buff=.1))
             image = field_image(target, "viridis", float(target.min()), float(target.max()), [4.55, .25, 0], 2.5)
             ilabel = small_label("Reference stress", [4.55, 2.0, 0], 27)
             arrow = Arrow([2.35, .3, 0], [2.95, .3, 0], color=INK, buff=0)
-            group = Group(ax, curve, labels, image, ilabel, arrow)
+            units = small_label("Grid: horizontal x1, vertical x2; benchmark units", [2.6,-2.2,0], 22)
+            group = Group(ax, curve, labels, image, ilabel, arrow, units)
             return group, [lambda: ShowPassingFlash(curve.copy().set_color(INK), time_width=.4),
                            lambda: Indicate(image[1], color=GOLD), lambda: Indicate(arrow)]
         low, high = min(float(target.min()), float(prediction.min())), max(float(target.max()), float(prediction.max()))
@@ -134,6 +137,7 @@ def build_visual(spec):
         score = receipt["cases"][case]["relative_error"]*100
         parts.append(formula(rf"\ell={score:.3f}\%", 32).move_to([2.6, -1.5, 0]))
         parts.append(small_label("Reference and prediction share a colour scale", [2.6, -2.1, 0], 21))
+        parts.append(small_label("Grid: horizontal x1, vertical x2; benchmark units", [2.6, -2.62, 0], 20))
         return Group(*parts), [lambda: Indicate(images[0][1]), lambda: Indicate(images[2][1], color=RED),
                                lambda: Indicate(images[1][1], color=BLUE)]
     if kind == "reflection_pair":
@@ -308,12 +312,181 @@ def build_visual(spec):
         group = VGroup(ax, curve, asymptote, labels, dot)
         return group, [lambda: MoveAlongPath(dot, curve), lambda: Indicate(asymptote, color=BLUE),
                        lambda: Indicate(curve, color=GOLD)]
+    if kind in ("pool_matrix", "pool_seed_curves", "pool_bounds"):
+        pool=json.loads((HERE/"assets/pool_geometry.json").read_text(encoding="utf-8"))
+        if (pool['n_cal'],pool['n_ev']) != (1000,19000):
+            raise ValueError("Unexpected empirical pool split")
+        names=["MLP","MSE","Refiner","FNO","UNet","KRR"]
+        colors=[BLUE,GOLD,GREEN,RED,"#C9A6E4","#D7D0B5"]
+        if kind == "pool_matrix":
+            values=np.asarray(pool['second_moments'])*1e4
+            low,high=float(values.min()),float(values.max())
+            palette=np.asarray(json.loads((HERE/'assets/colormaps.json').read_text(encoding='utf-8'))['viridis'],dtype=np.uint8)
+            rgba=palette[np.rint((values-low)/(high-low)*255).astype(int)]
+            picture=ImageMobject(rgba).set_resampling_algorithm(RESAMPLING_ALGORITHMS['nearest'])
+            picture.set_height(3.6).move_to([2.8,.25,0])
+            boundaries=VGroup();labels=VGroup()
+            for a,name in enumerate(names):
+                x=1.+(a+.5)*.6;y=2.05-(a+.5)*.6
+                boundaries.add(Square(.6,color=INK,stroke_width=1.2).move_to([x,y,0]))
+                labels.add(small_label(name,[x,-1.88,0],17))
+                labels.add(small_label(name,[.5,y,0],20))
+            ramp=ImageMobject(palette[::-1,None,:]).stretch_to_fit_height(3.6).stretch_to_fit_width(.16).move_to([4.97,.25,0])
+            labels.add(formula(f'{high:.2f}',20,DIM).next_to(ramp,UP,buff=.1))
+            labels.add(formula(f'{low:.2f}',20,DIM).next_to(ramp,DOWN,buff=.1))
+            labels.add(formula(r'10^4\widehat S_{ab}',28,INK).move_to([2.8,2.55,0]))
+            labels.add(small_label('Every outlined block contains ten seeds',[2.6,-2.6,0],22))
+            group=Group(picture,boundaries,ramp,labels)
+            return group,[lambda:Indicate(boundaries[0]),lambda:Indicate(boundaries[3]),lambda:Indicate(boundaries[5])]
+        if kind == 'pool_seed_curves':
+            ax=axes(x=(1,10,1),y=(4.85,5.6,.2),width=5.3,height=3.3).move_to([2.65,.6,0])
+            curves=VGroup();labels=VGroup()
+            for a,(configuration,name,color) in enumerate(zip(pool['configurations'],names,colors)):
+                points=[ax.c2p(row['k'],100*row['mean_rms']) for row in pool['curves'][configuration]]
+                curve=VMobject(color=color,stroke_width=3).set_points_as_corners(points)
+                dots=VGroup(*(Dot(point,radius=.04,color=color) for point in points))
+                curves.add(VGroup(curve,dots))
+                labels.add(small_label(name,[.7+(a%3)*2.,-2.35-(a//3)*.42,0],21,color))
+            for x in (1,2,3,5,10):
+                labels.add(formula(str(x),19,DIM).next_to(ax.c2p(x,4.85),DOWN,buff=.1))
+            for y in (4.9,5.1,5.3,5.5):
+                labels.add(formula(f'{y:.1f}',19,DIM).next_to(ax.c2p(1,y),LEFT,buff=.1))
+            labels.add(small_label('RMS relative error (%)',[2.6,2.65,0],25))
+            labels.add(small_label('Seeds in an equal-weight subset',[2.6,-1.75,0],24))
+            group=VGroup(ax,curves,labels)
+            return group,[lambda:Indicate(curves[0]),lambda:Indicate(curves[3]),lambda:Indicate(curves[5])]
+        ax=axes(x=(4.78,5.02,.05),y=(0,1.1,.5),width=5.3,height=2.6).move_to([2.6,.3,0])
+        ax.y_axis.set_opacity(0)
+        lower=100*pool['block']['rms_lower_bound'];upper=100*pool['optimum']['rms_upper']
+        equal=100*pool['equal_rms']
+        markers=VGroup();labels=VGroup()
+        for value,height,label,color in ((lower,.9,'Lower bound',BLUE),(upper,.55,'Optimum',GOLD),(equal,.15,'Equal weights',GREEN)):
+            marker=Line(ax.c2p(value,0),ax.c2p(value,height),color=color,stroke_width=3)
+            point=Dot(ax.c2p(value,height),radius=.055,color=color)
+            markers.add(VGroup(marker,point))
+            text=VGroup(small_label(label,ORIGIN,21,color),formula(f'{value:.3f}'+r'\%',24,color)).arrange(DOWN,buff=.09)
+            text.next_to(point,UP,buff=.12);labels.add(text)
+        for x in (4.8,4.85,4.9,4.95,5.):
+            labels.add(formula(f'{x:.2f}',18,DIM).next_to(ax.c2p(x,0),DOWN,buff=.12))
+        labels.add(small_label('RMS relative error (%); axis shown from 4.78',[2.6,-1.8,0],23))
+        labels.add(formula(rf'\text{{Gap}}={upper-lower:.3f}\text{{ percentage points}}',27,INK,6.3).move_to([2.6,-2.5,0]))
+        group=VGroup(ax,markers,labels)
+        return group,[lambda:Indicate(markers[0]),lambda:Indicate(markers[1]),lambda:Indicate(markers[2])]
+    if kind in ("kernel_sections", "residual_function"):
+        ax = axes(x=(-3, 3, 1), y=(-1.3, 1.5, 1), width=5.4, height=3.8).move_to([2.6,.15,0])
+        curves = VGroup(); labels = VGroup()
+        if kind == "kernel_sections":
+            for center, color in zip((-1.5,0,1.5),(BLUE,GOLD,GREEN)):
+                curve = ax.plot(lambda x,c=center: np.exp(-.5*(x-c)**2), x_range=[-3,3], color=color, stroke_width=3)
+                curves.add(curve)
+            labels.add(formula(r"k(x,z)=\exp\big(-(x-z)^2/2\big)",28,INK,6.3).move_to([2.6,2.45,0]))
+            labels.add(small_label("Input coordinate z", [2.6,-2.3,0],26))
+        else:
+            target = lambda x: .7*np.sin(x)+.18*np.cos(3*x)
+            mean = lambda x: .65*np.sin(x)
+            for fn,color in ((target,INK),(mean,BLUE),(lambda x:target(x)-mean(x),GOLD)):
+                curves.add(ax.plot(fn,x_range=[-3,3],color=color,stroke_width=3))
+            for label,x,color in ((r"G",.2,INK),(r"m",2.6,BLUE),(r"r=G-m",4.8,GOLD)):
+                labels.add(formula(label,30,color).move_to([x,2.35,0]))
+            labels.add(small_label("Toy functions of a scalar input", [2.6,-2.3,0],24))
+        for x in (-3,0,3):
+            labels.add(formula(str(x),18,DIM).next_to(ax.c2p(x,0),DOWN,buff=.12))
+        group = VGroup(ax,curves,labels)
+        return group,[lambda:Indicate(curves[0]),lambda:Indicate(curves[1]),lambda:Indicate(curves[2])]
+    if kind == "feature_circle":
+        center=np.array([2.5,.05,0]);radius=1.75
+        circle=Circle(radius,color=DIM).move_to(center)
+        angle=np.pi/4
+        query_end=center+radius*np.array([np.cos(angle),np.sin(angle),0])
+        horizontal=Arrow(center,center+radius*RIGHT,buff=0,color=BLUE,stroke_width=4)
+        vertical=Arrow(center,center+radius*UP,buff=0,color=GREEN,stroke_width=4)
+        query=Arrow(center,query_end,buff=0,color=GOLD,stroke_width=4)
+        horizontal_part=DashedLine(query_end,center+[radius*np.cos(angle),0,0],color=DIM)
+        labels=VGroup(formula(r"\varphi(0)",26,BLUE).next_to(horizontal.get_end(),RIGHT,buff=.15),
+                      formula(r"\varphi(\pi/2)",26,GREEN).next_to(vertical.get_end(),UP,buff=.15),
+                      formula(r"\varphi(u)",27,GOLD).next_to(query_end,RIGHT,buff=.12),
+                      formula(r"\varphi(u)=(\cos u,\sin u)",29,INK,6.2).move_to([2.6,-2.35,0]))
+        group=VGroup(circle,horizontal,vertical,query,horizontal_part,labels)
+        return group,[lambda:Indicate(query,color=GOLD),lambda:Indicate(horizontal_part),
+                      lambda:AnimationGroup(Indicate(horizontal),Indicate(vertical))]
+    if kind in ("ensemble_segment", "ensemble_hull"):
+        from ensemble_geometry import two_member
+        first = np.array([1., 0.])
+        second = np.array([1.2, .4]) if spec.get("variant") == "aligned" else np.array([0., 2.])
+        result = two_member(first, second)
+        ax = axes(x=(-.4, 2.6, 1), y=(-.4, 2.6, 1), width=3.8, height=3.8).move_to([2.6, .05, 0])
+        origin = ax.c2p(0, 0)
+        v1 = Arrow(origin, ax.c2p(*first), buff=0, color=BLUE, stroke_width=4)
+        v2 = Arrow(origin, ax.c2p(*second), buff=0, color=GOLD, stroke_width=4)
+        segment = Line(ax.c2p(*first), ax.c2p(*second), color=GREEN, stroke_width=3)
+        optimum = ax.c2p(*result['point'])
+        error = DashedLine(origin, optimum, color=RED, stroke_width=3)
+        dot = Dot(ax.c2p(*first), color=RED, radius=.075)
+        labels = VGroup(formula(r"\rho_1", 28, BLUE).next_to(v1.get_end(), DOWN, buff=.18),
+                        formula(r"\rho_2", 28, GOLD).next_to(v2.get_end(), UP, buff=.17),
+                        formula(rf"t^\star={result['weight']:.3f}", 28, GREEN).move_to([4.8, -.4, 0]),
+                        formula(rf"\min\|\rho_w\|^2={result['squared_error']:.3f}", 28, RED).move_to([2.6, -2.5, 0]))
+        group = VGroup(ax, segment, v1, v2, error, dot, labels)
+        if kind == "ensemble_hull":
+            third = ax.c2p(2, 1)
+            hull = Polygon(ax.c2p(*first), ax.c2p(*second), third, color=GREEN,
+                           fill_color=GREEN, fill_opacity=.12, stroke_width=2)
+            extra = Arrow(origin, third, buff=0, color=DIM, stroke_width=2)
+            group.add_to_back(hull); group.add(extra)
+        path = Line(ax.c2p(*first), optimum)
+        return group, [lambda: Indicate(v1, color=BLUE), lambda: Indicate(v2, color=GOLD),
+                       lambda: MoveAlongPath(dot, path) if path.get_length() > 1e-9 else Indicate(dot)]
+    if kind == "second_moment_toy":
+        matrix = np.array([[1., 0.], [0., 4.]])
+        cells = VGroup(); labels = VGroup()
+        for i in range(2):
+            for j in range(2):
+                center = [1.65+j*1.7, 1.0-i*1.7, 0]
+                cell = Square(1.65, color=DIM, fill_color=BLUE if i == j else GOLD,
+                              fill_opacity=.13+.08*matrix[i,j]).move_to(center)
+                cells.add(cell)
+                labels.add(formula(f"{matrix[i,j]:g}", 44, INK).move_to(center))
+        labels.add(formula(r"S=\begin{pmatrix}1&0\\0&4\end{pmatrix}", 31, INK).move_to([2.5, -2.2, 0]))
+        labels.add(small_label("Squared lengths on the diagonal", [2.5, 2.35, 0], 25))
+        group = VGroup(cells, labels)
+        return group, [lambda: Indicate(cells[0], color=BLUE), lambda: Indicate(cells[3], color=BLUE),
+                       lambda: AnimationGroup(Indicate(cells[1], color=GOLD), Indicate(cells[2], color=GOLD))]
+    if kind == "equicorrelation_curve":
+        correlation = .6
+        ax = axes(x=(1, 30, 10), y=(0, 1.1, .2), width=5.3, height=3.7).move_to([2.6,.15,0])
+        curve = ax.plot(lambda m: correlation+(1-correlation)/m, x_range=[1,30], color=GOLD, stroke_width=3)
+        floor = DashedLine(ax.c2p(1,.6), ax.c2p(30,.6), color=BLUE)
+        labels = VGroup(small_label("Member count", [2.6,-2.25,0], 26),
+                        small_label("Normalized squared error", [2.6,2.45,0], 26),
+                        formula(r"\varrho=0.6", 25, BLUE).next_to(floor, UP, buff=.15))
+        for x in (1,10,20,30):
+            labels.add(formula(str(x), 19, DIM).next_to(ax.c2p(x,0), DOWN, buff=.1))
+        for y in (0,.2,.4,.6,.8,1):
+            labels.add(formula(f"{y:g}", 19, DIM).next_to(ax.c2p(1,y), LEFT, buff=.1))
+        dot = Dot(ax.c2p(1,1), radius=.07, color=INK)
+        group = VGroup(ax, curve, floor, labels, dot)
+        return group, [lambda: Indicate(dot), lambda: MoveAlongPath(dot, curve), lambda: Indicate(floor)]
+    if kind == "error_metric_geometry":
+        ax = axes(x=(.5, 2.5, 1), y=(0, 2.3, 1), width=3.8, height=3.4).move_to([2.4,.2,0])
+        zero = Dot(ax.c2p(1,0), radius=.07, color=BLUE)
+        bar = Rectangle(width=.8, height=ax.c2p(2,2)[1]-ax.c2p(2,0)[1],
+                        color=GOLD, fill_color=GOLD, fill_opacity=.5)
+        bar.move_to((ax.c2p(2,2)+ax.c2p(2,0))/2)
+        mean = DashedLine(ax.c2p(.5,1), ax.c2p(2.5,1), color=GREEN)
+        rms = DashedLine(ax.c2p(.5,np.sqrt(2)), ax.c2p(2.5,np.sqrt(2)), color=RED)
+        labels = VGroup(small_label("Case 1", ax.c2p(1,-.25), 25),
+                        small_label("Case 2", ax.c2p(2,-.25), 25),
+                        formula(r"\mathcal E_1=1", 27, GREEN).next_to(mean, RIGHT, buff=.15),
+                        formula(r"\mathcal E_2=\sqrt2", 27, RED).next_to(rms, RIGHT, buff=.15),
+                        small_label("Two equally likely relative errors", [2.6,2.35,0], 25))
+        group = VGroup(ax, zero, bar, mean, rms, labels)
+        return group, [lambda: Indicate(bar), lambda: Indicate(rms, color=RED), lambda: Indicate(mean, color=GREEN)]
     if kind == "kernel_projection":
         from kernel_geometry import geometry
         ridge = spec.get("ridge", 0.)
         result = geometry([[1, 0]], [3, 2], ridge)
         coefficient = result["coefficients"][0]
-        ax = axes(x=(-.3, 4, 1), y=(-.3, 3, 1), width=5.3, height=3.9).move_to([2.7, .15, 0])
+        ax = axes(x=(-.3, 4, 1), y=(-.3, 3, 1), width=5.16, height=3.96).move_to([2.7, .15, 0])
         origin = ax.c2p(0, 0)
         train = Arrow(origin, ax.c2p(1, 0), buff=0, color=BLUE, stroke_width=5)
         query = Arrow(origin, ax.c2p(3, 2), buff=0, color=GOLD, stroke_width=4)
@@ -327,6 +500,17 @@ def build_visual(spec):
                         formula(rf"\|g_u\|^2={result['exact_squared']:g}", 29, RED).move_to([2.6, 2.5, 0]),
                         small_label("The horizontal line is the observed span", [2.6, -2.62, 0], 21))
         group = VGroup(ax, projection, train, fitted, query, gap, labels)
+        if spec.get("focus") == "coefficients":
+            gap.set_opacity(0); labels[3].set_opacity(0); labels[4].set_opacity(0)
+        if spec.get("focus") == "norm":
+            horizontal_gap = Arrow(ax.c2p(coefficient,0),ax.c2p(3,0),buff=0,color=RED,stroke_width=3)
+            vertical_gap = Arrow(ax.c2p(3,0),ax.c2p(3,2),buff=0,color=GREEN,stroke_width=3)
+            group.add(horizontal_gap,vertical_gap)
+        if spec.get("focus") == "coefficients":
+            projected = Arrow(origin,ax.c2p(3,0),buff=0,color=GREEN,stroke_width=4)
+            zero_label = formula(r'\lambda=0:\ c=3',23,GREEN).move_to(labels[2])
+            return group,[lambda:Indicate(query,color=GOLD),lambda:Indicate(fitted,color=GREEN),
+                          lambda:AnimationGroup(Transform(fitted,projected),Transform(labels[2],zero_label),Indicate(projection))]
         return group, [lambda: Indicate(query, color=GOLD),
                        lambda: Indicate(fitted, color=GREEN), lambda: Indicate(gap, color=RED)]
     if kind == "cauchy_ball":
@@ -346,9 +530,10 @@ def build_visual(spec):
                         formula(r"|\langle r,g_u\rangle|=\rho\|g_u\|\,|\cos\theta|", 27, INK, 6.2).move_to([2.6, -2.4, 0]))
         group = VGroup(ball, fixed, r, projection, labels)
         return group, [lambda: Indicate(projection), lambda: Indicate(ball, color=BLUE),
-                       lambda: AnimationGroup(Transform(r, target), FadeOut(projection))]
+                       lambda: AnimationGroup(Transform(r, target), FadeOut(projection),
+                           labels[2].animate.next_to(target.get_end(), RIGHT, buff=.1))]
     if kind == "invisible_residuals":
-        ax = axes(x=(-1, 3.5, 1), y=(-2, 2.5, 1), width=5.3, height=3.8).move_to([2.6, .05, 0])
+        ax = axes(x=(-1, 3.5, 1), y=(-2, 2.5, 1), width=4.1, height=4.1).move_to([2.6, .05, 0])
         origin = ax.c2p(0, 0)
         train = Arrow(origin, ax.c2p(1, 0), buff=0, color=BLUE, stroke_width=5)
         plus = Arrow(origin, ax.c2p(0, 1.6), buff=0, color=GOLD, stroke_width=4)

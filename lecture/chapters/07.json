@@ -5,89 +5,253 @@
     {
       "key": "c07_residual",
       "title": "Fix the mean and name the residual",
-      "visual": {"kind": "kernel_projection", "ridge": 0, "label": "Two-dimensional Hilbert-space illustration", "source": "paper/theory.tex:thm:or"},
+      "visual": {
+        "kind": "residual_function",
+        "ridge": 0,
+        "label": "Illustrative target, neural mean and residual as functions of one input",
+        "source": "lecture/scenes.py:residual_function"
+      },
       "visual_argument": "The unknown residual is a function-space vector; kernel sections span the information available from training observations.",
       "segments": [
-        {"line": "The residual is the target minus the fitted mean", "math": "r=G-m", "say": "Fix the neural mean m. It can be a single network, a stacked ensemble, or any other realized map. Define the residual r as G minus m. We are now asking a deterministic question: given values of this residual at the design points, how large can the kernel correction error be at one query? For this theorem the fitted mean need not be statistically independent of the design. What matters is that the residual used in the statement is a single compatible function."},
-        {"line": "Assume each output component belongs to the chosen RKHS", "math": "r_j\\in\\mathcal H_k,\\qquad j=1,\\ldots,q", "say": "The crucial assumption is that each component of r belongs to the reproducing kernel Hilbert space associated with k. That is a substantive assumption about the target and the chosen kernel. We have not proved it for the benchmark targets. The theorem tells us what follows if it holds. It is useful precisely because it separates a property of the unknown residual function from a property of the sampling geometry."},
-        {"line": "Combine component norms by a sum of squares", "math": "\\|r\\|_K^2=\\sum_{j=1}^q\\|r_j\\|_{\\mathcal H_k}^2", "say": "For a vector-valued output, define the squared residual norm as the sum of the squared RKHS norms of its components. The subscript K denotes this product-space norm; the capital K will also denote the finite Gram matrix, so keep the surrounding expression in view. Our goal is a bound that multiplies this residual norm by a factor determined entirely by the kernel, the design, the query, and the regularization value."}
+        {
+          "line": "The residual is the target minus the fitted mean",
+          "math": "r=G-m",
+          "say": "Fix the neural mean m. It can be a single network, a stacked ensemble, or any other realized map. Define the residual r as G minus m. We are now asking a deterministic question: given values of this residual at the design points, how large can the kernel correction error be at one query? For this theorem the fitted mean need not be statistically independent of the design. What matters is that the residual used in the statement is a single compatible function."
+        },
+        {
+          "line": "Assume each output component belongs to the chosen RKHS",
+          "math": "r_j\\in\\mathcal H_k,\\qquad j=1,\\ldots,q",
+          "say": "The crucial assumption is that each component of r belongs to the reproducing kernel Hilbert space associated with k. That is a substantive assumption about the target and the chosen kernel. We have not proved it for the benchmark targets. The theorem tells us what follows if it holds. It is useful precisely because it separates a property of the unknown residual function from a property of the sampling geometry."
+        },
+        {
+          "line": "Combine component norms by a sum of squares",
+          "math": "\\|r\\|_K^2=\\sum_{j=1}^q\\|r_j\\|_{\\mathcal H_k}^2",
+          "say": "For a vector-valued output, define the squared residual norm as the sum of the squared RKHS norms of its components. The subscript K denotes this product-space norm; the capital K will also denote the finite Gram matrix, so keep the surrounding expression in view. Our goal is a bound that multiplies this residual norm by a factor determined entirely by the kernel, the design, the query, and the regularization value."
+        }
       ]
     },
     {
       "key": "c07_coefficients",
       "title": "Write the correction as a weighted sum",
-      "visual": {"kind": "kernel_projection", "ridge": 0.5, "label": "Illustrative ridge approximation to the query representer", "source": "paper/theory.tex:thm:or"},
+      "visual": {
+        "kind": "kernel_projection",
+        "ridge": 0.5,
+        "label": "Illustrative ridge approximation to the query representer",
+        "source": "paper/theory.tex:thm:or",
+        "focus": "coefficients"
+      },
       "visual_argument": "The query representer is approximated by a linear combination of design representers; ridge changes the coefficients.",
       "segments": [
-        {"line": "Kernel values determine the query weights", "math": "\\begin{aligned}K&=k(X,X),\\quad k_u=k(X,u)\\\\c&=(K+n\\lambda I)^{-1}k_u\\end{aligned}", "say": "Let K be the Gram matrix of the n design points, and let k sub u collect the kernel values between those points and the query. Solve the linear system with K plus n lambda times the identity to obtain c. The factor n is part of the regularization convention used in the paper. If lambda is positive, adding this diagonal term makes the system positive definite even when the unregularized Gram matrix is singular."},
-        {"line": "The same weights act on every output component", "math": "\\widehat r_{\\lambda,j}(u)=\\sum_{i=1}^n c_i\\,r_j(u_i)", "say": "The corrected value of component j is the weighted sum of its residual observations at the design points. The weights depend on the query and the kernel system, but they do not depend on j. For a stress field, this means the same query weights combine all sixteen hundred and eighty-one output coordinates. That shared coefficient vector is what will let one geometric factor control the Euclidean norm of the entire output error."},
-        {"line": "At zero nugget, use interpolation", "math": "\\lambda=0:\\quad c=K^{-1}k_u", "say": "At zero nugget, assume first that K is positive definite. The correction is the kernel interpolant. In the function-space picture, the query representer is projected onto the span of the design representers. At a positive nugget, the coefficients are regularized and the approximation is no longer the orthogonal projection. We will keep both cases in the same algebra and see the extra ridge error explicitly. The singular zero-nugget case can be handled by the pseudoinverse."}
+        {
+          "line": "Kernel values determine the query weights",
+          "math": "\\begin{aligned}K&=k(X,X),\\quad k_u=k(X,u)\\\\c&=(K+n\\lambda I)^{-1}k_u\\end{aligned}",
+          "say": "Let K be the Gram matrix of the n design points, and let k sub u collect the kernel values between those points and the query. Solve the linear system with K plus n lambda times the identity to obtain c. The factor n is part of the regularization convention used in the paper. If lambda is positive, adding this diagonal term makes the system positive definite even when the unregularized Gram matrix is singular."
+        },
+        {
+          "line": "The same weights act on every output component",
+          "math": "\\widehat r_{\\lambda,j}(u)=\\sum_{i=1}^n c_i\\,r_j(u_i)",
+          "say": "The corrected value of component j is the weighted sum of its residual observations at the design points. The weights depend on the query and the kernel system, but they do not depend on j. For a stress field, this means the same query weights combine all sixteen hundred and eighty-one output coordinates. That shared coefficient vector is what will let one geometric factor control the Euclidean norm of the entire output error."
+        },
+        {
+          "line": "At zero nugget, use interpolation",
+          "math": "\\lambda=0:\\quad c=K^{-1}k_u",
+          "say": "At zero nugget, assume first that K is positive definite. The correction is the kernel interpolant. In the function-space picture, the query representer is projected onto the span of the design representers. At a positive nugget, the coefficients are regularized and the approximation is no longer the orthogonal projection. We will keep both cases in the same algebra and see the extra ridge error explicitly. The singular zero-nugget case can be handled by the pseudoinverse."
+        }
+      ]
+    },
+    {
+      "key": "c07_singular",
+      "title": "Redundant observations do not break the zero-nugget formula",
+      "visual": {
+        "kind": "kernel_projection",
+        "ridge": 0,
+        "label": "Repeated horizontal design sections span the same one-dimensional space",
+        "source": "paper/theory.tex:thm:or, singular-design case"
+      },
+      "visual_argument": "A zero-norm combination of design sections is the zero function, so its inner product with the query section vanishes.",
+      "segments": [
+        {
+          "line": "A vector in the Gram nullspace represents the zero function",
+          "math": "\\begin{aligned}Kz=0&\\ \\Longrightarrow\\\\\n\\left\\|\\sum_i z_i k(u_i,\\cdot)\\right\\|^2&=z^\\top Kz=0\\end{aligned}",
+          "say": "At zero nugget, the Gram matrix may be singular because some design sections are redundant. Take a vector z in its nullspace. The corresponding linear combination of design sections has squared RKHS norm z transpose K z, which is zero. In a Hilbert space, a zero-norm element is the zero function. This elementary observation will show that the query coefficient system is still consistent even though its solution need not be unique."
+        },
+        {
+          "line": "The query vector is orthogonal to every null vector",
+          "math": "z^\\top k_u=\\left\\langle\\sum_i z_i k(u_i,\\cdot),k(u,\\cdot)\\right\\rangle=0",
+          "say": "Take the inner product of that zero function with the query section. The result is zero. Expanding the inner product gives z transpose k sub u. Thus the query kernel vector is orthogonal to every vector in the nullspace of K. Since K is symmetric, the orthogonal complement of its nullspace is its range. Therefore k sub u lies in the range of K. No arbitrary extension of the query vector is required."
+        },
+        {
+          "line": "The pseudoinverse gives a consistent coefficient vector",
+          "math": "k_u\\in\\operatorname{range}K,\\qquad c=K^+k_u,\\qquad Kc=k_u",
+          "say": "Use the Moore-Penrose pseudoinverse to choose c. Because k sub u is in the range of K, this coefficient vector satisfies K c equals k sub u exactly. Different coefficient vectors may represent the same fitted RKHS function, but the projection and its error representer are well defined. The norm expansion and sharpness argument therefore continue to hold. This completes the singular zero-nugget case promised in the theorem rather than leaving it as an unexplained inverse symbol."
+        }
       ]
     },
     {
       "key": "c07_representer",
       "title": "Turn evaluation error into one inner product",
-      "visual": {"kind": "kernel_projection", "ridge": 0.5, "label": "The red vector is the error representer g at this query", "source": "paper/proofs.tex:proof:thm:or"},
+      "visual": {
+        "kind": "kernel_projection",
+        "ridge": 0.5,
+        "label": "The red vector is the error representer g at this query",
+        "source": "paper/proofs.tex:proof:thm:or"
+      },
       "visual_argument": "Subtract the fitted combination from the query representer; the remaining vector is the linear functional that measures correction error.",
       "segments": [
-        {"line": "Subtract the design-based approximation", "math": "g_u=k(u,\\cdot)-\\sum_i c_i k(u_i,\\cdot)", "say": "Define g sub u as the query kernel section minus its design-based approximation. This is a function in the RKHS. It depends on the query, the kernel, the design, and lambda, but not on the unknown residual values. In the drawing it is the red vector from the approximate representer to the query representer. Once we know its norm, we know how strongly this particular query can amplify an unknown residual direction."},
-        {"line": "Use the reproducing property at the query and at every design point", "math": "\\begin{aligned}r_j(u)&=\\langle r_j,k(u,\\cdot)\\rangle\\\\r_j(u_i)&=\\langle r_j,k(u_i,\\cdot)\\rangle\\end{aligned}", "say": "The reproducing property says that evaluating a function at a point is the same as taking its inner product with that point's kernel section. Apply it once at the query and once at each design point. This is the only specifically RKHS step in the basic bound. After this substitution, the argument is ordinary Hilbert-space geometry. We can think about lengths, angles, and projections without changing the mathematics."},
-        {"line": "Linearity combines the terms", "math": "r_j(u)-\\widehat r_{\\lambda,j}(u)=\\langle r_j,g_u\\rangle_{\\mathcal H_k}", "say": "Subtract the weighted training evaluations from the query evaluation. Linearity of the inner product combines all the kernel sections into g sub u. The error of component j is therefore exactly the inner product of the unknown residual component with this one known representer. This is an identity, not yet a bound. If the residual points nearly perpendicular to g sub u, its error can be small even when its norm is large. Alignment with g sub u produces the worst case."}
+        {
+          "line": "Subtract the design-based approximation",
+          "math": "g_u=k(u,\\cdot)-\\sum_i c_i k(u_i,\\cdot)",
+          "say": "Define g sub u as the query kernel section minus its design-based approximation. This is a function in the RKHS. It depends on the query, the kernel, the design, and lambda, but not on the unknown residual values. In the drawing it is the red vector from the approximate representer to the query representer. Once we know its norm, we know how strongly this particular query can amplify an unknown residual direction."
+        },
+        {
+          "line": "Use the reproducing property at the query and at every design point",
+          "math": "\\begin{aligned}r_j(u)&=\\langle r_j,k(u,\\cdot)\\rangle\\\\r_j(u_i)&=\\langle r_j,k(u_i,\\cdot)\\rangle\\end{aligned}",
+          "say": "The reproducing property says that evaluating a function at a point is the same as taking its inner product with that point's kernel section. Apply it once at the query and once at each design point. This is the only specifically RKHS step in the basic bound. After this substitution, the argument is ordinary Hilbert-space geometry. We can think about lengths, angles, and projections without changing the mathematics."
+        },
+        {
+          "line": "Linearity combines the terms",
+          "math": "r_j(u)-\\widehat r_{\\lambda,j}(u)=\\langle r_j,g_u\\rangle_{\\mathcal H_k}",
+          "say": "Subtract the weighted training evaluations from the query evaluation. Linearity of the inner product combines all the kernel sections into g sub u. The error of component j is therefore exactly the inner product of the unknown residual component with this one known representer. This is an identity, not yet a bound. If the residual points nearly perpendicular to g sub u, its error can be small even when its norm is large. Alignment with g sub u produces the worst case."
+        }
       ]
     },
     {
       "key": "c07_cauchy",
       "title": "Cauchy-Schwarz controls every component",
-      "visual": {"kind": "cauchy_ball", "label": "Illustrative Hilbert-space lengths and alignment", "source": "paper/proofs.tex:proof:thm:or"},
+      "visual": {
+        "kind": "cauchy_ball",
+        "label": "Illustrative Hilbert-space lengths and alignment",
+        "source": "paper/proofs.tex:proof:thm:or"
+      },
       "visual_argument": "Rotating a fixed-length residual toward the error representer increases their inner product; alignment gives equality.",
       "segments": [
-        {"line": "Bound the inner product by the product of lengths", "math": "|\\langle r_j,g_u\\rangle|\\le\\|r_j\\|_{\\mathcal H_k}\\,\\|g_u\\|_{\\mathcal H_k}", "say": "Cauchy-Schwarz bounds the absolute value of an inner product by the product of the two lengths. Apply it to each component. The geometric meaning is familiar from a dot product in the plane: the inner product equals the product of the lengths times the cosine of the angle. The largest absolute value occurs when the directions are parallel or opposite. Hilbert-space Cauchy-Schwarz makes the same statement without requiring a finite-dimensional coordinate system."},
-        {"line": "Square and add across output coordinates", "math": "\\sum_j|r_j(u)-\\widehat r_{\\lambda,j}(u)|^2\\le\\|g_u\\|^2\\sum_j\\|r_j\\|^2", "say": "Now square the componentwise inequalities and add them. The factor involving g sub u is the same for every component, so it comes outside the sum. The sum on the left is the squared Euclidean norm of the output error. The sum on the right is the squared product-space norm of r. No factor equal to the output dimension appears, because the component norms were combined by this sum of squares from the beginning."},
-        {"line": "The remaining task is to compute one norm", "math": "\\|r(u)-\\widehat r_\\lambda(u)\\|_2\\le\\|r\\|_K\\,\\|g_u\\|_{\\mathcal H_k}", "say": "Take square roots. The output error is bounded by the residual norm times the norm of g sub u. We have isolated the unknown quantity, the residual's RKHS norm, from a completely computable geometric factor. The next step is to expand that geometric norm using the Gram matrix. This will also reveal why the usual Gaussian-process posterior standard deviation is a valid but slightly larger factor when the nugget is positive."}
+        {
+          "line": "Bound the inner product by the product of lengths",
+          "math": "|\\langle r_j,g_u\\rangle|\\le\\|r_j\\|_{\\mathcal H_k}\\,\\|g_u\\|_{\\mathcal H_k}",
+          "say": "Cauchy-Schwarz bounds the absolute value of an inner product by the product of the two lengths. Apply it to each component. The geometric meaning is familiar from a dot product in the plane: the inner product equals the product of the lengths times the cosine of the angle. The largest absolute value occurs when the directions are parallel or opposite. Hilbert-space Cauchy-Schwarz makes the same statement without requiring a finite-dimensional coordinate system."
+        },
+        {
+          "line": "Square and add across output coordinates",
+          "math": "\\sum_j|r_j(u)-\\widehat r_{\\lambda,j}(u)|^2\\le\\|g_u\\|^2\\sum_j\\|r_j\\|^2",
+          "say": "Now square the componentwise inequalities and add them. The factor involving g sub u is the same for every component, so it comes outside the sum. The sum on the left is the squared Euclidean norm of the output error. The sum on the right is the squared product-space norm of r. No factor equal to the output dimension appears, because the component norms were combined by this sum of squares from the beginning."
+        },
+        {
+          "line": "The remaining task is to compute one norm",
+          "math": "\\|r(u)-\\widehat r_\\lambda(u)\\|_2\\le\\|r\\|_K\\,\\|g_u\\|_{\\mathcal H_k}",
+          "say": "Take square roots. The output error is bounded by the residual norm times the norm of g sub u. We have isolated the unknown quantity, the residual's RKHS norm, from a completely computable geometric factor. The next step is to expand that geometric norm using the Gram matrix. This will also reveal why the usual Gaussian-process posterior standard deviation is a valid but slightly larger factor when the nugget is positive."
+        }
       ]
     },
     {
       "key": "c07_expand",
       "title": "Compute the geometric factor exactly",
-      "visual": {"kind": "kernel_projection", "ridge": 0.5, "label": "Squared length of the error representer", "source": "paper/proofs.tex:proof:thm:or"},
+      "visual": {
+        "kind": "kernel_projection",
+        "ridge": 0.5,
+        "label": "Squared length of the error representer",
+        "source": "paper/proofs.tex:proof:thm:or",
+        "focus": "norm"
+      },
       "visual_argument": "The squared length of a vector difference has a query term, a cross term and an approximation term.",
       "segments": [
-        {"line": "Expand the squared norm of the difference", "math": "\\|g_u\\|^2=k(u,u)-2c^\\top k_u+c^\\top Kc", "say": "Expand the squared norm of g sub u. The squared norm of the query kernel section is k of u u. The cross term is minus twice c transpose k sub u. The squared norm of the linear combination of design sections is c transpose K c. Each term follows directly from the identity that the inner product of two kernel sections is the kernel evaluated at their two points. This formula is also easy to check in a finite feature representation."},
-        {"line": "Use the defining linear system", "math": "(K+n\\lambda I)c=k_u\\quad\\Longrightarrow\\quad Kc=k_u-n\\lambda c", "say": "The coefficient vector was defined by a linear system. Rearranging that system gives K c equal to k sub u minus n lambda c. Substitute this into the last term of the norm expansion. One copy of c transpose k sub u cancels. The regularization contributes a negative term, minus n lambda times the squared Euclidean norm of c. This negative sign compares two factors at the same lambda; it does not mean that ridge improves on noiseless interpolation."},
-        {"line": "The exact factor is smaller than the posterior factor", "math": "\\begin{aligned}\\widetilde P_\\lambda(u)^2&=P_\\lambda(u)^2-n\\lambda\\|c\\|_2^2\\\\P_\\lambda(u)^2&=k(u,u)-k_u^\\top(K+n\\lambda I)^{-1}k_u\\end{aligned}", "say": "Call the exact norm of g sub u P tilde lambda. Its square equals P lambda squared minus n lambda times the squared coefficient norm. P lambda is the familiar posterior standard-deviation factor with the same nugget. The exact factor cannot be negative because it was derived as a squared norm. It is no larger than P lambda. We have therefore proved both inequalities in the theorem: the sharp representer bound and the slightly looser posterior-factor bound."}
+        {
+          "line": "Expand the squared norm of the difference",
+          "math": "\\|g_u\\|^2=k(u,u)-2c^\\top k_u+c^\\top Kc",
+          "say": "Expand the squared norm of g sub u. The squared norm of the query kernel section is k of u u. The cross term is minus twice c transpose k sub u. The squared norm of the linear combination of design sections is c transpose K c. Each term follows directly from the identity that the inner product of two kernel sections is the kernel evaluated at their two points. This formula is also easy to check in a finite feature representation."
+        },
+        {
+          "line": "Use the defining linear system",
+          "math": "(K+n\\lambda I)c=k_u\\quad\\Longrightarrow\\quad Kc=k_u-n\\lambda c",
+          "say": "The coefficient vector was defined by a linear system. Rearranging that system gives K c equal to k sub u minus n lambda c. Substitute this into the last term of the norm expansion. One copy of c transpose k sub u cancels. The regularization contributes a negative term, minus n lambda times the squared Euclidean norm of c. This negative sign compares two factors at the same lambda; it does not mean that ridge improves on noiseless interpolation."
+        },
+        {
+          "line": "The exact factor is smaller than the posterior factor",
+          "math": "\\begin{aligned}\\widetilde P_\\lambda(u)^2&=P_\\lambda(u)^2-n\\lambda\\|c\\|_2^2\\\\P_\\lambda(u)^2&=k(u,u)-k_u^\\top(K+n\\lambda I)^{-1}k_u\\end{aligned}",
+          "say": "Call the exact norm of g sub u P tilde lambda. Its square equals P lambda squared minus n lambda times the squared coefficient norm. P lambda is the familiar posterior standard-deviation factor with the same nugget. The exact factor cannot be negative because it was derived as a squared norm. It is no larger than P lambda. We have therefore proved both inequalities in the theorem: the sharp representer bound and the slightly looser posterior-factor bound."
+        }
       ]
     },
     {
       "key": "c07_example",
       "title": "Check the formula in a two-dimensional example",
-      "visual": {"kind": "kernel_projection", "ridge": 0.5, "label": "Exact toy example: one design vector (1,0), query vector (3,2), lambda=1/2", "source": "lecture/kernel_geometry.py"},
+      "visual": {
+        "kind": "kernel_projection",
+        "ridge": 0.5,
+        "label": "Exact toy example: one design vector (1,0), query vector (3,2), lambda=1/2",
+        "source": "lecture/kernel_geometry.py",
+        "focus": "norm"
+      },
       "visual_argument": "The ridge approximation is (2,0), so the error representer is (1,2), whose squared length is five.",
       "segments": [
-        {"line": "Use one design feature and one query feature", "math": "\\phi(x_1)=(1,0),\\quad\\phi(u)=(3,2),\\quad k(x,y)=\\phi(x)^\\top\\phi(y)", "say": "Take an exact finite-dimensional example. There is one design feature vector, one zero, and the query feature vector is three two. Use their ordinary dot product as the kernel. The Gram matrix is the one-by-one matrix with entry one. The query kernel vector has entry three, and k of u u is thirteen. These numbers come directly from the displayed vectors, so we can check the abstract formula by elementary geometry."},
-        {"line": "A nugget of one half gives coefficient two", "math": "c=\\frac3{1+1/2}=2,\\qquad g_u=(3,2)-(2,0)=(1,2)", "say": "With n equal to one and lambda equal to one half, the coefficient is three divided by one and a half, which is two. The approximating feature vector is therefore two zero. Subtract it from the query vector three two and obtain the error representer one two. Its squared length is one plus four, or five. We have computed the exact factor without using the posterior-variance formula at all."},
-        {"line": "The two calculation paths agree", "math": "P_\\lambda^2=13-\\frac9{3/2}=7,\\qquad\\widetilde P_\\lambda^2=7-\\frac12\\,2^2=5", "say": "Now use the matrix formula. The posterior factor squared is thirteen minus nine divided by one and a half, giving seven. Subtract lambda times the coefficient squared: one half times four, or two. The result is five, exactly as the vector calculation gave. At zero nugget, the orthogonal projection is three zero and the remaining vector is zero two, with squared length four. Ridge has increased the exact worst-case factor from two to the square root of five."}
+        {
+          "line": "Use one design feature and one query feature",
+          "math": "\\phi(x_1)=(1,0),\\quad\\phi(u)=(3,2),\\quad k(x,y)=\\phi(x)^\\top\\phi(y)",
+          "say": "Take an exact finite-dimensional example. There is one design feature vector, one zero, and the query feature vector is three two. Use their ordinary dot product as the kernel. The Gram matrix is the one-by-one matrix with entry one. The query kernel vector has entry three, and k of u u is thirteen. These numbers come directly from the displayed vectors, so we can check the abstract formula by elementary geometry."
+        },
+        {
+          "line": "A nugget of one half gives coefficient two",
+          "math": "c=\\frac3{1+1/2}=2,\\qquad g_u=(3,2)-(2,0)=(1,2)",
+          "say": "With n equal to one and lambda equal to one half, the coefficient is three divided by one and a half, which is two. The approximating feature vector is therefore two zero. Subtract it from the query vector three two and obtain the error representer one two. Its squared length is one plus four, or five. We have computed the exact factor without using the posterior-variance formula at all."
+        },
+        {
+          "line": "The two calculation paths agree",
+          "math": "P_\\lambda^2=13-\\frac9{3/2}=7,\\qquad\\widetilde P_\\lambda^2=7-\\frac12\\,2^2=5",
+          "say": "Now use the matrix formula. The posterior factor squared is thirteen minus nine divided by one and a half, giving seven. Subtract lambda times the coefficient squared: one half times four, or two. The result is five, exactly as the vector calculation gave. At zero nugget, the orthogonal projection is three zero and the remaining vector is zero two, with squared length four. Ridge has increased the exact worst-case factor from two to the square root of five."
+        }
       ]
     },
     {
       "key": "c07_equality",
       "title": "Construct a residual that attains the bound",
-      "visual": {"kind": "cauchy_ball", "label": "Equality case: align one residual component with the error representer", "source": "paper/proofs.tex:proof:thm:or"},
+      "visual": {
+        "kind": "cauchy_ball",
+        "label": "Equality case: align one residual component with the error representer",
+        "source": "paper/proofs.tex:proof:thm:or"
+      },
       "visual_argument": "A residual on the boundary of the RKHS ball is rotated into the direction of the error representer.",
       "segments": [
-        {"line": "Choose any radius rho and align the first component", "math": "r_1=\\rho\\frac{g_u}{\\|g_u\\|},\\qquad r_j=0\\quad(j>1)", "say": "To prove sharpness, we must produce a residual that attains the bound, not just show that the inequalities look tight. Suppose g sub u is nonzero. Choose any radius rho. Put all the residual norm in the first output component, and choose that component to be rho times the unit vector in the direction of g sub u. Set the other components to zero. This is allowed by the product-space ball in the theorem."},
-        {"line": "Its norm is exactly the prescribed radius", "math": "\\|r\\|_K=\\rho", "say": "The first component has RKHS norm rho, and all other components have norm zero. The product-space norm is therefore exactly rho. The estimator is built from this constructed residual's own training values. We are not choosing arbitrary training labels after choosing the function, and we are not treating the estimator as fixed independently of those values. The representer identity remains valid because the correction always applies the same query coefficient vector to whatever residual values are observed."},
-        {"line": "Its error equals the upper bound", "math": "\\langle r_1,g_u\\rangle=\\rho\\|g_u\\|=\\rho\\widetilde P_\\lambda(u)", "say": "Take the inner product with g sub u. Alignment makes it rho times the norm of g sub u. The entire output error lies in the first coordinate, so its Euclidean norm is exactly the bound. This proves the exact worst-case error over the ball. If g sub u is zero, the error identity is zero for every residual and sharpness is immediate. The worst-case residual can depend on the query. The theorem does not claim that one residual simultaneously attains the bound at every query."}
+        {
+          "line": "Choose any radius rho and align the first component",
+          "math": "r_1=\\rho\\frac{g_u}{\\|g_u\\|},\\qquad r_j=0\\quad(j>1)",
+          "say": "To prove sharpness, we must produce a residual that attains the bound, not just show that the inequalities look tight. Suppose g sub u is nonzero. Choose any radius rho. Put all the residual norm in the first output component, and choose that component to be rho times the unit vector in the direction of g sub u. Set the other components to zero. This is allowed by the product-space ball in the theorem."
+        },
+        {
+          "line": "Its norm is exactly the prescribed radius",
+          "math": "\\|r\\|_K=\\rho",
+          "say": "The first component has RKHS norm rho, and all other components have norm zero. The product-space norm is therefore exactly rho. The estimator is built from this constructed residual's own training values. We are not choosing arbitrary training labels after choosing the function, and we are not treating the estimator as fixed independently of those values. The representer identity remains valid because the correction always applies the same query coefficient vector to whatever residual values are observed."
+        },
+        {
+          "line": "Its error equals the upper bound",
+          "math": "\\langle r_1,g_u\\rangle=\\rho\\|g_u\\|=\\rho\\widetilde P_\\lambda(u)",
+          "say": "Take the inner product with g sub u. Alignment makes it rho times the norm of g sub u. The entire output error lies in the first coordinate, so its Euclidean norm is exactly the bound. This proves the exact worst-case error over the ball. If g sub u is zero, the error identity is zero for every residual and sharpness is immediate. The worst-case residual can depend on the query. The theorem does not claim that one residual simultaneously attains the bound at every query."
+        }
       ]
     },
     {
       "key": "c07_scope",
       "title": "What has been proved, and what remains unknown",
-      "visual": {"kind": "nugget_factors", "label": "Exact toy factors for the displayed linear-kernel example", "source": "lecture/kernel_geometry.py"},
+      "visual": {
+        "kind": "nugget_factors",
+        "label": "Exact toy factors for the displayed linear-kernel example",
+        "source": "lecture/kernel_geometry.py"
+      },
       "visual_argument": "The interpolation factor, exact ridge factor and posterior factor are plotted separately; none supplies the unknown residual norm.",
       "segments": [
-        {"line": "The geometric factor is computable", "math": "\\sup_{\\|r\\|_K\\le\\rho}\\|r(u)-\\widehat r_\\lambda(u)\\|_2=\\rho\\widetilde P_\\lambda(u)", "say": "We have proved an exact worst-case statement over a specified RKHS ball. The geometric factor can be computed from the kernel matrix and the query. The radius rho describes the class of residuals we allow. In the actual benchmark, the target's residual norm is not known, and its RKHS membership is not established. The theorem is therefore an interpretation of the method, not a numerical certificate that the fitted surrogate's next error will be below a known value."},
-        {"line": "A fitted norm is the norm of a fitted function", "math": "\\|\\widehat r_\\lambda\\|_K^2=\\operatorname{tr}(\\alpha^\\top K\\alpha)", "say": "We can calculate the norm of a fitted kernel function. That is a useful diagnostic, but it is not automatically the norm of the unknown residual. For compatible observations of one RKHS function, ridge contraction gives a lower bound on that function's norm. In the deployed pipeline, the training-row means and the query-time mean can differ, so even that interpretation requires care. A dramatic reduction in a fitted norm does not by itself prove a dramatic reduction in an unknown target norm."},
-        {"line": "The next result gives a matching lower bound for all recovery rules", "math": "\\text{Same observations}\\quad\\Longrightarrow\\quad\\text{an unavoidable ambiguity}", "say": "The sharpness result so far concerns this particular kernel correction rule. A more ambitious question remains: could some different rule, perhaps nonlinear, use the same residual observations and achieve a smaller worst-case error? At zero nugget the answer is no, for this RKHS ball. The proof will use two residuals that are identical on the design but opposite at the query. Their geometric separation creates an error that no recovery rule can avoid."}
+        {
+          "line": "The geometric factor is computable",
+          "math": "\\sup_{\\|r\\|_K\\le\\rho}\\|r(u)-\\widehat r_\\lambda(u)\\|_2=\\rho\\widetilde P_\\lambda(u)",
+          "say": "We have proved an exact worst-case statement over a specified RKHS ball. The geometric factor can be computed from the kernel matrix and the query. The radius rho describes the class of residuals we allow. In the actual benchmark, the target's residual norm is not known, and its RKHS membership is not established. The theorem is therefore an interpretation of the method, not a numerical certificate that the fitted surrogate's next error will be below a known value."
+        },
+        {
+          "line": "A fitted norm is the norm of a fitted function",
+          "math": "\\|\\widehat r_\\lambda\\|_K^2=\\operatorname{tr}(\\alpha^\\top K\\alpha)",
+          "say": "We can calculate the norm of a fitted kernel function. That is a useful diagnostic, but it is not automatically the norm of the unknown residual. For compatible observations of one RKHS function, ridge contraction gives a lower bound on that function's norm. In the deployed pipeline, the training-row means and the query-time mean can differ, so even that interpretation requires care. A dramatic reduction in a fitted norm does not by itself prove a dramatic reduction in an unknown target norm."
+        },
+        {
+          "line": "The next result gives a matching lower bound for all recovery rules",
+          "math": "\\text{Same observations}\\quad\\Longrightarrow\\quad\\text{an unavoidable ambiguity}",
+          "say": "The sharpness result so far concerns this particular kernel correction rule. A more ambitious question remains: could some different rule, perhaps nonlinear, use the same residual observations and achieve a smaller worst-case error? At zero nugget the answer is no, for this RKHS ball. The proof will use two residuals that are identical on the design but opposite at the query. Their geometric separation creates an error that no recovery rule can avoid."
+        }
       ]
     }
   ]

@@ -1,0 +1,48 @@
+{
+  "kind": "author_algebra_verification",
+  "scope": "illustrative residual vectors",
+  "orthogonal": {
+    "weight": 0.2,
+    "point": [
+      0.8,
+      0.4
+    ],
+    "squared_error": 0.8000000000000002,
+    "first_error": 1.0,
+    "second_error": 2.0,
+    "correlation": 0.0,
+    "threshold": 0.5
+  },
+  "aligned": {
+    "weight": 0.0,
+    "point": [
+      1.0,
+      0.0
+    ],
+    "squared_error": 1.0,
+    "first_error": 1.0,
+    "second_error": 1.2649110640673518,
+    "correlation": 0.9486832980505138,
+    "threshold": 0.7905694150420948
+  },
+  "antiparallel": {
+    "weight": 0.3333333333333333,
+    "point": [
+      0.0,
+      0.0
+    ],
+    "squared_error": 0.0,
+    "first_error": 1.0,
+    "second_error": 2.0,
+    "correlation": -1.0,
+    "threshold": 0.5
+  },
+  "gram_identity": {
+    "direct": 0.5226666666666667,
+    "quadratic": 0.5226666666666666
+  },
+  "negative_control": {
+    "wrong_centered_value": 0.07235555555555556,
+    "result": "Rejected: covariance is not the required second moment"
+  }
+}

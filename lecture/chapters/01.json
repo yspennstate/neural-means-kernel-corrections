@@ -99,7 +99,7 @@
         {
           "line": "This case was selected by its error rank",
           "math": "\\text{Selection: near the 98th error percentile}",
-          "say": "Now look at a more difficult case. We selected it near the ninety-eighth percentile of the historical seed-zero model's error distribution. That selection is deliberate and disclosed. It is not a typical test case, and it is not an independent test of a new hypothesis. It shows a part of the distribution that an average can hide. Compare the load shape, the reference stress, and the residual pattern with the previous example."
+          "say": "Now look at a more difficult case. We selected it near the ninety-eighth percentile of the historical seed-zero model's error distribution. That selection is deliberate and disclosed. It is not a typical test case, and it is not an independent test of a new hypothesis. It shows a part of the distribution that an average can hide. Compare the reference stress and the residual pattern with the previous example."
         },
         {
           "line": "A mean does not describe the tail",

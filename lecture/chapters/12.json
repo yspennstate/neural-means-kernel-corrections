@@ -1,0 +1,172 @@
+{
+  "id": "12",
+  "title": "What the proofs and completed experiments establish",
+  "boards": [
+    {
+      "key": "c12_layers",
+      "title": "Read the pipeline one layer at a time",
+      "visual": {
+        "kind": "pipeline_stages",
+        "label": "Diagram of the mechanics pipeline; each fitted object has a different statistical role",
+        "source": "paper/theory.tex and the completed sensitivity evidence"
+      },
+      "visual_argument": "The arrows separate construction of a mean, correction of its remaining error, and calibration of a radius.",
+      "segments": [
+        {
+          "line": "First choose a useful mean",
+          "math": "m(u)=\\operatorname{Stack}(f_1(u),\\ldots,f_M(u))",
+          "say": "The first question is whether the available predictors make different mistakes. Averaging reduces the part of their error that points in different directions. Repeating a configuration can reduce variation among its seeds, but a shared component remains. The block calculation quantifies this obstruction under its stated assumptions. It does not say that every extra model must be useless."
+        },
+        {
+          "line": "Then approximate what the mean leaves behind",
+          "math": "r(u)=G(u)-m(u)",
+          "say": "The next question concerns the remaining function. A kernel correction uses its observed values and the geometry of the kernel sections. The sharp error factor measures the part of a query section that the chosen reconstruction misses. This is a worst-case statement over a specified function-space ball. Its radius must be supplied; the data do not reveal it automatically."
+        },
+        {
+          "line": "Calibrate a prediction set on separate cases",
+          "math": "C(u)=\\{v:\\|v-\\widehat G(u)\\|_2\\le Qa(u)\\}",
+          "say": "The third question is statistical coverage. The rank argument calibrates a ball around a fixed prediction, with any positive scale fixed in advance. It uses exchangeability instead of an unknown native-space norm. These three questions explain why ensemble accuracy, kernel geometry, and calibration appear together in the paper. They are connected, but each answer has its own assumptions."
+        }
+      ]
+    },
+    {
+      "key": "c12_centering",
+      "title": "Measure the implementation differences",
+      "visual": {
+        "kind": "sensitivity_results",
+        "label": "Completed ten-seed comparisons; percentage-point differences; the two vertical scales are separate",
+        "source": "paper/theory.tex and the completed sensitivity evidence",
+        "chart": "centering"
+      },
+      "visual_argument": "Paired differences reveal changes hidden by nearly overlapping headline accuracy values.",
+      "segments": [
+        {
+          "line": "Pair each fold-local run with its pooled counterpart",
+          "math": "\\Delta_s=100(E_{s,\\mathrm{local}}-E_{s,\\mathrm{pooled}})",
+          "say": "The top panel compares the two centering conventions within each training seed. Every dot uses the same benchmark cases and a paired downstream rerun. Read the axis multiplier before judging the height of a line. Pairing isolates this implementation difference more clearly than comparing two unrelated runs, whose changes could also come from initialization or data ordering."
+        },
+        {
+          "line": "Report the size as well as the sign",
+          "math": "\\overline\\Delta=1.07\\times10^{-5}\\ \\mathrm{pp}",
+          "say": "Across the ten pairs, the fold-local mean error is higher. The average change has magnitude about 10.71 millionths of a percentage point. The number is deliberately shown on its own scale. Its magnitude supports a limited statement about these retained predictors and cases. The validity of pooled target centering as cross-fitting is a separate question about which labels each fit may use."
+        },
+        {
+          "line": "The correction-label check is a separate experiment",
+          "math": "\\overline\\Delta_{\\mathrm{labels}}=7.02\\times10^{-6}\\ \\mathrm{pp}",
+          "say": "The lower panel holds the historical mean, kernel, and stacking weights fixed, and changes only the residual labels to match the deployed mean. This increases the mean test error by about 7.02 millionths of a percentage point. The propagated mismatch term also bounds the casewise change by the reverse triangle inequality. A bound on that change is not a prediction of its sign."
+        }
+      ]
+    },
+    {
+      "key": "c12_grid_reduced",
+      "title": "A larger kernel search: reduced-coordinate error",
+      "visual": {
+        "kind": "sensitivity_results",
+        "label": "Completed three-seed comparisons in each band; negative values mean lower error under the expanded grid",
+        "source": "paper/theory.tex and the completed sensitivity evidence",
+        "chart": "grid_reduced"
+      },
+      "visual_argument": "The paired error differences show which fitted families benefit from the larger validation search.",
+      "segments": [
+        {
+          "line": "Change the search while retaining the other controls",
+          "math": "4\\times3=12\\quad\\longrightarrow\\quad7\\times8=56",
+          "say": "This panel uses reduced-coordinate error. The grid grows from twelve to fifty-six candidates by extending the kernel scales and nuggets. Each comparison retains its network features, split, and source emulator. The dots represent the three paired seeds within each spectral band. The short horizontal marks show their means, not confidence intervals for new atmospheric states."
+        },
+        {
+          "line": "Read all three fitted families",
+          "math": "\\Delta=100(E_{\\mathrm{expanded}}-E_{\\mathrm{recorded}})",
+          "say": "The raw-input kernel tests how much the original comparison depended on a restricted kernel search. The feature head tests the same issue after a neural representation has been learned. The coordinate combination is selected again from validation errors, because its available candidates have changed. Looking at all three families prevents an improvement in one component from being mistaken for an improvement everywhere."
+        },
+        {
+          "line": "Validation selection does not force test improvement",
+          "math": "\\#\\{\\Delta_{\\mathrm{combination}}<0\\}=0\\ \\mathrm{of}\\ 9",
+          "say": "The coordinate combination improves in 0 of the nine paired seed-and-band comparisons in this metric. That count describes these comparisons; it is not a significance test with nine independent datasets. A larger candidate set cannot worsen the best validation objective when the old candidates are retained, but it can change selection in a way that worsens test error."
+        }
+      ]
+    },
+    {
+      "key": "c12_grid_radiance",
+      "title": "A larger kernel search: reconstructed-radiance error",
+      "visual": {
+        "kind": "sensitivity_results",
+        "label": "Completed three-seed comparisons in each band; negative values mean lower error under the expanded grid",
+        "source": "paper/theory.tex and the completed sensitivity evidence",
+        "chart": "grid_radiance"
+      },
+      "visual_argument": "The paired error differences show which fitted families benefit from the larger validation search.",
+      "segments": [
+        {
+          "line": "Change the search while retaining the other controls",
+          "math": "4\\times3=12\\quad\\longrightarrow\\quad7\\times8=56",
+          "say": "Now keep exactly the same predictions and examine reconstructed radiance. Undo the coordinate standardization, apply the spectral basis, and restore the reference mean. This changes the norm in which an error is measured. A unit error in one reduced coordinate can affect the spectrum much more than the same error in another. The signs and relative sizes of improvements can therefore change."
+        },
+        {
+          "line": "Read all three fitted families",
+          "math": "\\Delta=100(E_{\\mathrm{expanded}}-E_{\\mathrm{recorded}})",
+          "say": "Compare each spectral band with its reduced-coordinate panel. The plotted changes are derived from the same saved predictions, rather than a separately selected set of favorable runs. We do not choose another model after looking at this test panel. The radiance calculation was also checked through a spectral Gram quadratic form and by direct summation across the reconstructed channels."
+        },
+        {
+          "line": "Validation selection does not force test improvement",
+          "math": "\\#\\{\\Delta_{\\mathrm{combination}}<0\\}=4\\ \\mathrm{of}\\ 9",
+          "say": "In reconstructed radiance, the coordinate combination improves in 4 of the nine paired comparisons. The practical interpretation depends on the prediction task: reduced-coordinate accuracy and spectral accuracy answer different questions. Report both when both matter. A method should earn its conclusion in the declared metric, under a stated search budget, with the difficult cases still visible."
+        }
+      ]
+    },
+    {
+      "key": "c12_scope",
+      "title": "Keep the theorem tied to its assumptions",
+      "visual": {
+        "kind": "kernel_projection",
+        "label": "Exact two-feature illustration: training section (1,0), query section (3,2), interpolation coefficient 3",
+        "source": "paper/theory.tex and the completed sensitivity evidence"
+      },
+      "visual_argument": "The unobserved component explains both the sharp bound and why an unknown norm remains necessary.",
+      "segments": [
+        {
+          "line": "The sharp factor is a norm of a residual representer",
+          "math": "\\sup_{\\|r\\|_K\\le\\rho}\\|r(u)-\\widehat r_\\lambda(u)\\|_2=\\rho\\widetilde P_\\lambda(u)",
+          "say": "Return to the projection picture. The residual representer gives the exact worst-case constant for the fixed kernel reconstruction. Cauchy and Schwarz give the upper bound; a residual aligned with that representer attains it. Both parts are necessary for sharpness. The finite-dimensional drawing makes this alignment visible, while the Hilbert-space proof supplies the general statement."
+        },
+        {
+          "line": "Indistinguishable residuals give the minimax lower bound",
+          "math": "r^+(X)=r^-(X)=0",
+          "say": "For interpolation, the residual representer vanishes at the training inputs. Two opposite multiples therefore produce identical observations and opposite query values. Every estimator returns the same answer for both, so one error is at least half their separation. This is the main information argument. It applies to rules using those observations, with the kernel and function class fixed."
+        },
+        {
+          "line": "The reported geometry does not estimate the missing norm",
+          "math": "\\rho\\ \\text{must be justified separately}",
+          "say": "The calculation gives a geometric constant, not an estimate of the unknown target norm. Likewise, a small fitted correction norm does not prove that the true residual is smooth or small in that space. The paper therefore reports measured errors and calibrated radii alongside the deterministic theory. Their agreement or disagreement is informative precisely because the claims are kept distinct."
+        }
+      ]
+    },
+    {
+      "key": "c12_return",
+      "title": "Return to the prediction problem",
+      "visual": {
+        "kind": "elastic_domain",
+        "label": "The mechanics task maps a boundary load to a field; accuracy and uncertainty concern that whole output",
+        "source": "paper/theory.tex and the completed sensitivity evidence"
+      },
+      "visual_argument": "Returning to the physical input-output map connects the abstract argument to the task being solved.",
+      "segments": [
+        {
+          "line": "Check the prediction in the metric that matters",
+          "math": "E=\\frac1N\\sum_i\\frac{\\|\\widehat G(u_i)-G(u_i)\\|_2}{\\|G(u_i)\\|_2}",
+          "say": "For a new application, start by writing the error metric and the intended output. Check ordinary cases and difficult cases in physical coordinates. A mean percentage alone will not show whether an error changes a localized stress peak or a narrow spectral feature. The field and spectrum images in this lecture are part of the numerical argument, rather than decoration."
+        },
+        {
+          "line": "Use new cases to test the completed choices",
+          "math": "\\text{fit}\\ \\longrightarrow\\ \\text{calibrate}\\ \\longrightarrow\\ \\text{evaluate}",
+          "say": "Freeze the predictor and every tuning choice before using fresh calibration and evaluation cases. The current benchmarks have been inspected through many research decisions, so another split of the same archive does not erase that history. A fresh campaign would test whether the observed gains and coverage survive a new collection of cases and any intended change of operating conditions."
+        },
+        {
+          "line": "Three objects make the method understandable",
+          "math": "\\begin{gathered}\\text{error vectors},\\quad\\text{kernel sections}\\\\\\text{score ranks}\\end{gathered}",
+          "say": "Keep three pictures in mind: error vectors reveal what averaging can cancel; kernel sections reveal what observations can reconstruct; and score ranks explain marginal coverage. They provide different ways to question a surrogate. Together with a reproducible experiment and images of its successes and failures, they make the method something we can inspect, prove statements about, and test."
+        }
+      ]
+    }
+  ],
+  "evidence_manifest_sha256": "714603298150658a9cbad70399da87887d3fa5bbded60ebc7e9d5aebd68ec30c"
+}

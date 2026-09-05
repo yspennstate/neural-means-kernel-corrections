@@ -1,0 +1,73 @@
+{
+  "observed_at": "2026-09-05T18:42:46.444982+00:00",
+  "scope": "One fixed lecture board; 600 identical frames through the adapted Manim writer per codec",
+  "rows": [
+    {
+      "codec": "h264_nvenc",
+      "encoder_seconds": 110.47469080000155,
+      "frames": 600,
+      "source_board_sha256": "19fe2b8140dfba220db4ef13a58c55abd25e9425491fd3bde0938c8905652a96",
+      "video_sha256": "1ad71d0c674e3421f4c5fbfa2360dbc11043f62ff176906067abf04f9b67ba0a",
+      "private_receipt_sha256": "c33400474180cacac56b98a93fac69a69d1b3def872f2b01b57459530474631d",
+      "independent_ffprobe": {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1",
+        "duration": "20.000000",
+        "nb_read_frames": "600"
+      },
+      "settings": {
+        "an": "1",
+        "preset": "p5",
+        "tune": "hq",
+        "rc": "vbr",
+        "cq": "18",
+        "b": "0"
+      },
+      "threads": 1,
+      "device_wide_encoder_peak_percent": 95,
+      "device_wide_gpu_peak_percent": 36,
+      "gpu_samples": 498,
+      "sampling_errors": [],
+      "first_frame_mean_absolute_rgb_error": 0.9352663644547325,
+      "author_visual_check": "Decoded first frame inspected at 1920x1080; fraction bars, labels and field images intact"
+    },
+    {
+      "codec": "libx264",
+      "encoder_seconds": 165.89252670000133,
+      "frames": 600,
+      "source_board_sha256": "19fe2b8140dfba220db4ef13a58c55abd25e9425491fd3bde0938c8905652a96",
+      "video_sha256": "51dcd6009f5c9c82e94e2d789b2a8b76f570ae3b8bb9cc570df6b19946bb5bd3",
+      "private_receipt_sha256": "f927f3924637723cc68b79f2be931eac1a1203ead49f30ff7e51576210c34d77",
+      "independent_ffprobe": {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1",
+        "duration": "20.000000",
+        "nb_read_frames": "600"
+      },
+      "settings": {
+        "preset": "veryfast",
+        "crf": "20"
+      },
+      "threads": 1,
+      "device_wide_encoder_peak_percent": 100,
+      "device_wide_gpu_peak_percent": 31,
+      "gpu_samples": 886,
+      "sampling_errors": [],
+      "first_frame_mean_absolute_rgb_error": 1.0411041988168723,
+      "author_visual_check": "Decoded first frame inspected at 1920x1080; fraction bars, labels and field images intact"
+    }
+  ],
+  "cpu_time_divided_by_nvenc_time": 1.501633772393405,
+  "limitations": [
+    "One sequential comparison under concurrent machine load, with different encoder quality presets.",
+    "Device-wide utilization includes other workloads; no process-specific attribution.",
+    "This measures encoding and frame delivery, not full scene construction or complete chapter throughput.",
+    "Visual observation covers the decoded first frame of this repeated-frame clip, not the whole lecture.",
+    "No audio is present in the probe."
+  ],
+  "reproduction": "lecture/benchmark_encoder.py; codecs h264_nvenc and libx264; --frames 600"
+}

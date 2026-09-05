@@ -3,6 +3,7 @@
 Box widths are a conservative preflight, not a substitute for the final
 Manim glyph bounds or visual inspection of the rendered frame.
 """
+import argparse
 import hashlib
 import json
 import os
@@ -17,14 +18,20 @@ HERE=Path(__file__).resolve().parent
 
 
 def main():
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--chapter', help='Check one chapter instead of the entire lecture')
+    parser.add_argument('--out', type=Path, default=HERE.parent/'.local-verification/lecture_equations')
+    args=parser.parse_args()
     if os.name=='nt':
         proc=psutil.Process();proc.nice(psutil.BELOW_NORMAL_PRIORITY_CLASS);proc.cpu_affinity([6])
-    out=HERE.parent/'.local-verification/lecture_equations'
+    out=args.out
     out.mkdir(parents=True,exist_ok=True)
     rows={};sources={}
     tex=[r'\documentclass{article}',PREAMBLE,
          r'\newwrite\measureout',r'\immediate\openout\measureout=dimensions.txt',r'\begin{document}']
-    for p in sorted((HERE/'chapters').glob('*.json')):
+    chapters=([HERE/'chapters'/(args.chapter+'.json')] if args.chapter else
+              sorted((HERE/'chapters').glob('*.json')))
+    for p in chapters:
         sources[p.name]=hashlib.sha256(p.read_bytes()).hexdigest()
         data=json.loads(p.read_text(encoding='utf-8'))
         for b in data['boards']:

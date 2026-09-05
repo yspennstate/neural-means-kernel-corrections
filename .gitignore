@@ -24,3 +24,11 @@ release_artifacts/
 # Paired manuscript build intermediates
 paper/nmkc-build/
 paper/output.*
+
+# Lecture build products; source, provenance and the script are versioned.
+lecture/audio/
+lecture/media/
+lecture/out/
+lecture/timing/
+lecture/logs/
+lecture/assets/generated/

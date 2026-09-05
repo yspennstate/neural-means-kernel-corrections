@@ -1,0 +1,22 @@
+{
+  "title": "Neural means and kernel corrections",
+  "author": "Yitzchak Shmalo",
+  "target_minutes": 120,
+  "status": "IN_PRODUCTION",
+  "voice": "en-US-AndrewMultilingualNeural",
+  "rate": "+10%",
+  "chapters": [
+    {"id": "01", "title": "From a load to a stress field", "target_minutes": 8, "visual": "Actual load curves, stress fields and a labelled elastic domain"},
+    {"id": "02", "title": "What the neural mean and kernel each do", "target_minutes": 9, "visual": "A progressively constructed pipeline and residual field"},
+    {"id": "03", "title": "The geometry of averaging errors", "target_minutes": 12, "visual": "Residual vectors, their convex hull and the nearest point to the origin"},
+    {"id": "04", "title": "Why more seeds can stop helping", "target_minutes": 12, "visual": "Nested common, architecture and seed directions; full block-floor proof"},
+    {"id": "05", "title": "What sixty trained predictors show", "target_minutes": 8, "visual": "Recorded second-moment matrix, empirical bounds and paired seed results"},
+    {"id": "06", "title": "Kernel regression as projection", "target_minutes": 10, "visual": "Kernel sections, interpolation span and the orthogonal error component"},
+    {"id": "07", "title": "A sharp bound, proved step by step", "target_minutes": 14, "visual": "Evaluation representer, Cauchy-Schwarz geometry and equality construction"},
+    {"id": "08", "title": "Why no recovery rule can beat interpolation", "target_minutes": 10, "visual": "Two opposite residuals invisible on the design; nugget cost in eigendirections"},
+    {"id": "09", "title": "Training labels and deployment must agree", "target_minutes": 7, "visual": "Foldwise and full-fit means, propagated mismatch and completed paired reruns"},
+    {"id": "10", "title": "Learned geometry in OCO-2", "target_minutes": 10, "visual": "Actual radiance coordinates, input ellipses, feature maps and expanded grid results"},
+    {"id": "11", "title": "Prediction balls and what coverage means", "target_minutes": 10, "visual": "Rank calibration, random prediction balls and power-versus-error data"},
+    {"id": "12", "title": "Reading the evidence and choosing the next experiment", "target_minutes": 10, "visual": "A worked decision map connecting measured residual alignment, features and uncertainty"}
+  ]
+}

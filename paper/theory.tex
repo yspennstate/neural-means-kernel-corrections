@@ -204,7 +204,26 @@ $M$ architectures takes it below
 $\bar e\sqrt{\varrho_b+(\varrho_w-\varrho_b)/M}$, and no pool of any size
 takes it below $\bar e\sqrt{\varrho_b}$.
 \end{theorem}
-\noindent\emph{Proof.} See Supplement~\ref{proof:thm:blockfloor}.
+\begin{proof}
+Let $W_a=\sum_{k=1}^K w_{a,k}$ be the weight assigned to architecture $a$.
+Then $\sum_aW_a=1$. Nonnegativity of the weights lets us apply the three
+entrywise lower bounds separately:
+\begin{align*}
+w^\top Sw
+&\ge \bar e^{\,2}\left[
+ \|w\|_2^2+\varrho_w\left(\sum_aW_a^2-\|w\|_2^2\right)
+ +\varrho_b\left(1-\sum_aW_a^2\right)\right]\\
+&=\bar e^{\,2}\left[
+ \varrho_b+(\varrho_w-\varrho_b)\sum_aW_a^2
+ +(1-\varrho_w)\|w\|_2^2\right].
+\end{align*}
+Cauchy--Schwarz gives $\sum_aW_a^2\ge1/M$ and
+$\|w\|_2^2\ge1/(MK)$. Their coefficients are nonnegative, so substitution
+proves the bound. Uniform weights make both Cauchy--Schwarz inequalities
+equalities. When the entrywise bounds are equalities too, every step is
+an equality. The stated limits follow directly, provided the same bounds
+hold throughout the enlarged pool.
+\end{proof}
 
 
 At fixed $M$, increasing $K$ reduces only the term $(1-\varrho_w)/(MK)$ in the lower bound. The within-architecture contribution $(\varrho_w-\varrho_b)/M$ persists. Section~\ref{sec:seeds-arch} applies the formula empirically to sixty trained predictors; it does not assume the same inequalities for untrained members.
@@ -347,7 +366,31 @@ a residual operator of norm $\|G-m\|_K$ at which it holds with equality, so
 $\|G-m\|_K\widetilde P_\lambda(u)$ is the exact worst-case error of the correction
 over the ball $\{r:\|r\|_K\le\|G-m\|_K\}$.
 \end{theorem}
-\noindent\emph{Proof.} See Supplement~\ref{proof:thm:or}.
+\begin{proof}
+Put $c=(K+n\lambda I)^{-1}k(X,u)$ and
+$g_u=k(u,\cdot)-\sum_i c_i k(u_i,\cdot)$.
+The reproducing property expresses each component of the error as
+$r_j(u)-\widehat r_{\lambda,j}(u)=\langle r_j,g_u\rangle_{\mathcal H_k}$.
+Consequently,
+\[
+\|r(u)-\widehat r_\lambda(u)\|_2^2
+\le\sum_j\|r_j\|_{\mathcal H_k}^2\|g_u\|_{\mathcal H_k}^2
+=\|r\|_K^2\|g_u\|_{\mathcal H_k}^2.
+\]
+Since $Kc=k(X,u)-n\lambda c$, expansion of the squared norm gives
+\[
+\|g_u\|_{\mathcal H_k}^2
+=k(u,u)-2c^\top k(X,u)+c^\top Kc
+=P_\lambda(u)^2-n\lambda\|c\|_2^2.
+\]
+This proves both inequalities. If $\|g_u\|>0$, take
+$r_1=\rho g_u/\|g_u\|$ and $r_j=0$ for $j>1$, for any prescribed
+radius $\rho$. Its norm is $\rho$ and its error is exactly $\rho\|g_u\|$,
+which proves sharpness. If $g_u=0$, every residual has zero error.
+For $\lambda=0$ and singular $K$, positive semidefiniteness of the augmented
+Gram matrix implies $k(X,u)\in\operatorname{range}K$; hence $c=K^+k(X,u)$
+satisfies $Kc=k(X,u)$ and the same argument applies.
+\end{proof}
 
 
 \paragraph{The recorded correction labels.}
@@ -392,7 +435,30 @@ A_\lambda^{-2}K^{-1}k_u ,
 so the nugget's cost in the worst-case constant is a computable quantity that
 vanishes as $\lambda\to0$.
 \end{theorem}
-\noindent\emph{Proof.} See Supplement~\ref{proof:thm:minimax}.
+\begin{proof}
+At $\lambda=0$, the function $g_u$ in the preceding proof vanishes on $X$,
+has norm $P_0(u)$, and satisfies $g_u(u)=P_0(u)^2$. If $P_0(u)>0$, the
+two residuals $r^\pm=\pm\rho g_u e_1/P_0(u)$ belong to the ball and give
+identical observations, namely zero. Any rule therefore returns the same
+vector $\psi=\Psi(0)$ for both. The triangle inequality gives
+\[
+2\rho P_0(u)=\|r^+(u)-r^-(u)\|_2
+\le\|r^+(u)-\psi\|_2+\|r^-(u)-\psi\|_2,
+\]
+so at least one error is $\rho P_0(u)$ or larger. When $P_0(u)=0$ this
+lower bound is immediate. The preceding theorem supplies the matching
+upper bound for interpolation and the exact ridge worst case.
+Finally, set $t=n\lambda$ and $A=K+tI$. Because $A$ commutes with $K$,
+\begin{align*}
+\widetilde P_\lambda^2-P_0^2
+&=k_u^\top(K^{-1}-2A^{-1}+A^{-1}KA^{-1})k_u\\
+&=k_u^\top A^{-2}K^{-1}(A-K)^2k_u
+=t^2k_u^\top A^{-2}K^{-1}k_u\ge0.
+\end{align*}
+The upper inequality follows from the preceding theorem. For the fixed
+finite positive definite matrix $K$, the last expression tends to zero
+as $t\to0$.
+\end{proof}
 
 
 The lower bound is the classical optimal-recovery argument

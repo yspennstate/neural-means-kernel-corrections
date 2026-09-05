@@ -1,0 +1,94 @@
+{
+  "id": "04",
+  "title": "Why more seeds can stop helping",
+  "boards": [
+    {
+      "key": "c04_three_directions",
+      "title": "An error can have three shared components",
+      "visual": {"kind": "residual_blocks", "stage": "components", "label": "Illustrative orthogonal-component model; not measured benchmark data", "source": "paper/theory.tex:thm:blockfloor"},
+      "visual_argument": "A common direction is shared by every member, an architecture direction by its seeds, and a seed direction by one member; the schematic represents orthogonal components in a higher-dimensional space.",
+      "segments": [
+        {"line": "A direction shared by the entire pool", "math": "\\rho_{a,k}=c+b_a+\\varepsilon_{a,k}", "say": "Suppose every predictor gets part of the problem wrong in the same way. Draw that error as a common vector, c. Each architecture then adds a second component, b sub a, shared by its different training seeds. Finally, each individual trained member has its own component, epsilon sub a k. This is an illustrative decomposition, not a fitted model of the benchmark. Its purpose is to show what averaging can remove. Imagine the three kinds of components lying in mutually orthogonal directions, even though our drawing compresses them onto a flat screen."},
+        {"line": "Averaging seeds leaves the architecture component", "math": "\\frac1K\\sum_k\\rho_{a,k}=c+b_a+\\frac1K\\sum_k\\varepsilon_{a,k}", "say": "Average the seeds of one architecture. The common vector remains unchanged. So does the architecture component. Only the individual seed components can cancel or become smaller through averaging. Training more seeds can therefore keep reducing one part of the error while leaving a much larger shared part untouched. This is the geometry behind a plateau. It is also why counting models is a poor substitute for measuring their residuals."},
+        {"line": "Averaging architectures still leaves the common direction", "math": "\\frac1M\\sum_a(c+b_a)=c+\\frac1M\\sum_a b_a", "say": "Now average across architectures. That can reduce the architecture-specific components, provided they point in sufficiently different directions. The common vector still survives. In this picture there are two distinct ways to spend a computation budget: add seeds to reduce the individual component, or add genuinely different predictors to reduce the architecture component. The theorem we are about to prove does not assume that this orthogonal decomposition literally exists. It needs only lower bounds on entries of the residual second-moment matrix."}
+      ]
+    },
+    {
+      "key": "c04_matrix",
+      "title": "Translate the picture into entries of a matrix",
+      "visual": {"kind": "block_matrix", "M": 3, "K": 4, "rho_w": 0.8, "rho_b": 0.6, "label": "Illustrative normalized matrix: 3 architectures, 4 seeds each", "source": "paper/theory.tex:thm:blockfloor"},
+      "visual_argument": "Diagonal cells, off-diagonal cells inside an architecture block, and cells between blocks receive three distinct lower bounds.",
+      "segments": [
+        {"line": "Every member has a minimum squared error", "math": "S_{ii}\\ge\\bar e^{\\,2}", "say": "Index each member by an architecture a and a seed k. There are M architectures and K seeds per architecture. The matrix entry S i j is the expected inner product of the two normalized residuals. A diagonal entry is the expected squared length of one residual. Our first assumption says that every diagonal entry is at least e bar squared. The scale e bar is a lower bound on member root-mean-square error, not necessarily their mean relative error."},
+        {"line": "Seeds of the same architecture remain aligned", "math": "S_{ij}\\ge\\varrho_w\\bar e^{\\,2}\\quad\\text{within an architecture}", "say": "The second assumption concerns two different seeds of the same architecture. Their second-moment entry is at least rho w times e bar squared. The subscript w stands for within. In the matrix, these are the off-diagonal cells inside each square block. This is an entrywise lower bound. It is stronger and more specific than saying that the average correlation looks large. Every pair covered by the assumption must satisfy it."},
+        {"line": "Different architectures can still share error", "math": "S_{ij}\\ge\\varrho_b\\bar e^{\\,2},\\qquad 0\\le\\varrho_b\\le\\varrho_w\\le1", "say": "The third assumption gives a lower bound between architectures, rho b times e bar squared. We assume the between-architecture level is no larger than the within-architecture level, and both lie between zero and one. Those inequalities will make two coefficients nonnegative in the proof. The displayed matrix uses three architectures and four seeds to make the blocks visible. Its numbers are illustrative. The theorem itself applies to any finite M and K satisfying the stated assumptions."}
+      ]
+    },
+    {
+      "key": "c04_weights",
+      "title": "First collect the weight of each architecture",
+      "visual": {"kind": "architecture_weights", "M": 3, "K": 4, "label": "Illustrative convex weights; bar height represents total architecture weight", "source": "paper/proofs.tex:proof:thm:blockfloor"},
+      "visual_argument": "Individual member weights are grouped into architecture totals; the total area stays one.",
+      "segments": [
+        {"line": "Member weights are nonnegative and sum to one", "math": "w_{a,k}\\ge0,\\qquad\\sum_{a,k}w_{a,k}=1", "say": "We are proving a statement about convex averaging. Every member weight is nonnegative, and all the weights sum to one. This restriction is doing real work. When we multiply an entrywise lower bound by a product of two weights, the inequality keeps its direction because that product is nonnegative. If we allowed arbitrary signed weights, this step would fail. A signed global stack has a different exact optimization formula, which we discussed in the previous chapter."},
+        {"line": "Add the seed weights inside each architecture", "math": "W_a=\\sum_{k=1}^K w_{a,k},\\qquad\\sum_{a=1}^M W_a=1", "say": "Let W sub a be the total weight assigned to architecture a. The lower-case weights tell us how the mass is split among individual seeds. The capital W tells us how much mass an architecture gets altogether. The sum of the capital W values is still one. Grouping the weights this way lets us separate two kinds of concentration: concentrating on a few architectures and concentrating on a few seeds inside them."},
+        {"line": "The squared weights measure concentration", "math": "\\sum_aW_a^2\\quad\\text{and}\\quad\\sum_{a,k}w_{a,k}^2", "say": "Why do squares appear? A quadratic loss pairs every residual with every other residual. When all the weight sits on one architecture, the sum of the squared architecture totals is one. When it is spread equally over M architectures, that sum is one over M. The individual squared weights behave in the same way. The two quantities are simple measures of how concentrated the averaging rule is. We can now rewrite all the pairwise products using them."}
+      ]
+    },
+    {
+      "key": "c04_pairs",
+      "title": "Partition every pair exactly once",
+      "visual": {"kind": "block_matrix", "M": 3, "K": 4, "rho_w": 0.8, "rho_b": 0.6, "label": "Three disjoint parts of the quadratic form", "source": "paper/proofs.tex:proof:thm:blockfloor"},
+      "visual_argument": "Highlight diagonal, within-block off-diagonal, and between-block entries in the order used by the algebra.",
+      "segments": [
+        {"line": "Diagonal pairs contribute the individual squared weights", "math": "\\sum_{a,k}w_{a,k}^2=\\|w\\|_2^2", "say": "Expand w transpose S w as a sum over ordered pairs of members. There are three disjoint groups. First come the diagonal pairs, where the member is paired with itself. Their total coefficient is the sum of the individual squared weights. Nothing has been bounded yet; we are only organizing the sum. The matrix picture shows these entries along the main diagonal."},
+        {"line": "Within each block, subtract its diagonal", "math": "\\sum_a\\sum_{k\\ne l}w_{a,k}w_{a,l}=\\sum_aW_a^2-\\|w\\|_2^2", "say": "Second come distinct seeds inside one architecture. Square W sub a. The expansion includes every ordered seed pair in that architecture, including the diagonal pairs. Subtract the individual squares and only the off-diagonal pairs remain. Add this identity over architectures. This gives the sum of the squared capital W values minus the sum of the individual squared weights. Notice that both orders of a distinct pair are included, exactly as they are in the quadratic form."},
+        {"line": "Between blocks, subtract all same-architecture pairs", "math": "\\sum_{a\\ne b}W_aW_b=1-\\sum_aW_a^2", "say": "Finally come pairs from different architectures. The square of the total architecture weight is one. Expanding it gives every architecture pair, including pairs of an architecture with itself. Subtract the same-architecture terms, the squared capital W values, and the remainder is precisely the between-architecture contribution. These three expressions account for every ordered member pair once. That bookkeeping is the main algebraic step of the proof."}
+      ]
+    },
+    {
+      "key": "c04_bound",
+      "title": "Apply the three lower bounds",
+      "visual": {"kind": "floor_components", "M": 3, "K": 4, "rho_w": 0.8, "rho_b": 0.6, "label": "Illustrative decomposition of the normalized lower bound", "source": "paper/theory.tex:thm:blockfloor"},
+      "visual_argument": "Three coloured contributions correspond to the common, architecture and individual-weight terms in the exact lower-bound expression.",
+      "segments": [
+        {"line": "Replace each matrix entry by its allowed minimum", "math": "\\frac{w^\\top Sw}{\\bar e^{\\,2}}\\ge A+\\varrho_w(B-A)+\\varrho_b(1-B)", "say": "To keep the line readable, write A for the sum of the individual squared weights and B for the sum of the squared architecture totals. The diagonal terms contribute at least e bar squared times A. The within-architecture terms contribute at least rho w times e bar squared times B minus A. The between-architecture terms contribute at least rho b times e bar squared times one minus B. Add these three bounds and divide by e bar squared, assuming for the moment that e bar is positive."},
+        {"line": "Collect the coefficients of the two concentration measures", "math": "\\frac{w^\\top Sw}{\\bar e^{\\,2}}\\ge\\varrho_b+(\\varrho_w-\\varrho_b)B+(1-\\varrho_w)A", "say": "Now collect terms. The constant term is rho b. The coefficient of B is rho w minus rho b. The coefficient of A is one minus rho w. This line is the algebraic version of the geometric picture at the beginning of the chapter. The between-architecture component survives every convex average. The architecture component is multiplied by how concentrated the architecture weights are. The individual component is multiplied by how concentrated the member weights are."},
+        {"line": "Both coefficients are nonnegative", "math": "\\varrho_w-\\varrho_b\\ge0,\\qquad1-\\varrho_w\\ge0", "say": "We can lower-bound A and B separately because their coefficients are nonnegative. This is exactly where the ordering assumptions on rho b and rho w enter. Without those signs, replacing a concentration measure by a lower bound could reverse what we want to prove. If e bar is zero, the original theorem gives the trivial lower bound zero and we do not divide by it. The nontrivial case is the positive scale we have used here."}
+      ]
+    },
+    {
+      "key": "c04_cauchy",
+      "title": "Uniform weights minimize both concentration terms",
+      "visual": {"kind": "architecture_weights", "M": 3, "K": 4, "label": "Uniform architecture and seed weights attain the two concentration minima", "source": "paper/proofs.tex:proof:thm:blockfloor"},
+      "visual_argument": "Unequal weights are flattened to uniform bars while preserving their total; the sum of squares decreases.",
+      "segments": [
+        {"line": "Cauchy-Schwarz across architectures", "math": "1=\\left(\\sum_aW_a\\right)^2\\le M\\sum_aW_a^2", "say": "Apply Cauchy-Schwarz to the vector of architecture weights and the vector of M ones. Their inner product is one. The squared norm of the vector of ones is M. Therefore one is at most M times the sum of the squared architecture weights. Rearranging gives B at least one over M. Equality holds when all the architecture weights are equal. Geometrically, among vectors lying on the plane whose coordinates sum to one, the uniform vector is the closest point to the origin."},
+        {"line": "The same argument across all members", "math": "1=\\left(\\sum_{a,k}w_{a,k}\\right)^2\\le MK\\|w\\|_2^2", "say": "Repeat the same argument over all M times K members. The individual squared weights sum to at least one over M K. Equality holds at uniform member weights. The useful feature is that these two equality conditions are compatible: assigning one over M K to every member automatically assigns one over M to every architecture. We can therefore attain both concentration minima at the same time."},
+        {"line": "Substitute the two minima", "math": "w^\\top Sw\\ge\\bar e^{\\,2}\\left[\\varrho_b+\\frac{\\varrho_w-\\varrho_b}{M}+\\frac{1-\\varrho_w}{MK}\\right]", "say": "Substitute the two bounds into the collected expression. This proves the theorem. The left side is the expected squared relative error of a convex stack. The right side has a constant term, a term that decays with the number of architectures, and a term that decays with the total number of members. Taking a square root gives a lower bound on root-mean-square relative error. It does not give a lower bound on the mean relative error reported in the main performance table."}
+      ]
+    },
+    {
+      "key": "c04_sharp",
+      "title": "The bound can be attained",
+      "visual": {"kind": "residual_blocks", "stage": "equality", "label": "Exact illustrative orthogonal construction for the equality case", "source": "paper/theory.tex:thm:blockfloor"},
+      "visual_argument": "Orthogonal common, architecture and seed basis directions realize all three matrix entry values exactly.",
+      "segments": [
+        {"line": "Choose orthogonal common, architecture and seed directions", "math": "\\rho_{a,k}=\\bar e\\left(\\sqrt{\\varrho_b}\\,e_0+\\sqrt{\\varrho_w-\\varrho_b}\\,e_a+\\sqrt{1-\\varrho_w}\\,e_{a,k}\\right)", "say": "We have proved a lower bound, but is it merely loose algebra? Construct a family that attains it. Take mutually orthonormal basis vectors: one common vector e zero, one vector for each architecture, and one vector for each individual member. Define each residual by adding the three displayed components. Their coefficients are square roots because inner products multiply coefficients, and we want the resulting second moments to contain rho b, rho w minus rho b, and one minus rho w."},
+        {"line": "Its three kinds of inner products have exactly the required values", "math": "S_{ii}=\\bar e^{\\,2},\\quad S_{ij}=\\varrho_w\\bar e^{\\,2}\\text{ within},\\quad S_{ij}=\\varrho_b\\bar e^{\\,2}\\text{ between}", "say": "The squared norm of any member is e bar squared: the three squared coefficients add to one. Two different seeds of the same architecture share the common and architecture directions, so their inner product is rho w times e bar squared. Members of different architectures share only the common direction, giving rho b times e bar squared. All three entrywise inequalities are therefore equalities. This construction lives in a sufficiently large Euclidean space; the screen diagram is only a schematic of those mutually orthogonal directions."},
+        {"line": "Uniform averaging makes every proof step an equality", "math": "w_{a,k}=\\frac1{MK}", "say": "Use uniform member weights. Both Cauchy-Schwarz bounds become equalities, and all the earlier entrywise bounds were already equalities. The resulting squared error is exactly the lower-bound expression. That establishes sharpness for this class of assumptions. It does not assert that the measured benchmark residuals have this exact decomposition. In the experiment we use the actual matrix to see how close the empirical lower bound lies to the best achievable convex combination."}
+      ]
+    },
+    {
+      "key": "c04_limits",
+      "title": "What more computation can and cannot remove",
+      "visual": {"kind": "block_floor_curve", "M": 3, "rho_w": 0.8, "rho_b": 0.6, "label": "Illustrative normalized squared-error floor; fixed pairwise assumptions", "source": "paper/theory.tex:thm:blockfloor"},
+      "visual_argument": "The curve decreases with seed count toward a positive asymptote; changing architecture count moves a different term.",
+      "segments": [
+        {"line": "At fixed architecture count, only one term vanishes", "math": "K\\to\\infty:\\quad\\varrho_b+\\frac{\\varrho_w-\\varrho_b}{M}", "say": "Hold the number of architectures fixed and let the number of seeds grow. The final term vanishes, leaving rho b plus the within-minus-between gap divided by M. For a single architecture, this becomes rho w. The curve is a lower bound under fixed assumptions, not a predicted learning curve for an arbitrary training campaign. To apply it to new, untrained members, the same entrywise inequalities would have to continue to hold for those members as well."},
+        {"line": "A common residual component survives even many architectures", "math": "M\\to\\infty:\\quad\\varrho_b", "say": "If we also increase the number of architectures while preserving the same bounds, the architecture term can vanish, but rho b remains. This identifies a limit of convex averaging within that residual family. It does not forbid a better individual model, a new representation, a nonlinear combination, or a correction that changes the residual family itself. Those are different interventions. The theorem tells us which intervention averaging alone cannot accomplish."},
+        {"line": "Measure alignment before adding more seeds", "math": "\\text{Empirical }S\\longrightarrow\\text{scope for convex averaging}", "say": "The practical lesson is to measure the residual matrix before assuming that more seeds will help. If the empirical lower bound is already close to the simplex optimum, there is little room left for another choice of global convex weights on that measured pool. The next question is then how to change the error directions. The kernel correction and the learned feature representation are two ways to try. In the next chapter, we will put the theorem beside the actual sixty-member matrix and keep the empirical and population claims separate."}
+      ]
+    }
+  ]
+}

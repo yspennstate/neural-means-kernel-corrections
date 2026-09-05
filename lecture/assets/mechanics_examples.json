@@ -1,0 +1,48 @@
+{
+  "source_root": "/home/yitz/nmkc2",
+  "sources": {
+    "loads": {
+      "path": "data/structmech/loads.npy",
+      "sha256": "8baf46f02fcbab5e809344c6a62aa81ea23e8b0f6f2bfdedd9b7fa07b9e73464"
+    },
+    "stress": {
+      "path": "data/structmech/stress.npy",
+      "sha256": "a3c060c4f58aaefa36947b1cd7b0ab002c1cf8894cf1a47efdfabc67f2d9b3ac"
+    },
+    "indices": {
+      "path": "data/structmech/idx_test.npy",
+      "sha256": "b5181aaef47f8ec6bbfad10d17b0d44e8313032f8b11a6f3bff8284c3f38cc0a"
+    },
+    "prediction": {
+      "path": "seeds/sm_s0/runs/hpix_corr_pred_test.npy",
+      "sha256": "d353ab06666ccf176a7b70a946d57362a1452d3d080f7c01f1fc8277fe3a5d90"
+    }
+  },
+  "seed": 0,
+  "predictor": "historical six-member hpix_corr",
+  "metric": "unweighted relative Euclidean grid norm",
+  "orientation": "Stored axes are x1,x2; display array.T with origin=lower.",
+  "selection": "Error-ranked examples for explanation; not a fresh evaluation.",
+  "cases": {
+    "median": {
+      "test_row": 2517,
+      "dataset_index": 22517,
+      "zero_based_sorted_error_rank": 10000,
+      "relative_error": 0.04301802163347917
+    },
+    "p98": {
+      "test_row": 12320,
+      "dataset_index": 32320,
+      "zero_based_sorted_error_rank": 19600,
+      "relative_error": 0.08738483987356045
+    },
+    "first": {
+      "test_row": 0,
+      "dataset_index": 20000,
+      "zero_based_sorted_error_rank": null,
+      "relative_error": 0.033860658807157
+    }
+  },
+  "npz_sha256": "0eb8c7dd497e4dc12aa8e2d3cbdf1b57380440f6a36ad1ea4efb74e62d7eeed6",
+  "extractor_sha256": "91def653780866ec06444c794b70544e14f1486a4e293f6352dba79bee99d922"
+}

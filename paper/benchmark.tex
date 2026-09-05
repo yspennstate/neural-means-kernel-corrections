@@ -45,7 +45,7 @@ include, at 20000 training samples, 4.55\% (PARA-Net), 4.67\% (PCA-Net), 4.76\% 
 (DeepONet), and \citet{batlle2024kernel} report 5.18\% for their
 optimal-recovery kernel method (Mat\'ern/rational quadratic; 27.11\% for the
 linear kernel) on the same task. Within the 20000-sample budget we hold out
-the last 1000 samples (of a fixed permutation) for model selection and
+the first 1000 samples of a fixed permutation for model selection and
 stacking, and train on the remaining 19000, so no method of ours sees more
 than the 20000 training samples used by the baselines. In the \emph{low-data}
 protocol of \citet{mora2025operator}, 1250 samples are available and the same

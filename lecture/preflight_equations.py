@@ -1,6 +1,6 @@
 """Batch-compile every authored equation and flag likely layout overflow.
 
-Box widths are a conservative preflight, not a substitute for the final
+Box widths are a calibrated preflight, not a substitute for the final
 Manim glyph bounds or visual inspection of the rendered frame.
 """
 import argparse
@@ -55,7 +55,11 @@ def main():
     for line in measurements:
         key,w,h,d=line.split('|')
         rows[key].update(width_pt=float(w[:-2]),height_pt=float(h[:-2])+float(d[:-2]))
-    risky={k:v for k,v in rows.items() if v['width_pt']>170 or v['height_pt']>65}
+    # At Manim font_size=35, SCALE_FACTOR_PER_FONT_POINT=1/960.
+    # A 139.775-pt box was measured at 5.030 scene units on the real PDF/SVG
+    # route, beyond the 4.8-unit column. The former 170-pt cutoff missed it.
+    # 130 pt leaves a margin; native bounds remain the authoritative check.
+    risky={k:v for k,v in rows.items() if v['width_pt']>130 or v['height_pt']>65}
     result=dict(kind='author_batch_latex_preflight',compiled_equations=len(rows),
                 source_sha256=sources,rows=rows,likely_layout_overflow=list(risky),
                 limitation='TeX boxes only. Final glyph bounding boxes and board placement still require rendered inspection.')

@@ -60,7 +60,7 @@ def main():
     parser.add_argument("--board")
     parser.add_argument("--segment", type=int, default=0)
     parser.add_argument("--encoder", choices=("libx264", "h264_nvenc"), default="libx264")
-    parser.add_argument("--reuse-tex-from", type=Path,
+    parser.add_argument("--reuse-tex-from", type=Path, action='append',
                         help="Reuse exact TeX/SVG asset pairs from a completed owned build")
     parser.add_argument("--reuse-incomplete-tex", action="store_true",
                         help="Recover completed typesetting pairs from an interrupted owned build; does not certify its chapter")
@@ -137,8 +137,8 @@ def main():
         if hashlib.sha256(source.read_bytes()).hexdigest() != digest:
             raise RuntimeError(f"Source changed while freezing: {relative}")
         inputs[relative.as_posix()] = digest
-    if args.reuse_tex_from:
-        old = args.reuse_tex_from.resolve()
+    for donor_index, donor in enumerate(args.reuse_tex_from or [],1):
+        old = donor.resolve()
         if old.parent != (HERE / "builds").resolve() or not (old / "input_manifest.json").is_file():
             raise ValueError("TeX reuse requires an owned build in this lecture directory")
         # Normally the donor must have reached its final board. After a crash,
@@ -185,7 +185,7 @@ def main():
                           donor_has_completed_board_manifest=bool(manifests),
                           recovery_mode=args.reuse_incomplete_tex,
                           scope="Exact previously typeset vector assets; new or changed TeX compiles normally")
-        cache_record = build / "tex_cache_provenance.json"
+        cache_record = build / f"tex_cache_provenance_{donor_index:02d}.json"
         cache_record.write_text(json.dumps(provenance, indent=2), encoding="utf-8")
         inputs[cache_record.name] = hashlib.sha256(cache_record.read_bytes()).hexdigest()
     (build/"input_manifest.json").write_text(json.dumps(inputs, indent=2), encoding="utf-8")

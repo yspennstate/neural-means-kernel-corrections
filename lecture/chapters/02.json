@@ -73,7 +73,7 @@
         },
         {
           "line": "The risk statement needs exact symmetry assumptions",
-          "math": "G(Su)=T G(u),\\qquad S_\\#\\mu=\\mu",
+          "math": "\\begin{gathered}G(Su)=T G(u)\\\\S_\\#\\mu=\\mu\\end{gathered}",
           "say": "The population argument requires two assumptions. The target must be equivariant: reflecting the input reflects the output in the stated way. The distribution of loads must also be unchanged by reflection. For an isometric output reflection and a convex norm loss, averaging cannot increase population risk under these assumptions. Empirical symmetry checks can support the modeling choice, but they do not prove that a numerical solver and a finite dataset satisfy the assumptions exactly."
         },
         {
@@ -123,7 +123,7 @@
         {
           "line": "Build the Gram matrix from standardized inputs",
           "math": "K_{ij}=k(u_i,u_j)",
-          "say": "Choose a positive-definite kernel and evaluate it on every pair of training inputs. The result is the Gram matrix K. The structural-mechanics residual correction uses a Mat\u00e9rn five-halves kernel on standardized load vectors. A length scale controls how rapidly similarity decreases with distance. The kernel sees distances in the forty-one-dimensional input space, not distances between pixels in the output field. Keeping those two geometries separate makes the formula much easier to read."
+          "say": "Choose a positive-definite kernel and evaluate it on every pair of training inputs. The result is the Gram matrix K. The structural-mechanics residual correction uses a Matérn five-halves kernel on standardized load vectors. A length scale controls how rapidly similarity decreases with distance. The kernel sees distances in the forty-one-dimensional input space, not distances between pixels in the output field. Keeping those two geometries separate makes the formula much easier to read."
         },
         {
           "line": "Solve one regularized system with many right-hand sides",

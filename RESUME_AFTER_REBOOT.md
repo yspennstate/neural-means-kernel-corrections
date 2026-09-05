@@ -1,6 +1,48 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
-## Current checkpoint: 22:58 Jerusalem
+## Current checkpoint: 23:58 Jerusalem
+
+The overnight order still runs through September 6 at 12:55 Jerusalem. No
+independent referee has returned a verdict. Scientific source and frozen packet
+remain unchanged. Build 06 also matches build 05's extracted text on all 85 pages.
+
+Referee 01 is running in native thread 01a07306-8a1b-7742-93bb-01f73cdb2df2,
+resumed under controller PID 8212 (23:36:50), native PID 46060. Its controller
+runtime ends in `01_05_resume2`. The first controller failed on a transient
+PermissionError reading compute_state.json; this was not measured CPU distress.
+The fixed monitor now holds or pauses safely without discarding native progress.
+
+Referee 06 is running in native thread 01a07326-223d-7c03-9897-101e289417ca,
+native PID 44992, birth 1788640004.1754563. Its controller 52288 was deliberately
+detached, leaving the native reader alive. ROOT MUST MONITOR this reader directly.
+Its output remains under runtime `06_10_resume3/reviewer06`. When it finishes,
+validate its actual verdict and packet hash, then launch the fixed controller
+for reviewers 07 through 10. Do not launch a duplicate 06. The 01 controller
+will handle 02 through 05 after 01. Earlier failed attempts are not votes.
+
+Chapter 12 now has a successful 18-frame sample build:
+`lecture/builds/20260905T232406_chapter12_samples`, return 0, 1070.9631 seconds.
+Seven of its 18 frames have been inspected at native resolution so far. Its
+calibration segment still uses the old pipeline picture; the current source
+adds a transition to a calibrated output-space ball, awaiting its own render.
+BoardSamples now accepts the existing --board selection for bounded rechecks.
+No corrected full chapter movie exists yet.
+
+All 252 equations pass the revised preflight (130-point width, 65-point height).
+Native layout uses fixed readable math size and reflows long expressions; it
+does not shrink them to fit. The prior 170-point width threshold missed a
+5.030-unit overflow at the actual font size. Receipts retain that failed build.
+All 252 audio files passed independent RIFF/PCM checks again at 23:49, with
+source-bound manifest refreshed after equation-only edits. Spoken duration
+remains exactly 6718.992 seconds. The approximately 120-minute assembled
+duration remains a prediction until the movie is measured.
+
+Latest verified remote commit before this checkpoint is
+08c0eac0ab05fc4f6ed42856203023bd4a88c423. The NVENC benchmark used the actual
+PyAV writer; do not describe it as the FFmpeg 7.1 binary. A direct 7.1 writer
+probe and final assembly through that exact executable are still required.
+
+## Historical checkpoint: 22:58 Jerusalem
 
 The alternate supplement-root build has now finished successfully: receipt
 `final-build-06-supp/completion_receipt.json`, return 0, selected supplement,

@@ -78,7 +78,7 @@
         },
         {
           "line": "Separate the representation from the choice of readout",
-          "math": "\\begin{gathered}\\varphi(u)\\\\\\downarrow\\\\\\left\\{\\begin{array}{l}\\text{trained linear layer}\\\\\\text{refitted ridge readout}\\\\\\text{Mat\\'ern kernel head}\\end{array}\\right.\\end{gathered}",
+          "math": "\\begin{gathered}\\varphi(u)\\quad\\downarrow\\\\\\left\\{\\begin{array}{l}\\text{trained linear layer}\\\\\\text{refitted ridge readout}\\\\\\text{Mat\\'ern kernel head}\\end{array}\\right.\\end{gathered}",
           "say": "A neural feature map followed by a kernel has spent more total computation than a raw-input kernel. Matching the kernel grid alone does not remove that difference. We therefore include a readout control: on the same frozen features, compare the trained output layer, a ridge regression refit, and the Matérn head. That comparison helps distinguish the value of the representation from the value of replacing its final linear readout by a nonlinear kernel fit."
         }
       ]
@@ -123,7 +123,7 @@
       "segments": [
         {
           "line": "This is a saved test spectrum, chosen by an explicit rank",
-          "math": "\\text{Rank }1000\\text{ of }2000\\text{, zero-based}",
+          "math": "\\begin{gathered}\\text{Rank }1000\\text{ of }2000\\\\\\text{zero-based}\\end{gathered}",
           "say": "Here is an actual O2 test example from the recorded-grid branch of the seed-zero follow-up. We ordered cases by the combined model's radiance error and selected the middle rank, using zero-based rank one thousand out of two thousand cases. The top panel plots the reference, the combined prediction, and the source kernel-flow prediction across all stored channels. Their agreement at this scale is encouraging, but it conceals most of the differences we need to evaluate."
         },
         {
@@ -151,7 +151,7 @@
       "segments": [
         {
           "line": "Use the same selection rule to inspect the tail",
-          "math": "\\text{Rank }1960\\text{ of }2000\\text{, zero-based}",
+          "math": "\\begin{gathered}\\text{Rank }1960\\text{ of }2000\\\\\\text{zero-based}\\end{gathered}",
           "say": "Now move to rank nineteen hundred sixty in the same ordering, near the ninety-eighth percentile of the combined model's error. The spectral shape remains visually convincing in the top panel. In the lower panel, however, the combined residual has a substantial coherent component. This is the kind of failure an attractive overlay can hide. The source kernel-flow emulator is more accurate on this particular atmospheric state."
         },
         {

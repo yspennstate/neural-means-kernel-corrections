@@ -100,7 +100,7 @@
         },
         {
           "line": "With distinct scores, the rank probability is exact",
-          "math": "\\begin{gathered}\\mathbb P(\\text{covered})=\\frac{k}{m+1}\\\\\\frac{k}{m+1}\\ge1-\\alpha\\\\\\frac{k}{m+1}\\le1-\\alpha+\\frac1{m+1}\\end{gathered}",
+          "math": "\\begin{gathered}p=\\mathbb P(\\text{covered})=\\frac{k}{m+1}\\\\1-\\alpha\\le p\\le1-\\alpha+\\frac1{m+1}\\end{gathered}",
           "say": "When scores are almost surely distinct, the rank event and the coverage event are identical, so the probability is exactly k over m plus one. It is at most one minus alpha plus one over m plus one. With ties, coverage can be more conservative, and that narrow upper bound is no longer generally available. This distinction is easy to omit when writing a short statement of conformal coverage, but it belongs in a complete proof."
         },
         {
@@ -132,7 +132,7 @@
         },
         {
           "line": "An independent evaluation block adds binomial sampling",
-          "math": "\\begin{gathered}B\\mid p_{\\rm cal}\\sim\\operatorname{Bin}(N,p_{\\rm cal})\\\\B\\sim\\operatorname{BetaBin}(N,k,m+1-k)\\end{gathered}",
+          "math": "\\begin{gathered}B\\mid p_{\\rm cal}\\sim\\operatorname{Bin}(N,p_{\\rm cal})\\\\B\\sim\\operatorname{BetaBin}\\\\(N,k,m+1-k)\\end{gathered}",
           "say": "Conditional on the calibration sample, an independent evaluation block has a binomial count of covered cases. Integrating over the random Beta success probability gives the Beta-binomial law. With nineteen thousand evaluation cases, the central ninety-five-percent reference interval for the observed fraction at nominal ninety percent is about eighty-eight point zero to ninety-one point eight percent. Exchangeability alone does not imply this stronger law, and agreement with the interval does not prove its assumptions."
         }
       ]
@@ -215,7 +215,7 @@
         },
         {
           "line": "Keep the theorem and the measurement side by side",
-          "math": "\\begin{gathered}\\text{Proved rank statement}\\\\\\text{Measured benchmark behavior}\\end{gathered}",
+          "math": "\\begin{gathered}\\text{Proved rank statement}\\\\\\text{Benchmark measurements}\\end{gathered}",
           "say": "We therefore report two things separately and precisely: the coverage theorem with its complete proof and assumptions, and the measured radii and coverages on the retained benchmark partition. The observed results can inform a future deployment study without being relabeled as that study. This distinction makes the uncertainty section more useful. It tells a reader which guarantees are available, what the present evidence measures, and what new data would be needed for a prospective claim."
         }
       ]

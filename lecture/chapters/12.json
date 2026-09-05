@@ -7,14 +7,15 @@
       "title": "Read the pipeline one layer at a time",
       "visual": {
         "kind": "pipeline_stages",
-        "label": "Diagram of the mechanics pipeline; each fitted object has a different statistical role",
-        "source": "paper/theory.tex and the completed sensitivity evidence"
+        "label": "Pipeline schematic, then an illustrative cross-section of a calibrated output-space ball",
+        "source": "paper/theory.tex and the completed sensitivity evidence",
+        "show_calibration": true
       },
       "visual_argument": "The arrows separate construction of a mean, correction of its remaining error, and calibration of a radius.",
       "segments": [
         {
           "line": "First choose a useful mean",
-          "math": "m(u)=\\operatorname{Stack}(f_1(u),\\ldots,f_M(u))",
+          "math": "m(u)=\\sum_{a=1}^M w_a f_a(u)",
           "say": "The first question is whether the available predictors make different mistakes. Averaging reduces the part of their error that points in different directions. Repeating a configuration can reduce variation among its seeds, but a shared component remains. The block calculation quantifies this obstruction under its stated assumptions. It does not say that every extra model must be useless."
         },
         {
@@ -24,7 +25,7 @@
         },
         {
           "line": "Calibrate a prediction set on separate cases",
-          "math": "C(u)=\\{v:\\|v-\\widehat G(u)\\|_2\\le Qa(u)\\}",
+          "math": "\\begin{gathered}C(u)=\\overline B_2(\\widehat G(u),Qa(u))\\\\\\text{closed Euclidean ball}\\end{gathered}",
           "say": "The third question is statistical coverage. The rank argument calibrates a ball around a fixed prediction, with any positive scale fixed in advance. It uses exchangeability instead of an unknown native-space norm. These three questions explain why ensemble accuracy, kernel geometry, and calibration appear together in the paper. They are connected, but each answer has its own assumptions."
         }
       ]
@@ -70,12 +71,12 @@
       "segments": [
         {
           "line": "Change the search while retaining the other controls",
-          "math": "4\\times3=12\\quad\\longrightarrow\\quad7\\times8=56",
+          "math": "4\\times3=12\\quad\\to\\quad7\\times8=56",
           "say": "This panel uses reduced-coordinate error. The grid grows from twelve to fifty-six candidates by extending the kernel scales and nuggets. Each comparison retains its network features, split, and source emulator. The dots represent the three paired seeds within each spectral band. The short horizontal marks show their means, not confidence intervals for new atmospheric states."
         },
         {
           "line": "Read all three fitted families",
-          "math": "\\Delta=100(E_{\\mathrm{expanded}}-E_{\\mathrm{recorded}})",
+          "math": "\\begin{aligned}\\Delta&=100(E_{\\mathrm{expanded}}\\\\&\\qquad-E_{\\mathrm{recorded}})\\end{aligned}",
           "say": "The raw-input kernel tests how much the original comparison depended on a restricted kernel search. The feature head tests the same issue after a neural representation has been learned. The coordinate combination is selected again from validation errors, because its available candidates have changed. Looking at all three families prevents an improvement in one component from being mistaken for an improvement everywhere."
         },
         {
@@ -98,12 +99,12 @@
       "segments": [
         {
           "line": "Change the search while retaining the other controls",
-          "math": "4\\times3=12\\quad\\longrightarrow\\quad7\\times8=56",
+          "math": "4\\times3=12\\quad\\to\\quad7\\times8=56",
           "say": "Now keep exactly the same predictions and examine reconstructed radiance. Undo the coordinate standardization, apply the spectral basis, and restore the reference mean. This changes the norm in which an error is measured. A unit error in one reduced coordinate can affect the spectrum much more than the same error in another. The signs and relative sizes of improvements can therefore change."
         },
         {
           "line": "Read all three fitted families",
-          "math": "\\Delta=100(E_{\\mathrm{expanded}}-E_{\\mathrm{recorded}})",
+          "math": "\\begin{aligned}\\Delta&=100(E_{\\mathrm{expanded}}\\\\&\\qquad-E_{\\mathrm{recorded}})\\end{aligned}",
           "say": "Compare each spectral band with its reduced-coordinate panel. The plotted changes are derived from the same saved predictions, rather than a separately selected set of favorable runs. We do not choose another model after looking at this test panel. The radiance calculation was also checked through a spectral Gram quadratic form and by direct summation across the reconstructed channels."
         },
         {
@@ -125,7 +126,7 @@
       "segments": [
         {
           "line": "The sharp factor is a norm of a residual representer",
-          "math": "\\sup_{\\|r\\|_K\\le\\rho}\\|r(u)-\\widehat r_\\lambda(u)\\|_2=\\rho\\widetilde P_\\lambda(u)",
+          "math": "\\begin{gathered}\\sup_{\\|r\\|_K\\le\\rho}\\|r(u)-\\widehat r_\\lambda(u)\\|_2\\\\=\\rho\\widetilde P_\\lambda(u)\\end{gathered}",
           "say": "Return to the projection picture. The residual representer gives the exact worst-case constant for the fixed kernel reconstruction. Cauchy and Schwarz give the upper bound; a residual aligned with that representer attains it. Both parts are necessary for sharpness. The finite-dimensional drawing makes this alignment visible, while the Hilbert-space proof supplies the general statement."
         },
         {
@@ -157,12 +158,12 @@
         },
         {
           "line": "Use new cases to test the completed choices",
-          "math": "\\text{fit}\\ \\longrightarrow\\ \\text{calibrate}\\ \\longrightarrow\\ \\text{evaluate}",
+          "math": "\\text{fit}\\to\\text{calibrate}\\to\\text{evaluate}",
           "say": "Freeze the predictor and every tuning choice before using fresh calibration and evaluation cases. The current benchmarks have been inspected through many research decisions, so another split of the same archive does not erase that history. A fresh campaign would test whether the observed gains and coverage survive a new collection of cases and any intended change of operating conditions."
         },
         {
           "line": "Three objects make the method understandable",
-          "math": "\\begin{gathered}\\text{error vectors},\\quad\\text{kernel sections}\\\\\\text{score ranks}\\end{gathered}",
+          "math": "\\begin{gathered}\\text{error vectors}\\\\\\text{kernel sections}\\\\\\text{score ranks}\\end{gathered}",
           "say": "Keep three pictures in mind: error vectors reveal what averaging can cancel; kernel sections reveal what observations can reconstruct; and score ranks explain marginal coverage. They provide different ways to question a surrogate. Together with a reproducible experiment and images of its successes and failures, they make the method something we can inspect, prove statements about, and test."
         }
       ]

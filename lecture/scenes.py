@@ -512,6 +512,11 @@ def build_visual(spec):
                         small_label("Reference", [4.8,2.05,0], 24),
                         small_label("Fit a kernel", [1.0,-.9,0], 22, GREEN))
         group = VGroup(mean, target, residual, kernel, final, links, bypass, labels)
+        if spec.get('show_calibration'):
+            ball, _ = build_visual({'kind':'conformal_ball'})
+            return group, [lambda: Indicate(mean,color=BLUE),
+                lambda: Indicate(residual,color=GOLD),
+                lambda: AnimationGroup(FadeOut(group),FadeIn(ball))]
         return group, [lambda: Indicate(mean, color=BLUE), lambda: Indicate(residual, color=GOLD),
                        lambda: Indicate(final, color=GREEN)]
     if kind == "data_split":
@@ -968,6 +973,11 @@ class BoardMixin:
         if line.width > 4.75: line.scale(4.75/line.width)
         line.move_to([-3.85, 1.0, 0])
         equation = formula(segment["math"], size=35, max_width=4.8, shrink=False).move_to([-3.85, -.65, 0])
+        clearance = line.get_bottom()[1]-.35-equation.get_top()[1]
+        if clearance < 0:
+            equation.shift(UP*clearance)
+        if equation.get_bottom()[1] < -2.7:
+            raise ValueError('Reflow the tall formula or its heading: '+segment['math'])
         return VGroup(line, equation)
 
 
@@ -996,7 +1006,11 @@ class BoardSamples(BoardMixin, Scene):
         out = HERE / "media" / "board_samples" / CHAPTER
         out.mkdir(parents=True, exist_ok=True)
         rows = []
-        for board in DATA["boards"]:
+        selected_key = os.environ.get("NMKC_BOARD")
+        boards = [b for b in DATA["boards"] if selected_key is None or b["key"] == selected_key]
+        if not boards:
+            raise ValueError(f"Unknown board: {selected_key}")
+        for board in boards:
             self.clear()
             _, effects = self.frame(board)
             text = None
@@ -1015,6 +1029,7 @@ class BoardSamples(BoardMixin, Scene):
                              "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
         (out / "manifest.json").write_text(json.dumps({
             "kind": "author_layout_samples", "chapter": CHAPTER,
+            "selected_board": selected_key,
             "human_visual_review": "PENDING", "rows": rows}, indent=2), encoding="utf-8")
 
 

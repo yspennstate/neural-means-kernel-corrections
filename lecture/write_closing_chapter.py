@@ -32,14 +32,14 @@ def main():
         mantissa,exponent=f'{value:.2e}'.split('e')
         return mantissa+rf'\times10^{{{int(exponent)}}}'
     boards=[board('c12_layers','Read the pipeline one layer at a time','pipeline_stages',
-        'Diagram of the mechanics pipeline; each fitted object has a different statistical role',
+        'Pipeline schematic, then an illustrative cross-section of a calibrated output-space ball',
         'The arrows separate construction of a mean, correction of its remaining error, and calibration of a radius.',[
-        segment('First choose a useful mean',r'm(u)=\operatorname{Stack}(f_1(u),\ldots,f_M(u))',
+        segment('First choose a useful mean',r'm(u)=\sum_{a=1}^M w_a f_a(u)',
             'The first question is whether the available predictors make different mistakes. Averaging reduces the part of their error that points in different directions. Repeating a configuration can reduce variation among its seeds, but a shared component remains. The block calculation quantifies this obstruction under its stated assumptions. It does not say that every extra model must be useless.'),
         segment('Then approximate what the mean leaves behind',r'r(u)=G(u)-m(u)',
             'The next question concerns the remaining function. A kernel correction uses its observed values and the geometry of the kernel sections. The sharp error factor measures the part of a query section that the chosen reconstruction misses. This is a worst-case statement over a specified function-space ball. Its radius must be supplied; the data do not reveal it automatically.'),
-        segment('Calibrate a prediction set on separate cases',r'C(u)=\{v:\|v-\widehat G(u)\|_2\le Qa(u)\}',
-            'The third question is statistical coverage. The rank argument calibrates a ball around a fixed prediction, with any positive scale fixed in advance. It uses exchangeability instead of an unknown native-space norm. These three questions explain why ensemble accuracy, kernel geometry, and calibration appear together in the paper. They are connected, but each answer has its own assumptions.')]),
+        segment('Calibrate a prediction set on separate cases',r'\begin{gathered}C(u)=\overline B_2(\widehat G(u),Qa(u))\\\text{closed Euclidean ball}\end{gathered}',
+            'The third question is statistical coverage. The rank argument calibrates a ball around a fixed prediction, with any positive scale fixed in advance. It uses exchangeability instead of an unknown native-space norm. These three questions explain why ensemble accuracy, kernel geometry, and calibration appear together in the paper. They are connected, but each answer has its own assumptions.')],show_calibration=True),
     board('c12_centering','Measure the implementation differences','sensitivity_results',
         'Completed ten-seed comparisons; percentage-point differences; the two vertical scales are separate',
         'Paired differences reveal changes hidden by nearly overlapping headline accuracy values.',[
@@ -56,10 +56,10 @@ def main():
             'A larger kernel search: '+readable+' error','sensitivity_results',
             'Completed three-seed comparisons in each band; negative values mean lower error under the expanded grid',
             'The paired error differences show which fitted families benefit from the larger validation search.',[
-            segment('Change the search while retaining the other controls',r'4\times3=12\quad\longrightarrow\quad7\times8=56',
+            segment('Change the search while retaining the other controls',r'4\times3=12\quad\to\quad7\times8=56',
                 (f'This panel uses {readable} error. The grid grows from twelve to fifty-six candidates by extending the kernel scales and nuggets. Each comparison retains its network features, split, and source emulator. The dots represent the three paired seeds within each spectral band. The short horizontal marks show their means, not confidence intervals for new atmospheric states.' if metric=='reduced' else
                  'Now keep exactly the same predictions and examine reconstructed radiance. Undo the coordinate standardization, apply the spectral basis, and restore the reference mean. This changes the norm in which an error is measured. A unit error in one reduced coordinate can affect the spectrum much more than the same error in another. The signs and relative sizes of improvements can therefore change.')),
-            segment('Read all three fitted families',r'\Delta=100(E_{\mathrm{expanded}}-E_{\mathrm{recorded}})',
+            segment('Read all three fitted families',r'\begin{aligned}\Delta&=100(E_{\mathrm{expanded}}\\&\qquad-E_{\mathrm{recorded}})\end{aligned}',
                 ('The raw-input kernel tests how much the original comparison depended on a restricted kernel search. The feature head tests the same issue after a neural representation has been learned. The coordinate combination is selected again from validation errors, because its available candidates have changed. Looking at all three families prevents an improvement in one component from being mistaken for an improvement everywhere.' if metric=='reduced' else
                  'Compare each spectral band with its reduced-coordinate panel. The plotted changes are derived from the same saved predictions, rather than a separately selected set of favorable runs. We do not choose another model after looking at this test panel. The radiance calculation was also checked through a spectral Gram quadratic form and by direct summation across the reconstructed channels.')),
             segment('Validation selection does not force test improvement',rf'\#\{{\Delta_{{\mathrm{{combination}}}}<0\}}={improved}\ \mathrm{{of}}\ 9',
@@ -69,7 +69,7 @@ def main():
     board('c12_scope','Keep the theorem tied to its assumptions','kernel_projection',
         'Exact two-feature illustration: training section (1,0), query section (3,2), interpolation coefficient 3',
         'The unobserved component explains both the sharp bound and why an unknown norm remains necessary.',[
-        segment('The sharp factor is a norm of a residual representer',r'\sup_{\|r\|_K\le\rho}\|r(u)-\widehat r_\lambda(u)\|_2=\rho\widetilde P_\lambda(u)',
+        segment('The sharp factor is a norm of a residual representer',r'\begin{gathered}\sup_{\|r\|_K\le\rho}\|r(u)-\widehat r_\lambda(u)\|_2\\=\rho\widetilde P_\lambda(u)\end{gathered}',
             'Return to the projection picture. The residual representer gives the exact worst-case constant for the fixed kernel reconstruction. Cauchy and Schwarz give the upper bound; a residual aligned with that representer attains it. Both parts are necessary for sharpness. The finite-dimensional drawing makes this alignment visible, while the Hilbert-space proof supplies the general statement.'),
         segment('Indistinguishable residuals give the minimax lower bound',r'r^+(X)=r^-(X)=0',
             'For interpolation, the residual representer vanishes at the training inputs. Two opposite multiples therefore produce identical observations and opposite query values. Every estimator returns the same answer for both, so one error is at least half their separation. This is the main information argument. It applies to rules using those observations, with the kernel and function class fixed.'),
@@ -80,9 +80,9 @@ def main():
         'Returning to the physical input-output map connects the abstract argument to the task being solved.',[
         segment('Check the prediction in the metric that matters',r'E=\frac1N\sum_i\frac{\|\widehat G(u_i)-G(u_i)\|_2}{\|G(u_i)\|_2}',
             'For a new application, start by writing the error metric and the intended output. Check ordinary cases and difficult cases in physical coordinates. A mean percentage alone will not show whether an error changes a localized stress peak or a narrow spectral feature. The field and spectrum images in this lecture are part of the numerical argument, rather than decoration.'),
-        segment('Use new cases to test the completed choices',r'\text{fit}\ \longrightarrow\ \text{calibrate}\ \longrightarrow\ \text{evaluate}',
+        segment('Use new cases to test the completed choices',r'\text{fit}\to\text{calibrate}\to\text{evaluate}',
             'Freeze the predictor and every tuning choice before using fresh calibration and evaluation cases. The current benchmarks have been inspected through many research decisions, so another split of the same archive does not erase that history. A fresh campaign would test whether the observed gains and coverage survive a new collection of cases and any intended change of operating conditions.'),
-        segment('Three objects make the method understandable',r'\begin{gathered}\text{error vectors},\quad\text{kernel sections}\\\text{score ranks}\end{gathered}',
+        segment('Three objects make the method understandable',r'\begin{gathered}\text{error vectors}\\\text{kernel sections}\\\text{score ranks}\end{gathered}',
             'Keep three pictures in mind: error vectors reveal what averaging can cancel; kernel sections reveal what observations can reconstruct; and score ranks explain marginal coverage. They provide different ways to question a surrogate. Together with a reproducible experiment and images of its successes and failures, they make the method something we can inspect, prove statements about, and test.')])])
     result=dict(id='12',title='What the proofs and completed experiments establish',boards=boards,
                 evidence_manifest_sha256=record['evidence_manifest_sha256'])

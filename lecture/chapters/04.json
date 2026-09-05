@@ -25,7 +25,7 @@
         },
         {
           "line": "Averaging architectures still leaves the common direction",
-          "math": "\\frac1M\\sum_a(c+b_a)=c+\\frac1M\\sum_a b_a",
+          "math": "\\begin{gathered}\\frac1M\\sum_a(c+b_a)\\\\=c+\\frac1M\\sum_a b_a\\end{gathered}",
           "say": "Now average across architectures. That can reduce the architecture-specific components, provided they point in sufficiently different directions. The common vector still survives. In this picture there are two distinct ways to spend a computation budget: add seeds to reduce the individual component, or add genuinely different predictors to reduce the architecture component. The theorem we are about to prove does not assume that this orthogonal decomposition literally exists. It needs only lower bounds on entries of the residual second-moment matrix."
         }
       ]
@@ -80,7 +80,7 @@
         },
         {
           "line": "Add the seed weights inside each architecture",
-          "math": "W_a=\\sum_{k=1}^K w_{a,k},\\qquad\\sum_{a=1}^M W_a=1",
+          "math": "\\begin{gathered}W_a=\\sum\\nolimits_{k=1}^K w_{a,k}\\\\\\sum\\nolimits_{a=1}^M W_a=1\\end{gathered}",
           "say": "Let W sub a be the total weight assigned to architecture a. The lower-case weights tell us how the mass is split among individual seeds. The capital W tells us how much mass an architecture gets altogether. The sum of the capital W values is still one. Grouping the weights this way lets us separate two kinds of concentration: concentrating on a few architectures and concentrating on a few seeds inside them."
         },
         {
@@ -137,7 +137,7 @@
       "segments": [
         {
           "line": "Replace each matrix entry by its allowed minimum",
-          "math": "\\begin{gathered}\\frac{w^\\top Sw}{\\bar e^{\\,2}}\\\\\\ge A+\\varrho_w(B-A)+\\varrho_b(1-B)\\end{gathered}",
+          "math": "\\begin{gathered}\\frac{w^\\top Sw}{\\bar e^{\\,2}}\\\\\\ge A+\\varrho_w(B-A)\\\\{}+\\varrho_b(1-B)\\end{gathered}",
           "say": "To keep the line readable, write A for the sum of the individual squared weights and B for the sum of the squared architecture totals. The diagonal terms contribute at least e bar squared times A. The within-architecture terms contribute at least rho w times e bar squared times B minus A. The between-architecture terms contribute at least rho b times e bar squared times one minus B. Add these three bounds and divide by e bar squared, assuming for the moment that e bar is positive."
         },
         {
@@ -171,12 +171,12 @@
         },
         {
           "line": "The same argument across all members",
-          "math": "1=\\left(\\sum_{a,k}w_{a,k}\\right)^2\\le MK\\|w\\|_2^2",
+          "math": "\\begin{gathered}1=\\left(\\sum_{a,k}w_{a,k}\\right)^2\\\\\\le MK\\|w\\|_2^2\\end{gathered}",
           "say": "Repeat the same argument over all M times K members. The individual squared weights sum to at least one over M K. Equality holds at uniform member weights. The useful feature is that these two equality conditions are compatible: assigning one over M K to every member automatically assigns one over M to every architecture. We can therefore attain both concentration minima at the same time."
         },
         {
           "line": "Substitute the two minima",
-          "math": "\\begin{aligned}w^\\top Sw\\ge\\bar e^{\\,2}\\Big[&\\varrho_b\\\\&+\\frac{\\varrho_w-\\varrho_b}{M}\\\\&+\\frac{1-\\varrho_w}{MK}\\Big]\\end{aligned}",
+          "math": "\\begin{aligned}w^\\top Sw\\ge\\bar e^{\\,2}\\Big[&\\varrho_b\\\\[-.25ex]&+\\frac{\\varrho_w-\\varrho_b}{M}\\\\[-.25ex]&+\\frac{1-\\varrho_w}{MK}\\Big]\\end{aligned}",
           "say": "Substitute the two bounds into the collected expression. This proves the theorem. The left side is the expected squared relative error of a convex stack. The right side has a constant term, a term that decays with the number of architectures, and a term that decays with the total number of members. Taking a square root gives a lower bound on root-mean-square relative error. It does not give a lower bound on the mean relative error reported in the main performance table."
         }
       ]

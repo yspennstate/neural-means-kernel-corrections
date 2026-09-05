@@ -73,7 +73,7 @@
         },
         {
           "line": "Add the propagated mismatch by the triangle inequality",
-          "math": "\\begin{aligned}\\|e_{\\rm tr}(u)\\|_2&\\le\\|G-m_{\\rm full}\\|_K\\widetilde P_\\lambda(u)\\\\&\\quad+\\|c_\\lambda(u)^\\top\\Delta\\|_2.\\end{aligned}",
+          "math": "\\begin{gathered}\\|e_{\\rm tr}(u)\\|_2\\\\\\le\\|G-m_{\\rm full}\\|_K\\widetilde P_\\lambda(u)\\\\{}+\\|c_\\lambda(u)^\\top\\Delta\\|_2\\end{gathered}",
           "say": "The implemented error differs from the compatible error by the propagated mismatch. The triangle inequality therefore adds its norm to the sharp residual bound. The two arrows in the picture need not point in the same direction; adding their lengths is a worst-case step. This is why a measured mismatch term can be larger than the actual change in error. Cancellation is allowed in the observed vector even though the bound discards it."
         },
         {
@@ -100,7 +100,7 @@
         },
         {
           "line": "The difference follows from one affine kernel formula",
-          "math": "\\begin{aligned}\\widehat G_H(\\mu)&=\\mathbf1\\mu^\\top\\\\&\\quad+k_HA^{-1}(Y_F-\\mathbf1\\mu^\\top)\\end{aligned}",
+          "math": "\\begin{gathered}\\widehat G_H(\\mu)=\\mathbf1\\mu^\\top\\\\{}+k_HA^{-1}(Y_F-\\mathbf1\\mu^\\top)\\end{gathered}",
           "say": "For a chosen centering vector, subtract it from the fitting labels, perform the kernel solve, and add it back to every prediction. Write A for the regularized fitting Gram matrix and k H for the cross-kernel matrix to the held-out inputs. The prediction is affine in the centering vector. We can therefore compare the two choices using the same factorization, avoiding an unnecessary second factorization of a large matrix."
         },
         {

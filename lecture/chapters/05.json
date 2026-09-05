@@ -105,7 +105,7 @@
         },
         {
           "line": "Repeated seeds share cases and therefore share evaluation variation",
-          "math": "\\begin{gathered}\\text{Ten seeds}\\\\\\ne\\text{ten independent populations}\\end{gathered}",
+          "math": "\\begin{gathered}\\text{Ten seeds}\\ne\\\\\\text{ten independent}\\\\\\text{populations}\\end{gathered}",
           "say": "The ten training seeds provide useful replication of fitting variation. They do not create ten independent test populations because the same inputs and target fields are reused. Similarly, thousands of overlapping subsets of the same ten predictors are not thousands of independent training runs. Error bars and conclusions should match these dependencies. A visually narrow band can otherwise suggest much more independent evidence than the experiment contains."
         }
       ]
@@ -154,7 +154,7 @@
         },
         {
           "line": "The target is a deterministic numerical map",
-          "math": "G_{\\rm data}\\ne G_{\\rm continuum}\\quad\\text{in general}",
+          "math": "\\begin{gathered}G_{\\rm data}\\ne G_{\\rm continuum}\\\\\\text{in general}\\end{gathered}",
           "say": "The benchmark target includes finite-element discretization and interpolation onto a regular grid. A surrogate is evaluated against those numerical labels. Even if the labels differ from a continuum solution, that discrepancy does not by itself make them impossible to learn. Calling a shared surrogate residual a solver-imposed irreducible floor would require additional evidence, such as carefully matched refined-mesh experiments. Those experiments have not been performed here."
         },
         {

@@ -5,17 +5,14 @@ The current main branch contains the recovered earlier release. The PDF files
 in this branch are still that earlier release; the edited TeX is the working
 manuscript and will be rebuilt with the completed sensitivity results.
 
-At 16:10 local time (UTC+03), all ten correction-label mismatch probes, all
-ten paired centering seeds, and eight of nine OCO-2 grid comparisons had
-completed. The SCO2 comparison at seed 2 was running as the final item
-in the fixed queue. The centering lane
-has finished. The remaining training lane uses eight CPU threads, subject
-to measured capacity; no jobs are appended at runtime.
+All ten correction-label checks, ten paired centering seeds, and nine OCO-2
+grid comparisons have completed. The fixed queue is empty. The archive was
+downloaded and its exact 454-file manifest verified before extraction.
 
 The code now recomputes per-case metrics, conformal ranks and coverage,
 checks the exact planned predictor set and case counts, and verifies kernel
-selection against recorded validation cells. Full end-to-end aggregation
-and final tables await completion of the entire campaign.
+selection against recorded validation cells. Complete aggregation passed,
+and the final tables, macros and paired-seed figure have been generated.
 
 Editorial checks have corrected the refiner description, optional
 kernel-flow implementation scope, cost units, conformal-ball radius
@@ -33,21 +30,25 @@ The independent centering checker has recomputed all twenty arms from the
 saved 20000-case prediction fields. It checks relative and absolute errors,
 the disagreement scale through pairwise member differences, and scalar
 summation controls. The largest absolute difference in a per-case relative
-error was 4.45e-16 or less. The complete OCO-2 reconstruction and final
-archive aggregation remain pending.
+error was 4.45e-16 or less. The OCO-2 reconstruction passed for all fourteen
+predictors in all eighteen band/seed/grid scenarios. The per-case evidence,
+executed source and check records are in `campaign/evidence/`.
 
 An intermediate prose build completed at 32 main-text pages and 46 supplement
 pages with no unresolved references or citations. The working manuscript contains
 explicit main-text proofs of the ensemble floor, sharp kernel bound and
 minimax result, with the singular-Gram argument written out. The final
-manuscript will receive a fresh build and visual check after integration.
+manuscript is now undergoing a fresh paired build and visual check after
+integration. A clean MiKTeX build exposed a bibliography lookup issue in
+nested output directories; the portable helper now stages exact bibliography
+copies beside each child's auxiliary file.
 
 Ten independent publication reviews will inspect the completed manuscript
 and its pinned evidence. They have not started. The twenty older reviews in
 paper/reviews concern an earlier version and are not votes on this work.
 
-The new sensitivity-section source files are drafts awaiting generated
-tables and macros; they are not yet included by main.tex or supplement.tex.
+The new sensitivity sections and generated tables are included in both
+roots, with Supplement S11 giving the detailed protocols and full records.
 The lecture is also in production. It uses Microsoft Andrew narration and
 Latin Modern mathematics, with complete proof chapters and actual benchmark
 images. Earlier previews are superseded: a LaTeX-to-SVG import defect hid

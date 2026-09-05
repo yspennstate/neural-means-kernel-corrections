@@ -1,0 +1,22 @@
+{
+  "evidence_manifest_sha256": "714603298150658a9cbad70399da87887d3fa5bbded60ebc7e9d5aebd68ec30c",
+  "metric_reconstruction_inputs": {
+    ".local-verification\\evidence-final\\benchmark_metric_check.json": "49ca8616a7c0f1c5dc9e32bf099ee6e2db73e48ec947fd53a65b25a431f30f00",
+    "C:\\Users\\owner\\nmkc-resume-20260905\\campaign\\collected\\dgx\\seedarch.json": "bd1cf355e421befdb40e1d0bfefef018c68a136539f11b4acd15b1dd8bc6da58"
+  },
+  "metric_reconstruction_driver_sha256": "8258dd44a51f9e80f9baee057fe36ef71bfd40051f8369b2ed8c0113cc25854e",
+  "metric_solver_sha256": "b2efb7e1cac863190895582596351ef4ba7542a938bfac726bd95d9e4a0ebf2a",
+  "generator_sha256": "bebe3127539b0104f3822a282897eb619a10014ded78aa46dab1f83ec0451fff",
+  "outputs": {
+    "paper\\table_centering_sensitivity.tex": "2636d4172da0fcdff993ce771941355803e982a257c095593f78367beb99da98",
+    "paper\\table_mismatch_sensitivity.tex": "785e850afccf397ec621f84528aa33b2fbd07df550b54a281730ec3a3e6179fd",
+    "paper\\table_centering_uq.tex": "2ac66661034444d8e119e96cb8cf2d0d0606903eb54b2d365160199c2fa80b30",
+    "paper\\table_grid_sensitivity.tex": "5650dfe21c37a1b2b136616032e415a594b5eab7632c5545592503d0fd4e0a9f",
+    "paper\\table_grid_o2_full.tex": "d91e7030e71d68dfc692b86ee679fd7421dfded8e67ded3a49fd0bdf79ed814d",
+    "paper\\table_grid_wco2_full.tex": "9015564d2150ddbde48b22618742d2892e4744a0fd40970c6daf1cce19d4729f",
+    "paper\\table_grid_sco2_full.tex": "53ffe82f948f2df9b624b500df8cc3e821c54a55bb80e45971edfda7856bb7f0",
+    "paper\\sensitivity_macros.tex": "ce39698fd821e4683f916d671a97a3d977171dda168bf147a823460aa302863d",
+    "paper\\figs\\paired_implementation_sensitivity.pdf": "198800748b3a4bc28de32ea39f686e4e349d1290225dd05d7f9f72d7ae1ce138",
+    "campaign\\sensitivity_summary_with_metric_check.json": "d645db00657387bdf276327862610ff473509565101fd7abdceed435e88a19d0"
+  }
+}

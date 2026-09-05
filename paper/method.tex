@@ -15,7 +15,7 @@ given an extra input channel: the kernel method's predicted stress field for
 the same load, concatenated with the load. The network predicts the full stress
 field from these two inputs; it has no explicit residual-output constraint.
 Its test error is close to that of the normalized-MSE network
-(Table~\ref{tab:members}). During training the refiner reads four-fold kernel predictions. The kernel weights are fitted excluding the held-out fold, but the recorded runs centered targets using the mean over the full fitting pool. Consequently a held-out row can affect its kernel channel through that pooled target mean. This is training-label reuse, not strict cross-fitting. At query time the refiner receives the full-data kernel prediction. The tables describe that recorded implementation; the effect of later fold-local centering has not been rerun here.
+(Table~\ref{tab:members}). During training the refiner reads four-fold kernel predictions. The kernel weights are fitted excluding the held-out fold, but the recorded runs centered targets using the mean over the full fitting pool. Consequently a held-out row can affect its kernel channel through that pooled target mean. This is training-label reuse, not strict cross-fitting. At query time the refiner receives the full-data kernel prediction. The historical tables describe that implementation. Section~\ref{sec:implementation-sensitivity} changes the target centering in a paired rerun and repeats the downstream fitting steps.
 
 \emph{Other instances.} The mean slot is not tied to a particular
 architecture. We also use a Fourier neural operator \citep{li2021fourier}

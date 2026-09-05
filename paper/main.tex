@@ -20,6 +20,7 @@
 \firstpageno{1}
 
 \input{macros}
+\input{sensitivity_macros}
 \hypersetup{pdftitle={Neural means and kernel corrections for operator learning},pdfauthor={Yitzchak Shmalo},pdfsubject={operator learning, kernel ridge regression, ensembles, conformal prediction}}
 
 \begin{document}
@@ -76,10 +77,12 @@ conformal prediction
 \section{Results on the structural-mechanics benchmark}
 \label{sec:experiments}
 \input{experiments}
+\input{implementation_sensitivity}
 
 \section{The OCO-2 radiative-transfer emulator}
 \label{sec:oco2}
 \input{oco2}
+\input{oco_grid_sensitivity}
 
 \section{Theory}
 \label{sec:theory}
@@ -128,7 +131,7 @@ and the kernel-flow emulator's predictions through the OSF project
 \texttt{subsampled\_low\_res}.
 
 \section*{Supplementary material}
-The online supplement, referenced throughout as Supplement~S1--S10, is part of this manuscript. The repository hosts the current \href{https://github.com/yspennstate/neural-means-kernel-corrections/blob/main/paper/main.pdf}{article} and \href{https://github.com/yspennstate/neural-means-kernel-corrections/blob/main/paper/supplement.pdf}{supplement}, together with their editable sources in \texttt{paper/}. Consult the supplement for the full proofs; each formal result identifies its specific proof location.
+The online supplement, referenced throughout as Supplement~S1--S11, is part of this manuscript. The repository hosts the current \href{https://github.com/yspennstate/neural-means-kernel-corrections/blob/main/paper/main.pdf}{article} and \href{https://github.com/yspennstate/neural-means-kernel-corrections/blob/main/paper/supplement.pdf}{supplement}, together with their editable sources in \texttt{paper/}. The three main theorems are proved in the article; the supplement collects every proof, and each formal result identifies its specific proof location.
 It contains the finite-sample bounds for every fitted stage and
 all proofs, the margin and per-coordinate selection results, the
 effective-dimension identity, the ablation, error-localization, spectra,
@@ -136,7 +139,9 @@ uncertainty-quantification and cost detail on structural mechanics, the
 uncontrolled survey of the remaining suite problems and the mirror-symmetry
 check, the OCO-2 input-metric study with the data-scaling and ClimSim
 results, the implementation and compute record, and the numerical
-checks of the stated identities and inequalities. Both documents and their editable sources are also included in the accompanying Overleaf package.
+checks of the stated identities and inequalities, and the paired centering,
+correction-label, and kernel-grid sensitivity experiments. Both documents and
+their editable sources are also included in the accompanying Overleaf package.
 
 \bibliography{refs}
 

@@ -411,7 +411,7 @@ The implemented predictor is $m_{\rm full}(u)+c_\lambda(u)^\top R_{\rm tr}$. If 
        +\|c_\lambda(u)^\top\Delta\|_2,\label{eq:mismatch}\\
 \|c_\lambda(u)^\top\Delta\|_2&\le\|c_\lambda(u)\|_2\|\Delta\|_F.\nonumber
 \end{align}
-Indeed, $R_{\rm tr}=(G-m_{\rm full})(X)+\Delta$; substituting this identity and applying the theorem proves the display. This proof is included here. The mismatch has not been measured, so the single-mean theorem is not an evaluated certificate for the reported correction.
+Indeed, $R_{\rm tr}=(G-m_{\rm full})(X)+\Delta$; substituting this identity and applying the theorem proves the display. Section~\ref{sec:implementation-sensitivity} measures the propagated mismatch on the recorded test cases. The first term still contains an unknown native-space norm, so the display is not an evaluated error certificate for the reported correction.
 
 The RKHS assumption is also unverified for these targets and the norm is unknown. For labels sampled from one compatible $r\in H_k^q$, ridge contraction gives $\|\widehat r_\lambda\|_K\le\|r\|_K$. With the recorded mixed training labels, the fitted norm need not lower-bound $\|G-m_{\rm full}\|_K$. Table~\ref{tab:norms} therefore describes fitted functions only: its squared-norm ratio is about 4900 before energy normalization and 8.8 after it. Neither ratio proves a corresponding reduction in an unknown residual norm or smoothness. The design factor is a worst-case error factor and need not rank realized errors well; Section~\ref{sec:uq} measures that ranking directly.
 

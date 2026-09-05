@@ -16,6 +16,16 @@ my @documents = ('main', 'supplement');
 make_path($build);
 make_path("$build/$_") for @documents;
 
+# MiKTeX may invoke BibTeX from the output directory without adding the
+# source directory to BIBINPUTS. Keep exact current bibliography copies
+# beside each child's auxiliary file, independently of shell path syntax.
+for my $bib (glob('*.bib')) {
+    for my $document (@documents) {
+        copy($bib, "$build/$document/$bib")
+            or die "Cannot stage $bib for $document: $!\n";
+    }
+}
+
 sub contents {
     my ($path) = @_;
     return '' unless -f $path;

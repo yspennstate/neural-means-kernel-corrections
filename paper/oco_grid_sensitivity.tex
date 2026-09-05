@@ -13,7 +13,13 @@ comparison; they do not replace the ten-seed historical table.
 Table~\ref{tab:oco-grid-sensitivity} reports representative predictors
 under both searches. The per-seed records include both improvements and
 deteriorations on test. The grids are nested, but the validation winner
-need not improve test error. Supplement~\ref{supp:sensitivity}
+need not improve test error. For the coordinate combination, mean reduced
+error rises from $\sensOtwoComboOldRed\%$ to $\sensOtwoComboNewRed\%$ on O2,
+from $\sensWcoComboOldRed\%$ to $\sensWcoComboNewRed\%$ on WCO2, and from
+$\sensScoComboOldRed\%$ to $\sensScoComboNewRed\%$ on SCO2. The radiance
+changes have mixed signs across seeds. The flat-feature kernel head still
+outperforms the raw-input kernel on the reduced criterion in each band.
+Supplement~\ref{supp:sensitivity}
 reports all fourteen predictors, the paired records, boundary selections
 and failed-cell counts. The finite grid and training budget still limit
 the comparison. Because the study had already inspected these public

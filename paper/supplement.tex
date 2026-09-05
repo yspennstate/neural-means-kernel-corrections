@@ -25,6 +25,7 @@
 \firstpageno{1}
 
 \input{macros}
+\input{sensitivity_macros}
 \hypersetup{pdftitle={Supplement: neural means and kernel corrections for operator learning},pdfauthor={Yitzchak Shmalo}}
 
 \begin{document}
@@ -52,7 +53,8 @@ structural-mechanics results (ablation, error localization, spectra,
 uncertainty quantification, cost); Section~S7 the OCO-2 input-metric study
 and the data-scaling and ClimSim results; Sections~S8--S10 all proofs, the
 implementation and compute record, and the numerical checks of every stated
-identity and inequality.
+identity and inequality; and Section~S11 the paired centering, correction-label,
+and kernel-grid sensitivity experiments and reconstruction from saved fields.
 Numbering of the form S$n$ refers to this document; all other references
 point to the main text.
 \end{abstract}
@@ -96,6 +98,10 @@ point to the main text.
 \section{Numerical verification of the stated results}
 \label{app:verification}
 \input{verification}
+
+\section{Implementation sensitivity and prediction reconstruction}
+\label{supp:sensitivity}
+\input{supp_sensitivity}
 
 \bibliography{refs}
 

@@ -13,8 +13,14 @@ Reflection test-time averaging lowers the metric-trained MLP's test error by
 $\ttaGainMLP$ points. This agrees with the direction of
 Proposition~\ref{prop:sym} under its symmetry assumptions; the empirical
 symmetry checks do not prove those assumptions. The effect is smaller on the
-normalized-MSE network ($0.02$ points) and absent by construction from the
-refiner, which trains symmetrized. The kernel-flow regularizer did not improve
+normalized-MSE network ($0.02$ points). In the ten-seed refiner records,
+the implemented supplied-field average lowers test error by
+$\ttaGainRefiner\pm\ttaGainRefinerSd$ percentage points (mean and sample standard deviation),
+with an improvement at every seed. Random reflection augmentation during
+training does not make the averaging effect vanish. The additional
+equivariance condition needed to apply Proposition~\ref{prop:sym} to this
+refiner is not established; these changes are empirical measurements.
+The kernel-flow regularizer did not improve
 the low-data MLP's validation error. At high data the ten-seed records give
 $\saKfMlpThree\%$ at weight $0.3$ against $\saKfMlpZero\%$ without it, and
 $\saKfMlpOne\%$ at weight $1.0$ in the recorded smaller campaign.

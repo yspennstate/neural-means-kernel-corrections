@@ -34,10 +34,24 @@ and report the ensemble without it (Supplement~\ref{app:impl}).
 All means are trained with AdamW and a cosine schedule, batches of 128--256,
 for up to a few hundred epochs (Supplement~\ref{app:impl} lists every
 hyperparameter).
-During training each batch is reflected with probability $1/2$ (load reversed,
-target field reflected along the first grid coordinate); at test time each
-model is evaluated as $\frac12(f(u)+T f(Su))$. Proposition~\ref{prop:sym}
-shows the test-time step cannot increase population risk under exact target equivariance and distribution invariance (proof in Supplement~\ref{app:proofs}); the empirical symmetry checks do not prove those assumptions exactly. Training augmentation is a separate heuristic whose effect is measured in the ablation. Optionally, the training
+The neural trainers reflect batches with probability $1/2$ (load reversed,
+target field reflected along the first grid coordinate). Direct neural
+predictors use $\frac12(f(u)+T f(Su))$ at evaluation. For the refiner, write
+$F(u,h)$ for its prediction from a load and a supplied kernel field. Its
+implemented average is
+\[
+\tfrac12\big(F(u,h(u))+T F(Su,T h(u))\big).
+\]
+The reflected branch permutes the supplied field rather than recomputing
+$h(Su)$. This equals reflection averaging of the composite predictor
+$f(u)=F(u,h(u))$ if $h(Su)=T h(u)$, which we have not established for the
+fitted kernel channel. Proposition~\ref{prop:sym} gives the population-risk
+guarantee for the full-map average under exact target equivariance and
+distribution invariance; it does not supply that guarantee for the recorded
+refiner without the additional channel condition. The kernel-only member
+uses neither neural augmentation nor this prediction average. Training
+augmentation is a separate intervention from prediction averaging.
+Optionally, the training
 loss includes a regularized kernel-flow term computed from the batch
 with a Gaussian kernel on penultimate features and a learned bandwidth
 multiplier. The implementation adds $10^{-3}I$ to the half-batch Gram matrix

@@ -1,0 +1,158 @@
+{
+  "producer_sha256": "6c13050ddb1d9b5d42b5808cb1f26e2708e0bef548130b6702fe9ac379f72401",
+  "input_code_sha256": {
+    "train_mlp_refine.py": "44722d9a5bc7d3cec18c8723711cd16d847db0fea07bfecea18d5a6414ddd476",
+    "gen_preds.py": "be976e5514742187f9e4dd5eacdc67ba2aaec2180316861025d0854507e34b25"
+  },
+  "paper_sha256": {
+    "macros.tex": "a00b3c4c623d91dee143c1c46de558cecb9cb0efac931ecb751a939c0aa2d5a1",
+    "supp_experiments.tex": "9e24c650d5075b37c089ee15e8a8488367f8fdb6f20c007ff2788193fdf58dc8",
+    "supp_theory_stages.tex": "da0f581addf91bbfe4d99c876fffc3f7e9c6657dbc7cd85f489496327aa886c5"
+  },
+  "witness": {
+    "rows": [
+      {
+        "input": 1,
+        "plain": [
+          1,
+          1
+        ],
+        "full_map": [
+          1.0,
+          1.0
+        ],
+        "supplied_field": [
+          2.0,
+          2.0
+        ]
+      },
+      {
+        "input": -1,
+        "plain": [
+          1,
+          1
+        ],
+        "full_map": [
+          1.0,
+          1.0
+        ],
+        "supplied_field": [
+          2.0,
+          2.0
+        ]
+      }
+    ],
+    "plain_relative_risk": 0,
+    "full_map_relative_risk": 0,
+    "supplied_field_relative_risk": 1,
+    "refiner_channel_lipschitz_constant": 1,
+    "mean_relative_branch_defect": 2,
+    "risk_bound": 1,
+    "defect_bound_equality": "PASS",
+    "independent_scalar_derivation": "PASS",
+    "equivariant_channel_control": "PASS",
+    "scope": "Exact finite counterexample, not a benchmark simulation"
+  },
+  "retained_records": {
+    "rows": [
+      {
+        "seed": 0,
+        "source": "campaign/collected/dgx/runs/sm_s0/mlpR_s0_w1024_d4.json",
+        "sha256": "48ac3308ac12d62e4df6ae96c1c7bc7097244a74f075b38d34a55aaaa74bbab8",
+        "test_tta": 0.047283166466304434,
+        "test_plain": 0.047698454066979465,
+        "improvement_pp": 0.041528760067503084,
+        "decimal_improvement_pp": "0.041528760067503100"
+      },
+      {
+        "seed": 1,
+        "source": "campaign/collected/dgx/runs/sm_s1/mlpR_s1_w1024_d4.json",
+        "sha256": "4555ec9b4c4a2a842f3954fcf0f58f7ccaed76425138a2812005307bf883b437",
+        "test_tta": 0.04720893652228155,
+        "test_plain": 0.047606769045586125,
+        "improvement_pp": 0.0397832523304574,
+        "decimal_improvement_pp": "0.039783252330457500"
+      },
+      {
+        "seed": 2,
+        "source": "campaign/collected/dgx/runs/sm_s2/mlpR_s2_w1024_d4.json",
+        "sha256": "ed581a15b51c838af710b3db48c1cdf847b066aa796803ad7a70d34b38dc23e1",
+        "test_tta": 0.04728176579234436,
+        "test_plain": 0.047684921100515906,
+        "improvement_pp": 0.04031553081715461,
+        "decimal_improvement_pp": "0.040315530817154600"
+      },
+      {
+        "seed": 3,
+        "source": "campaign/collected/dgx/runs/sm_s3/mlpR_s3_w1024_d4.json",
+        "sha256": "cbf6a00a1f333ee941d5e7e8b283d059bb53ac7f913b34b6ff1a773ad62626a3",
+        "test_tta": 0.04728583787052994,
+        "test_plain": 0.047718554167145655,
+        "improvement_pp": 0.043271629661571775,
+        "decimal_improvement_pp": "0.043271629661571500"
+      },
+      {
+        "seed": 4,
+        "source": "campaign/collected/dgx/runs/sm_s4/mlpR_s4_w1024_d4.json",
+        "sha256": "0888570e34c1bd03295dfcb178b432bf6015f5d45e0002a5261153ac5853e245",
+        "test_tta": 0.047279261015132086,
+        "test_plain": 0.04768649963487808,
+        "improvement_pp": 0.040723861974599485,
+        "decimal_improvement_pp": "0.040723861974599400"
+      },
+      {
+        "seed": 5,
+        "source": "campaign/collected/dgx/runs/sm_s5/mlpR_s5_w1024_d4.json",
+        "sha256": "24a94424db85bc560af03500db6aca12117b8f19fff32d9c50f61dcbe88358a0",
+        "test_tta": 0.04742246445085953,
+        "test_plain": 0.047864811994350366,
+        "improvement_pp": 0.04423475434908383,
+        "decimal_improvement_pp": "0.044234754349083600"
+      },
+      {
+        "seed": 6,
+        "source": "campaign/collected/dgx/runs/sm_s6/mlpR_s6_w1024_d4.json",
+        "sha256": "cd233cba118455d35dae027f5352c7980a38c2c748ef0989b9bbbac1b8d7a2e7",
+        "test_tta": 0.04732720448035433,
+        "test_plain": 0.047785596088318415,
+        "improvement_pp": 0.04583916079640843,
+        "decimal_improvement_pp": "0.045839160796408500"
+      },
+      {
+        "seed": 7,
+        "source": "campaign/collected/dgx/runs/sm_s7/mlpR_s7_w1024_d4.json",
+        "sha256": "cd02dd025ba90e168557850e65b1f9192ae7b5294ab2ae6ab97ada5b2cbb7d69",
+        "test_tta": 0.04730470000432652,
+        "test_plain": 0.0477259569265066,
+        "improvement_pp": 0.042125692218007715,
+        "decimal_improvement_pp": "0.04212569221800800"
+      },
+      {
+        "seed": 8,
+        "source": "campaign/collected/dgx/runs/sm_s8/mlpR_s8_w1024_d4.json",
+        "sha256": "f71963c846dce769425b0990a56c2bdc497285c0140a4e6588bceaca063a8174",
+        "test_tta": 0.047330682071338864,
+        "test_plain": 0.047759970132862165,
+        "improvement_pp": 0.042928806152330024,
+        "decimal_improvement_pp": "0.042928806152330100"
+      },
+      {
+        "seed": 9,
+        "source": "campaign/collected/dgx/runs/sm_s9/mlpR_s9_w1024_d4.json",
+        "sha256": "51f9d28cab56a802ebe7a1ed0979436d49f13acca0368a2a1b6ee15eaa5e07d3",
+        "test_tta": 0.04727888828142262,
+        "test_plain": 0.04769015562166216,
+        "improvement_pp": 0.04112673402395378,
+        "decimal_improvement_pp": "0.04112673402395400"
+      }
+    ],
+    "n": 10,
+    "mean_improvement_pp": 0.042187818239107014,
+    "sample_sd_improvement_pp": 0.001892694803349329,
+    "decimal_mean_pp": "0.042187818239107030",
+    "decimal_sample_sd_pp": "0.0018926948033492813631310614719595235516664909683243",
+    "improved_seeds": 10,
+    "paper_macros": "PASS",
+    "scope": "Retained per-seed log metrics; no fresh training or prediction reconstruction"
+  }
+}

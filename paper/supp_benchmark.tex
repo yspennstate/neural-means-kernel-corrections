@@ -70,11 +70,17 @@ Outputs of near-mirror inputs are far closer than the inputs themselves,
 which is what equivariance plus a Lipschitz solution map predicts, and the
 effect singles out the correct output reflection axis. A complementary check
 on the input law: the empirical mean and covariance of the training loads are
-invariant under reflection to within 1.1\% and 1.5\% respectively, as required
-for Proposition~\ref{prop:sym}. Consistently with all of this, reflection
+invariant under reflection to within 1.1\% and 1.5\% respectively. These
+moment checks are consistent with, but do not establish, the exact input-law
+invariance assumed by Proposition~\ref{prop:sym}. Consistently with this evidence, reflection
 averaging at test time improves twenty-nine of the thirty reflected members of
-the seed campaign (Section~\ref{sec:experiments}), which is what
-Proposition~\ref{prop:sym} predicts: it constrains the expected loss, so a
-finite test sample is free to go the other way, and at one seed it does.
+the seed campaign (Section~\ref{sec:experiments}). This direction is consistent
+with the symmetry motivation. For the true full-map average,
+Proposition~\ref{prop:sym} controls expected loss under its exact assumptions;
+a finite test sample can go the other way.
+The thirty records include ten refiners whose supplied-field averaging
+requires a further channel-equivariance condition, as explained in
+Supplement~\ref{sec:theory-sym}; their improvements are empirical support
+for that implementation, not instances of the proposition's guarantee.
 
 

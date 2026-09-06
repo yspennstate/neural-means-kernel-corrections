@@ -1,4 +1,4 @@
-\subsection{Symmetry averaging does not increase the risk}
+\subsection{Full-map symmetry averaging does not increase the risk}
 \label{sec:theory-sym}
 
 The elasticity problem behind the benchmark is invariant under the reflection
@@ -36,10 +36,60 @@ the reflection-augmented empirical loss upper-bounds the empirical loss of
 the symmetrized predictor. The objectives are generally different, so the
 proposition does not guarantee that training with augmentation improves the
 fitted model. The near-mirror checks support, but do not prove, exact
-symmetry of the distributed solver output. In the campaign, test-time
-averaging improves twenty-nine of thirty reflected members and worsens one
-by a thousandth of a point (Section~\ref{app:verification}). The convexity
+symmetry of the distributed solver output. In the campaign, the recorded
+averages improve twenty-nine of thirty members across the two MLP variants
+and the refiner, and worsen one by a thousandth of a point. The refiner's
+operation requires the distinction below. The convexity
 argument is standard; \citet{lyle2020benefits} give a general account.
+
+\paragraph{A supplied conditioning field is an additional input.}
+For a fitted refiner $F(u,h)$ and a fixed kernel predictor $h(u)$, define
+$f(u)=F(u,h(u))$. The proposition concerns
+\[
+f_S(u)=\tfrac12\big(F(u,h(u))+T F(Su,h(Su))\big).
+\]
+The implementation instead uses $T h(u)$ as the second branch's conditioning
+field. Thus $h(Su)=T h(u)$ is a sufficient additional condition for identifying
+the implemented average with $f_S$. Equivariance of the target and invariance
+of the load distribution do not establish this property of a fitted kernel
+predictor. Nor does training the refiner with randomly reflected triples
+force exact equivariance. We make no non-increase guarantee for its recorded
+averaging operation without that additional condition.
+
+There is a quantitative way to state the missing requirement. Write
+$b(u)=\tfrac12(F(u,h(u))+T F(Su,T h(u)))$ for the implemented average and
+$R(g)=\mathbb E\|g(u)-G(u)\|_2/\|G(u)\|_2$, assuming nonzero targets
+almost surely and finite quantities below. Under the proposition's exact
+symmetry assumptions,
+\begin{equation}\label{eq:refiner-defect}
+\begin{aligned}
+R(b)&\le R(f_S)+\frac12\mathbb E
+\frac{\|F(Su,T h(u))-F(Su,h(Su))\|_2}{\|G(u)\|_2}
+\\
+&\le R(f)+\frac12\mathbb E
+\frac{\|F(Su,T h(u))-F(Su,h(Su))\|_2}{\|G(u)\|_2}.
+\end{aligned}
+\end{equation}
+Indeed, the triangle inequality bounds the risk difference by
+$\mathbb E\|b-f_S\|_2/\|G\|_2$, and orthogonality of $T$ gives the
+displayed defect exactly; the second inequality is Proposition~\ref{prop:sym}.
+If $F(u,\cdot)$ is uniformly $L_h$-Lipschitz, the additional term is at most
+$(L_h/2)\mathbb E[\|T h(u)-h(Su)\|_2/\|G(u)\|_2]$.
+Neither this defect nor such a Lipschitz bound was measured in the campaign,
+so this inequality does not certify its observed error changes.
+
+The distinction can matter even with an exactly symmetric target. Let the
+input take the values $+1$ and $-1$ with equal probability, let $S$ exchange
+them, and let $T$ swap two output coordinates. Set $G(u)=(1,1)$,
+$h(+1)=(1,1)$ and $h(-1)=(3,3)$. Define $F(+1,z)=z$ and
+$F(-1,z)=(4,4)-z$. Then $f(u)=G(u)$ at both inputs, and the full-map average
+also has zero error. Averaging with $T h(u)$ instead gives $(2,2)$ at both
+inputs, with relative error one. This finite example disproves a general
+guarantee for the supplied-field operation and attains equality in
+\eqref{eq:refiner-defect} (here $L_h=1$). It is not a model of the measured
+benchmark. The accompanying \texttt{campaign/refiner\_symmetry\_diagnostic.py}
+checks the construction and independently recomputes the ten recorded
+refiner differences.
 
 \subsection{What the kernel-flow regularizer estimates}
 \label{sec:theory-kf}

@@ -61,13 +61,20 @@ predictions for the input channel and full-data kernel predictions at
 evaluation; otherwise identical to the MLP but run for 100 epochs (the
 trainer's own default of 300 is not what the campaign used). 6.64M parameters. Reflection
 augmentation flips the load and permutes both the kernel channel and the target
-by the row-reversal index.
+by the row-reversal index. Evaluation averages $F(u,h(u))$ with
+$T F(Su,T h(u))$; it does not recompute the kernel prediction at $Su$.
+Training on randomly reflected triples does not force the fitted network
+to be exactly equivariant. The full-map guarantee and the additional
+condition on the kernel channel are distinguished in
+Supplement~\ref{sec:theory-sym}.
 
 \paragraph{Common training details.} Loss: mean over the batch of
 $\|\hat v-v\|_2/\|v\|_2$ in original units (predictions denormalized inside
 the loss; targets standardized by the per-pixel training mean and global
 standard deviation), except for the MSE variant above. Reflection
-augmentation with probability $1/2$; reflection averaging at evaluation.
+augmentation with probability $1/2$ for neural members; reflection averaging
+at evaluation, with the refiner's supplied-field convention just described.
+The kernel-only member has neither operation.
 Model selection: validation error computed every 10 epochs, best checkpoint
 kept. The ensemble's diversity comes from the architectures and losses rather
 than from reseeding; the correlation analysis of Section~\ref{sec:diversity}

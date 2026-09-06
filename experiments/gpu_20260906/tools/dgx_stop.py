@@ -62,11 +62,35 @@ def flip(word):
         log(f"flip {word}: git error {ex!r}")
 
 
-def connect(pw, timeout=25):
+def connect(pw, timeout=600):
+    """One patient socket: sshd's parent on a thrashing box accepts rarely, and every short attempt
+    that gives up leaves a stale connection in its backlog for it to waste an accept on. So one
+    connection waits up to ten minutes for the banner instead of thirty tries of 25 s."""
+    import socket, struct
+    # A connection we abandon with a clean close (FIN) sits in sshd's accept queue until the hung
+    # parent accepts it. Closing with a reset instead (SO_LINGER 1,0 -> RST) is meant to let the
+    # kernel discard the entry so this prober never clogs the queue it is waiting on - that is the
+    # intent, not a measured fact (unverified on 6 Sep 2026); at worst it is harmless. Windows caps
+    # the connect wait at its own SYN-retry limit (about two minutes) whatever timeout is asked.
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0))
+    sock.settimeout(timeout)
+    try:
+        sock.connect((HOST, 22))
+    except Exception:
+        sock.close()          # RST, not FIN
+        raise
     c = paramiko.SSHClient()
     c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    c.connect(HOST, username=USER, password=pw, look_for_keys=False, allow_agent=False,
-              timeout=timeout, banner_timeout=timeout, auth_timeout=timeout)
+    try:
+        c.connect(HOST, username=USER, password=pw, sock=sock, look_for_keys=False, allow_agent=False,
+                  timeout=timeout, banner_timeout=timeout, auth_timeout=timeout)
+    except Exception:
+        try:
+            sock.close()      # RST
+        except Exception:
+            pass
+        raise
     return c
 
 
@@ -112,13 +136,13 @@ def main():
     pw = password()
     if word:
         flip(word)
-    log(f"waiting for an SSH login to {HOST} (one attempt every 30 s; Ctrl-C to stop waiting)")
+    log(f"waiting for an SSH login to {HOST} (one patient connection at a time, banner wait 600 s; Ctrl-C to stop waiting)")
     while True:
         try:
             c = connect(pw)
         except Exception as ex:  # noqa: BLE001
-            log(f"no login yet: {str(ex)[:80]}")
-            time.sleep(30)
+            log(f"no login yet after a long wait: {str(ex)[:80]}")
+            time.sleep(15)
             continue
         try:
             rc, o, _ = sh(c, "hostname; uptime")

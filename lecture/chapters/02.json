@@ -79,7 +79,7 @@
         {
           "line": "Training augmentation is a separate intervention",
           "math": "(u,v)\\longmapsto(Su,Tv)",
-          "say": "During training, reflected input-output pairs are also supplied as augmentation. That can change the learned network, so it is a different operation from averaging two predictions after training. The test-time argument holds for a fixed fitted map under the symmetry assumptions. It is not a proof that a particular stochastic training run improves when augmented. The paper measures augmentation and prediction averaging as separate parts of its recipe."
+          "say": "During training, reflected input-output pairs are also supplied as augmentation. That can change the learned network, so it is a different operation from averaging two predictions after training. The test-time argument holds for a fixed fitted map under the symmetry assumptions. This argument does not establish that a particular stochastic training run improves when augmented. The paper measures augmentation and prediction averaging as separate parts of its recipe."
         }
       ]
     },
@@ -177,7 +177,7 @@
         {
           "line": "The single-mean theorem uses one residual function",
           "math": "R=G(X)-m(X)",
-          "say": "The clean theorem assumes that the residual labels come from one function G minus m evaluated at the design. Once m is fixed, those labels and the query residual belong to the same object. The recorded pipeline has a complication: some training-row predictions are foldwise, while the query-time mean uses full-data fits. The refiner also sees a different kernel channel at deployment. These changes mean that the recorded training-row mean need not equal the deployed mean evaluated on the training inputs."
+          "say": "The clean theorem assumes that the residual labels come from one function: the target function minus the fitted mean, evaluated at the design. Once m is fixed, those labels and the query residual belong to the same object. The recorded pipeline has a complication: some training-row predictions are foldwise, while the query-time mean uses full-data fits. The refiner also sees a different kernel channel at deployment. These changes mean that the recorded training-row mean need not equal the deployed mean evaluated on the training inputs."
         },
         {
           "line": "Name the discrepancy rather than hide it",

@@ -97,7 +97,7 @@
         {
           "line": "Write the mixture using one scalar",
           "math": "\\begin{gathered}f_t=(1-t)f_1+t f_2\\\\0\\le t\\le1\\end{gathered}",
-          "say": "Order the two members so that the first has no larger RMS error than the second. Let e one and e two be their positive RMS errors, and let varrho be their uncentered correlation. Use t as the weight on the weaker second member. At t equal to zero, the stack is just the first member. To decide whether any mixing helps, inspect the squared error as we begin moving along the segment toward the second residual."
+          "say": "Order the two members so that the first has no larger RMS error than the second. Let e one and e two be their positive RMS errors, and let rho be their uncentered correlation. Use t as the weight on the weaker second member. At t equal to zero, the stack is just the first member. To decide whether any mixing helps, inspect the squared error as we begin moving along the segment toward the second residual."
         },
         {
           "line": "Its squared risk is a quadratic",
@@ -107,7 +107,7 @@
         {
           "line": "The initial derivative gives the exact admission rule",
           "math": "\\begin{aligned}V'(0)&=2(\\varrho e_1e_2-e_1^2)\\\\\nV'(0)<0&\\iff\\varrho<e_1/e_2\\end{aligned}",
-          "say": "Differentiate at t equal to zero. The derivative is twice varrho e one e two minus e one squared. It is negative exactly when varrho is less than the ratio e one over e two. Because the objective is convex and the first member is at least as good individually, this is the exact condition for a strict improvement from adding the second member. A weaker member needs a correspondingly lower correlation to earn positive weight."
+          "say": "Differentiate at t equal to zero. The derivative is twice the difference between rho times e one times e two and e one squared. It is negative exactly when rho is less than the ratio e one over e two. Because the objective is convex and the first member is at least as good individually, this is the exact condition for a strict improvement from adding the second member. A weaker member needs a correspondingly lower correlation to earn positive weight."
         }
       ]
     },
@@ -179,17 +179,17 @@
         {
           "line": "Assume equal diagonal entries and one common off-diagonal value",
           "math": "\\begin{gathered}S_{aa}=e^2\\\\S_{ab}=\\varrho e^2\\quad(a\\ne b)\\end{gathered}",
-          "say": "Consider a family in which every member has RMS error e and every distinct pair has the same uncentered correlation varrho. This is a restrictive model, but its calculation exposes the common-error mechanism clearly. We use a nonnegative varrho, as in the proposition. The matrix consists of a shared all-ones component plus a diagonal component. The shared part represents alignment that averaging cannot remove."
+          "say": "Consider a family in which every member has RMS error e and every distinct pair has the same uncentered correlation rho. This is a restrictive model, but its calculation exposes the common-error mechanism clearly. We use a nonnegative rho, as in the proposition. The matrix consists of a shared all-ones component plus a diagonal component. The shared part represents alignment that averaging cannot remove."
         },
         {
           "line": "The quadratic form separates into two pieces",
           "math": "\\begin{gathered}w^\\top S w\\\\=e^2\\left[\\varrho+(1-\\varrho)\\sum_a w_a^2\\right]\\end{gathered}",
-          "say": "Expand the matrix into varrho e squared times the all-ones matrix and one minus varrho times e squared times the identity. The all-ones contribution is fixed because the weights sum to one. Only the sum of squared weights can be reduced. Cauchy-Schwarz gives that sum at least one over M, with equality at uniform weights. Thus equal weighting is optimal for this exact symmetric model."
+          "say": "Expand the matrix into rho e squared times the all-ones matrix and one minus rho times e squared times the identity. The all-ones contribution is fixed because the weights sum to one. Only the sum of squared weights can be reduced. Cauchy-Schwarz gives that sum at least one over M, with equality at uniform weights. Thus equal weighting is optimal for this exact symmetric model."
         },
         {
           "line": "More members remove only the unshared component",
           "math": "\\min_w w^\\top S w=e^2\\left(\\varrho+\\frac{1-\\varrho}{M}\\right)",
-          "say": "The optimum is e squared times varrho plus one minus varrho divided by M. As M grows, the second term vanishes and the shared term remains. The RMS floor is e times the square root of varrho. This limit presumes that the same quality and correlation model continues to hold as members are added. It is not evidence that every future architecture must share the same error. The next chapter replaces exact equal correlation with entrywise lower bounds."
+          "say": "The optimum squared error has two terms. The first is e squared times rho. The second is e squared, multiplied by the quantity one minus rho, and divided by M. As M grows, the second term vanishes and the shared term remains. The RMS floor is the individual RMS error multiplied by the square root of rho. This limit presumes that the same quality and correlation model continues to hold as members are added. It is not evidence that every future architecture must share the same error. The following chapter replaces exact equal correlation with entrywise lower bounds."
         }
       ]
     },

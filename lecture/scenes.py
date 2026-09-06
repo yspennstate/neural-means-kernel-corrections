@@ -223,7 +223,7 @@ def build_visual(spec):
                       formula(r"e_2",27,DIM).next_to(ax.c2p(0,1.5),UP,buff=.12),
                       formula(r"\|e\|_2=1",25,BLUE).move_to([5.,1.5,0]),
                       formula(r"\|\operatorname{diag}(1,2)e\|_2=1",24,GOLD).move_to([2.6,-2.35,0]),
-                      formula(r"a=(1,0)",24,GREEN).next_to(a.get_end(),DOWN,buff=.2),
+                      formula(r"a=(1,0)",24,GREEN).next_to(a.get_end(),RIGHT,buff=.22).shift(DOWN*.3),
                       formula(r"b=(0,0.65)",24,RED).next_to(b.get_end(),LEFT,buff=.18))
         return VGroup(ax,circle,ellipse,a,b,labels),[lambda:Indicate(circle,color=BLUE),
                 lambda:Indicate(ellipse,color=GOLD),lambda:Indicate(VGroup(a,b),color=INK)]

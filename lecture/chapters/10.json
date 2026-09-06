@@ -14,7 +14,7 @@
       "segments": [
         {
           "line": "The target is a numerical radiative-transfer map",
-          "math": "u\\in\\mathbb R^{20\\text{--}24}\\longmapsto z\\in\\mathbb R^{40}",
+          "math": "\\begin{gathered}u\\in\\mathbb R^d\\longmapsto z\\in\\mathbb R^{40}\\\\20\\le d\\le24\\end{gathered}",
           "say": "The second application predicts a spectrum from an atmospheric state. We use the published radiative-transfer emulation benchmark associated with the three OCO-2 spectral bands. Its inputs have already been reduced to twenty through twenty-four dimensions, depending on the band. The output is forty standardized principal-component coefficients. These are simulator targets from a released benchmark, not a collection of satellite observations that we are treating as ground truth."
         },
         {
@@ -51,7 +51,7 @@
         },
         {
           "line": "The reconstruction metric has a stated scope",
-          "math": "\\begin{gathered}\\|R(\\widehat z)-R(z)\\|_2\\\\=\\|D_z(\\widehat z-z)\\|_2\\end{gathered}",
+          "math": "\\begin{gathered}U^\\top U=I\\\\\\|R(\\widehat z)-R(z)\\|_2\\\\=\\|D_z(\\widehat z-z)\\|_2\\end{gathered}",
           "say": "The equality concerns two reconstructions in the retained forty-dimensional subspace. It does not include the truncation error of principal-component reduction, the instrument line shape, or the source study's measurement-noise model. A small percentage here is therefore not automatically a retrieval-accuracy claim. We keep both criteria visible because a single favorable number would hide which coordinates and which downstream question the method actually serves."
         }
       ]

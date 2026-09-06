@@ -1,6 +1,60 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
-## Current checkpoint: September 6, 06:22 Jerusalem
+## Current checkpoint: September 6, 07:09 Jerusalem
+
+All ten original reviews returned on the build05 packet: seven YES and three
+NO. Referees05 and10 finished at06:58/06:59; their final report hashes are
+8932bb8c7328d32d4ea3bff1c847e8c8d4eb1c5399eabc5b04f4b9595279d030
+and8cc42b5867dcdbdda946a7564c2ceda13d6de8cdee718f5b81d54d228a21455c.
+Their22/9 evidence pins match; both report schemas pass, human review and
+Brain registration remain pending. R05's blocker is the Fourier boundary's
+missing empirical metric provenance, already addressed by the descriptive
+replacement in build10. No original vote transfers to the corrected packet.
+
+The corrected packet is being prepared by hidden process50756, started07:00,
+using final-build-10 and commit6ca8aacbbd53a4af51d60c187884d218af267611.
+Output is final_panel/packet_6ca8aacbbd53_final-build-10_v2; do not start readers
+until MANIFEST.json exists and all hashes/membership pass. The separate
+.local-verification/panel_reassessment_controller.py resumes existing threads
+into distinct report leaves. Four controls pass, including missing-original
+vote and unobserved-session rejection. original_panel_sessions.json records
+the ten native thread IDs; referee06 uses its retained scientific review
+thread01a07326, not its earlier interrupted launch. Two bounded serial groups
+may reuse these ten referees after fresh admission; none launched yet.
+
+The PDFs and routing controls were pushed at06:33 as6ca8aac. The index, working
+PDFs and build10 PDF bytes match in three SHA-256 lanes. Repository PDF binary
+attributes now override the machine's inappropriate astextplain diff driver.
+
+Chapter10 passed media checks:18467frames,615.566667seconds,21 zero-offset
+waveform matches, movie6b8576482ecae6801370e4142766bb0fd6c0a1f6f8e6b27523a02276e444a2fc.
+All21 native frames inspected; visual_review_0640.json requires a clearer
+input dimension and an endpoint-label placement, plus a displayed U-transpose-U
+condition. Source fixed; chapter10 needs one later replacement, beyond the
+currently running serial plan. Controller24268 is still rendering11 in build
+20260906T062309_chapter11_final, then02–09 and12. Do not duplicate it.
+
+Actual chapter01 assembly boundary and three rejection controls passed:
+.local-verification/assembly_boundary_0655/receipt.json. No full film assembled.
+Original252-WAV GPU ASR remains active under37388, output asr_full_0604.
+Two chapter02 and five chapter03 passages were re-recorded for clarity and
+explicit algebraic grouping. Old WAVs/scripts are retained in private
+narration_repair_0645 and narration_repair_0705. The old ASR results for those
+seven passages are superseded; new transcription checks are still required.
+Current252-WAV text identities and two independent duration lanes pass:
+6730.2seconds of speech, before pauses. Full ASR is screening, not listening.
+Three extra closing 'you' transcripts occur over near-silent tails (peaks3,
+2 and0 int16 units), with inferred ASR times beyond the actual WAV endpoints.
+The apparent missing minus in c02_members_01 is the transcript's G-M hyphen.
+The possible c01_split_01 repeated 'the' still needs a focused check.
+
+Video-Brain peer independently reported100 submitted-text hashes consistent,
+but89 source-record hashes include LF and11 omit it. Root acknowledged message
+895122a71d; the representation distinction and old GPU paragraph supersession
+still need explicit ledger/Brain updates. Missing CH9085 attachment retained.
+Latest pulse06:53:13, leases through07:38:13. Continue through12:55 Jerusalem.
+
+## Historical checkpoint: September 6, 06:22 Jerusalem
 
 Build10 passed and its two PDFs are now copied into paper/main.pdf and
 paper/supplement.pdf. Main34pages SHA

@@ -4,12 +4,14 @@ Code and paper for a study of neural predictors combined with exact kernel regre
 
 ## Paper, supplement, and Overleaf sources
 
-- [Main paper](paper/main.pdf): revised manuscript, 32 pages.
-- [Supplement](paper/supplement.pdf): complete proofs and additional experiments, 46 pages. Each result with a deferred proof identifies its location here.
-- [Overleaf ZIP](releases/nmkc_overleaf_20260905.zip): complete editable project, figures, both PDFs, and the twenty-review revision record.
-- [Publication review](paper/reviews/publication_review.pdf): original votes and the substantive corrections.
+- [Main paper](paper/main.pdf): revised article, 34 pages.
+- [Supplement](paper/supplement.pdf): complete proofs and additional experiments, 52 pages.
+- [Overleaf ZIP](releases/nmkc_overleaf_20260906.zip): the matching editable project, figures, build instructions, and both PDFs.
+- [Revision record](docs/paper1_completion_status.md): the scope of the current corrections and the retained evidence.
 
-The source revision on this branch includes complete main-text proofs and new paired centering, correction-label, and OCO-2 grid experiments. Their [complete evidence archive](campaign/evidence/README.md) supports reconstruction of the new tables from per-case records. The linked PDFs and Overleaf ZIP above still belong to the earlier release while the final PDFs and ten new publication reviews are being prepared; the older twenty-review record is not a vote on this revision. See [the current completion record](docs/paper1_completion_status.md).
+The current pair incorporates the completed sensitivity campaign and the corrected reflection-averaging argument. The refiner's supplied-channel average is distinguished from an average of the full predictor; the supplement proves a defect bound and gives a counterexample to an unconditional guarantee. The theoretical symmetry condition is sufficient and is not assumed for the recorded fitted kernel. No new training result is introduced by the final presentation edits.
+
+The [complete sensitivity evidence archive](campaign/evidence/README.md) supports reconstruction from its per-case records. Historical reviews under `paper/reviews/` and the older Overleaf archive concern their named earlier versions; they are not part of the new Overleaf package.
 
 Upload the ZIP to Overleaf, choose **pdfLaTeX**, and select **main.tex**. The supplied build configuration compiles the companion supplement and resolves references in both directions. Locally:
 

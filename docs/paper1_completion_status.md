@@ -1,62 +1,31 @@
-# Paper 1 completion work, September 5
+# Paper 1 revision state, 6 September 2026
 
-This branch preserves work in progress toward the completed Paper 1 revision.
-The current main branch contains the recovered earlier release. The PDF files
-in this branch are still that earlier release; the edited TeX is the working
-manuscript and will be rebuilt with the completed sensitivity results.
+The revised release pairs a 34-page article with a 52-page supplement and
+an editable Overleaf project. The earlier 32/46-page release and the
+subsequent 34/51-page review packet remain historical versions.
 
-All ten correction-label checks, ten paired centering seeds, and nine OCO-2
-grid comparisons have completed. The fixed queue is empty. The archive was
-downloaded and its exact 454-file manifest verified before extraction.
+The completed sensitivity evidence contains ten paired target-centering
+seeds, ten fixed-estimator correction-label checks, and nine paired OCO-2
+grid comparisons. Its per-case records and frozen inputs preserve the
+historical estimator and metric identities. The expanded-grid experiments
+do not replace the historical ten-seed OCO-2 comparison.
 
-The code now recomputes per-case metrics, conformal ranks and coverage,
-checks the exact planned predictor set and case counts, and verifies kernel
-selection against recorded validation cells. Complete aggregation passed,
-and the final tables, macros and paired-seed figure have been generated.
+The refiner correction distinguishes reflection of a supplied kernel field
+from reflection of the full composed predictor. The supplement proves a
+defect bound and gives a two-point counterexample. Kernel-field equivariance
+is sufficient for equality of the two averages; the manuscript neither
+assumes it for the fitted kernel nor claims it is necessary for every refiner.
 
-Editorial checks have corrected the refiner description, optional
-kernel-flow implementation scope, cost units, conformal-ball radius
-terminology, and the scope of the retained half-precision archives.
-The hardware description now distinguishes 20 physical cores from 40
-hardware threads. A second matrix optimizer, using active-set solves and
-explicit optimality bounds, reproduces the sixty-member hindsight optimum
-and all twenty five-/six-member validation optima checked. A separate float64
-reconstruction from all sixty saved prediction fields also agrees with the
-retained pool floor and optimum to four decimal places in percentage units.
-The ten historical pipelines were rescored under plain and trapezoidal grid
-norms; those are distinct metrics, not interchangeable comparison tables.
+The final presentation edits identify the separate supplement, label the
+Marchenko-Pastur diagnostic as one Gaussian realization, and write out the
+four values in the counterexample. No numerical record or reported score
+changes in those edits. The 6,000-row spectrum remains a finite-subsample
+diagnostic, and the sixty-predictor floor remains an empirical RMS bound
+for that fixed pool.
 
-The independent centering checker has recomputed all twenty arms from the
-saved 20000-case prediction fields. It checks relative and absolute errors,
-the disagreement scale through pairwise member differences, and scalar
-summation controls. The largest absolute difference in a per-case relative
-error was 4.45e-16 or less. The OCO-2 reconstruction passed for all fourteen
-predictors in all eighteen band/seed/grid scenarios. The per-case evidence,
-executed source and check records are in `campaign/evidence/`.
-
-An intermediate prose build completed at 32 main-text pages and 46 supplement
-pages with no unresolved references or citations. The working manuscript contains
-explicit main-text proofs of the ensemble floor, sharp kernel bound and
-minimax result, with the singular-Gram argument written out. The final
-manuscript is now undergoing a fresh paired build and visual check after
-integration. A clean MiKTeX build exposed a bibliography lookup issue in
-nested output directories; the portable helper now stages exact bibliography
-copies beside each child's auxiliary file.
-
-The completed 34-page article and 51-page supplement have been frozen with
-their evidence for ten fresh independent Codex CLI reviews. The panel is in
-progress; the twenty older reviews in paper/reviews are not votes on these
-bytes. The first returned comments are being integrated into the working
-source, which will receive a new paired build and revision review. The frozen
-panel packet remains unchanged. The corrections clarify reflection handling,
-retrospective test-block fitting and the internal effective-dimension reference,
-and make the campaign centering choice and resume provenance explicit.
-
-The new sensitivity sections and generated tables are included in both
-roots, with Supplement S11 giving the detailed protocols and full records.
-The lecture is also in production. It uses Microsoft Andrew narration and
-Latin Modern mathematics, with complete proof chapters and actual benchmark
-images. Earlier previews are superseded: a LaTeX-to-SVG import defect hid
-fraction bars. The process-local repair has a native notation probe and
-rule-removal regression controls. Neither those checks nor the source
-compilation establish complete audiovisual approval.
+The source includes the paired-document build helper and the evidence needed
+to reconstruct its released summary tables. Large prediction arrays and
+training checkpoints remain separately retained; the public source package
+does not reproduce every array-level check without them. Historical review
+reports attach to their named versions. New experiments and proposed
+extensions are assessed separately before inclusion in a later revision.

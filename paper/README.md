@@ -1,65 +1,74 @@
 # Neural means and kernel corrections for operator learning
 
-Revised manuscript and Overleaf project, 5 September 2026. The source on this
-branch now includes the completed sensitivity campaign and three main-text
-proofs. The packaged PDFs and older review files below remain the earlier
-release until the new build and ten-reviewer panel are finished. See
-`../docs/paper1_completion_status.md` for the current revision state.
+Revised article and supplement, 6 September 2026. The matching files are
+`main.pdf` (34 pages) and `supplement.pdf` (52 pages). Keep those filenames
+and keep the files together: links between the PDFs use these names. Printed
+section references also identify every deferred proof.
 
 ## Open in Overleaf
 
-1. Choose **New Project → Upload Project** and upload the ZIP.
-2. Set the compiler to **pdfLaTeX** and the main document to **main.tex**.
-3. Recompile. The supplied `latexmkrc` also builds the supplement and resolves references between the two documents. No shell-escape setting is required.
-4. To display the supplement in the editor, select **supplement.tex** as the main document and recompile.
+1. Upload `releases/nmkc_overleaf_20260906.zip` from the repository as a new project.
+2. Choose **pdfLaTeX** and **main.tex**, then recompile.
+3. Choose **supplement.tex** to display the companion document.
 
-The checked PDFs are `main.pdf` (32 pages) and `supplement.pdf` (46 pages). Keep these filenames and keep both files together when downloading them: links between the PDFs use these names. Some browser PDF viewers do not follow links to another local PDF; the printed section references remain usable.
+The supplied `latexmkrc` builds both documents and resolves their reciprocal
+references. No shell-escape setting is required. The new archive contains
+the flat paper project and both PDFs; historical review reports and old
+build databases are excluded.
 
-For a local TeX Live installation with latexmk, run this command from the project directory:
+For a local installation with latexmk, run from the paper directory:
 
 ```sh
 latexmk -pdf -interaction=nonstopmode -halt-on-error -jobname=output main.tex
 ```
 
-Replace `main.tex` with `supplement.tex` to select the other root. The helper creates both named PDFs as well as the selected `output.pdf`. The archive excludes old build databases and auxiliary files; if reusing an older checkout, start from a fresh extraction or clear generated build files first.
+Replace `main.tex` with `supplement.tex` to select the other root. The helper
+creates both named PDFs and the selected `output.pdf`. Use a fresh extraction
+when checking reproducibility.
 
 ## Contents
 
-| Item | Contents |
+| Files | Purpose |
 | --- | --- |
-| `main.tex`, `supplement.tex`, other `.tex` files | Editable article and complete supplementary material |
-| `refs.bib`, `jmlr2e.sty`, `figs/` | Bibliography, document style, and figure assets |
-| `latexmkrc`, `build_external_documents.pl` | Paired-document build and external references |
-| `main.pdf`, `supplement.pdf` | Verified compiled manuscripts |
-| `reviews/publication_review.pdf` | Vote tally, main findings, and revision record |
-| `reviews/review01.md` through `review20.md` | All twenty original AI-agent reviews |
-| `reviews/revision*.md`, `reviews/prose_edit.md` | Targeted follow-up audits and editorial work |
-| `verification/` | Numerical audit logs and clean-build report |
-| `proof_map.json` | Explicit result-to-proof pointers |
-| `MANIFEST.sha256` | Checksums of the packaged files |
+| `main.tex`, `supplement.tex`, other `.tex` files | Article and complete supplementary material |
+| `refs.bib`, `jmlr2e.sty`, `figs/` | Bibliography, document style, and figures |
+| `latexmkrc`, `build_external_documents.pl` | Paired build and external references |
+| `main.pdf`, `supplement.pdf` | Matching compiled manuscripts |
+| `proof_map.json` | Result-to-proof pointers |
 
-## Publication assessment and revision
+## Correction scope
 
-The coordinating review and all twenty separately spawned reviewing agents voted **NO on publishing the original version unchanged**. The coordinating vote on the earlier repaired release was **YES for submission as an empirical research paper**. Those votes remain attached to those earlier versions. Ten fresh independent agent reviews are planned for the completed current manuscript and its pinned evidence; none has yet voted. These are internal AI assessments, not external journal reviews or a guarantee of acceptance.
+The manuscript distinguishes the implemented refiner average, which reflects
+the supplied kernel field, from reflection of the full composed predictor.
+Equivariance of that kernel field is a sufficient condition for the two
+averages to agree. It is not established for the recorded fit and is not a
+necessary condition for every possible refiner. The supplement proves a
+defect bound and supplies an explicit two-point counterexample.
 
-The revision corrects theorem hypotheses and endpoint cases, provides an explicit bound for correction-label mismatch, separates rigorous empirical RMS floors from correlation heuristics, and replaces an unsupported anisotropic-rate argument with a proved finite-design rank-truncation result. It describes the actual recorded estimators and limits the empirical claims to the available evidence. The prose has been revised for direct academic exposition. The first GitHub footnote now directs readers to the supplement, and each formal result with a deferred proof identifies its specific proof location.
+The effective-dimension figure is explicitly a 6,000-row subsample diagnostic.
+The Fourier-input provenance, pooled training-target centering, retrospective
+selection, and finite-pool RMS interpretation retain their stated scopes.
+Final presentation edits label the Marchenko-Pastur experiment as one
+Gaussian realization, identify the separate supplement, and display all four
+refiner values in the counterexample. They change no recorded benchmark score.
 
-## Source and numerical provenance
+## Source and evidence
 
-The matching editable source was obtained from:
+Repository: https://github.com/yspennstate/neural-means-kernel-corrections
 
-https://github.com/yspennstate/neural-means-kernel-corrections
+The base source identified in the article is
+`50c05ff1cce32d20df446c5c57c1c20027df5875`. The corrected scientific source
+before the final presentation edits was
+`47c29c8a32ade3b1131d4c77999973ad171e666a`. These identify earlier states,
+not the current release commit.
 
-Base source commit: `50c05ff1cce32d20df446c5c57c1c20027df5875`.
+Per-run summaries, the fixed sensitivity evidence, data checksums, and
+reproduction instructions are in the repository. See `docs/reproduce.md`
+and `campaign/evidence/README.md` from the repository root. Some array-level
+checks require separately retained prediction fields and checkpoints; these
+large artifacts are not bundled in the public source package. Recomputing a
+summary from retained records is distinct from repeating the original training.
 
-The original repository PDF is byte-for-byte identical to the uploaded `nmkc_paper_20260903e.pdf`. Its SHA-256 is:
-
-```text
-d7952a24060c555e0b86981d8a2eef0365431dbd625f2226ef674f0cbee1a072
-```
-
-The revised article, supplement, editable LaTeX sources, figures, and paired-document build files are synchronized with the public repository's `paper/` directory. The commit above identifies the prior version used as the base for this revision. The current online supplement is `paper/supplement.pdf`; it contains the full proofs at the locations cited by each formal result.
-
-The repository's reported-number audit found zero discrepancies against its summary artifacts, and its fifteen algebraic checks passed. The two compile roots were tested from clean source without existing auxiliary files or prebuilt PDFs, using Overleaf's `output` job name. Both builds had no unresolved citations or references, duplicate labels, missing PDF destinations, or overfull boxes. The build report records source checksums and reciprocal PDF links.
-
-Caltech access was recovered after the earlier connection failure. The completed follow-up campaign includes ten paired target-centering reruns, ten fixed-estimator correction-label checks, and three paired OCO-2 grid comparisons in each band. Both the raw-prediction checks and complete archive aggregation passed. The archive under `../campaign/evidence/` includes 454 manifest-bound files and supports table reconstruction; its README states which large prediction fields and checkpoints are retained separately. The historical comparisons keep their original estimator and metric identities. The Overleaf build needs none of the large training artifacts.
+Historical review files remain in the repository as records of their named
+versions. They are not journal decisions or automatic approval of changed
+source or PDF bytes.

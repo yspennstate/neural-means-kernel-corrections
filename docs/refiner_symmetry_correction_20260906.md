@@ -66,3 +66,22 @@ adds reproducibility checks. It does not change historical model weights,
 prediction arrays, or reported ensemble errors. Historical review votes
 remain attached to their original source and PDF packets. A changed
 manuscript requires review of its own exact bytes.
+
+
+## Presentation edits following the independent V1 review
+
+The independent F2 report recommends publication of the immutable V1 packet
+(source commit 47c29c8a32ade3b1131d4c77999973ad171e666a), with minor edits.
+This revision identifies the Marchenko--Pastur simulation figure as one
+realization, names the separate supplement.pdf, foregrounds the sufficient
+conditioning-field equivariance condition, and writes all four evaluations
+in the two-point counterexample. Numerical records and theorem statements
+are unchanged. The paired build and author visual verification have completed;
+a changed-packet reassessment remains required.
+
+The review's requested "if and only if" wording was not adopted. Equivariance
+of h is sufficient, but need not be necessary when F ignores or discards part
+of that channel. Pointwise equality of the two averages is equivalent to
+F(Su, T h(u)) = F(Su, h(Su)); it does not imply equality of the two inputs
+without injectivity of F(Su, .). The reviewer has been sent the constant-F
+countercase. The previous V1 report and packet remain preserved separately.

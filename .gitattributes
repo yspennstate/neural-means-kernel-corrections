@@ -1,1 +1,6 @@
 *.pdf binary
+
+# Preserve the exact compiled release and archive bytes.
+paper/main.pdf binary
+paper/supplement.pdf binary
+releases/nmkc_overleaf_20260906.zip binary

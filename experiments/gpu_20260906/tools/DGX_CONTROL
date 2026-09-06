@@ -1,4 +1,4 @@
-RUN
+STOP
 DEADMAN off
 # line 1: RUN | PAUSE | STOP  (the Caltech DGX kill switch reads this file every minute)
 # line 2: DEADMAN on|off      (self-kill on low memory / dead sshd)

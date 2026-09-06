@@ -214,15 +214,10 @@ results["sixty_pcr_mp"] = rel(pred_ev, ev); results["_pcr_components_median"] = 
 stage('shrink toward global convex')
 # Final weights use all calibration rows. Candidate selection below refits both
 # weight systems and selects the ridge inside each training fold.
-from scipy.optimize import minimize
-Rn = (P60c.astype(np.float64) - Ycal[None]) / nte[cal][None, :, None]
-S = np.einsum("mnd,knd->mk", Rn, Rn) / n_
-res = minimize(lambda z: z @ S @ z, np.ones(m_) / m_, jac=lambda z: 2 * S @ z, bounds=[(0, 1)] * m_,
-               constraints={"type": "eq", "fun": lambda z: z.sum() - 1}, method="SLSQP", options=dict(maxiter=3000, ftol=1e-15))
-wg = np.maximum(res.x, 0); wg /= wg.sum()
+from fold_selection import convex_weights, select_shrinkage
+wg = convex_weights(P60c, Ycal)
 Wg = np.concatenate([np.tile(wg, (D_, 1)), np.zeros((D_, 1))], 1)          # (D, 61), no intercept
 Wp = fit_pixel(P60c, Ycal, lam_l)
-from fold_selection import select_shrinkage
 best_s, shrink_selection = select_shrinkage(P60c, Ycal, lams, n_splits=5, seed=1)
 results['_shrinkage_selection'] = shrink_selection
 Wm = (1 - best_s) * Wp + best_s * Wg

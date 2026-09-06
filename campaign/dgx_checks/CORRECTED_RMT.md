@@ -7,6 +7,8 @@ The candidate repairs two reporting and selection paths in `ens_rmt_dgx.py`:
 
 These corrections have been checked on small adversarial inputs. The fold helper also passed an independent deleted-row least-squares check and held-label perturbation check. They have not yet been run on the full retained dataset, so the candidate provides no replacement scientific score.
 
+The final all-calibration convex refit uses the same checked optimizer as the fold fits. A failed optimization or unresolved optimality gap stops the run instead of silently supplying final weights. This hardening does not establish that a historical optimizer failed.
+
 `sm_ens_rmt.json` belongs to the historical source. The corrected driver uses the distinct output `sm_ens_rmt_corrected_v1.json`, refuses an existing corrected output, and records hashes of its source and `fold_selection.py` at startup. Source hashes are part of provenance; they do not replace a pinned launch command, data hashes, split record, environment, or completion receipt.
 
 The historical source SHA-256 is `849b441446b9d5c8b87e637abd583dc5ebea54ef8e8082fc85f350edaf552d2c` with LF endings (`f2c35624e49899618fc944e9cb19198676008c3b7521f182b6232ddf897d26dc` with CRLF endings). The historical result SHA-256 is `e028360381e84c2a530093303ebd55c99e6f4b52960cb8813fcbde968a3cd338`. Keep that source alongside its result when integrating the corrected candidate.
@@ -18,7 +20,7 @@ The inherited PCR threshold `2.858 * median(covariance eigenvalues)` is retained
 Run the small tests from this directory with BLAS restricted to one thread:
 
 ```text
-python -m unittest -v test_fold_selection.py test_rmt_metrics.py
+python -m unittest -v test_fold_selection.py test_rmt_metrics.py test_driver_refit.py
 ```
 
 Full execution still needs an authorized host, a live resource/hold check, an input-based peak-memory estimate, and a bounded launch. In particular, the historical monolithic loader materializes the full predictor pool and several copies. These small tests do not establish that a full run fits the host's memory limit.

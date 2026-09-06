@@ -138,9 +138,13 @@ corrects, calibrates):
 
     NMKC_ROOT=<root> NMKC_SEED=<s> NMKC_TARGET_CENTERING=pooled python campaign/seed_pipeline.py
 
-`pooled` explicitly reproduces the historical target-mean convention. For the
-fold-local convention, set `NMKC_TARGET_CENTERING=fold-local`; the driver uses
-a separate `seeds/sm_fold_local_s<s>` directory and default result identifier.
+`pooled` explicitly reproduces the historical target-mean convention. Run
+the corrected fold-local chain with:
+
+    NMKC_ROOT=<new_root> NMKC_SEED=<s> NMKC_TARGET_CENTERING=fold-local python campaign/seed_pipeline.py
+
+The fold-local chain uses a separate `seeds/sm_fold_local_s<s>` directory and
+default result identifier.
 The standalone `krr_oof.py` defaults to fold-local, so the campaign always
 passes its centering argument explicitly. This driver is the full model chain;
 the archived paired sensitivity experiment has its own fixed controls and
@@ -270,9 +274,13 @@ and the record behind each change:
 - `cost_check.py` sets the BLAS thread cap before importing NumPy; the cost
   record and its macros are from the capped rerun.
 - The audit fails closed: a record the paper's macros depend on must exist.
-- The wider-grid OCO-2 campaign (multipliers 0.5 to 32, nuggets 1e-12 to
-  1e-4, ten seeds per band, 250 and 750 epochs) is queued on the campaign
-  host and is not part of this version.
+- An earlier wider-grid proposal specified multipliers 0.5 to 32, nuggets
+  1e-12 to 1e-4, ten seeds per band, and two epoch budgets. That proposal is
+  not a completed experiment in this paper. The completed September 5
+  sensitivity study instead uses three paired seeds per band, one frozen
+  representation per band/seed, and the two grids specified in
+  [paired_sensitivity_campaign.md](paired_sensitivity_campaign.md).
+  Its results are in Supplement S11 and the deposited evidence archive.
 
 ## Second review, same day: further corrections
 
@@ -284,10 +292,13 @@ and the record behind each change:
 - `collect.py` reports the central 95 percent Beta-binomial band of the
   observed evaluation fraction as `band95`, the band the paper quotes; the
   earlier `band90` was a 5 to 95 percent interval.
-- `krr_oof.py` centers targets within the fitting folds. The released
-  out-of-fold fields were centered with the pooled training mean (a leak of
-  order 1/sqrt(n) per output); the rerun of the refiner and downstream stages
-  is queued and not in this version.
+- `krr_oof.py` now defaults to centering targets within the fitting folds.
+  The historical out-of-fold fields used the pooled training mean. The
+  paired rerun of the refiner and downstream stages is complete for all ten
+  mechanics seeds and reported in Supplement S11. The explicit recipes above
+  distinguish the two conventions; the paired study's fixed controls and
+  archived outputs are described in
+  [paired_sensitivity_campaign.md](paired_sensitivity_campaign.md).
 - The deployed global stack is described as it is coded (uniform start,
   random hill climb in logit space on half the validation split); the
   second-moment simplex minimizer is used only in the pool analyses.

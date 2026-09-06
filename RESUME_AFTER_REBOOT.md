@@ -1,6 +1,44 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
-## Current checkpoint: September 6, 04:48 Jerusalem
+## Current checkpoint: September 6, 05:15 Jerusalem
+
+Original panel now has eight votes: six YES (01,02,03,04,06,07), two NO
+(08,09). Complete 04 and 09 reports/verdicts read by root; their evidence pins
+still need the root hash pass. 09-F01 independently identifies the same
+historical recipe routing fixed in ca4f; stale queued-run prose was still
+present and is now corrected. 09-F02 independently identifies the 6000-row
+spectrum attribution, now corrected by the new pinned diagnostic below.
+Neither author's repair is an independently closed finding. No original vote
+or original packet was overwritten. Readers 04/09 were alive while finishing
+bookkeeping at05:11; 04 node_repl51640 birth1788653253.0869539 remains stopped.
+Do not kill them or repeat a fresh review. New final original readers launched:
+05 controller17120, run tag after04_0513; 10 controller25312, after09_0513.
+Both use patched panel_controller.py and the unchanged original manifest.
+
+Paper build08 failed on a fragile path command inside the Fourier caption.
+Both caption paths are now escaped texttt. Build09 launcher55896/Perl49232
+started05:03:14 in .local-verification/final-build-09 and is progressing through
+both documents; no final receipt yet. Preserve build08's failure. Working
+paper source differs from d33 only by these two caption repairs.
+
+Chapter09 is complete:12609frames/420.3seconds,1521inputs,15narrations checked.
+Movie SHA 91945b3d6822df1e23cdebbd3e999c1e469a312671a557a6f303dacad7c41b2e;
+input SHA 4c115fa7a3c293b327858b2512f367b5f9b3c0e1e48c25559e487e4ed83580ef.
+Its 15 native frames await inspection. Audio verifier47464 launched05:13.
+Chapter10 renders in20260906T045453_chapter10_final, launcher41508 and
+Manim53552, CPU14. Chapters07 remaining18 and08 all21 still await native QA.
+Replacement list remains02,03,04,05,06,07,12; do not assemble old source.
+
+ASR isolated environment READY: .local-verification/asr-venv (Python3.13),
+faster-whisper1.2.1/CTranslate2 4.8.2; exact dependencies in asr_requirements.txt
+and public-PyPI install report. No shared environment changed; cached local
+small model available. No transcription launched yet. Preparation5908 and
+chapter09 media verifier18680 have exited (native error87, no duplicate job).
+
+Latest verified push d33b398c592f9a3e641f592d12d9ad0c3af09cd8 at04:53.
+Root pulse05:10, leases through05:55. Continue through12:55 Jerusalem.
+
+## Historical checkpoint: September 6, 04:48 Jerusalem
 
 The new 6000-row spectrum diagnostic is COMPLETE and independently checked.
 Caltech retry PID 220481 ran one nice-15 thread, 111.708 seconds, ending

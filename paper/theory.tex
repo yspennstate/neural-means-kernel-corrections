@@ -176,13 +176,12 @@ negative coordinate.
 \noindent\emph{Proof.} See Supplement~\ref{proof:cor:signed}.
 
 
-On the measured $S$ the two minima agree to within $0.0005$ points at every
+On the measured $S$ the two minima differ by at most $0.00052$ percentage points at every
 seed and for both member sets, but not because the constraint is slack: the
 unconstrained minimizer carries a small negative coordinate at seven seeds of
 ten for the six members and at one seed for the five (the stored
-\texttt{signed} records), and removing it costs at most those five
-ten-thousandths. Allowing signed global weights therefore buys nothing
-measurable here, and what the deployed per-pixel stack gains over the convex
+\texttt{signed} records). The effect of allowing signed global weights is
+therefore small here. What the deployed per-pixel stack gains over the convex
 one ($0.032$ and $0.035$ points in the two campaigns) is a benefit of a different per-pixel affine class; the global signed-weight comparison does not isolate the effect of signs or intercepts within that class.
 
 The members of a pool are usually of two kinds at once, architectures and

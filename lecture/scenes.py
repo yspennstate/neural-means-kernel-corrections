@@ -79,6 +79,13 @@ def axes(x=(0, 1, .5), y=(0, 1, .5), width=3.0, height=2.6):
                 tips=False, axis_config={"color": DIM, "stroke_width": 1.5, "include_ticks": True})
 
 
+def ticks_at(number_line, values):
+    """Use the same coordinates for ticks and manually typeset labels."""
+    number_line.remove(number_line.ticks)
+    number_line.ticks = VGroup(*(number_line.get_tick(value) for value in values))
+    number_line.add(number_line.ticks)
+
+
 def mechanics():
     p = HERE / "assets/mechanics_examples.npz"
     receipt = json.loads(p.with_suffix(".json").read_text(encoding="utf-8"))
@@ -567,15 +574,15 @@ def build_visual(spec):
         for a, x in enumerate((.55, 2.6, 4.65)):
             arch = RoundedRectangle(width=1.7, height=.72, color=BLUE, fill_color=BLUE,
                                     fill_opacity=.18, corner_radius=.07).move_to([x, .05, 0])
-            label = formula(rf"b_{{{a+1}}}", 30, BLUE).move_to(arch)
-            archs.add(VGroup(arch, label))
+            label = formula(rf"b_{{{a+1}}}", 26, BLUE).move_to([x, -.11, 0])
+            name = small_label("Architecture", [x, .24, 0], 19, BLUE)
+            archs.add(VGroup(arch, name, label))
             arrows.add(Arrow([x, 1.25, 0], [x, .5, 0], buff=.08, color=DIM))
             for k, dx in enumerate((-.57, -.19, .19, .57)):
                 dot = Dot([x+dx, -1.35, 0], radius=.095, color=GREEN)
                 seeds.add(dot)
                 arrows.add(Line([x, -.35, 0], dot.get_top(), color=DIM, stroke_width=1.2))
-        labels = VGroup(small_label("Architecture components", [2.6, -.58, 0], 23, BLUE),
-                        small_label("Individual seed components", [2.6, -1.93, 0], 23, GREEN),
+        labels = VGroup(small_label("Individual seed components", [2.6, -1.93, 0], 23, GREEN),
                         small_label("Orthogonality is in the model space, not the drawing", [2.6, -2.5, 0], 18))
         group = VGroup(common, common_label, archs, seeds, arrows, labels)
         return group, [lambda: Indicate(common, color=GOLD), lambda: Indicate(archs, color=BLUE),
@@ -644,21 +651,33 @@ def build_visual(spec):
         return group, [lambda: Indicate(bars[0]), lambda: Indicate(bars[1]), lambda: Indicate(bars[2])]
     if kind == "block_floor_curve":
         M, rw, rb = spec["M"], spec["rho_w"], spec["rho_b"]
-        low = rb+(rw-rb)/M
-        ax = axes(x=(1, 61, 20), y=(.64, .8, .04), width=5.5, height=3.35).move_to([2.6, .3, 0])
-        curve = ax.plot(lambda k: low+(1-rw)/(M*k), x_range=[1, 60], color=GOLD, stroke_width=3)
-        asymptote = DashedLine(ax.c2p(1, low), ax.c2p(60, low), color=BLUE, stroke_width=2)
-        labels = VGroup(prose("Seeds per architecture", 24).move_to([2.6, -2.15, 0]),
-                        prose("Normalized squared-error lower bound", 22).move_to([2.6, 2.35, 0]),
-                        formula(rf"\varrho_b+(\varrho_w-\varrho_b)/M={low:.4f}", 24, BLUE, 6.5).move_to([2.6, -2.75, 0]))
-        for x in (1, 20, 40, 60):
-            labels.add(formula(str(x), 18, DIM).next_to(ax.c2p(x, .64), DOWN, buff=.13))
-        for y in (.64, .68, .72, .76, .8):
-            labels.add(formula(f"{y:.2f}", 18, DIM).next_to(ax.c2p(1, y), LEFT, buff=.13))
-        dot = Dot(ax.c2p(1, low+(1-rw)/M), color=INK, radius=.065)
-        group = VGroup(ax, curve, asymptote, labels, dot)
-        return group, [lambda: MoveAlongPath(dot, curve), lambda: Indicate(asymptote, color=BLUE),
-                       lambda: Indicate(curve, color=GOLD)]
+        def chart(architecture_count=False):
+            low = rb if architecture_count else rb+(rw-rb)/M
+            bottom = .58 if architecture_count else .64
+            top = .82 if architecture_count else .8
+            value = (lambda m: rb+(rw-rb)/m) if architecture_count else (
+                lambda k: low+(1-rw)/(M*k))
+            ax = axes(x=(1, 61, 20), y=(bottom, top, .04), width=5.5, height=3.35).move_to([2.6, .3, 0])
+            ticks_at(ax.x_axis, (1, 20, 40, 60))
+            curve = ax.plot(value, x_range=[1, 60, .1], use_smoothing=False, color=GOLD, stroke_width=3)
+            asymptote = DashedLine(ax.c2p(1, low), ax.c2p(60, low), color=BLUE, stroke_width=2)
+            limit = rf"\varrho_b={low:.4f}" if architecture_count else rf"\varrho_b+(\varrho_w-\varrho_b)/M={low:.4f}"
+            axis_title = "Architecture count (seed limit taken)" if architecture_count else "Seeds per architecture"
+            labels = VGroup(prose(axis_title, 23).move_to([2.6, -2.15, 0]),
+                            prose("Normalized squared-error lower bound", 22).move_to([2.6, 2.35, 0]),
+                            formula(limit, 24, BLUE, 6.5).move_to([2.6, -2.75, 0]))
+            for x in (1, 20, 40, 60):
+                labels.add(formula(str(x), 18, DIM).next_to(ax.c2p(x, bottom), DOWN, buff=.13))
+            for y in np.arange(bottom, top+.001, .04):
+                labels.add(formula(f"{y:.2f}", 18, DIM).next_to(ax.c2p(1, y), LEFT, buff=.13))
+            dot_x = 60 if architecture_count else 1
+            dot = Dot(ax.c2p(dot_x, value(dot_x)), color=INK, radius=.065)
+            return VGroup(ax, curve, asymptote, labels, dot)
+        group = chart()
+        architecture_chart = chart(True)
+        return group, [lambda: MoveAlongPath(group[4], group[1]),
+                       lambda: Transform(group, architecture_chart),
+                       lambda: Indicate(group[1], color=GOLD)]
     if kind in ("pool_matrix", "pool_seed_curves", "pool_bounds"):
         pool=json.loads((HERE/"assets/pool_geometry.json").read_text(encoding="utf-8"))
         if (pool['n_cal'],pool['n_ev']) != (1000,19000):
@@ -687,6 +706,7 @@ def build_visual(spec):
             return group,[lambda:Indicate(boundaries[0]),lambda:Indicate(boundaries[3]),lambda:Indicate(boundaries[5])]
         if kind == 'pool_seed_curves':
             ax=axes(x=(1,10,1),y=(4.85,5.6,.2),width=5.3,height=3.3).move_to([2.65,.6,0])
+            ticks_at(ax.y_axis, (4.9,5.1,5.3,5.5))
             curves=VGroup();labels=VGroup()
             for a,(configuration,name,color) in enumerate(zip(pool['configurations'],names,colors)):
                 points=[ax.c2p(row['k'],100*row['mean_rms']) for row in pool['curves'][configuration]]
@@ -703,6 +723,7 @@ def build_visual(spec):
             group=VGroup(ax,curves,labels)
             return group,[lambda:Indicate(curves[0]),lambda:Indicate(curves[3]),lambda:Indicate(curves[5])]
         ax=axes(x=(4.78,5.02,.05),y=(0,1.1,.5),width=5.3,height=2.6).move_to([2.6,.3,0])
+        ticks_at(ax.x_axis, (4.8,4.85,4.9,4.95,5.))
         ax.y_axis.set_opacity(0)
         lower=100*pool['block']['rms_lower_bound'];upper=100*pool['optimum']['rms_upper']
         equal=100*pool['equal_rms']
@@ -712,7 +733,10 @@ def build_visual(spec):
             point=Dot(ax.c2p(value,height),radius=.055,color=color)
             markers.add(VGroup(marker,point))
             text=VGroup(small_label(label,ORIGIN,21,color),formula(f'{value:.3f}'+r'\%',24,color)).arrange(DOWN,buff=.09)
-            text.next_to(point,UP,buff=.12);labels.add(text)
+            text.next_to(point,UP,buff=.12)
+            if label == 'Equal weights':
+                text.shift(.35*RIGHT)
+            labels.add(text)
         for x in (4.8,4.85,4.9,4.95,5.):
             labels.add(formula(f'{x:.2f}',18,DIM).next_to(ax.c2p(x,0),DOWN,buff=.12))
         labels.add(small_label('RMS relative error (%); axis shown from 4.78',[2.6,-1.8,0],23))

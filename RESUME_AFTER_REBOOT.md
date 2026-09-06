@@ -1,6 +1,48 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
-## Current checkpoint: September 6, 02:39 Jerusalem
+## Current checkpoint: September 6, 03:12 Jerusalem
+
+Five original-packet reviews have returned YES: 01, 02, 03, 06, 07.
+Reviewer 03's 19 snapshot hashes all match; report SHA
+fcda4c693af6835315ef92375b5ed5f7885e3efcd630e9c2f9578a4a517366b4.
+Its new minor finding is a strict rounded bound: the signed/convex maximum
+gap is 0.0005178047039096 percentage points, slightly above 0.0005.
+Root independently enumerated all simplex faces and used 50-digit Gaussian
+elimination for the affine and active-face optima: agreement to 1.9e-16 points.
+Both paper occurrences now use 0.00052. The other two comments were already
+corrected in working sources. Reviewer 04 is active under native PID 48636;
+08 remains under 38356. All ten still review the unchanged original packet.
+
+Chapter 06 completed (105 animations, return 0, 936.180 seconds) in
+20260906T024645_chapter06_final. Input manifest SHA
+adc94c0182368dc52f9f2c6d2e137cb0da06e3107deedc329e52f8cfe8b70614.
+Media, waveform and frame review are next. It was reduced to CPU 14 at 02:55
+after repeated CPU spikes. Latest 03:08 live CPU 87.6 percent; no new heavy
+job has been admitted. The renderer now accepts one allowed CPU explicitly.
+
+All 24 chapter-04 and 18 chapter-05 end frames were inspected. Chapter 04's
+second limit segment must switch its graph from seed count to architecture
+count; smooth interpolation also made an artificial shoulder. Source now
+switches to the correct curve and uses dense unsmoothed segments. Component
+captions now sit inside their boxes. Chapter 05's tick marks were offset from
+numeric labels; source now builds ticks at the label coordinates and moves
+the equal-weights caption clear of the optimum marker. Replacement renders
+are required for chapters 02, 03, 04, 05 and 12, followed by fresh inspection.
+Chapter-05 movie SHA be2e99d5fdd7438bda1e6a530a6eba90309dedaebb05d22a87151db3e3ee2fe3;
+15,445 frames, 3089/6 seconds, all 18 waveforms pass at zero offset.
+
+Assembly native probes at 02:52 and 02:54 stopped on measured CPU pressure.
+The second attempt retained three valid 31/32/33-frame fixture clips and
+original PCM under .local-verification/assembly_native_0254. No concat was
+started and no integration PASS is claimed. Reuse those valid inputs for
+the remaining native join/marker/waveform check when fresh headroom permits.
+The private build_pair.py now pins serial TeX to CPU 15, checks fresh health
+and the output claim, and never performs unclaimed timeout kills. No corrected
+PDF build has yet started. Root pulse 02:51:49 is valid through 03:36:49.
+Last verified push before this checkpoint: 91311d7f775452612aabefc2f84ed8444413216d.
+Continue through 12:55; final publication and lecture delivery remain pending.
+
+## Historical checkpoint: September 6, 02:39 Jerusalem
 
 Four original-packet reviews have returned YES: 01, 02, 06, 07. Root read
 reviewer 07's full report and verified all 13 snapshot hashes; report SHA

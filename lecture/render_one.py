@@ -61,7 +61,7 @@ def main():
     parser.add_argument("--segment", type=int, default=0)
     parser.add_argument("--encoder", choices=("libx264", "h264_nvenc"), default="libx264")
     parser.add_argument("--writer", choices=("pyav", "ffmpeg71"), default="pyav")
-    parser.add_argument("--cpus", default="4,5", help="Exactly two CPUs within the owner's background partition")
+    parser.add_argument("--cpus", default="4,5", help="One or two CPUs within the owner's background partition")
     parser.add_argument("--reuse-tex-from", type=Path, action='append',
                         help="Reuse exact TeX/SVG asset pairs from a completed owned build")
     parser.add_argument("--reuse-incomplete-tex", action="store_true",
@@ -69,8 +69,8 @@ def main():
     parser.add_argument("--quality", choices=("preview", "samples", "notation", "draft", "final"), required=True)
     args = parser.parse_args()
     render_cpus = sorted({int(x) for x in args.cpus.split(',')})
-    if len(render_cpus) != 2 or not set(render_cpus).issubset(BACKGROUND):
-        raise ValueError('Choose two allowed background CPUs')
+    if len(render_cpus) not in (1, 2) or not set(render_cpus).issubset(BACKGROUND):
+        raise ValueError('Choose one or two allowed background CPUs')
     guard = json.loads(GUARD.read_text(encoding="utf-8-sig"))
     if guard.get("background_cpus") != BACKGROUND or guard.get("reserved_cpus") != RESERVED:
         raise RuntimeError("CPU partition changed")

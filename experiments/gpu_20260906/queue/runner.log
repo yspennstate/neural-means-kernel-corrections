@@ -1,0 +1,62 @@
+2026-09-06 10:03:22 runner start parallel=1
+2026-09-06 10:03:23 started pid=29852: train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 -> job_width_1024_depth_4_loss_metric_seed_0.log
+2026-09-06 10:09:53 finished rc=4294967295: train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0
+2026-09-06 10:38:36 started pid=52928: train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 -> job_width_1024_depth_4_loss_metric_seed_0.log
+2026-09-06 10:41:32 finished rc=0: train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0
+2026-09-06 10:41:33 started pid=32408: train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0 -> job_width_1024_depth_4_loss_mse_seed_0.log
+2026-09-06 10:42:57 STOP: leaving running job to finish: train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0
+2026-09-06 10:43:00 runner exit
+2026-09-06 10:43:30 runner start parallel=2
+2026-09-06 10:43:31 started pid=24520: train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0 -> job_width_1024_depth_4_loss_mse_seed_0.log
+2026-09-06 10:43:42 started pid=56204: train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 0 -> job_width_2048_depth_4_loss_metric_seed_0.log
+2026-09-06 10:44:32 finished rc=0: train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0
+2026-09-06 10:44:35 started pid=32348: train_mlp_scale.py --width 2048 --depth 4 --loss mse --seed 0 -> job_width_2048_depth_4_loss_mse_seed_0.log
+2026-09-06 10:46:31 finished rc=4294967295: train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 0
+2026-09-06 10:46:43 started pid=42760: train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 0 -> job_width_2048_depth_4_loss_metric_seed_0.log
+2026-09-06 10:46:48 finished rc=4294967295: train_mlp_scale.py --width 2048 --depth 4 --loss mse --seed 0
+2026-09-06 10:46:53 started pid=20596: train_mlp_scale.py --width 2048 --depth 4 --loss mse --seed 0 -> job_width_2048_depth_4_loss_mse_seed_0.log
+2026-09-06 10:47:42 finished rc=1: train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 0
+2026-09-06 10:47:42 started pid=3264: train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 0 -> job_width_2048_depth_4_loss_metric_seed_0.log
+2026-09-06 10:48:45 finished rc=1: train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 0
+2026-09-06 10:48:45 started pid=34616: train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 0 -> job_width_2048_depth_4_loss_metric_seed_0.log
+2026-09-06 10:49:47 finished rc=0: train_mlp_scale.py --width 2048 --depth 4 --loss mse --seed 0
+2026-09-06 10:49:48 started pid=52180: train_mlp_scale.py --width 4096 --depth 4 --loss metric --seed 0 -> job_width_4096_depth_4_loss_metric_seed_0.log
+2026-09-06 10:49:54 finished rc=1: train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 0
+2026-09-06 10:49:55 started pid=57056: train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 0 -> job_width_2048_depth_4_loss_metric_seed_0.log
+2026-09-06 10:50:33 finished rc=1: train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 0
+2026-09-06 10:50:55 finished rc=4294967295: train_mlp_scale.py --width 4096 --depth 4 --loss metric --seed 0
+2026-09-06 11:21:20 runner exit
+2026-09-06 11:21:30 runner start parallel=1
+2026-09-06 11:23:12 runner start parallel=1
+2026-09-06 11:23:20 started pid=45556: train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --stop-after 10 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_resume -> job_rt_resume.log
+2026-09-06 11:24:37 finished rc=3: train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --stop-after 10 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_resume
+2026-09-06 11:24:39 started pid=46968: train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --stop-after 10 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_resume -> job_rt_resume.log
+2026-09-06 11:26:12 finished rc=3: train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --stop-after 10 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_resume
+2026-09-06 11:26:56 started pid=19624: train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --stop-after 10 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_resume -> job_rt_resume.log
+2026-09-06 11:29:27 finished rc=0: train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --stop-after 10 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_resume
+2026-09-06 11:29:35 started pid=55132: train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_resume -> job_rt_resume.log
+2026-09-06 11:30:58 finished rc=0: train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_resume
+2026-09-06 11:31:06 started pid=54276: train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_straight -> job_rt_straight.log
+2026-09-06 11:34:44 finished rc=0: train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_straight
+2026-09-06 11:34:54 started pid=34056: train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0 --graph 0 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/controls --tag mlpMSE_s0_w1024_d4_eager -> job_mlpMSE_s0_w1024_d4_eager.log
+2026-09-06 11:41:50 finished rc=4294967295: train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0 --graph 0 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/controls --tag mlpMSE_s0_w1024_d4_eager
+2026-09-06 11:41:50 external kill (rc 4294967295); holding launches 60 s
+2026-09-06 11:42:20 runner exit
+2026-09-06 11:42:31 runner start parallel=1
+2026-09-06 11:42:33 started pid=16700: train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0 --epochs 10 --graph 1 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/controls --tag mse10_graph -> job_mse10_graph.log
+2026-09-06 11:42:43 started pid=26140: train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0 --epochs 10 --graph 0 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/controls --tag mse10_eager -> job_mse10_eager.log
+2026-09-06 11:44:36 finished rc=0: train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0 --epochs 10 --graph 1 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/controls --tag mse10_graph
+2026-09-06 11:44:38 started pid=2092: train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 0 -> job_width_2048_depth_4_loss_metric_seed_0.log
+2026-09-06 11:45:15 finished rc=0: train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0 --epochs 10 --graph 0 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/controls --tag mse10_eager
+2026-09-06 11:45:26 VRAM gate: used 3920 MB + expected 2700 MB > 6500; waiting
+2026-09-06 11:46:20 started pid=37880: train_mlp_scale.py --width 4096 --depth 4 --loss metric --seed 0 -> job_width_4096_depth_4_loss_metric_seed_0.log
+2026-09-06 11:49:03 finished rc=1: train_mlp_scale.py --width 4096 --depth 4 --loss metric --seed 0
+2026-09-06 12:04:49 finished rc=0: train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 0
+2026-09-06 12:05:19 started pid=24120: train_mlp_scale.py --width 4096 --depth 4 --loss metric --seed 0 -> job_width_4096_depth_4_loss_metric_seed_0.log
+2026-09-06 12:22:37 started pid=39268: train_mlp_scale.py --width 4096 --depth 4 --loss mse --seed 0 -> job_width_4096_depth_4_loss_mse_seed_0.log
+2026-09-06 12:30:55 runner start parallel=1
+2026-09-06 12:31:01 started pid=40092: train_mlp_scale.py --width 4096 --depth 4 --loss metric --seed 0 -> job_width_4096_depth_4_loss_metric_seed_0.log
+2026-09-06 12:31:13 started pid=25816: train_mlp_scale.py --width 4096 --depth 4 --loss mse --seed 0 -> job_width_4096_depth_4_loss_mse_seed_0.log
+2026-09-06 12:32:07 STOP: leaving running job to finish: train_mlp_scale.py --width 4096 --depth 4 --loss metric --seed 0
+2026-09-06 12:32:07 STOP: leaving running job to finish: train_mlp_scale.py --width 4096 --depth 4 --loss mse --seed 0
+2026-09-06 12:32:07 runner exit

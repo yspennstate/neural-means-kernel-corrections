@@ -1,0 +1,2 @@
+[launch_hidden] pid=46452 start=2026-09-06 12:55:04 script=C:\Users\owner\GOAL20H_20260906\nmkc_gpu_experiments\runs\train_mlp_scale.py args=--width 1024 --depth 4 --loss mse --seed 0 --epochs 10 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/controls --tag mse10_cpu
+mse10_cpu: params 4.91M  epochs 10  amp none  graph False  device cpu:4thr

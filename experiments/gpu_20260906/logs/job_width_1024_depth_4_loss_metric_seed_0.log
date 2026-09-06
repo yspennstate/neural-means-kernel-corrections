@@ -1,0 +1,57 @@
+C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\cuda\__init__.py:65: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+mlp_s0_w1024_d4: params 4.91M  epochs 400  amp none  device NVIDIA RTX PRO 2000 Blackwell Generation Laptop GPU
+ep   10  train 0.0504  val 0.0529  [55s] *
+ep   20  train 0.0521  val 0.0520  [95s] *
+ep   30  train 0.0493  val 0.0518  [133s] *
+ep   40  train 0.0508  val 0.0508  [173s] *
+C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\cuda\__init__.py:65: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+mlp_s0_w1024_d4: params 4.91M  epochs 400  amp none  graph True  device NVIDIA RTX PRO 2000 Blackwell Generation Laptop GPU
+CUDA graph captured; warm-up undone in place
+C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\autograd\graph.py:865: UserWarning: The AccumulateGrad node's stream does not match the stream of the node that produced the incoming gradient. This may incur unnecessary synchronization and break CUDA graph capture if the AccumulateGrad node's stream is the default stream. This mismatch is caused by an AccumulateGrad node created prior to the current iteration being kept alive. This can happen if the autograd graph is still being kept alive by tensors such as the loss, or if you are using DDP, which will stash a reference to the node. To resolve the mismatch, delete all references to the autograd graph or ensure that DDP initialization is performed under the same stream as subsequent forwards. If the mismatch is intentional, you can use torch.autograd.graph.set_warn_on_accumulate_grad_stream_mismatch(False) to suppress this warning. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\input_buffer.cpp:250.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+C:\Users\owner\GOAL20H_20260906\nmkc_gpu_experiments\runs\train_mlp_scale.py:115: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  sched.step()
+ep   10  train 0.0504  val 0.0529  [3s] *
+ep   20  train 0.0521  val 0.0520  [6s] *
+ep   30  train 0.0493  val 0.0518  [8s] *
+ep   40  train 0.0508  val 0.0508  [11s] *
+ep   50  train 0.0496  val 0.0506  [13s] *
+ep   60  train 0.0529  val 0.0506  [17s]
+ep   70  train 0.0480  val 0.0505  [19s] *
+ep   80  train 0.0471  val 0.0501  [22s] *
+ep   90  train 0.0469  val 0.0519  [26s]
+ep  100  train 0.0451  val 0.0510  [29s]
+ep  110  train 0.0412  val 0.0534  [33s]
+ep  120  train 0.0447  val 0.0548  [37s]
+ep  130  train 0.0391  val 0.0554  [41s]
+ep  140  train 0.0369  val 0.0568  [43s]
+ep  150  train 0.0336  val 0.0568  [46s]
+ep  160  train 0.0359  val 0.0577  [48s]
+ep  170  train 0.0297  val 0.0589  [51s]
+ep  180  train 0.0318  val 0.0588  [54s]
+ep  190  train 0.0279  val 0.0597  [59s]
+ep  200  train 0.0259  val 0.0591  [62s]
+ep  210  train 0.0253  val 0.0595  [65s]
+ep  220  train 0.0231  val 0.0598  [68s]
+ep  230  train 0.0235  val 0.0598  [72s]
+ep  240  train 0.0225  val 0.0606  [74s]
+ep  250  train 0.0213  val 0.0604  [77s]
+ep  260  train 0.0198  val 0.0617  [80s]
+ep  270  train 0.0198  val 0.0614  [83s]
+ep  280  train 0.0187  val 0.0618  [85s]
+ep  290  train 0.0178  val 0.0620  [88s]
+ep  300  train 0.0178  val 0.0623  [90s]
+ep  310  train 0.0165  val 0.0625  [92s]
+ep  320  train 0.0165  val 0.0628  [96s]
+ep  330  train 0.0166  val 0.0628  [99s]
+ep  340  train 0.0153  val 0.0633  [102s]
+ep  350  train 0.0154  val 0.0630  [106s]
+ep  360  train 0.0157  val 0.0633  [109s]
+ep  370  train 0.0153  val 0.0632  [111s]
+ep  380  train 0.0156  val 0.0632  [114s]
+ep  390  train 0.0151  val 0.0633  [117s]
+ep  400  train 0.0149  val 0.0633  [120s]
+FINAL  val 0.0501  test 0.0497  test+TTA 0.0486
+saved mlp_s0_w1024_d4

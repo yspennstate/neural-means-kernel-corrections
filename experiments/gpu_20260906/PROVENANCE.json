@@ -1,0 +1,262 @@
+{
+ "created": "2026-09-06 09:45:51",
+ "agent": "claude-f5-gputrain-dd39",
+ "repo": "C:\\Users\\owner\\nmkc-resume-20260905",
+ "repo_head": "ref: refs/heads/codex/paper1-completion-20260905",
+ "files": {
+  "code/common.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\common.py",
+   "sha256": "f767c4a665e22ca181ed99ececf7002a3123a13d42c17ca0abe060ba45b10bd7",
+   "bytes": 2734
+  },
+  "code/models.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\models.py",
+   "sha256": "64e59f1fccf04411cf3806ab2385da078ba69c3cd8f5535b0c2f547f543af09b",
+   "bytes": 6426
+  },
+  "code/train_mlp.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\train_mlp.py",
+   "sha256": "0c8e57c246c753eb29ac17dd86eabf606267a2eecde7c425b6792ab6d4957f97",
+   "bytes": 6772
+  },
+  "code/train_krr.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\train_krr.py",
+   "sha256": "aba38a997322c8201caf469c0f19bcd7b11874bf9fbd4b95e1796c6ce22ab582",
+   "bytes": 4911
+  },
+  "code/krr_oof.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\krr_oof.py",
+   "sha256": "498a1129cb1d9cab6b608e766fd83687a74a255b2f364869cc3056a0e4359c96",
+   "bytes": 3142
+  },
+  "code/mlp_oof.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\mlp_oof.py",
+   "sha256": "365b942f51e4dbb1ad9e23eef969337c506d8310efc65e66fadb223ae0bdab3e",
+   "bytes": 4040
+  },
+  "code/learnable_kernel_gpu.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\learnable_kernel_gpu.py",
+   "sha256": "9bca9eff94d59a2175d2ef7ce890a3b3744e55e75bca34aff206d0b2df0ce968",
+   "bytes": 7593
+  },
+  "code/jpl_pipeline.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\jpl_pipeline.py",
+   "sha256": "97cc53ce88ef02ae53ba22fd8fe99004b4a1f6dbcba3431e834e0379f9fb34cb",
+   "bytes": 7739
+  },
+  "code/jpl_data.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\jpl_data.py",
+   "sha256": "11dcd79e48da32cc98d060b289a2b783d0f6f3576e0db8316ffa61ee256595d0",
+   "bytes": 2825
+  },
+  "code/ensemble_theory.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\ensemble_theory.py",
+   "sha256": "2cd613fbf2c312570d4d9166a74abf2c01ab64eeffa4823dfe73b049737b41f8",
+   "bytes": 3698
+  },
+  "code/ensemble_uq.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\ensemble_uq.py",
+   "sha256": "d249b07c81aa2f71048618ca13c80e972ec4c5ffe2e9ccd22a24e1a5d3f4b3ab",
+   "bytes": 2549
+  },
+  "code/fig_spectrum_diagnostic.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\fig_spectrum_diagnostic.py",
+   "sha256": "dab13c436fe1023fac29ef7db253893fadc18a244fe821289ba0e994ec781d26",
+   "bytes": 3428
+  },
+  "code/figures.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\figures.py",
+   "sha256": "b37c14115f89c043d34f1297a9e4a41e5b09b544d6ec04648f3de0f585ecc56a",
+   "bytes": 5538
+  },
+  "code/krr_scaling.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\krr_scaling.py",
+   "sha256": "0f0d3d3f0dd3784b5026701b4fca564da736b8d0ca1a43f0fb5771c3220a0523",
+   "bytes": 1961
+  },
+  "code/hidata_benchmark.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\hidata_benchmark.py",
+   "sha256": "95dace42074493a1aaaa8668a4823682b636313302251497dee29941965787ee",
+   "bytes": 8553
+  },
+  "code/gen_preds.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\gen_preds.py",
+   "sha256": "a26e9ae2943e4d9cadc47c7749b0052c350062d4aecaf210bb34dbb8cfef74fc",
+   "bytes": 4703
+  },
+  "code/stack_correct.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\stack_correct.py",
+   "sha256": "f0853216c785e69e8d67a016318caaa847a21918d052e3f690e84dcadb398513",
+   "bytes": 7393
+  },
+  "code/stack_perpixel.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\stack_perpixel.py",
+   "sha256": "980378c773801e4b5695a35dc6eb09a8619ee5710911effe009435c385cbd285",
+   "bytes": 4921
+  },
+  "code/uq_spectra.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\uq_spectra.py",
+   "sha256": "264a32964fb6aed1bddca84fae7f3645fbae9476fb9abb664f96b5ca04425e3b",
+   "bytes": 6945
+  },
+  "code/train_mlp_refine.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\train_mlp_refine.py",
+   "sha256": "df3c601ff83e959b4310c5ebc5526cc6b27d3e19345989c29472c9b7953b7f4b",
+   "bytes": 5722
+  },
+  "code/campaign/spectrum_diagnostic.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\campaign\\spectrum_diagnostic.py",
+   "sha256": "178c3fe7e33b31bdda1a2815c31b10941948d06ee0d7b2f4ce17cea3a2d06fc7",
+   "bytes": 6840
+  },
+  "code/campaign/ensemble_seeded5.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\campaign\\ensemble_seeded5.py",
+   "sha256": "44934e163642bba2d75730c2507024ccbb31df8b9bbe10186233c01fe8e06442",
+   "bytes": 6464
+  },
+  "code/campaign/conformal_utils.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\campaign\\conformal_utils.py",
+   "sha256": "850ae177ef580c387dc569836a2c93fec65d7bb8ffe9c1c3b6ad31e29f1ce092",
+   "bytes": 867
+  },
+  "code/campaign/uq_conformal_plam.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\campaign\\uq_conformal_plam.py",
+   "sha256": "d04dbc1c4805c3a1df7ace2a1da17d2e4bce82df1d7d6af7bfa7cdf1e9ff3cdf",
+   "bytes": 6341
+  },
+  "code/campaign/jpl_seeded.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\campaign\\jpl_seeded.py",
+   "sha256": "831d341f83e229ea4e7e8a20d9a3b3358110419591337a196314a15e1ebede62",
+   "bytes": 17230
+  },
+  "code/campaign/seedarch.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\campaign\\seedarch.py",
+   "sha256": "d8b9c45b5ac72fbff3b44e706e869cce11ea51d6a26d7f653a904b6d3e5b80ef",
+   "bytes": 13272
+  },
+  "code/campaign/seed_pipeline.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\campaign\\seed_pipeline.py",
+   "sha256": "026f6cc323f24c229d588821e58b723b9f992a5b3cf14541cdf0dc9509ae1326",
+   "bytes": 11108
+  },
+  "code/campaign/pipeline_contract.py": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\campaign\\pipeline_contract.py",
+   "sha256": "d9d9882206b6d3efded2f63c6de8e532b80d4410c722c0d479c4fb0d3b747562",
+   "bytes": 2127
+  },
+  "records/campaign/collected/spectrum_20260906/result.json": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\campaign\\collected\\spectrum_20260906\\result.json",
+   "sha256": "722364feaf2e51214468d037783dee7de3b927339036d7d572002f1f2b2ac38f",
+   "bytes": 3134
+  },
+  "records/campaign/collected/spectrum_20260906/design.npz": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\campaign\\collected\\spectrum_20260906\\design.npz",
+   "sha256": "7aacc87473849e670dc9566e2dda0e48acf900e4bddf49f2e620d1dd1bd6f507",
+   "bytes": 3047378
+  },
+  "records/campaign/collected/spectrum_20260906/spectrum.npz": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\campaign\\collected\\spectrum_20260906\\spectrum.npz",
+   "sha256": "c88843fd07bac9ebd32fd23f10dbbc82ef9b6d9e0fbfd044c690430c04f065bf",
+   "bytes": 50096
+  },
+  "records/campaign/collected/spectrum_20260906/README.md": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\campaign\\collected\\spectrum_20260906\\README.md",
+   "sha256": "07543867febfde5ad18c1d92270b2656ebcd051ec4cbc2d669c813902cb88f41",
+   "bytes": 1920
+  },
+  "records/runs/mlp_s0_w1024_d4_n19000_mir.json": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\runs\\mlp_s0_w1024_d4_n19000_mir.json",
+   "sha256": "269f9adfb0fe64e65fae5bbfda9b7fb64e53e805e6550a9adbfe00ec2c616728",
+   "bytes": 360
+  },
+  "records/runs/mlpMSE_s0_w1024_d4_n19000_mir.json": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\runs\\mlpMSE_s0_w1024_d4_n19000_mir.json",
+   "sha256": "f7646d9864c4a54ef95f05c867b6453c6d2e5598acf17fab069b3a7c2c9f8acd",
+   "bytes": 424
+  },
+  "records/runs/krr_full_matern52_n19000.json": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\runs\\krr_full_matern52_n19000.json",
+   "sha256": "47806e9e0bc7ec23ba6241c2473a2ec4bb5a4fb1cf72a768f64a5899b9b49383",
+   "bytes": 494
+  },
+  "records/runs/krr_scaling.json": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\runs\\krr_scaling.json",
+   "sha256": "22534808432d1ad9768c84b069f47994d93db4d76c7f297677c19cbfac3fea2b",
+   "bytes": 272
+  },
+  "records/runs/hyb_uq.json": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\runs\\hyb_uq.json",
+   "sha256": "a1793d5ba226dd1dc03129c24426f93ca00308bec8d13142a9905a4faf0ce028",
+   "bytes": 481
+  },
+  "records/runs/jpl_o2.json": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\runs\\jpl_o2.json",
+   "sha256": "ec2f8c7503712819d28317d9796d3279c16cf6fe92d9b339766c8455c0b05df2",
+   "bytes": 524
+  },
+  "records/runs/jpl_wco2.json": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\runs\\jpl_wco2.json",
+   "sha256": "56856e1f4cd9ca60abe35a565fa8d030bf35343fa531428948b25c89ecae7f5a",
+   "bytes": 464
+  },
+  "records/runs/jpl_sco2.json": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\runs\\jpl_sco2.json",
+   "sha256": "7b93e6e7d2a5a8562e1225799ed31d3880fe9ba866e3d46e8c80636db31a4859",
+   "bytes": 523
+  },
+  "records/paper/macros.tex": {
+   "source": "C:\\Users\\owner\\nmkc-resume-20260905\\paper\\macros.tex",
+   "sha256": "17d848d9975b6b925d815468e2a64a19f24dabec39451271861a925a981e74d7",
+   "bytes": 21600
+  },
+  "data/structmech/loads.npy": {
+   "source": "C:\\Users\\owner\\structmech_sprint\\data\\loads.npy",
+   "sha256": "8baf46f02fcbab5e809344c6a62aa81ea23e8b0f6f2bfdedd9b7fa07b9e73464",
+   "bytes": 6560128,
+   "matches_spectrum_record": true
+  },
+  "data/structmech/stress.npy": {
+   "source": "C:\\Users\\owner\\structmech_sprint\\data\\stress.npy",
+   "sha256": "a3c060c4f58aaefa36947b1cd7b0ab002c1cf8894cf1a47efdfabc67f2d9b3ac",
+   "bytes": 268960128,
+   "matches_spectrum_record": null
+  },
+  "data/structmech/idx_train.npy": {
+   "source": "C:\\Users\\owner\\structmech_sprint\\data\\idx_train.npy",
+   "sha256": "09de6da025d690ddbbd693e368445db1d02eca8e8b98e91d32656f0e109a23e0",
+   "bytes": 160128,
+   "matches_spectrum_record": true
+  },
+  "data/structmech/idx_test.npy": {
+   "source": "C:\\Users\\owner\\structmech_sprint\\data\\idx_test.npy",
+   "sha256": "b5181aaef47f8ec6bbfad10d17b0d44e8313032f8b11a6f3bff8284c3f38cc0a",
+   "bytes": 160128,
+   "matches_spectrum_record": null
+  },
+  "data/jpl_oco2/dimred_variables_4_mono.jld": {
+   "source": "C:\\Users\\owner\\nmkc-public\\data\\jpl_oco2\\dimred_variables_4_mono.jld",
+   "sha256": "d979ef32270ac4d72565c5eaad27d0d937e9da21512e15eb7c4a7b84c614da8b",
+   "bytes": 33098608
+  },
+  "data/jpl_oco2/dimred_data_4_mono.jld": {
+   "source": "C:\\Users\\owner\\nmkc-public\\data\\jpl_oco2\\dimred_data_4_mono.jld",
+   "sha256": "01a1e8fe3a60e8d4f6e73b90b2d67794fbcc01c82e56d73a7a6da1fc502d5efa",
+   "bytes": 9006994
+  },
+  "data/jpl_oco2/kf_results_o2_4_mono.jld": {
+   "source": "C:\\Users\\owner\\nmkc-public\\data\\jpl_oco2\\kf_results_o2_4_mono.jld",
+   "sha256": "ef1bdf80a02e13975524f6259dafb97e0612f2cff2547da05e02e34227909e7f",
+   "bytes": 41941872
+  },
+  "data/jpl_oco2/kf_results_wco2_4_mono.jld": {
+   "source": "C:\\Users\\owner\\nmkc-public\\data\\jpl_oco2\\kf_results_wco2_4_mono.jld",
+   "sha256": "a806aaf76782da2be36627a532e5cf49c36ddf1590be787d16a422a04128404a",
+   "bytes": 48344432
+  },
+  "data/jpl_oco2/kf_results_sco2_4_mono.jld": {
+   "source": "C:\\Users\\owner\\nmkc-public\\data\\jpl_oco2\\kf_results_sco2_4_mono.jld",
+   "sha256": "3eea6a5ccfdad37eea83975c1d499cd3c296ba1e71552fcded22a64347a0192c",
+   "bytes": 48344432
+  }
+ }
+}

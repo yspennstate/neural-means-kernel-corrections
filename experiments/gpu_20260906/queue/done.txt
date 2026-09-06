@@ -1,0 +1,9 @@
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0
+train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0
+train_mlp_scale.py --width 2048 --depth 4 --loss mse --seed 0
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --stop-after 10 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_resume
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_resume
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_straight
+train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0 --epochs 10 --graph 1 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/controls --tag mse10_graph
+train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0 --epochs 10 --graph 0 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/controls --tag mse10_eager
+train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 0

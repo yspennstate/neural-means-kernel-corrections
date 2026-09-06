@@ -1,0 +1,89 @@
+[launch_hidden] pid=24244 start=2026-09-06 13:06:29 script=C:\Users\owner\GOAL20H_20260906\nmkc_gpu_experiments\analysis\ensemble_floor.py args=--runs C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/structmech --out C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/analysis/out
+{
+ "paper_pair_w1024": {
+  "simplex_rms": {
+   "mean": 0.050576913293304,
+   "sd": 0.0,
+   "n": 1
+  },
+  "weak_floor": {
+   "mean": 0.050356432334987114,
+   "sd": 0.0,
+   "n": 1
+  },
+  "finite_M_floor": {
+   "mean": 0.050481241841236243,
+   "sd": 0.0,
+   "n": 1
+  },
+  "equicorr_floor": {
+   "mean": 0.050362701629725205,
+   "sd": 0.0,
+   "n": 1
+  },
+  "rho_min": {
+   "mean": 0.9901711917937499,
+   "sd": 0.0,
+   "n": 1
+  },
+  "rho_mean": {
+   "mean": 0.9594103845516071,
+   "sd": 0.0,
+   "n": 1
+  },
+  "realized_test_mean": {
+   "mean": 0.04705955996980716,
+   "sd": 0.0,
+   "n": 1
+  },
+  "realized_test_rms": {
+   "mean": 0.04995314863921598,
+   "sd": 0.0,
+   "n": 1
+  },
+  "equal_weights_test_mean": {
+   "mean": 0.04730339559577458,
+   "sd": 0.0,
+   "n": 1
+  },
+  "best_member_test": {
+   "mean": 0.047120580237305316,
+   "sd": 0.0,
+   "n": 1
+  },
+  "uniform_rms": {
+   "mean": 0.05089271691621695,
+   "sd": 0.0,
+   "n": 1
+  },
+  "members": [
+   "mlp_w1024_d4",
+   "mlpMSE_w1024_d4"
+  ]
+ }
+}
+{
+ "paper_pair_w1024": {
+  "members": 2,
+  "M": 2,
+  "K": 5,
+  "e_min": 0.05000570164471358,
+  "rho_w_min": NaN,
+  "rho_b_min": 0.985285111823346,
+  "bound": NaN,
+  "hindsight_convex_rms": 0.04994363209847234,
+  "hindsight_convex_mean": 0.04706158096750305,
+  "equal_weights_mean": 0.047312216654955615,
+  "ten_seed_style_means": {
+   "mlp_w1024_d4": 0.048630709594135374,
+   "mlpMSE_w1024_d4": 0.047130011993128586
+  },
+  "single_means": {
+   "mlp_w1024_d4": 0.048630709594135374,
+   "mlpMSE_w1024_d4": 0.047130011993128586
+  }
+ }
+}
+[stderr]
+
+[launch_hidden] exit=0 end=2026-09-06 13:07:42

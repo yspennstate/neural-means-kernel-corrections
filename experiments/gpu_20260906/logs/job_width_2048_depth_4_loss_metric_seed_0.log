@@ -1,0 +1,97 @@
+C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\cuda\__init__.py:65: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+mlp_s0_w2048_d4: params 16.12M  epochs 400  amp none  graph True  device NVIDIA RTX PRO 2000 Blackwell Generation Laptop GPU
+CUDA graph captured; warm-up undone in place
+C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\autograd\graph.py:865: UserWarning: The AccumulateGrad node's stream does not match the stream of the node that produced the incoming gradient. This may incur unnecessary synchronization and break CUDA graph capture if the AccumulateGrad node's stream is the default stream. This mismatch is caused by an AccumulateGrad node created prior to the current iteration being kept alive. This can happen if the autograd graph is still being kept alive by tensors such as the loss, or if you are using DDP, which will stash a reference to the node. To resolve the mismatch, delete all references to the autograd graph or ensure that DDP initialization is performed under the same stream as subsequent forwards. If the mismatch is intentional, you can use torch.autograd.graph.set_warn_on_accumulate_grad_stream_mismatch(False) to suppress this warning. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\input_buffer.cpp:250.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+C:\Users\owner\GOAL20H_20260906\nmkc_gpu_experiments\runs\train_mlp_scale.py:115: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  sched.step()
+ep   10  train 0.0508  val 0.0549  [8s] *
+ep   20  train 0.0524  val 0.0523  [15s] *
+ep   30  train 0.0514  val 0.0525  [23s]
+ep   40  train 0.0502  val 0.0529  [33s]
+ep   50  train 0.0494  val 0.0523  [41s]
+ep   60  train 0.0513  val 0.0521  [48s] *
+ep   70  train 0.0489  val 0.0533  [55s]
+ep   80  train 0.0465  val 0.0546  [63s]
+ep   90  train 0.0454  val 0.0546  [72s]
+ep  100  train 0.0425  val 0.0564  [82s]
+ep  110  train 0.0371  val 0.0564  [93s]
+C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\cuda\__init__.py:65: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Traceback (most recent call last):
+  File "C:\Users\owner\GOAL20H_20260906\nmkc_gpu_experiments\runs\train_mlp_scale.py", line 206, in <module>
+    torch.set_rng_state(s["rng_cpu"]); torch.cuda.set_rng_state(s["rng_cuda"])
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\random.py", line 19, in set_rng_state
+    default_generator.set_state(new_state)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+TypeError: RNG state must be a torch.ByteTensor
+C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\cuda\__init__.py:65: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Traceback (most recent call last):
+  File "C:\Users\owner\GOAL20H_20260906\nmkc_gpu_experiments\runs\train_mlp_scale.py", line 206, in <module>
+    torch.set_rng_state(s["rng_cpu"]); torch.cuda.set_rng_state(s["rng_cuda"])
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\random.py", line 19, in set_rng_state
+    default_generator.set_state(new_state)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+TypeError: RNG state must be a torch.ByteTensor
+C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\cuda\__init__.py:65: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Traceback (most recent call last):
+  File "C:\Users\owner\GOAL20H_20260906\nmkc_gpu_experiments\runs\train_mlp_scale.py", line 206, in <module>
+    torch.set_rng_state(s["rng_cpu"]); torch.cuda.set_rng_state(s["rng_cuda"])
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\random.py", line 19, in set_rng_state
+    default_generator.set_state(new_state)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+TypeError: RNG state must be a torch.ByteTensor
+C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\cuda\__init__.py:65: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Traceback (most recent call last):
+  File "C:\Users\owner\GOAL20H_20260906\nmkc_gpu_experiments\runs\train_mlp_scale.py", line 206, in <module>
+    torch.set_rng_state(s["rng_cpu"]); torch.cuda.set_rng_state(s["rng_cuda"])
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\random.py", line 19, in set_rng_state
+    default_generator.set_state(new_state)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+TypeError: RNG state must be a torch.ByteTensor
+C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\cuda\__init__.py:65: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+resumed mlp_s0_w2048_d4 at epoch 110
+mlp_s0_w2048_d4: params 16.12M  epochs 400  amp none  graph True  device NVIDIA RTX PRO 2000 Blackwell Generation Laptop GPU
+CUDA graph captured; warm-up undone in place
+C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\autograd\graph.py:865: UserWarning: The AccumulateGrad node's stream does not match the stream of the node that produced the incoming gradient. This may incur unnecessary synchronization and break CUDA graph capture if the AccumulateGrad node's stream is the default stream. This mismatch is caused by an AccumulateGrad node created prior to the current iteration being kept alive. This can happen if the autograd graph is still being kept alive by tensors such as the loss, or if you are using DDP, which will stash a reference to the node. To resolve the mismatch, delete all references to the autograd graph or ensure that DDP initialization is performed under the same stream as subsequent forwards. If the mismatch is intentional, you can use torch.autograd.graph.set_warn_on_accumulate_grad_stream_mismatch(False) to suppress this warning. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\input_buffer.cpp:250.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+ep  120  train 0.0375  val 0.0564  [51s]  gpu 78C duty 0.26 hold 0s
+ep  130  train 0.0326  val 0.0571  [94s]  gpu 82C duty 0.32 hold 0s
+ep  140  train 0.0317  val 0.0568  [142s]  gpu 81C duty 0.38 hold 6s
+ep  150  train 0.0300  val 0.0585  [198s]  gpu 78C duty 0.45 hold 20s
+ep  160  train 0.0292  val 0.0576  [239s]  gpu 74C duty 0.50 hold 24s
+ep  170  train 0.0266  val 0.0577  [280s]  gpu 76C duty 0.55 hold 24s
+ep  180  train 0.0256  val 0.0574  [346s]  gpu 74C duty 0.63 hold 26s
+ep  190  train 0.0235  val 0.0581  [388s]  gpu 81C duty 0.65 hold 28s
+ep  200  train 0.0210  val 0.0594  [432s]  gpu 81C duty 0.65 hold 28s
+ep  210  train 0.0210  val 0.0590  [478s]  gpu 82C duty 0.50 hold 30s
+ep  220  train 0.0192  val 0.0582  [533s]  gpu 74C duty 0.80 hold 30s
+ep  230  train 0.0187  val 0.0587  [577s]  gpu 77C duty 0.80 hold 30s
+ep  240  train 0.0199  val 0.0598  [601s]  gpu 78C duty 0.80 hold 30s
+ep  250  train 0.0167  val 0.0591  [629s]  gpu 81C duty 0.65 hold 30s
+ep  260  train 0.0159  val 0.0593  [660s]  gpu 83C duty 0.35 hold 30s
+ep  270  train 0.0144  val 0.0595  [691s]  gpu 82C duty 0.50 hold 30s
+ep  280  train 0.0132  val 0.0597  [715s]  gpu 81C duty 0.65 hold 30s
+ep  290  train 0.0133  val 0.0598  [763s]  gpu 70C duty 0.80 hold 32s
+ep  300  train 0.0124  val 0.0598  [787s]  gpu 78C duty 0.80 hold 32s
+ep  310  train 0.0120  val 0.0599  [815s]  gpu 71C duty 0.80 hold 32s
+ep  320  train 0.0108  val 0.0600  [841s]  gpu 72C duty 0.80 hold 32s
+ep  330  train 0.0109  val 0.0600  [868s]  gpu 80C duty 0.80 hold 32s
+ep  340  train 0.0096  val 0.0602  [903s]  gpu 78C duty 0.80 hold 32s
+ep  350  train 0.0099  val 0.0603  [940s]  gpu 76C duty 0.80 hold 32s
+ep  360  train 0.0093  val 0.0604  [973s]  gpu 81C duty 0.65 hold 32s
+ep  370  train 0.0091  val 0.0604  [1023s]  gpu 82C duty 0.50 hold 48s
+ep  380  train 0.0091  val 0.0605  [1092s]  gpu 82C duty 0.50 hold 64s
+ep  390  train 0.0087  val 0.0605  [1121s]  gpu 82C duty 0.50 hold 64s
+ep  400  train 0.0089  val 0.0605  [1162s]  gpu 82C duty 0.50 hold 64s
+FINAL  val 0.0521  test 0.0518  test+TTA 0.0495
+saved mlp_s0_w2048_d4

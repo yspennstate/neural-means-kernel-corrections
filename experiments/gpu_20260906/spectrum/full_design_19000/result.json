@@ -1,0 +1,147 @@
+{
+  "kind": "full_design_spectrum_diagnostic",
+  "agent": "claude-f5-gputrain-dd39",
+  "started_at": "2026-09-06T06:49:10.191392+00:00",
+  "source_sha256": "aaf45b1e87afb65e6ece986523aa939f8277d0299852f12b454f2e053e927451",
+  "n_training": 19000,
+  "n_full_design": 19000,
+  "split_seed": 0,
+  "median_subset_size": 2000,
+  "median_multiplier": 4.0,
+  "nugget": 1e-05,
+  "kernel": "Matern 5/2 on training-standardized recorded loads",
+  "host": "math-ross20",
+  "python": "3.14.3",
+  "numpy": "2.4.3",
+  "scipy": "1.17.1",
+  "stages": [
+    {
+      "stage": "input",
+      "at": "2026-09-06T06:49:10.194184+00:00",
+      "elapsed_seconds": 2.002716064453125e-05
+    },
+    {
+      "stage": "control 6000-row from packet design.npz",
+      "at": "2026-09-06T06:49:11.199933+00:00",
+      "elapsed_seconds": 1.0057706832885742
+    },
+    {
+      "stage": "full Gram float64 (CPU, blocks)",
+      "at": "2026-09-06T06:53:43.471643+00:00",
+      "elapsed_seconds": 273.2774987220764
+    },
+    {
+      "stage": "cpu64 Cholesky trace route",
+      "at": "2026-09-06T06:55:01.974106+00:00",
+      "elapsed_seconds": 351.7799596786499
+    },
+    {
+      "stage": "cpu64 eigenvalues (LAPACK evd)",
+      "at": "2026-09-06T07:16:45.142867+00:00",
+      "elapsed_seconds": 1654.9487266540527
+    }
+  ],
+  "status": "COMPLETE",
+  "input_files": {
+    "loads": {
+      "path": "C:\\Users\\owner\\GOAL20H_20260906\\nmkc_gpu_experiments\\data\\structmech\\loads.npy",
+      "sha256": "8baf46f02fcbab5e809344c6a62aa81ea23e8b0f6f2bfdedd9b7fa07b9e73464"
+    },
+    "idx_train": {
+      "path": "C:\\Users\\owner\\GOAL20H_20260906\\nmkc_gpu_experiments\\data\\structmech\\idx_train.npy",
+      "sha256": "09de6da025d690ddbbd693e368445db1d02eca8e8b98e91d32656f0e109a23e0"
+    }
+  },
+  "median_distance": 8.193651624044596,
+  "length_scale": 32.774606496178386,
+  "n_rows": 19000,
+  "control_design_reproduction": {
+    "packet_design_sha256": "7aacc87473849e670dc9566e2dda0e48acf900e4bddf49f2e620d1dd1bd6f507",
+    "packet_design_sha256_matches_record": true,
+    "training_rows_equal": true,
+    "subsample_positions_equal": true,
+    "median_rows_equal": true,
+    "training_mean_max_abs_diff": 0.0,
+    "training_scale_max_abs_diff": 0.0,
+    "standardized_loads_max_abs_diff": 0.0,
+    "median_distance_record": 8.193651624044596,
+    "median_distance_abs_diff": 0.0,
+    "length_scale_record": 32.774606496178386
+  },
+  "design_full_sha256": "f73572a49a53374c99897fc08c1b702644e408f61c99c59327b714960994799a",
+  "control_6000": {
+    "recomputed_effective_dimension": 103.11885064182374,
+    "record_spectral_effective_dimension": 103.11885064181605,
+    "abs_diff": 7.688072400924284e-12,
+    "eigenvalue_max_abs_diff_vs_packet": 3.637978807091713e-12,
+    "eigenvalue_max": 5653.198205329932,
+    "eigenvalue_min": 1.1548089955028115e-06,
+    "trace": 6000.0000000000055,
+    "top8_trace_fraction": 0.9902077976808908
+  },
+  "gram_trace": 19000.0,
+  "gram_frobenius_squared": 321030499.50372535,
+  "cpu64_chol": {
+    "trace_inverse": 99455.62923946031,
+    "direct_effective_dimension": 103.43044450254092
+  },
+  "cpu64_eig": {
+    "eigenvalue_min": 5.248180739740666e-07,
+    "eigenvalue_max": 17910.398229482584,
+    "n_negative": 0,
+    "trace_from_eigenvalues": 18999.99999999999,
+    "trace_rel_diff": 5.744177063829021e-16,
+    "frobenius_rel_diff": 7.612331038854011e-15,
+    "spectral_effective_dimension": 103.43044450254591,
+    "effective_dimension_same_shift_as_6000": 178.96478700969206,
+    "top8_eigenvalues": [
+      17910.398229482584,
+      426.9828969946494,
+      214.45087296538458,
+      103.68579450677234,
+      63.71967881107006,
+      43.02508814506908,
+      30.234757365302716,
+      23.339377402096787
+    ],
+    "top8_eigenvalues_over_n": [
+      0.9426525383938202,
+      0.02247278405234997,
+      0.011286888050809714,
+      0.005457147079303807,
+      0.0033536673058457925,
+      0.0022644783234246884,
+      0.0015913030192264588,
+      0.0012283882843208834
+    ],
+    "top8_trace_fraction": 0.9903071945091021,
+    "modes_for_99_percent_trace": 8,
+    "modes_for_999_percent_trace": 45,
+    "trace_check_absolute_difference": 4.988010005035903e-12,
+    "agrees_with_chol_1e-8": true
+  },
+  "spectrum_full_sha256": "4ef2aaaafa14f418e6a09b14e8415a38f1887ebec1e09ed9629790a431e5c3dd",
+  "thread_pools_cpu": [
+    {
+      "api": "openblas",
+      "threads": 4
+    },
+    {
+      "api": "openblas",
+      "threads": 4
+    }
+  ],
+  "summary": {
+    "effective_dimension_full_19000": 103.43044450254591,
+    "effective_dimension_full_19000_cholesky": 103.43044450254092,
+    "effective_dimension_6000_record": 103.11885064181605,
+    "ratio_full_over_6000": 1.003021696409439
+  },
+  "figure_sha256": {
+    "pdf": "d4da96fa6ed31ad2a464d80c0ffe42b464d43f38837720c5ba7da67fdc16ba63",
+    "png": "17c8ac04abdc389b5c7a05ae7046288c162cfde195751bcd02e724c6565a35d7"
+  },
+  "finished_at": "2026-09-06T08:20:55.143663+00:00",
+  "elapsed_seconds": 5504.949533224106,
+  "result_sha256_of_source": "840fb291c3887dcf6102c15f14fc2a41d185929253a3afea1715f5f92a3f3c64"
+}

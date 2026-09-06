@@ -1,0 +1,11 @@
+C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\cuda\__init__.py:65: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+mse10_graph: params 4.91M  epochs 10  amp none  graph True  device NVIDIA RTX PRO 2000 Blackwell Generation Laptop GPU
+CUDA graph captured; warm-up undone in place
+C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\autograd\graph.py:865: UserWarning: The AccumulateGrad node's stream does not match the stream of the node that produced the incoming gradient. This may incur unnecessary synchronization and break CUDA graph capture if the AccumulateGrad node's stream is the default stream. This mismatch is caused by an AccumulateGrad node created prior to the current iteration being kept alive. This can happen if the autograd graph is still being kept alive by tensors such as the loss, or if you are using DDP, which will stash a reference to the node. To resolve the mismatch, delete all references to the autograd graph or ensure that DDP initialization is performed under the same stream as subsequent forwards. If the mismatch is intentional, you can use torch.autograd.graph.set_warn_on_accumulate_grad_stream_mismatch(False) to suppress this warning. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\input_buffer.cpp:250.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+C:\Users\owner\GOAL20H_20260906\nmkc_gpu_experiments\runs\train_mlp_scale.py:118: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  sched.step()
+ep   10  train 0.0091  val 0.0532  [41s]  gpu 77C duty 0.25 hold 0s *
+FINAL  val 0.0532  test 0.0531  test+TTA 0.0523
+saved mse10_graph

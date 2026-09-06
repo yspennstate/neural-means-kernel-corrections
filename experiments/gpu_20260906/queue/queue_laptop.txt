@@ -1,0 +1,155 @@
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --stop-after 10 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_resume
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_resume
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --epochs 20 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/resumetest --tag rt_straight
+train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0 --epochs 10 --graph 1 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/controls --tag mse10_graph
+train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0 --epochs 10 --graph 0 --outdir C:/Users/owner/GOAL20H_20260906/nmkc_gpu_experiments/runs/controls --tag mse10_eager
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0
+train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 0
+train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 0
+train_mlp_scale.py --width 2048 --depth 4 --loss mse --seed 0
+train_mlp_scale.py --width 4096 --depth 4 --loss metric --seed 0
+train_mlp_scale.py --width 4096 --depth 4 --loss mse --seed 0
+train_mlp_scale.py --width 1024 --depth 5 --loss metric --seed 0
+train_mlp_scale.py --width 1024 --depth 5 --loss mse --seed 0
+train_mlp_scale.py --width 1024 --depth 6 --loss metric --seed 0
+jpl_scale.py --band o2 --width 384 --depth 4 --seed 0
+lk_scale.py --space state --ntr 6000 --steps 400 --bs 256 --rank 6 --seed 0
+train_mlp_scale.py --width 1024 --depth 6 --loss mse --seed 0
+jpl_scale.py --band o2 --width 768 --depth 4 --seed 0
+lk_scale.py --space features --ntr 6000 --steps 400 --bs 256 --rank 6 --seed 0
+train_mlp_scale.py --width 2048 --depth 6 --loss metric --seed 0
+jpl_scale.py --band o2 --width 1536 --depth 4 --seed 0
+lk_scale.py --space state --ntr 12000 --steps 400 --bs 256 --rank 6 --seed 0
+train_mlp_scale.py --width 4096 --depth 6 --loss metric --seed 0
+jpl_scale.py --band o2 --width 384 --depth 5 --seed 0
+lk_scale.py --space state --ntr 6000 --steps 1600 --bs 256 --rank 6 --seed 0
+train_mlp_scale.py --width 2048 --depth 5 --loss metric --seed 0
+jpl_scale.py --band o2 --width 384 --depth 6 --seed 0
+lk_scale.py --space state --ntr 6000 --steps 400 --bs 512 --rank 6 --seed 0
+train_mlp_scale.py --width 2048 --depth 6 --loss mse --seed 0
+jpl_scale.py --band o2 --width 384 --depth 4 --seed 1
+lk_scale.py --space state --ntr 6000 --steps 400 --bs 256 --rank 12 --seed 0
+train_mlp_scale.py --width 4096 --depth 6 --loss mse --seed 0
+jpl_scale.py --band o2 --width 768 --depth 4 --seed 1
+lk_scale.py --space state --ntr 6000 --steps 400 --bs 256 --rank 24 --seed 0
+train_mlp_scale.py --width 2048 --depth 5 --loss mse --seed 0
+jpl_scale.py --band o2 --width 1536 --depth 4 --seed 1
+lk_scale.py --space features --ntr 12000 --steps 400 --bs 256 --rank 6 --seed 0
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 1
+jpl_scale.py --band o2 --width 384 --depth 5 --seed 1
+lk_scale.py --space features --ntr 6000 --steps 1600 --bs 256 --rank 6 --seed 0
+train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 1
+jpl_scale.py --band o2 --width 384 --depth 6 --seed 1
+lk_scale.py --space features --ntr 6000 --steps 400 --bs 256 --rank 24 --seed 0
+train_mlp_scale.py --width 4096 --depth 4 --loss metric --seed 1
+jpl_scale.py --band o2 --width 384 --depth 4 --seed 2
+lk_scale.py --space state --ntr 12000 --steps 400 --bs 256 --rank 6 --seed 1
+train_mlp_scale.py --width 1024 --depth 5 --loss metric --seed 1
+jpl_scale.py --band o2 --width 768 --depth 4 --seed 2
+lk_scale.py --space state --ntr 6000 --steps 1600 --bs 256 --rank 6 --seed 1
+train_mlp_scale.py --width 1024 --depth 6 --loss metric --seed 1
+jpl_scale.py --band o2 --width 1536 --depth 4 --seed 2
+lk_scale.py --space state --ntr 6000 --steps 400 --bs 512 --rank 6 --seed 1
+train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 1
+jpl_scale.py --band o2 --width 384 --depth 5 --seed 2
+lk_scale.py --space state --ntr 6000 --steps 400 --bs 256 --rank 12 --seed 1
+train_mlp_scale.py --width 2048 --depth 4 --loss mse --seed 1
+jpl_scale.py --band o2 --width 384 --depth 6 --seed 2
+lk_scale.py --space state --ntr 6000 --steps 400 --bs 256 --rank 24 --seed 1
+train_mlp_scale.py --width 4096 --depth 4 --loss mse --seed 1
+jpl_scale.py --band o2 --width 384 --depth 4 --seed 3
+lk_scale.py --space features --ntr 12000 --steps 400 --bs 256 --rank 6 --seed 1
+train_mlp_scale.py --width 1024 --depth 5 --loss mse --seed 1
+jpl_scale.py --band o2 --width 768 --depth 4 --seed 3
+lk_scale.py --space features --ntr 6000 --steps 1600 --bs 256 --rank 6 --seed 1
+train_mlp_scale.py --width 1024 --depth 6 --loss mse --seed 1
+jpl_scale.py --band o2 --width 1536 --depth 4 --seed 3
+lk_scale.py --space features --ntr 6000 --steps 400 --bs 256 --rank 24 --seed 1
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 2
+jpl_scale.py --band o2 --width 384 --depth 5 --seed 3
+lk_scale.py --space state --ntr 6000 --steps 400 --bs 256 --rank 6 --seed 1
+train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 2
+jpl_scale.py --band o2 --width 384 --depth 6 --seed 3
+lk_scale.py --space features --ntr 6000 --steps 400 --bs 256 --rank 6 --seed 1
+train_mlp_scale.py --width 4096 --depth 4 --loss metric --seed 2
+jpl_scale.py --band o2 --width 384 --depth 4 --seed 4
+lk_scale.py --space state --ntr 12000 --steps 400 --bs 256 --rank 6 --seed 2
+train_mlp_scale.py --width 1024 --depth 5 --loss metric --seed 2
+jpl_scale.py --band o2 --width 768 --depth 4 --seed 4
+lk_scale.py --space state --ntr 6000 --steps 1600 --bs 256 --rank 6 --seed 2
+train_mlp_scale.py --width 1024 --depth 6 --loss metric --seed 2
+jpl_scale.py --band o2 --width 1536 --depth 4 --seed 4
+lk_scale.py --space state --ntr 6000 --steps 400 --bs 512 --rank 6 --seed 2
+train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 2
+jpl_scale.py --band o2 --width 384 --depth 5 --seed 4
+lk_scale.py --space state --ntr 6000 --steps 400 --bs 256 --rank 12 --seed 2
+train_mlp_scale.py --width 2048 --depth 4 --loss mse --seed 2
+jpl_scale.py --band o2 --width 384 --depth 6 --seed 4
+lk_scale.py --space state --ntr 6000 --steps 400 --bs 256 --rank 24 --seed 2
+train_mlp_scale.py --width 4096 --depth 4 --loss mse --seed 2
+jpl_scale.py --band o2 --width 384 --depth 4 --seed 0 --head gpu
+lk_scale.py --space features --ntr 12000 --steps 400 --bs 256 --rank 6 --seed 2
+train_mlp_scale.py --width 1024 --depth 5 --loss mse --seed 2
+jpl_scale.py --band o2 --width 1536 --depth 4 --seed 0 --head gpu
+lk_scale.py --space features --ntr 6000 --steps 1600 --bs 256 --rank 6 --seed 2
+train_mlp_scale.py --width 1024 --depth 6 --loss mse --seed 2
+jpl_scale.py --band o2 --width 384 --depth 4 --seed 1 --head gpu
+lk_scale.py --space features --ntr 6000 --steps 400 --bs 256 --rank 24 --seed 2
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 3
+jpl_scale.py --band o2 --width 1536 --depth 4 --seed 1 --head gpu
+lk_scale.py --space state --ntr 6000 --steps 400 --bs 256 --rank 6 --seed 2
+train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 3
+jpl_scale.py --band o2 --width 384 --depth 4 --seed 2 --head gpu
+lk_scale.py --space features --ntr 6000 --steps 400 --bs 256 --rank 6 --seed 2
+train_mlp_scale.py --width 4096 --depth 4 --loss metric --seed 3
+jpl_scale.py --band o2 --width 1536 --depth 4 --seed 2 --head gpu
+train_mlp_scale.py --width 1024 --depth 5 --loss metric --seed 3
+jpl_scale.py --band o2 --width 384 --depth 4 --seed 3 --head gpu
+train_mlp_scale.py --width 1024 --depth 6 --loss metric --seed 3
+jpl_scale.py --band o2 --width 1536 --depth 4 --seed 3 --head gpu
+train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 3
+jpl_scale.py --band o2 --width 384 --depth 4 --seed 4 --head gpu
+train_mlp_scale.py --width 2048 --depth 4 --loss mse --seed 3
+jpl_scale.py --band o2 --width 1536 --depth 4 --seed 4 --head gpu
+train_mlp_scale.py --width 4096 --depth 4 --loss mse --seed 3
+train_mlp_scale.py --width 1024 --depth 5 --loss mse --seed 3
+train_mlp_scale.py --width 1024 --depth 6 --loss mse --seed 3
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 4
+train_mlp_scale.py --width 2048 --depth 4 --loss metric --seed 4
+train_mlp_scale.py --width 4096 --depth 4 --loss metric --seed 4
+train_mlp_scale.py --width 1024 --depth 5 --loss metric --seed 4
+train_mlp_scale.py --width 1024 --depth 6 --loss metric --seed 4
+train_mlp_scale.py --width 1024 --depth 4 --loss mse --seed 4
+train_mlp_scale.py --width 2048 --depth 4 --loss mse --seed 4
+train_mlp_scale.py --width 4096 --depth 4 --loss mse --seed 4
+train_mlp_scale.py --width 1024 --depth 5 --loss mse --seed 4
+train_mlp_scale.py --width 1024 --depth 6 --loss mse --seed 4
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 0 --amp bf16
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 1 --amp bf16
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 2 --amp bf16
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 3 --amp bf16
+train_mlp_scale.py --width 1024 --depth 4 --loss metric --seed 4 --amp bf16
+train_mlp_scale.py --width 2048 --depth 6 --loss metric --seed 1
+train_mlp_scale.py --width 4096 --depth 6 --loss metric --seed 1
+train_mlp_scale.py --width 2048 --depth 5 --loss metric --seed 1
+train_mlp_scale.py --width 2048 --depth 6 --loss metric --seed 2
+train_mlp_scale.py --width 4096 --depth 6 --loss metric --seed 2
+train_mlp_scale.py --width 2048 --depth 5 --loss metric --seed 2
+train_mlp_scale.py --width 2048 --depth 6 --loss metric --seed 3
+train_mlp_scale.py --width 4096 --depth 6 --loss metric --seed 3
+train_mlp_scale.py --width 2048 --depth 5 --loss metric --seed 3
+train_mlp_scale.py --width 2048 --depth 6 --loss metric --seed 4
+train_mlp_scale.py --width 4096 --depth 6 --loss metric --seed 4
+train_mlp_scale.py --width 2048 --depth 5 --loss metric --seed 4
+train_mlp_scale.py --width 2048 --depth 6 --loss mse --seed 1
+train_mlp_scale.py --width 4096 --depth 6 --loss mse --seed 1
+train_mlp_scale.py --width 2048 --depth 5 --loss mse --seed 1
+train_mlp_scale.py --width 2048 --depth 6 --loss mse --seed 2
+train_mlp_scale.py --width 4096 --depth 6 --loss mse --seed 2
+train_mlp_scale.py --width 2048 --depth 5 --loss mse --seed 2
+train_mlp_scale.py --width 2048 --depth 6 --loss mse --seed 3
+train_mlp_scale.py --width 4096 --depth 6 --loss mse --seed 3
+train_mlp_scale.py --width 2048 --depth 5 --loss mse --seed 3
+train_mlp_scale.py --width 2048 --depth 6 --loss mse --seed 4
+train_mlp_scale.py --width 4096 --depth 6 --loss mse --seed 4
+train_mlp_scale.py --width 2048 --depth 5 --loss mse --seed 4

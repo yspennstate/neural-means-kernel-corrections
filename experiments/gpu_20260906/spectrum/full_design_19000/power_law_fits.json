@@ -1,0 +1,34 @@
+{
+ "kind": "spectrum_power_law_fits",
+ "source": "spectrum_full.npz (eigenvalues, eigenvalues_6000_control, lambda_grid, effective_dimension)",
+ "eigenvalue_index_slope_full_10_1000": -2.142,
+ "eigenvalue_index_slope_subsample_10_1000": -2.148,
+ "eigenvalue_index_slope_full_100_3000": -2.009,
+ "eigenvalue_index_slope_subsample_100_3000": -2.068,
+ "normalized_eigenvalue_ratio_full_over_subsample_index_10_1000": {
+  "median": 0.9967,
+  "min": 0.8995,
+  "max": 1.0281
+ },
+ "top8_ratio": [
+  1.0005,
+  0.9907,
+  0.986,
+  0.9958,
+  0.9977,
+  1.0052,
+  1.0196,
+  1.0057
+ ],
+ "deff_vs_nugget_slope_1e-7_to_1e-2": -0.464,
+ "deff_vs_nugget_slope_1e-6_to_1e-3": -0.452,
+ "deff_at": {
+  "nugget_1e-6": 299.09200937812864,
+  "nugget_1e-5": 103.43044450254591,
+  "nugget_1e-4": 38.37488495343583
+ },
+ "consistency": "for eigenvalues ~ i^-alpha, d_eff(lambda) ~ lambda^(-1/alpha): alpha 2.14 gives -0.47, measured -0.46",
+ "figure": "spectra_full_vs_subsample_loglog.pdf/png",
+ "figure_sha256": "b39880d15eae3fec",
+ "fitted": "2026-09-06 13:2x his clock by F5 claude-f5-gputrain-dd39, numpy polyfit in log-log"
+}

@@ -1,0 +1,22 @@
+[launch_hidden] pid=17256 start=2026-09-06 11:46:30 script=C:\Users\owner\GOAL20H_20260906\nmkc_gpu_experiments\code\train_mlp.py args=--mse 1 --epochs 120 --seed 0 --tag mlpMSE
+device: cuda
+params: 4.91M
+ep   10  train 0.0093  val 0.0538  [3s] *
+ep   20  train 0.0094  val 0.0524  [7s] *
+ep   30  train 0.0083  val 0.0513  [62s] *
+ep   40  train 0.0084  val 0.0507  [99s] *
+ep   50  train 0.0079  val 0.0494  [172s] *
+ep   60  train 0.0081  val 0.0492  [296s] *
+ep   70  train 0.0069  val 0.0483  [466s] *
+ep   80  train 0.0068  val 0.0477  [486s] *
+ep   90  train 0.0073  val 0.0483  [512s]
+ep  100  train 0.0070  val 0.0478  [531s]
+ep  110  train 0.0059  val 0.0478  [548s]
+ep  120  train 0.0067  val 0.0477  [564s] *
+FINAL  val 0.0477  test 0.0474  test+TTA 0.0471
+saved mlpMSE_s0_w1024_d4_n19000_mir
+[stderr]
+C:\Users\owner\AppData\Roaming\Python\Python314\site-packages\torch\cuda\__init__.py:65: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+
+[launch_hidden] exit=0 end=2026-09-06 11:56:39

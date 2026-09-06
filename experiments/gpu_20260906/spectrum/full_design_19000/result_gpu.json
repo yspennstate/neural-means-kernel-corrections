@@ -1,0 +1,75 @@
+{
+  "kind": "full_design_spectrum_diagnostic",
+  "agent": "claude-f5-gputrain-dd39",
+  "started_at": "2026-09-06T07:08:59.361906+00:00",
+  "source_sha256": "9ed83148e30f54a5f33c6df502a3e2409f710e435d213e3e9a6cc0340a4a0dbe",
+  "n_training": 19000,
+  "n_full_design": 19000,
+  "split_seed": 0,
+  "median_subset_size": 2000,
+  "median_multiplier": 4.0,
+  "nugget": 1e-05,
+  "kernel": "Matern 5/2 on training-standardized recorded loads",
+  "host": "math-ross20",
+  "python": "3.14.3",
+  "numpy": "2.4.3",
+  "scipy": "1.17.1",
+  "stages": [
+    {
+      "stage": "input",
+      "at": "2026-09-06T07:08:59.449023+00:00",
+      "elapsed_seconds": 9.489059448242188e-05
+    },
+    {
+      "stage": "gpu: bench",
+      "at": "2026-09-06T07:09:13.045722+00:00",
+      "elapsed_seconds": 13.596731901168823,
+      "fp64_tflops": 0.075
+    },
+    {
+      "stage": "gpu64_top: Gram + subspace iteration",
+      "at": "2026-09-06T07:09:13.049475+00:00",
+      "elapsed_seconds": 13.60048508644104
+    }
+  ],
+  "status": "RUNNING",
+  "input_files": {
+    "loads": {
+      "path": "C:\\Users\\owner\\GOAL20H_20260906\\nmkc_gpu_experiments\\data\\structmech\\loads.npy",
+      "sha256": "8baf46f02fcbab5e809344c6a62aa81ea23e8b0f6f2bfdedd9b7fa07b9e73464"
+    },
+    "idx_train": {
+      "path": "C:\\Users\\owner\\GOAL20H_20260906\\nmkc_gpu_experiments\\data\\structmech\\idx_train.npy",
+      "sha256": "09de6da025d690ddbbd693e368445db1d02eca8e8b98e91d32656f0e109a23e0"
+    }
+  },
+  "median_distance": 8.193651624044596,
+  "length_scale": 32.774606496178386,
+  "n_rows": 19000,
+  "control_design_reproduction": {
+    "packet_design_sha256": "7aacc87473849e670dc9566e2dda0e48acf900e4bddf49f2e620d1dd1bd6f507",
+    "packet_design_sha256_matches_record": true,
+    "training_rows_equal": true,
+    "subsample_positions_equal": true,
+    "median_rows_equal": true,
+    "training_mean_max_abs_diff": 0.0,
+    "training_scale_max_abs_diff": 0.0,
+    "standardized_loads_max_abs_diff": 0.0,
+    "median_distance_record": 8.193651624044596,
+    "median_distance_abs_diff": 0.0,
+    "length_scale_record": 32.774606496178386
+  },
+  "design_full_sha256": "f73572a49a53374c99897fc08c1b702644e408f61c99c59327b714960994799a",
+  "gpu": {
+    "device": "NVIDIA RTX PRO 2000 Blackwell Generation Laptop GPU",
+    "torch": "2.10.0+cu128",
+    "cuda": "12.8",
+    "vram_free_mb_at_start": 7043,
+    "fp64_gemm_tflops": 0.07533527515259647,
+    "fp64_gemm_3000_seconds": 0.7167956829071045,
+    "chunk_flops": 60000000000.0,
+    "expected_max_kernel_seconds": 0.7964396476745604,
+    "block": 1000,
+    "note": "no monolithic cuSOLVER call; every launch chunked below the WDDM TDR limit"
+  }
+}

@@ -1,0 +1,16 @@
+[launch_hidden] pid=5180 start=2026-09-06 09:49:04 script=C:\Users\owner\GOAL20H_20260906\nmkc_gpu_experiments\spectrum\full_design_spectrum.py args=--stage cpu --threads 4
+[     0.0s] input 
+[     1.0s] control 6000-row from packet design.npz 
+[   273.4s] full Gram float64 (CPU, blocks) 
+[   351.8s] cpu64 Cholesky trace route 
+[  1655.0s] cpu64 eigenvalues (LAPACK evd) 
+{
+ "effective_dimension_full_19000": 103.43044450254591,
+ "effective_dimension_full_19000_cholesky": 103.43044450254092,
+ "effective_dimension_6000_record": 103.11885064181605,
+ "ratio_full_over_6000": 1.003021696409439
+}
+STATUS COMPLETE
+[stderr]
+
+[launch_hidden] exit=0 end=2026-09-06 11:20:56

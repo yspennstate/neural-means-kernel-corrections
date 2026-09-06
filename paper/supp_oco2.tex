@@ -122,18 +122,15 @@ the representation ladder, which does not depend on this comparison.
 These are comparisons of recorded predictors with different computational
 costs; the study does not establish their ordering at matched total compute.
 
-Exploratory architecture comparisons show that these alignments depend on
-which predictors were trained. On WCO2, two residual MLPs with different
-activations correlate at $0.84$, a wide shallow network with the residual
-MLP at $0.40$, and a random-Fourier-feature network with it at $0.08$ to
-$0.17$. These are below the same-architecture seed alignment, but lower
-alignment alone does not guarantee a useful mixture: the weaker member's
-error also enters Proposition~\ref{prop:secmom}(i). In the recorded
-Fourier-feature bandwidth sweep, more accurate settings were correlated
-(error about $31\%$, alignment about $0.54$), whereas more decorrelated
-settings had error above $140\%$. These exploratory comparisons did not
-identify a useful improvement to the reported combination. Figure~\ref{fig:floor}
-retains the recorded accuracy--alignment comparison. Adding those candidates
+Lower residual alignment alone does not guarantee a useful mixture: the
+weaker member's RMS error also enters Proposition~\ref{prop:secmom}(i).
+A historical WCO2 Fourier-feature bandwidth sweep records error near
+$31\%$ with correlation $0.54$, and errors above $140\%$ with correlations
+near $0.11$ (Figure~\ref{fig:floor}). The surviving log contains rounded
+errors and correlations, but neither the prediction arrays nor the exact
+moment convention. It therefore supports an exploratory comparison, not
+a numerical test of the proposition's admission condition.
+Adding the exploratory architecture candidates
 to coordinate selection changed the mean error by less than $0.01$
 percentage points on each band. This is evidence about this trained pool,
 not a lower bound for an architecture class.
@@ -141,13 +138,13 @@ not a lower bound for an architecture class.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figs/floor.pdf}
-\caption{Recorded WCO2 residual alignments and a Fourier-feature bandwidth
-sweep. The architecture comparison uses one seed per architecture; the
-same-architecture dashed reference is the campaign mean over $45$ seed
-pairs. The right panel plots the algebraic two-member boundary from
-Proposition~\ref{prop:secmom}(i). It illustrates the joint dependence on
-error and alignment and does not establish a generalization threshold or
-an architecture-class error floor.}
+\caption{Historical WCO2 Fourier-feature sweep, transcribed from
+\path{runs/fourier_wco2.log}. Labels and colors identify bandwidths; the
+dashed line is the log's SiLU error of $16.37\%$. Three bandwidths nearly
+coincide in the upper left. The axes report the log's quantities, whose
+precise moment convention cannot be recovered from the retained records.
+No theorem boundary is plotted. The five rounded pairs and their source
+hash are retained in \path{paper/figs/floor_provenance.json}.}
 \label{fig:floor}
 \end{figure}
 

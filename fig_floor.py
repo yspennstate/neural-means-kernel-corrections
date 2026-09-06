@@ -1,18 +1,13 @@
-"""Figure: the ensembling floor is class-specific but hard to beat (paper/figs/floor.pdf).
+"""Plot the rounded historical WCO2 Fourier sweep, without a theorem overlay.
 
-Left: residual correlations on WCO2, seed-to-seed against cross-architecture.
-Right: the accuracy-decorrelation trade-off of the Fourier member across
-bandwidths, with the region where a member would lower the floor shaded.
+Usage: python fig_floor.py [figs_dir]
 
-    python fig_floor.py [figs_dir]
-
-The right panel is read from runs/fourier_wco2.log, the run log of the bandwidth
-sweep. The four left-panel correlations were computed on 2026-07-19 from the
-seed and architecture prediction arrays of that sweep (seed pairs averaged over
-the three box seeds, cross-architecture pairs from the diverse set); those arrays
-are not part of this repository, so the values are carried here as constants.
+The archived log does not define the correlation normalization or retain the
+predictions. Its values cannot establish the RMS/uncentered-second-moment
+condition of Proposition 6.1. The former architecture bars also lacked retained
+prediction inputs and are omitted. This figure reports only the sweep log.
 """
-import sys, pathlib, re
+import sys, pathlib, re, json, hashlib
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
@@ -22,32 +17,13 @@ HERE = pathlib.Path(__file__).resolve().parent
 FIGS = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else HERE / "paper" / "figs")
 LOG = HERE / "runs" / "fourier_wco2.log"
 
-LEFT = [("seed vs seed\n(same arch)", 0.97), ("ReLU vs SiLU", 0.84),
-        ("SiLU vs wide", 0.40), ("SiLU vs\nFourier", 0.11)]
-
 plt.rcParams.update({"font.size": 9, "axes.titlesize": 9, "axes.labelsize": 9,
                      "xtick.labelsize": 8, "ytick.labelsize": 8, "legend.fontsize": 8,
                      "axes.spines.top": False, "axes.spines.right": False,
                      "figure.dpi": 150, "savefig.bbox": "tight"})
 C = ["#3b5bdb", "#e8590c", "#2b8a3e", "#862e9c", "#495057"]
 
-fig, axes = plt.subplots(1, 2, figsize=(8.6, 4.5))
-
-ax = axes[0]
-labels = [l for l, _ in LEFT]
-cors = [v for _, v in LEFT]
-cols = [C[4]] + [C[0]] * (len(LEFT) - 1)
-bars = ax.bar(range(len(cors)), cors, color=cols)
-ax.axhline(cors[0], ls="--", color=C[4], lw=0.8)
-ax.set_xticks(range(len(labels)))
-ax.set_xticklabels(labels)
-ax.set_ylabel("residual correlation")
-ax.set_ylim(0, 1)
-ax.set_title("the floor is class-specific")
-for b_, v in zip(bars, cors):
-    ax.text(b_.get_x() + b_.get_width() / 2, v + 0.02, f"{v:.2f}", ha="center", fontsize=7)
-
-ax = axes[1]
+fig, ax = plt.subplots(figsize=(6.2, 3.5))
 sig, err, corr = [], [], []
 e_ref = None
 for line in LOG.read_text(encoding="utf-8").splitlines():
@@ -60,6 +36,10 @@ for line in LOG.read_text(encoding="utf-8").splitlines():
         err.append(float(m.group(2)))
         corr.append(float(m.group(3)))
 sig, err, corr = np.array(sig), np.array(err), np.array(corr)
+if len(sig) != 5 or e_ref is None or not np.all(np.isfinite([sig, err, corr])):
+    raise ValueError("Expected five complete archived sweep rows and a reference")
+if len(set(sig)) != 5 or np.any(err < 0) or np.any(np.abs(corr) > 1):
+    raise ValueError("Invalid archived sweep values")
 
 sc = ax.scatter(corr, err, c=sig, cmap="viridis", s=40, zorder=3)
 # Bandwidths 1.0, 1.5 and 2.0 land on one point (corr 0.11, error 144%); label the
@@ -73,19 +53,26 @@ if cluster.any():
     ax.annotate(names, (cx, cy), fontsize=7, xytext=(0.26, 0.86), textcoords="axes fraction",
                 arrowprops=dict(arrowstyle="-", color=C[4], lw=0.6), va="center")
 plt.colorbar(sc, ax=ax, label="Fourier bandwidth")
-cc = np.linspace(0.01, 1, 200)
-ax.plot(cc, e_ref / cc, color=C[1], lw=1.0)
-ax.fill_between(cc, 0, e_ref / cc, color=C[1], alpha=0.08)
-ax.axhline(e_ref, ls="--", color=C[4], lw=0.8, label="SiLU reference")
-ax.text(0.62, e_ref * 0.38, "members here\nlower the floor", fontsize=7, color=C[1])
-ax.set_xlabel("correlation with the SiLU mean")
-ax.set_ylabel("test error (%)")
+ax.axhline(e_ref, ls="--", color=C[4], lw=0.8, label="Recorded SiLU error")
+ax.set_xlabel("reported residual correlation with SiLU")
+ax.set_ylabel("reported test error (%)")
 ax.set_ylim(0, min(160, err.max() * 1.1))
 ax.set_xlim(0, 1)
-ax.set_title("no member is both accurate and decorrelated")
+ax.set_title("Archived WCO2 Fourier-feature sweep")
 ax.legend(frameon=False, loc="upper right")
 
 fig.tight_layout()
 FIGS.mkdir(parents=True, exist_ok=True)
-fig.savefig(FIGS / "floor.pdf")
+fig.savefig(FIGS / "floor.pdf", metadata={"CreationDate": None, "ModDate": None})
+receipt = dict(
+    source="runs/fourier_wco2.log",
+    source_sha256=hashlib.sha256(LOG.read_bytes()).hexdigest(),
+    producer_sha256=hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest(),
+    figure_sha256=hashlib.sha256((FIGS / "floor.pdf").read_bytes()).hexdigest(),
+    reference_reported_error_percent=e_ref,
+    rows=[dict(bandwidth=float(s), reported_error_percent=float(e),
+               reported_correlation=float(c)) for s, e, c in zip(sig, err, corr)],
+    metric_provenance="Rounded historical log; underlying arrays and exact moment convention unavailable",
+    theorem_admission_overlay=False, architecture_comparison_bars=False)
+(FIGS / "floor_provenance.json").write_text(json.dumps(receipt, indent=2)+"\n", encoding="utf-8")
 print("wrote", FIGS / "floor.pdf")

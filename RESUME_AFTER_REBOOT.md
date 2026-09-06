@@ -1,6 +1,51 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
-## Current checkpoint: September 6, 03:47 Jerusalem
+## Current checkpoint: September 6, 04:14 Jerusalem
+
+Publication blockers are being corrected, not closed. fig_floor.py now uses
+only the five rounded archived sweep pairs, with no theorem boundary or
+unreproducible architecture bars. The caption names the missing moment
+convention. New floor.pdf SHA
+225f3ccbd125864bea8adb3e253be5a2d19acba2986963f46d1951a204f26e8c;
+floor_provenance.json pins its source, values and producer. Native figure
+inspection is next; the paper still requires the spectrum repair and rebuild.
+
+A one-thread, nice-15 Caltech spectrum diagnostic launched at 04:09:43 under
+/home/yitz/nmkc_paper1_20260905/spectrum_20260906, PID 216239, then stopped
+before the Gram matrix when CPU reached 91.834 percent. The process is dead;
+there is no queue. Prepared output/design.npz SHA
+7aacc87473849e670dc9566e2dda0e48acf900e4bddf49f2e620d1dd1bd6f507
+contains the actual subsample and standardization. Source SHA
+1b30dca27fbe11e76571b8da214f17529f1afac2f8f58025d76921ccf7a503c3.
+The median distance 8.193651624044596 matches the historical JSON exactly.
+Eigenvalues and the independent Cholesky trace have NOT been computed. The
+coordinator claude-boxstatus-0904 advised one low-priority CPU, no queue.
+Root holds topic:dgx-caltech and the isolated directory for this diagnostic.
+
+Reviewer 04's additional stopped code host 6764 was resumed by exact handle
+at 03:59; its event log is growing again. Reviewer 09's controller then failed
+at 04:08:14 on AccessDenied for child 42056 after partially suspending its tree.
+Both controllers are now dead; original readers 48636 and 48388 remain alive.
+Root must finish their recovery/monitoring, then launch 05 and 10 once each.
+Do not duplicate 04 or 09. Native 09 recovery targets are recorded in
+.local-verification/recover_reviewer09.py. Future controller source now retains
+only successfully suspended identities and continues past gone/denied children;
+its new controls still require a bounded regression test.
+
+Chapter 07 has 23236 frames, exact 11618/15 seconds, 1247 frozen inputs and
+27 matching narration segments. All waveform checks pass at zero offset.
+Movie SHA 27e40bdfcb29dd8bd384c8c944426d089d674137974586ece05ca4fd2c79a38e.
+Only its first three end frames inspected so far: residual plot endpoint labels
+overlap curves and need an outward shift. Chapter 08 is rendering, launcher
+48280 / Manim 42028, CPU 14 only, build 20260906T035056_chapter08_final.
+The earlier plot launch failed because Manim's venv lacks matplotlib; system
+Python 3.14 has it and produced the revised figure. Do not install duplicates.
+
+Latest verified push 3a1a1b6216d9931bd6e5d5221aa14f6673ebcd70, 03:50 Jerusalem.
+Root pulse 03:53:03, claims through 04:38:03; renew by 04:18-04:23.
+Continue through 12:55. Original packet, votes and failed-run evidence unchanged.
+
+## Historical checkpoint: September 6, 03:47 Jerusalem
 
 Six original-packet votes: 01/02/03/06/07 YES, 08 NO. Reviewer 08's seven
 snapshot hashes match; report SHA

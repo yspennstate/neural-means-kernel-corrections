@@ -126,7 +126,7 @@
         {
           "line": "40,000 recorded input-output pairs",
           "math": "\\begin{gathered}20{,}000\\text{ development}\\\\+20{,}000\\text{ test}\\end{gathered}",
-          "say": "The benchmark contains forty thousand pairs. The first twenty thousand form the available development pool. The last twenty thousand form the public test block. Within the development pool, a fixed seeded permutation assigns one thousand examples to validation and nineteen thousand to training. Different campaign seeds change this internal split and the stochastic training, while the public test block stays the same."
+          "say": "The benchmark contains forty thousand pairs. The first twenty thousand form the available development pool. The last twenty thousand form the public test block. Within the development pool, a fixed seeded permutation assigns one thousand examples to validation and nineteen thousand to training. Campaign seeds change the internal split and the stochastic training. Every run uses the same public test block."
         },
         {
           "line": "Validation influences several fitted stages",

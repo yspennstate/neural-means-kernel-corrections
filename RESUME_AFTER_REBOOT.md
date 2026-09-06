@@ -1,6 +1,55 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
-## Current checkpoint: September 6, 07:09 Jerusalem
+## Current checkpoint: September 6, 07:44 Jerusalem
+
+Corrected immutable packet preparation completed: source commit
+6ca8aacbbd53a4af51d60c187884d218af267611, final-build-10, manifest SHA
+db1d4db7badd657e3d68de4e7e8576a91f83b44de6c4e0733ffab74d6d426d27,
+1117 payload artifacts. Original threads are now reassessing it in two serial
+groups, controllers 25872 and 48220, started07:16. Current original referees
+01 and06 have distinct corrected-round leaves. Do not launch new reviewers
+or read sibling judgments into their contexts. Controller producer SHA
+0aa6dacc9bc59469bed804de0b2a32397a7c6f8f9206d31c134e7a35962c4a5f.
+
+Latest verified GitHub push07:18:1716d75c5de3ab4d3638569330e6ccbd1aed95ca,
+lecture-only changes after scientific packet pin. Main release still pending.
+
+Chapter11 finished:20363 frames/678.766667seconds, movie SHA
+5c69378cca412484876cbb614f58a0ab27bbe600558606726cdf79531455a082,
+input manifest35412438eeb71202b305630ee2f862f6e2979744c433e79ca36b6e897ada8130.
+1830 frozen inputs and24 zero-offset waveform alignments pass. Native frame
+inspection is underway, not yet approved. Serial controller24268 now renders
+chapter02, child20624 birth1788668707.0974236, started07:25. Next03–09,12.
+Chapters01 and10 require additional replacements after this finite plan.
+
+An eighth narration passage, c01_split_01, was clarified and re-recorded07:22.
+Private backup narration_repair_0715 retains the old WAV and script. All252
+current text/audio identities and two independent duration lanes now pass:
+6730.08seconds of speech, exact168252/25, before pauses. ASR full original
+batch is still active; eight new WAVs need an explicit replacement check.
+Author triage of the first63 raw transcript edit lists is recorded in
+.local-verification/asr_author_triage_0720.json, SHA
+c501f06066dc764644182bce9efe37c5102cc73720c1b8e62b32971d89f74c44.
+No human listening approval is claimed. Chapter01's earlier assembly boundary
+PASS predates its new narration and does not accept the obsolete build now.
+
+Root independently verified all100 selected native submitted-text hashes and
+line-number versus byte-offset reads. Record-hash conventions are89 with LF,
+11 without; one intentionally redacted ledger display differs from native text.
+The CH9085 historical pasted attachment remains unavailable. Receipt SHA
+53a44d12325db73a789a0c3a0ad3a2b04b42492819c45cdced48f39dd03f218e in
+.local-verification/prompt_source_representations_20260906.json. New immutable
+Brain attachment lecture-revision-20260906-0740.md SHA
+3e088edb31e308948a3b1e8b9ef3763ddddfb20032b2000fd254b804e911a1f1
+is attached and integrity-verified. Parent now points to it as governing the
+prompt-provenance and GPU-policy updates; realistic recall verification is
+still running. Preserve both older and newer document bytes.
+
+Mesh pulse07:38:48, core leases through08:23:48. Brain-update claims have
+shorter15-minute leases and should be released after verification. Continue
+through12:55 Jerusalem; paper release and full lecture remain unfinished.
+
+## Historical checkpoint: September 6, 07:09 Jerusalem
 
 All ten original reviews returned on the build05 packet: seven YES and three
 NO. Referees05 and10 finished at06:58/06:59; their final report hashes are

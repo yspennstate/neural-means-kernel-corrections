@@ -1,0 +1,121 @@
+--- executed_aaf45b1e (09:49:10 start)
++++ on_disk_840fb291 (LF-normalized)
+@@ -220,3 +220,3 @@
+ 
+-def gpu_routes(rec, z, ls):
++def gpu_routes(rec, z, ls, which=("fp32", "fp64")):
+     import torch
+@@ -246,59 +246,9 @@
+ 
+-    # ---- float32 eigenvalues on the card
+-    try:
+-        t0 = time.time()
+-        rec.stage("gpu32 Gram float32")
+-        K32 = gram_torch(torch.float32)
+-        torch.cuda.synchronize()
+-        tr32 = float(K32.diagonal().sum().item())
+-        rec.stage("gpu32 eigenvalues (cuSOLVER)", vram_free_mb=torch.cuda.mem_get_info()[0] // 2 ** 20)
+-        ev32 = torch.linalg.eigvalsh(K32)
+-        torch.cuda.synchronize()
+-        ev32 = np.sort(ev32.double().cpu().numpy())
+-        del K32
+-        torch.cuda.empty_cache()
+-        top = ev32[::-1]
+-        rec.d["gpu32_eig"] = dict(seconds=time.time() - t0, trace_from_diagonal=tr32,
+-                                  trace_from_eigenvalues=float(ev32.sum()),
+-                                  eigenvalue_min=float(ev32[0]), eigenvalue_max=float(ev32[-1]),
+-                                  n_negative=int(np.sum(ev32 < 0)),
+-                                  spectral_effective_dimension=deff(ev32, n, NUGGET),
+-                                  spectral_effective_dimension_clipped=deff(np.maximum(ev32, 0), n, NUGGET),
+-                                  top8_eigenvalues=top[:8].tolist(),
+-                                  top8_trace_fraction=float(top[:8].sum() / ev32.sum()))
+-        np.save(OUT / "eigenvalues_gpu_fp32.npy", ev32)
+-        rec.save()
+-    except Exception as ex:  # noqa: BLE001
+-        rec.d["gpu32_eig"] = dict(error=repr(ex)[:300]); rec.save()
+-        torch.cuda.empty_cache()
+-    # ---- float64 Cholesky trace on the card (independent library, independent precision path)
+-    try:
+-        free = torch.cuda.mem_get_info()[0]
+-        need = 2 * n * n * 8 + 300 * 2 ** 20
+-        rec.stage("gpu64 Cholesky trace", vram_free_mb=free // 2 ** 20, need_mb=need // 2 ** 20)
+-        if free < need:
+-            raise MemoryError(f"skip: free {free//2**20} MB < need {need//2**20} MB")
+-        t0 = time.time()
+-        A = gram_torch(torch.float64)
+-        A.diagonal().add_(n * NUGGET)
+-        L = torch.linalg.cholesky(A)
+-        del A
+-        torch.cuda.empty_cache()
+-        inv_fro = 0.0
+-        blk = 1000
+-        for s in range(0, n, blk):
+-            e = min(s + blk, n)
+-            rhs = torch.zeros((n - s, e - s), dtype=torch.float64, device=dev)
+-            rhs[torch.arange(e - s), torch.arange(e - s)] = 1.0
+-            X = torch.linalg.solve_triangular(L[s:, s:], rhs, upper=False)
+-            inv_fro += float((X * X).sum().item())
+-            del X, rhs
+-        del L
+-        torch.cuda.synchronize(); torch.cuda.empty_cache()
+-        rec.d["gpu64_chol"] = dict(seconds=time.time() - t0, trace_inverse=inv_fro,
+-                                   direct_effective_dimension=n - n * NUGGET * inv_fro)
+-        rec.save()
+-    except Exception as ex:  # noqa: BLE001
+-        rec.d["gpu64_chol"] = dict(error=repr(ex)[:300]); rec.save()
+-        torch.cuda.empty_cache()
++    # ---- monolithic cuSOLVER routes are DISABLED on this card. One torch.linalg.eigvalsh of
++    # the 19000x19000 float32 Gram took the display driver down at 10:00 on 6 Sep 2026 (exit -1,
++    # no Python exception, every CUDA context on the card lost). gpu_blocked_routes.py holds the
++    # routes that never launch a long kernel (chunked float64 Cholesky, subspace iteration).
++    rec.d["gpu32_eig"] = dict(skipped="monolithic cuSOLVER eigvalsh disabled after the 10:00 driver reset; see gpu_blocked_routes.py")
++    rec.d["gpu64_chol_monolithic"] = dict(skipped="monolithic torch.linalg.cholesky disabled; see gpu_blocked_routes.py")
++    rec.save()
+ 
+@@ -306,3 +256,11 @@
+ def summarize(rec):
+-    d = rec.d
++    """Merge the CPU record (result.json) and the GPU record (result_gpu.json), which are
++    written by separate processes, into one view before comparing routes."""
++    d = dict(rec.d)
++    for other in ("result.json", "result_gpu.json"):
++        f = OUT / other
++        if f != rec.path and f.exists():
++            for k, v in json.loads(f.read_text(encoding="utf-8")).items():
++                d.setdefault(k, v)
++    rec.d["merged_from"] = [str(f.name) for f in (OUT / "result.json", OUT / "result_gpu.json") if f.exists()]
+     s = {}
+@@ -323,4 +281,12 @@
+                                                               - d["cpu64_chol"]["direct_effective_dimension"])
+-    d["summary"] = s
++    rec.d["summary"] = s
+     rec.save()
++    if s:
++        (OUT / "summary.json").write_text(json.dumps(dict(summary=s, cpu64_eig=d.get("cpu64_eig"), cpu64_chol=d.get("cpu64_chol"),
++                                                          gpu32_eig=d.get("gpu32_eig"), gpu64_chol=d.get("gpu64_chol"),
++                                                          control_6000=d.get("control_6000"), gpu=d.get("gpu"),
++                                                          length_scale=d.get("length_scale"), median_distance=d.get("median_distance"),
++                                                          input_files=d.get("input_files"), design_full_sha256=d.get("design_full_sha256"),
++                                                          spectrum_full_sha256=d.get("spectrum_full_sha256")), indent=2) + "\n", encoding="utf-8")
++    return d
+ 
+@@ -349,3 +315,3 @@
+     ax.semilogx(lam_s, curve_s, color=C[1], lw=1.1, ls="--", label="subsample ($n=6000$)")
+-    d_full = rec.d["cpu64_eig"]["spectral_effective_dimension"]
++    d_full = json.loads((OUT / "result.json").read_text(encoding="utf-8"))["cpu64_eig"]["spectral_effective_dimension"]
+     ax.axvline(NUGGET, color=C[4], ls=":", lw=0.9)
+@@ -371,3 +337,3 @@
+     a = p.parse_args()
+-    rec = Record(OUT / "result.json")
++    rec = Record(OUT / ("result_gpu.json" if a.stage == "gpu" else "result.json"))
+     rec.stage("input")
+@@ -378,6 +344,6 @@
+         gpu_routes(rec, z, ls)
+-    summarize(rec)
+-    if a.stage in ("all", "figure", "cpu") and (OUT / "spectrum_full.npz").exists():
++    merged = summarize(rec)
++    if a.stage in ("all", "figure", "cpu", "gpu") and (OUT / "spectrum_full.npz").exists() and "cpu64_eig" in merged:
+         figure(rec)
+-    rec.d["status"] = "COMPLETE" if "cpu64_eig" in rec.d else "PARTIAL"
++    rec.d["status"] = "COMPLETE" if "cpu64_eig" in merged else "PARTIAL"
+     rec.d["finished_at"] = datetime.now(timezone.utc).isoformat()

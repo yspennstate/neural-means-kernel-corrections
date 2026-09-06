@@ -34,6 +34,16 @@ under `campaign/collected/dgx/hidata_p400/`. Paths at the top of each script
 (`ROOT`, `P2`, `SM_DATA`, `NMKC_HIDATA`) point at the run and data
 directories.
 
+The retained `ens_rmt_dgx.py` record contains exploratory methods beyond the
+manuscript's reported ridge stack. Its historical shrinkage selector reused
+weights fitted on all calibration labels inside its folds, and its small-sample
+PCR field averaged predictions instead of errors. These exploratory fields do
+not support the advertised selection or error claims. The paper's 4.547% row
+uses the separately computed `sixty_ridge_loo` field. See the
+[retained RMT source and result scope](docs/retained_rmt_scope_20260906.md) for
+the exact dependency trace and correction status; the original records remain
+preserved.
+
 ```
 # Helmholtz and Navier-Stokes survey cells, output rank 400, exact solve on 19,000 pairs (three seeds each)
 python hidata_seeded.py --name Helmholtz    --grid 101 --seed 0 --npca 400 --fit 19000
@@ -45,8 +55,8 @@ python rmt_krr.py --problem structmech --seed 0 --nfit 8000
 # kernel-flow-regularized members (weights 0.3 and 1.0), the campaign's own training script
 python train_mlp.py --seed 0 --mirror 1 --epochs 400 --kf 0.3 --tag mlpKF03 --threads 4
 python train_mlp.py --seed 0 --mirror 1 --epochs 400 --kf 1.0 --tag mlpKF1  --threads 4
-# the sixty-member per-pixel stacks with GCV, LOO, per-pixel GCV, MP-edge PCR, Ledoit-Wolf and shrinkage, plus the
-# 300- and 120-row calibration regimes
+# historical sixty-member per-pixel exploration; read docs/retained_rmt_scope_20260906.md
+# before interpreting its shrinkage and small-sample PCR outputs
 python ens_rmt_dgx.py
 # the paragraph's numbers: KF-regularized members from the run records, learned kernels on the evaluation half,
 # and the six- and seven-mean stacks at the fixed and the leave-one-out ridge

@@ -243,6 +243,20 @@ if len(six) == 10:
             chk("saCorrMseFno", sa["between"]["mlpMSE-fno"]["mean"], 2)
     else:
         print("  seedarch.json absent, sixty-predictor macros not checked")
+    # These six retained RMT-record macros were previously outside this audit.
+    # Check field-to-macro transcription, not the validity of every exploratory
+    # method in the record. Top-level errors are fractions; small-cal errors
+    # were already multiplied by 100 by their generator.
+    rmt_path = os.path.join(DGX, "sm_ens_rmt.json")
+    if present(rmt_path):
+        rmt = json.load(open(rmt_path, encoding="utf-8"))["results"]
+        chk("saPerpixSixtyLoo", 100 * rmt["sixty_ridge_loo"], 3)
+        chk("saPerpixMeansLoo", 100 * rmt["six_means_ridge_loo"], 3)
+        small = rmt["_small_calibration"]
+        chk("saSixtyLooThreeH", small["ncal300"]["ridge_loo"], 3)
+        chk("saMeansThreeH", small["ncal300"]["six_means_ridge1e-3"], 3)
+        chk("saSixtyLooOneTwenty", small["ncal120"]["ridge_loo"], 3)
+        chk("saMeansOneTwenty", small["ncal120"]["six_means_ridge1e-3"], 3)
     lc_path = os.path.join(DGX, "learning_curve.json")
     if present(lc_path):
         lc = json.load(open(lc_path, encoding="utf-8"))

@@ -51,6 +51,27 @@ def vram_used_mb():
 
 VRAM_CAP_MB = 6500   # never let the card pass this: a near-full WDDM card resets the driver for everyone
 
+MEM_GATE_GB = float(os.environ.get("NMKC_MEM_GATE_GB", "50"))   # owner law 06 Sep 2026: launch only while MemAvailable
+                                                                  # stays above this PLUS the job's written peak; never
+                                                                  # fill a shared box (the DGX runner's own gate is 50 GB)
+
+
+def mem_available_gb():
+    try:
+        for line in open("/proc/meminfo"):
+            if line.startswith("MemAvailable"):
+                return int(line.split()[1]) / 1048576.0
+    except Exception:
+        return None
+    return None
+
+
+def peak_gb_from_line(line):
+    """The peak written on the queue line as a trailing @peak_gb=<x> token (the law: size the peak from
+    the inputs and write it on the line); a line without one does not launch on a box with /proc/meminfo."""
+    m = re.search(r"@peak_gb=([0-9.]+)", line)
+    return float(m.group(1)) if m else None
+
 
 def read_queue():
     q = CTRL / "queue.txt"
@@ -112,7 +133,17 @@ def main():
                     log(f"VRAM gate: used {used} MB + expected {need} MB > {VRAM_CAP_MB}; waiting")
                     time.sleep(30)
                     continue
-                parts = line.split()
+                avail = mem_available_gb()
+                if avail is not None:                       # a Linux box: the memory gate is the governor
+                    peak = peak_gb_from_line(line)
+                    if peak is None:
+                        skipped.add(line); log(f"SKIPPED (no @peak_gb on the line; the law wants the peak written): {line}")
+                        continue
+                    if avail < MEM_GATE_GB + peak or peak > avail / 2:
+                        log(f"memory gate: MemAvailable {avail:.1f} GB, need gate {MEM_GATE_GB} + peak {peak} GB; waiting")
+                        time.sleep(60)
+                        continue
+                parts = [t for t in line.split() if not t.startswith("@peak_gb=")]
                 script = W / "runs" / parts[0]
                 if "--tag" in parts:
                     stem = "job_" + parts[parts.index("--tag") + 1]

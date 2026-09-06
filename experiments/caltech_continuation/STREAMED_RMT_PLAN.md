@@ -12,10 +12,20 @@ Matching array dimensions does not prove that predictor rows align with target r
 
 Full orchestration still needs multiple passes. Accumulate each global convex objective over all pixels using whole-case target norms; select global ridge penalties from scores summed over all pixels; then compute fold candidate errors with those fixed training-fold fits. Fitting separate global weights per pixel block would change the estimator. Final evaluation must use the same pinned input/split/metric contract, with a distinct output and a full integrity recheck.
 
+A simpler option for the retained 1,000-row calibration size is to keep that calibration pool intact: its float32 data buffer is 403,440,000 bytes (384.75 MiB). This preserves the reviewed training-fold helper while streaming the much larger evaluation pool. Calibration workspaces still need an explicit peak estimate before execution.
+
+`affine_pool_evaluation.py` composes the reader and metric streams for already-fitted per-pixel affine weights. It enforces disjoint calibration/evaluation positions, records the explicit predictor-to-target position mapping, and returns a result only after complete tiling and full input hash rechecks. It does not fit models, attest the supplied row mapping's native origin, write result files, or grant compute admission.
+
 The file reader and metric accumulator are tested against separate full-array calculations on tiny fixtures. These checks are not a peak-RSS measurement, a real-data score, a DGX deployment, or proof that the complete study fits the process ceiling.
 
 The 11 small tests passed with BLAS restricted to one thread:
 
 ```text
 python -m unittest -v test_streamed_error.py test_blocked_prediction_pool.py
+```
+
+The four additional affine-composition tests also passed against separate per-pixel full-matrix products, including input mutation during evaluation and split/weight rejection before reads:
+
+```text
+python -m unittest -v test_affine_pool_evaluation.py
 ```

@@ -53,7 +53,7 @@
         {
           "line": "At the query, its value equals its squared norm",
           "math": "\\|g_0\\|^2=P_0(u)^2=g_0(u)",
-          "say": "The earlier norm calculation gives the squared norm of g zero as P zero squared. Evaluate the function at u and obtain k of u u minus k sub u transpose K inverse k sub u, the same expression. Geometrically, the inner product of the orthogonal remainder with the full query vector equals the squared length of the remainder. Its inner product with the projected part vanishes. We now know both its size in function space and the size of its effect at the query."
+          "say": "The earlier norm calculation gives the squared norm of g zero as P zero squared. Evaluate the function at the query. The result is the kernel evaluated at the pair u comma u, minus k sub u transpose K inverse k sub u. This is the same squared norm. Geometrically, the inner product of the orthogonal remainder with the full query vector equals the squared length of the remainder. Its inner product with the projected part vanishes. We now know both its size in function space and the size of its effect at the query."
         }
       ]
     },
@@ -75,7 +75,7 @@
         {
           "line": "Both produce the same training matrix",
           "math": "\\|r^\\pm\\|_K=\\rho,\\qquad r^\\pm(X)=0",
-          "say": "Each residual has product-space norm rho. Each is zero at every design point because g zero is zero there. Therefore the entire observed n by q matrix is zero for both residuals. A recovery rule receives literally the same input matrix in the two cases. Extra computation cannot create a distinction absent from its information. Additional assumptions on the target might create one, but they would define a smaller class than the ball we are considering."
+          "say": "Both residuals have norm equal to the chosen radius, rho, in the product space. Each is zero at every design point because g zero is zero there. Therefore the entire observed n by q matrix is zero for both residuals. A recovery rule receives literally the same input matrix in the two cases. Extra computation cannot create a distinction absent from its information. Additional assumptions on the target might create one, but they would define a smaller class than the ball we are considering."
         },
         {
           "line": "Their query values are separated by twice the proposed bound",
@@ -97,7 +97,7 @@
         {
           "line": "The recovery rule returns the same vector for both",
           "math": "\\psi=\\Psi(0)",
-          "say": "Write psi for the rule's answer when the observation matrix is zero. This answer can be any vector in the output space. It need not lie on the line connecting our two constructed outputs. The drawing places it on that line so the distances are easy to see, but the argument will use the Euclidean triangle inequality and therefore covers every possible position. Moving away from the line cannot evade that inequality."
+          "say": "Let the Greek letter psi denote the rule's answer when the observation matrix is zero. This answer can lie anywhere in the output space, including away from the line connecting our two constructed outputs. The drawing places it on that line so the distances are easy to see, but the argument will use the Euclidean triangle inequality and therefore covers every possible position. Moving away from the line cannot evade that inequality."
         },
         {
           "line": "Apply the triangle inequality",
@@ -163,7 +163,7 @@
         {
           "line": "Factor the matrix to expose its sign",
           "math": "\\begin{gathered}\\widetilde P_\\lambda^2-P_0^2\\\\=t^2 k_u^\\top A^{-2}K^{-1}k_u\\ge0\\end{gathered}",
-          "say": "Use the common eigenbasis, or multiply out directly, to factor the matrix as A inverse squared times K inverse times A minus K squared. Since A minus K is t times the identity, the result is t squared times k sub u transpose A inverse squared K inverse k sub u. Every eigenvalue of A inverse squared K inverse is positive. The gap is therefore nonnegative. This calculation gives the exact nugget cost for the fixed design and query, not just its sign."
+          "say": "Use the common eigenvectors, or multiply out directly. The matrix factors into A inverse squared, times K inverse, times the square of the matrix difference A minus K. Since A minus K is t times the identity, the result is t squared times k sub u transpose A inverse squared K inverse k sub u. Every eigenvalue of A inverse squared K inverse is positive. The gap is therefore nonnegative. This calculation gives the exact nugget cost for the fixed design and query, not just its sign."
         }
       ]
     },

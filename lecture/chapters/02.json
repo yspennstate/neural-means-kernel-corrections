@@ -61,10 +61,11 @@
       "title": "Use a symmetry by averaging two equivalent views",
       "visual": {
         "kind": "reflection_pair",
-        "label": "Actual reference field and its coordinate reflection; not a new solver run",
+        "refiner_condition": true,
+        "label": "Reference-field reflection, then the two distinct routes for conditioning a refiner",
         "source": "paper/method.tex"
       },
-      "visual_argument": "Reflection reverses the boundary load and reflects the predicted field; transforming back permits a coordinatewise average.",
+      "visual_argument": "Reflection permits aligned output averaging; the final diagram distinguishes recomputing h(Su) from supplying T h(u), whose equality is an extra unproved condition.",
       "segments": [
         {
           "line": "Reflect the input, predict, and transform the field back",
@@ -77,9 +78,9 @@
           "say": "The population argument requires two assumptions. The target must be equivariant: reflecting the input reflects the output in the stated way. The distribution of loads must also be unchanged by reflection. For an isometric output reflection and a convex norm loss, averaging cannot increase population risk under these assumptions. Empirical symmetry checks can support the modeling choice, but they do not prove that a numerical solver and a finite dataset satisfy the assumptions exactly."
         },
         {
-          "line": "Training augmentation is a separate intervention",
-          "math": "(u,v)\\longmapsto(Su,Tv)",
-          "say": "During training, reflected input-output pairs are also supplied as augmentation. That can change the learned network, so it is a different operation from averaging two predictions after training. The test-time argument holds for a fixed fitted map under the symmetry assumptions. This argument does not establish that a particular stochastic training run improves when augmented. The paper measures augmentation and prediction averaging as separate parts of its recipe."
+          "line": "The refiner's conditioning field adds a condition",
+          "math": "h(Su)=T h(u)",
+          "say": "Training with reflected pairs changes the learned network; it is a different operation from averaging a fixed fitted map. The refiner introduces another distinction. Its reflected branch uses the reflection of the supplied kernel field, instead of recomputing that field at the reflected load. The full-map risk guarantee applies to this operation if the kernel field itself is equivariant, as written here. We have not established that condition for the fitted kernel channel. Its measured averaging benefit is an empirical result. Training augmentation alone does not supply the missing guarantee."
         }
       ]
     },

@@ -178,10 +178,10 @@ def build_visual(spec):
         curve=VMobject(color=BLUE,stroke_width=3).set_points_as_corners([ax.c2p(x,y) for x,y in zip(xx,yy)])
         mode=100*(data['k']-1)/(data['m']-1)
         marker=Dot(ax.c2p(mode,np.interp(mode,xx,yy)),color=GOLD)
-        labels=VGroup(small_label("Density of conditional coverage",[2.6,2.65,0],25),
-                      small_label("Conditional coverage (%)",[2.6,-2.02,0],25),
+        labels=VGroup(small_label("Density of conditional coverage",[2.6,2.50,0],25),
+                      small_label("Conditional coverage (%)",[2.6,-2.16,0],25),
                       formula(r"p_{\rm cal}\sim\operatorname{Beta}(901,100)",27,BLUE).move_to([2.6,-2.63,0]))
-        for x in (86,88,90,92,94):labels.add(formula(str(x),20,DIM).next_to(ax.c2p(x,0),DOWN,buff=.1))
+        for x in (86,88,90,92,94):labels.add(formula(str(x),20,DIM).next_to(ax.c2p(x,0),DOWN,buff=.18))
         return VGroup(ax,curve,marker,labels),[lambda:ShowPassingFlash(curve.copy().set_color(GOLD)),
                 lambda:Indicate(marker,color=GOLD),lambda:Indicate(labels[2],color=BLUE)]
     if kind == "calibration_protocol":
@@ -409,6 +409,29 @@ def build_visual(spec):
                         formula(r"x_1\mapsto1-x_1", 30, GOLD).move_to([2.6, -1.5, 0]),
                         small_label("Transform back before averaging predictions", [2.6, -2.2, 0], 23))
         group = Group(original, reflected, arrow, labels)
+        if spec.get("refiner_condition"):
+            # The third sentence changes the mathematical object: a reflected
+            # target image cannot explain two different refiner input routes.
+            def node(tex, x, y, color):
+                box = RoundedRectangle(width=1.55, height=.78, corner_radius=.08,
+                    color=color, fill_color=color, fill_opacity=.1).move_to([x, y, 0])
+                return VGroup(box, formula(tex, 30, color, 1.38).move_to(box))
+            su = node(r"Su", .25, .8, BLUE)
+            recomputed = node(r"h(Su)", 4.65, .8, BLUE)
+            supplied = node(r"h(u)", .25, -1., GOLD)
+            reflected_field = node(r"T h(u)", 4.65, -1., GOLD)
+            routes = VGroup(
+                Arrow(su.get_right(), recomputed.get_left(), buff=.12, color=BLUE),
+                Arrow(supplied.get_right(), reflected_field.get_left(), buff=.12, color=GOLD))
+            route_labels = VGroup(
+                small_label("Recompute the kernel", [2.45, 1.4, 0], 24, BLUE),
+                small_label("Reflect its supplied field", [2.45, -.4, 0], 24, GOLD),
+                small_label("Two conditioning routes", [2.6, 2.2, 0], 28),
+                small_label("Equality needs an equivariant kernel field", [2.6, -2.2, 0], 23))
+            comparison = VGroup(su, recomputed, supplied, reflected_field, routes, route_labels)
+            return group, [lambda: Indicate(original[1], color=BLUE),
+                lambda: Indicate(reflected[1], color=GOLD),
+                lambda: AnimationGroup(FadeOut(group), FadeIn(comparison))]
         return group, [lambda: Indicate(original[1], color=BLUE), lambda: Indicate(reflected[1], color=GOLD),
                        lambda: Indicate(arrow, color=GOLD)]
     if kind == "member_paths":

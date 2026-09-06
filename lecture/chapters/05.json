@@ -47,7 +47,7 @@
         {
           "line": "The curves describe this averaging operation",
           "math": "\\mathcal E_2(f_{\\rm equal})=\\sqrt{K^{-2}\\sum_{a,b\\in I}\\widehat S_{ab}}",
-          "say": "For a subset I of size K, sum all entries in its second-moment submatrix, divide by K squared and take a square root. Then average that RMS value over the subsets of the chosen size. The graph shows those directly recomputed values. It answers how much equal weighting improves within the available configurations. It does not isolate every source of variation in network training, nor does it tell us what a newly designed architecture would do."
+          "say": "For a subset I of size K, sum all entries in its second-moment submatrix, divide by K squared and take a square root. Then average that RMS value over the subsets of the chosen size. The graph shows those directly recomputed values. It answers how much equal weighting improves within the available configurations. Other sources of training variation remain mixed together in this comparison. The result also leaves open how a newly designed architecture would perform."
         },
         {
           "line": "A flatter curve is evidence about shared residuals",
@@ -123,7 +123,7 @@
         {
           "line": "The theorem constrains global convex combinations",
           "math": "f_w=\\sum_a w_af_a,\\qquad w\\in\\Delta",
-          "say": "The lower bound concerns one global nonnegative weight vector summing to one. The deployed pipeline is more flexible. Its weights can vary by output coordinate, it can include affine intercepts, and it adds kernel corrections. Those operations are not restricted to the same global convex hull. If that pipeline has a lower measured error, it has not contradicted the theorem or somehow broken a universal limit."
+          "say": "The lower bound concerns one global weight vector. Every weight is at least zero, and the weights sum to one. The deployed pipeline is more flexible. Its weights can vary by output coordinate, it can include affine intercepts, and it adds kernel corrections. Those operations are not restricted to the same global convex hull. If that pipeline has a lower measured error, it has not contradicted the theorem or somehow broken a universal limit."
         },
         {
           "line": "A mean-error comparison is not an RMS lower-bound violation",
@@ -155,7 +155,7 @@
         {
           "line": "The target is a deterministic numerical map",
           "math": "\\begin{gathered}G_{\\rm data}\\ne G_{\\rm continuum}\\\\\\text{in general}\\end{gathered}",
-          "say": "The benchmark target includes finite-element discretization and interpolation onto a regular grid. A surrogate is evaluated against those numerical labels. Even if the labels differ from a continuum solution, that discrepancy does not by itself make them impossible to learn. Calling a shared surrogate residual a solver-imposed irreducible floor would require additional evidence, such as carefully matched refined-mesh experiments. Those experiments have not been performed here."
+          "say": "The benchmark target includes finite-element discretization and interpolation onto a regular grid. A surrogate is evaluated against those numerical labels. Even if the labels differ from a continuum solution, that discrepancy does not by itself make them impossible to learn. Calling a shared surrogate residual a solver-imposed irreducible floor would require additional evidence, such as carefully matched refined-mesh experiments. Those refined-mesh experiments remain future work."
         },
         {
           "line": "Use the bound to locate the unresolved question",

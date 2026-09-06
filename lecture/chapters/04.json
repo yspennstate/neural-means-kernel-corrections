@@ -138,7 +138,7 @@
         {
           "line": "Replace each matrix entry by its allowed minimum",
           "math": "\\begin{gathered}\\frac{w^\\top Sw}{\\bar e^{\\,2}}\\\\\\ge A+\\varrho_w(B-A)\\\\{}+\\varrho_b(1-B)\\end{gathered}",
-          "say": "To keep the line readable, write A for the sum of the individual squared weights and B for the sum of the squared architecture totals. The diagonal terms contribute at least e bar squared times A. The within-architecture terms contribute at least rho w times e bar squared times B minus A. The between-architecture terms contribute at least rho b times e bar squared times one minus B. Add these three bounds and divide by e bar squared, assuming for the moment that e bar is positive."
+          "say": "To keep the line readable, use capital A for the sum of the individual squared weights, and capital B for the sum of the squared architecture totals. The diagonal terms contribute at least e bar squared times A. For the within-architecture terms, multiply rho sub w by e bar squared and by the difference B minus A. That product is their lower bound. For the between-architecture terms, multiply rho sub b by e bar squared and by the difference one minus B. Add these three bounds and divide by e bar squared, assuming for the moment that e bar is positive."
         },
         {
           "line": "Collect the coefficients of the two concentration measures",
@@ -177,7 +177,7 @@
         {
           "line": "Substitute the two minima",
           "math": "\\begin{aligned}w^\\top Sw\\ge\\bar e^{\\,2}\\Big[&\\varrho_b\\\\[-.25ex]&+\\frac{\\varrho_w-\\varrho_b}{M}\\\\[-.25ex]&+\\frac{1-\\varrho_w}{MK}\\Big]\\end{aligned}",
-          "say": "Substitute the two bounds into the collected expression. This proves the theorem. The left side is the expected squared relative error of a convex stack. The right side has a constant term, a term that decays with the number of architectures, and a term that decays with the total number of members. Taking a square root gives a lower bound on root-mean-square relative error. It does not give a lower bound on the mean relative error reported in the main performance table."
+          "say": "Substitute the two bounds into the collected expression. This proves the theorem. The left side is the expected squared relative error of a convex stack. The right side has a constant term, a term that decays with the number of architectures, and a term that decays with the total number of members. Taking a square root gives a lower bound on root-mean-square relative error. The mean relative error in the main performance table is a different quantity. This theorem supplies no lower bound for that mean."
         }
       ]
     },
@@ -205,7 +205,7 @@
         {
           "line": "Uniform averaging makes every proof step an equality",
           "math": "w_{a,k}=\\frac1{MK}",
-          "say": "Use uniform member weights. Both Cauchy-Schwarz bounds become equalities, and all the earlier entrywise bounds were already equalities. The resulting squared error is exactly the lower-bound expression. That establishes sharpness for this class of assumptions. It does not assert that the measured benchmark residuals have this exact decomposition. In the experiment we use the actual matrix to see how close the empirical lower bound lies to the best achievable convex combination."
+          "say": "Use uniform member weights. Both Cauchy-Schwarz bounds become equalities, and all the earlier entrywise bounds were already equalities. The resulting squared error is exactly the lower-bound expression. That establishes sharpness for this class of assumptions. The measured benchmark residuals need not have this exact decomposition. In the experiment we use the actual matrix to see how close the empirical lower bound lies to the best achievable convex combination."
         }
       ]
     },

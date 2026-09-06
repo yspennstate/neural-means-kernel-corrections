@@ -56,6 +56,7 @@ def windows():
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--agent", required=True, help="Current live mesh identity owning this lecture and workload")
     parser.add_argument("--chapter", required=True)
     parser.add_argument("--board")
     parser.add_argument("--segment", type=int, default=0)
@@ -81,13 +82,20 @@ def main():
     own.cpu_affinity(render_cpus)
     if args.reuse_incomplete_tex and not args.reuse_tex_from:
         raise ValueError('Incomplete cache recovery requires an explicit owned donor')
+    mesh = Path(r'C:\Users\owner\ai-memories-and-functionality\12_cognitive_architecture\agent_mesh\agent_mesh.py')
+    def assert_owned(resource):
+        subprocess.run([r'C:\Python314\python.exe', '-B', str(mesh), 'assert', '--agent',
+                        args.agent, '--resource', str(resource)], check=True,
+                       capture_output=True, text=True, encoding='utf-8',
+                       creationflags=0x08000000, timeout=150)
+    assert_owned(HERE)
     if args.encoder == 'h264_nvenc':
         if args.quality not in ('draft', 'final'):
             raise ValueError('Still frames have no video encoding stage')
         mesh = Path(r'C:\Users\owner\ai-memories-and-functionality\12_cognitive_architecture\agent_mesh\agent_mesh.py')
         for attempt in range(3):
             assertion = subprocess.run([r'C:\Python314\python.exe', '-B', str(mesh), 'assert', '--agent',
-                            'codex-nmkc-resume-20260905', '--resource', 'topic:gpu-workload/MATH-ROSS20/codex-nmkc-resume-20260905'],
+                            args.agent, '--resource', 'topic:gpu-workload/MATH-ROSS20/'+args.agent],
                            capture_output=True, text=True, encoding='utf-8',
                            creationflags=0x08000000, timeout=150)
             if assertion.returncode == 0:
@@ -136,11 +144,12 @@ def main():
                NUMEXPR_NUM_THREADS="1", PYTHONIOENCODING="utf-8", PYTHONFAULTHANDLER="1", PYTHONUNBUFFERED="1")
     if args.board:
         env["NMKC_BOARD"] = args.board
-    log_dir = HERE / "logs"; log_dir.mkdir(exist_ok=True)
+    log_dir = HERE / "logs"; assert_owned(log_dir); log_dir.mkdir(exist_ok=True)
     tag = args.board or f"chapter{args.chapter}_{args.quality}"
     # A long render reads a frozen source/audio/asset snapshot. Continued
     # authoring of other chapters cannot change its inputs halfway through.
     build = HERE / "builds" / (time.strftime("%Y%m%dT%H%M%S")+"_"+tag)
+    assert_owned(build)
     build.mkdir(parents=True, exist_ok=False)
     (build / "chapters").mkdir()
     sources = list(HERE.glob("*.py"))+[HERE / "chapters" / (args.chapter+".json")]

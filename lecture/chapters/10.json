@@ -189,7 +189,7 @@
         {
           "line": "A broader search can worsen the test score",
           "math": "\\begin{gathered}\\operatorname*{argmin}_{h\\in\\mathcal H}E_{\\rm val}(h)\\\\\\text{need not minimize}\\\\E_{\\rm test}(h)\\end{gathered}",
-          "say": "Expanding the grid can only improve or preserve the minimum successful tuning-validation objective when the old candidates remain available. It need not improve the refitted validation score or the public test score. The tuning subset, full refit, and evaluation distribution are different objects. We therefore retain failed cells, selected settings, boundary flags, and all final candidate scores. The completed sensitivity tables show whether the original conclusions survive this broader search, including any deterioration."
+          "say": "Expanding the grid can only improve or preserve the minimum successful tuning-validation objective when the old candidates remain available. The refitted validation score and the public test score can both worsen. The tuning subset, full refit, and evaluation distribution are different objects. We therefore retain failed cells, selected settings, boundary flags, and all final candidate scores. The completed sensitivity tables show whether the original conclusions survive this broader search, including any deterioration."
         }
       ]
     }

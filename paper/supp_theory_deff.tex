@@ -60,11 +60,12 @@ The learned neural features and nonlinear kernel matrices in the experiments
 are not covered by those assumptions. In particular, a bulk-and-outlier
 spectral shape alone does not establish a Mar\v{c}enko--Pastur limit or
 identify which eigenvectors carry predictive signal. The finite-matrix trace
-identity remains valid without either claim. Figure~\ref{fig:spectra} uses
-that identity for the Mat\'ern Gram matrix on the loads: at the selected
-nugget, its effective dimension is a few hundred out of 19000. This is the
-trace of the fitted smoother; it neither certifies generalization nor reduces
-the cubic cost of its dense factorization.
+identity remains valid without either claim. Figure~\ref{fig:spectra} applies
+it to a separate $6000$-row subsample of the structural-mechanics training
+design. At the diagnostic's fixed nugget $10^{-5}$, its effective dimension
+is $103.12$. This is the trace of that subsample smoother, not a measurement
+of the full $19000$-row deployed fit. The trace neither certifies generalization
+nor reduces the cubic cost of a dense factorization.
 
 The effective dimension also determines the sum of the training-point
 posterior variances. Writing $A=K+n\lambda I$, their sum is

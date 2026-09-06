@@ -54,12 +54,19 @@ def main():
         python=platform.python_version(),numpy=np.__version__,scipy=scipy.__version__,
         stages=[])
     def checkpoint(stage):
-        busy=cpu_sample()
-        record['stages'].append(dict(stage=stage,cpu_busy_percent=busy,
-            elapsed_seconds=time.time()-begun,at=datetime.now(timezone.utc).isoformat()))
-        (a.out/'status.json').write_text(json.dumps(record,indent=2)+'\n')
-        if busy>=90:
-            raise RuntimeError('CPU pressure: diagnostic stopped before '+stage)
+        until=time.monotonic()+900
+        while True:
+            busy=cpu_sample()
+            record['status']='RUNNING' if busy<90 else 'WAITING_FOR_HEADROOM'
+            record['stages'].append(dict(stage=stage,cpu_busy_percent=busy,
+                elapsed_seconds=time.time()-begun,at=datetime.now(timezone.utc).isoformat()))
+            (a.out/'status.json').write_text(json.dumps(record,indent=2)+'\n')
+            if busy<90:return
+            if time.monotonic()>=until:
+                record['status']='STOPPED_FOR_PRESSURE'
+                (a.out/'status.json').write_text(json.dumps(record,indent=2)+'\n')
+                raise RuntimeError('No headroom within 15 minutes before '+stage)
+            time.sleep(15)
     checkpoint('input')
     paths={name:a.data/(name+'.npy') for name in ('loads','idx_train')}
     record['input_files']={name:dict(name=p.name,sha256=sha(p)) for name,p in paths.items()}

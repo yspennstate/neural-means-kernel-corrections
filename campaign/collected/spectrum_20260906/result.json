@@ -1,0 +1,92 @@
+{
+  "kind": "new_subsample_spectrum_diagnostic",
+  "started_at": "2026-09-06T01:24:20.720611+00:00",
+  "source_sha256": "178c3fe7e33b31bdda1a2815c31b10941948d06ee0d7b2f4ce17cea3a2d06fc7",
+  "n_training": 19000,
+  "n_subsample": 6000,
+  "split_seed": 0,
+  "subsample_rng_seed": 0,
+  "median_subset_size": 2000,
+  "median_multiplier": 4.0,
+  "nugget": 1e-05,
+  "kernel": "Matern 5/2 on training-standardized recorded loads",
+  "parameter_status": "Fixed diagnostic parameters matching runs/hyb_uq.json; no new selection",
+  "full_deployed_smoother": false,
+  "historical_array_recovered": false,
+  "python": "3.10.12",
+  "numpy": "2.2.6",
+  "scipy": "1.15.3",
+  "stages": [
+    {
+      "stage": "input",
+      "cpu_busy_percent": 71.414355019281,
+      "elapsed_seconds": 2.011425733566284,
+      "at": "2026-09-06T01:24:22.732040+00:00"
+    },
+    {
+      "stage": "Gram matrix",
+      "cpu_busy_percent": 72.23743155798905,
+      "elapsed_seconds": 4.875538349151611,
+      "at": "2026-09-06T01:24:25.596153+00:00"
+    },
+    {
+      "stage": "eigenvalues",
+      "cpu_busy_percent": 80.22648083623693,
+      "elapsed_seconds": 10.151395320892334,
+      "at": "2026-09-06T01:24:30.872004+00:00"
+    },
+    {
+      "stage": "independent Cholesky trace",
+      "cpu_busy_percent": 75.27615737867693,
+      "elapsed_seconds": 83.79525518417358,
+      "at": "2026-09-06T01:25:44.515868+00:00"
+    }
+  ],
+  "status": "COMPLETE",
+  "input_files": {
+    "loads": {
+      "name": "loads.npy",
+      "sha256": "8baf46f02fcbab5e809344c6a62aa81ea23e8b0f6f2bfdedd9b7fa07b9e73464"
+    },
+    "idx_train": {
+      "name": "idx_train.npy",
+      "sha256": "09de6da025d690ddbbd693e368445db1d02eca8e8b98e91d32656f0e109a23e0"
+    }
+  },
+  "median_distance": 8.193651624044596,
+  "length_scale": 32.774606496178386,
+  "design_sha256": "7aacc87473849e670dc9566e2dda0e48acf900e4bddf49f2e620d1dd1bd6f507",
+  "gram_trace": 6000.0,
+  "gram_frobenius_squared": 31983878.807220258,
+  "eigenvalue_min": 1.154808995096497e-06,
+  "eigenvalue_max": 5653.198205329928,
+  "spectral_effective_dimension": 103.11885064181605,
+  "direct_effective_dimension": 103.11885064179933,
+  "trace_check_absolute_difference": 1.6726175999792758e-11,
+  "modes_for_99_percent_trace": 8,
+  "spectrum_sha256": "c88843fd07bac9ebd32fd23f10dbbc82ef9b6d9e0fbfd044c690430c04f065bf",
+  "thread_pools": [
+    {
+      "user_api": "blas",
+      "internal_api": "openblas",
+      "num_threads": 1,
+      "prefix": "libscipy_openblas",
+      "filepath": "/home/yitz/nmkc_venv/lib/python3.10/site-packages/numpy.libs/libscipy_openblas64_-56d6093b.so",
+      "version": "0.3.29",
+      "threading_layer": "pthreads",
+      "architecture": "Haswell"
+    },
+    {
+      "user_api": "blas",
+      "internal_api": "openblas",
+      "num_threads": 1,
+      "prefix": "libscipy_openblas",
+      "filepath": "/home/yitz/nmkc_venv/lib/python3.10/site-packages/scipy.libs/libscipy_openblas-68440149.so",
+      "version": "0.3.28",
+      "threading_layer": "pthreads",
+      "architecture": "Haswell"
+    }
+  ],
+  "elapsed_seconds": 111.7083649635315,
+  "finished_at": "2026-09-06T01:26:12.428976+00:00"
+}

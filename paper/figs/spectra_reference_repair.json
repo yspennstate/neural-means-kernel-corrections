@@ -1,5 +1,7 @@
 {
   "kind": "editorial_vector_pdf_reference_repair",
+  "status": "SUPERSEDED_BY_NUMERICAL_REGENERATION_20260906",
+  "current_figure_provenance": "spectra_provenance.json",
   "input_sha256": "d870b6b3aa0adff290a9acb9439e7a308dbd408a7da011fe5ab721320c51a339",
   "output_sha256": "570cb9121c0cf46e6d840fb8120fdc21e9154e62764e7ed1379774b612f0452d",
   "font_sha256": "3fdf69cabf06049ea70a00b5919340e2ce1e6d02b0cc3c4b44fb6801bd1e0d22",

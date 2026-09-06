@@ -1,6 +1,68 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
-## Current checkpoint: September 6, 04:14 Jerusalem
+## Current checkpoint: September 6, 04:48 Jerusalem
+
+The new 6000-row spectrum diagnostic is COMPLETE and independently checked.
+Caltech retry PID 220481 ran one nice-15 thread, 111.708 seconds, ending
+04:26:12. No jobs or queue remain; all three DGX claims released at 04:41.
+Result SHA 722364feaf2e51214468d037783dee7de3b927339036d7d572002f1f2b2ac38f;
+design SHA 7aacc87473849e670dc9566e2dda0e48acf900e4bddf49f2e620d1dd1bd6f507;
+spectrum SHA c88843fd07bac9ebd32fd23f10dbbc82ef9b6d9e0fbfd044c690430c04f065bf.
+Files are in campaign/collected/spectrum_20260906. Producer SHA
+178c3fe7e33b31bdda1a2815c31b10941948d06ee0d7b2f4ce17cea3a2d06fc7.
+The original failed attempt is preserved remotely; the successful retry used
+output_retry1 and a separately named source file, never overwriting that run.
+
+Effective dimension: spectral 103.11885064181605, direct Cholesky trace
+103.11885064179933, absolute difference 1.6726e-11. Root independently verified
+all hashes, generator replay, row identities, standardization, math.fsum and
+Stieltjes sums. Seven modes carry 98.8986408194% of trace; eight 99.0207797681%.
+The leading eigenvalue is 94.21997% of trace, consistent with an independently
+computed sample mean kernel 0.943438 at the broad fixed length scale. Receipt:
+.local-verification/spectrum_author_check_0434.json. This is a new subsample
+diagnostic, never a full-design or recovered-historical-array claim.
+
+fig_spectrum_diagnostic.py produced spectra.pdf SHA
+6d9c341ce48ee0a4e80238891fa0e636f6098c6933ef82b73b6f99f191892ae2.
+Both spectrum and revised Fourier figures were inspected at native full size.
+Both R08 findings are corrected in working source, pending rebuilt-paper and
+independent reassessment. The old label-only repair metadata is marked superseded.
+The spectrum methods and figure provenance have dedicated README documents.
+Paper build 08 launcher 41084 refused initial admission at 04:43:04 (CPU 95%);
+no build directory was created. build_pair.py now waits at most ten minutes
+for headroom before making a fresh build directory; relaunch is next.
+
+Original panel still has six votes: five YES and reviewer08 NO. Reviewer04
+continues in native 48636. Reviewer09's partial suspension was finally resumed
+by exact handle for code host 32304 and parent 48388 at 04:31; its events grew
+to 1.7 MB by 04:37. Both controllers are dead. Root must monitor these readers
+and launch 05 and 10 once each afterward. The five fault-injection controls in
+.local-verification/test_reader_controls.py PASS for denied/reused children,
+preserved pending resume, and no double-resume of a parent. Never use the old
+controller process to infer that another referee will start automatically.
+
+Chapter08 completed: 19273 frames, 19273/30 seconds, 1399 frozen inputs,
+21 narrations and all 21 waveform comparisons PASS. Movie SHA
+da87e225b9ab0a215094059fcc0051c082d3bfae0088f8dd31bac562c7249713;
+input SHA fef7991f384a51cb834c8aeafd08e4d2d23315985f07aca4a3e12be84189b481.
+Its 21 frames remain uninspected. Chapter09 is rendering, launcher24568 /
+Manim13864, CPU14, build20260906T042135_chapter09_final. It has experienced
+pressure pauses/delays; inspect live progress rather than launching a duplicate.
+Nine chapter07 end frames inspected (residual, coefficients, singular boards).
+Only residual endpoint labels need an outward shift so far; now fixed in source.
+All other chapter07 frames remain. Replacements now include chapter07 too.
+
+Brain recall and complete audiobook-ASR node read confirmed transcription as
+a distinct content check, not listening. C:/Users/owner/audiobook/verify_audio_content.py
+is the earlier implementation. A faster-whisper-small model is cached locally;
+system Python 3.14 and the Manim 3.14 venv lack faster_whisper/ctranslate2.
+No ASR runtime installed or transcription launched yet. Official faster-whisper
+README checked. Do not equate waveform identity or ASR with human listening.
+
+Latest verified push 9c019e1a0076f12ee1478450f47bfd54a52bad7d at 04:18.
+Root pulse 04:39:19, claims through05:24:19. Continue through12:55.
+
+## Historical checkpoint: September 6, 04:14 Jerusalem
 
 Publication blockers are being corrected, not closed. fig_floor.py now uses
 only the five rounded archived sweep pairs, with no theorem boundary or

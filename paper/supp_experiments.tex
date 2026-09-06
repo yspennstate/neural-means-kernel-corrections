@@ -109,24 +109,34 @@ whose correlation is $0.01$.}
 
 \subsection{Spectra and effective dimension}
 \label{sec:spectra}
-Figure~\ref{fig:spectra} shows the spectrum of the Mat\'ern Gram matrix on the
-loads and the effective dimension $d_{\mathrm{eff}}(\lambda)$ from the identity
-of Lemma~\ref{lem:deff}. A few hundred eigenvalues carry most of the mass,
-with a tail many orders of magnitude below the leading modes. At the selected
-nugget the effective dimension is a few hundred out of $n=19000$.
-This is a summary of the regularized smoothing matrix, not a generalization
-guarantee for the selected estimator. The positive nugget means the correction
-is a ridge fit rather than an interpolant. The dense factorization still
-performs its full cubic computation regardless of this spectral concentration.
+Figure~\ref{fig:spectra} reports a separate diagnostic on $6000$ rows sampled
+without replacement from the $19000$ training rows. The load coordinates are
+standardized using the full training design. The Mat\'ern-$5/2$ length scale
+is fixed at four times the median distance on a $2000$-row training subsample,
+and the marked nugget is $10^{-5}$. These match the parameters recorded for
+the earlier hybrid diagnostic; they are not a new selection or the parameters
+of every deployed correction. The split and sampling generators both use seed~0.
+
+The leading eight eigenvalues carry $99\%$ of the trace, while
+$d_{\mathrm{eff}}(10^{-5})=103.11885$. Spectral mass and effective dimension
+summarize different aspects of the matrix: the latter counts each mode with
+weight $\mu_i/(\mu_i+6000\lambda)$. An independent Cholesky calculation of
+$6000-6000\lambda\operatorname{tr}\big((K_S+6000\lambda I)^{-1}\big)$ agrees with the
+eigenvalue sum to $1.7\times10^{-11}$. The selected rows, normalization,
+eigenvalues and generation record are retained under
+\path{campaign/collected/spectrum_20260906}. This regenerated diagnostic
+does not measure the full deployed smoother. Its spectral concentration also
+does not reduce the cubic work of the dense factorization used here.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figs/spectra.pdf}
-\caption{Left: eigenvalues of the Mat\'ern Gram matrix $K/n$ on the loads
-(log scale); the spectrum decays by many orders of magnitude within a few
-hundred modes. Right: the effective dimension $d_{\mathrm{eff}}(\lambda)$ from
-the exact identity of Lemma~\ref{lem:deff}, with the validation-selected nugget
-marked.}
+\caption{A regenerated $6000$-row training-subsample diagnostic with the fixed
+kernel parameters specified in the text. Left: eigenvalues of $K_S/6000$
+on a log scale. Right: the effective dimension from Lemma~\ref{lem:deff};
+the marker at the fixed nugget $10^{-5}$ gives $103.12$. Both panels describe
+this subsample matrix. The eigenvalues and an independent direct trace check
+are included in the numerical record.}
 \label{fig:spectra}
 \end{figure}
 

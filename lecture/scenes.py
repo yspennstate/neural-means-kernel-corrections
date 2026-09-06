@@ -764,6 +764,8 @@ def build_visual(spec):
             label = formula(str(x),18,DIM).next_to(ax.c2p(x,0),DOWN,buff=.12)
             if x == 0:
                 label.shift(.18*LEFT)
+            elif kind == "residual_function":
+                label.shift(.22*LEFT if x < 0 else .22*RIGHT)
             labels.add(label)
         group = VGroup(ax,curves,labels)
         return group,[lambda:Indicate(curves[0]),lambda:Indicate(curves[1]),lambda:Indicate(curves[2])]

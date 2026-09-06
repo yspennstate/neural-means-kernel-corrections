@@ -928,6 +928,10 @@ def build_visual(spec):
                         formula(r"r", 30, GOLD).next_to(r.get_end(), RIGHT, buff=.1),
                         formula(r"|\langle r,g_u\rangle|=\rho\|g_u\|\,|\cos\theta|", 27, INK, 6.2).move_to([2.6, -2.4, 0]))
         group = VGroup(ball, fixed, r, projection, labels)
+        if v.get("align_first", False):
+            return group, [lambda: AnimationGroup(Transform(r, target), FadeOut(projection),
+                               labels[2].animate.next_to(target.get_end(), RIGHT, buff=.1)),
+                           lambda: Indicate(ball, color=BLUE), lambda: Indicate(r, color=GOLD)]
         return group, [lambda: Indicate(projection), lambda: Indicate(ball, color=BLUE),
                        lambda: AnimationGroup(Transform(r, target), FadeOut(projection),
                            labels[2].animate.next_to(target.get_end(), RIGHT, buff=.1))]
@@ -960,7 +964,7 @@ def build_visual(spec):
                         formula(r"+\rho P_0", 27, GOLD).next_to(b, UP, buff=.2),
                         formula(r"\psi", 31, RED).next_to(psi, DOWN, buff=.15),
                         formula(r"2\rho P_0", 28, INK).next_to(total, DOWN, buff=.18),
-                        small_label("At least one error is half the separation", [2.6, -2.25, 0], 25))
+                        small_label("The larger error is at least half the separation", [2.6, -2.25, 0], 25))
         group = VGroup(line, a, b, psi, dist_left, dist_right, total, labels)
         return group, [lambda: Indicate(psi, color=RED), lambda: Indicate(total),
                        lambda: AnimationGroup(psi.animate.move_to(mid),

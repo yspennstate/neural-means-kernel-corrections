@@ -1,6 +1,39 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
-## Current checkpoint: September 6, 05:15 Jerusalem
+## Current checkpoint: September 6, 05:49 Jerusalem
+
+Original eight votes unchanged (six YES, two NO). Root hash verification of
+the complete 04/09 reports and both 09 findings passed at05:21; all 60 cited
+pins matched. Native readers04 and09 have now exited (OpenProcess error87).
+05 controller17120/native49128 and10 controller25312/native45344 continue;
+10 is intermittently pressure-paused. Do not duplicate either reader.
+
+Build09 completed successfully:34-page main and51-page supplement, zero
+unresolved references or overfull boxes. All85 pages rendered in pdf-qa-09;
+main pixels match build07. Root inspected supplement13–29 and45–51 at full
+resolution. Two awkward line breaks were fixed afterwards. Build10 now
+runs under launcher36568/Perl7660, CPU15, in final-build-10; preserve09.
+
+Chapter07 all27 frames inspected; new repairs at05:26 align the equality
+picture with the first proof step, replace slash fractions, and clarify the
+posterior comparison and zero-nugget lower-bound scope. No narration changed.
+Its visual receipt is CORRECTIONS_REQUIRED, not an accepted final chapter.
+Chapter08 first6 native frames inspected; remainder and09 await inspection.
+Chapter09 audio comparison passed all15 segments. Chapter10 still renders
+under41508/53552, CPU14. Replacement list02–07 and12 remains pending.
+
+ASR CPU probe completed three passages (81.888seconds). Its disagreements
+are two fibre/fiber spellings and one the/a article; no missing mathematics
+in this small sample. Full lecture content screening remains pending.
+The executed CPU checker is preserved privately as
+verify_narration_content_cpu_0521.py. The current public checker adds an
+explicit CUDA option with pinned cuBLAS12/cuDNN9 libraries and fresh GPU
+headroom checks. A bounded GPU probe is the next action, not yet validated.
+
+Latest verified push f380afce9cfc89b6a0f43dbcef441c559423dd1a at05:21.
+Root pulse05:46:43, leases through06:31:43. Continue through12:55 Jerusalem.
+
+## Historical checkpoint: September 6, 05:15 Jerusalem
 
 Original panel now has eight votes: six YES (01,02,03,04,06,07), two NO
 (08,09). Complete 04 and 09 reports/verdicts read by root; their evidence pins

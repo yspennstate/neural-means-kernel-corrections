@@ -17,6 +17,7 @@ import xml.etree.ElementTree as ET
 
 import psutil
 from compute_admission import health
+from ffmpeg_writer import require_gpu_observation
 
 HERE = Path(__file__).resolve().parent
 PYTHON = Path(r"C:\Users\owner\lecture\venv\Scripts\python.exe")
@@ -90,6 +91,7 @@ def main():
                        creationflags=0x08000000, timeout=150)
     assert_owned(HERE)
     if args.encoder == 'h264_nvenc':
+        require_gpu_observation()
         if args.quality not in ('draft', 'final'):
             raise ValueError('Still frames have no video encoding stage')
         mesh = Path(r'C:\Users\owner\ai-memories-and-functionality\12_cognitive_architecture\agent_mesh\agent_mesh.py')
@@ -253,8 +255,11 @@ def main():
             stop.wait(.015)
     start = time.perf_counter()
     watcher = threading.Thread(target=poll, daemon=True); watcher.start()
+    gpu_safety_stop = None
     try:
         with (log_dir / (tag + "_render.log")).open("w", encoding="utf-8") as log:
+            if args.encoder == 'h264_nvenc':
+                require_gpu_observation()
             proc = subprocess.Popen(command, cwd=build, env=env, stdout=log, stderr=subprocess.STDOUT,
                                     creationflags=0x08000000 | 0x4000 | 0x4)
             resumed = False
@@ -269,11 +274,40 @@ def main():
                 if not resumed:
                     proc.kill()
                     proc.wait()
-            proc.wait()
+            while proc.poll() is None:
+                if args.encoder == 'h264_nvenc':
+                    try:
+                        require_gpu_observation()
+                    except RuntimeError as error:
+                        gpu_safety_stop = str(error)
+                        assert_owned(build)
+                        assert_owned('topic:gpu-workload/MATH-ROSS20/'+args.agent)
+                        # These handles descend from the specific process we
+                        # launched. Never search for unrelated Python encoders.
+                        owned_children = child.children(recursive=True)
+                        for process in owned_children+[child]:
+                            try:
+                                if process.name().lower() == 'python.exe':
+                                    process.suspend()
+                            except psutil.NoSuchProcess:
+                                pass
+                        for process in reversed(owned_children+[child]):
+                            try:
+                                if process.name().lower() != 'conhost.exe':
+                                    process.terminate()
+                            except psutil.NoSuchProcess:
+                                pass
+                        proc.wait(timeout=30)
+                        break
+                try:
+                    proc.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    pass
     finally:
         stop.set(); watcher.join()
     intervals = samples[1:]
     receipt = {"command": command, "encoder": args.encoder, "writer": args.writer, "returncode": proc.returncode, "affinity_mask": mask,
+               "gpu_safety_stop": gpu_safety_stop,
                "build_directory": str(build), "input_manifest_sha256": hashlib.sha256(
                    (build/"input_manifest.json").read_bytes()).hexdigest(),
                "elapsed_seconds": time.perf_counter()-start, "visibility_samples": len(samples),

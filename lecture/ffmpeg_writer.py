@@ -4,6 +4,7 @@ Frozen waits send one RGBA frame and an exact repetition count to FFmpeg.
 Animations send every distinct frame. No shared Manim installation is edited.
 """
 from fractions import Fraction
+from datetime import datetime, timezone
 import hashlib
 import inspect
 import json
@@ -16,6 +17,39 @@ import numpy as np
 FFMPEG = Path(r'C:\Users\owner\tools\ffmpeg-7.1.1\bin\ffmpeg.exe')
 FFMPEG_SHA256 = '2ce797a0f88d7f067180338fb227f7b1928ea727bd9a4d7a1d022f7c52af71a3'
 WRITER_SHA256 = '66ffdee7bc6d2b62e3b135c8d0a7e66dff607c5ea6994ad1e413cde683f6ba7f'
+GPU_OBSERVER = Path.home()/'.claude/compute/cpu_gpu_postboot_20260905/live/snapshot.json'
+
+
+def gpu_observation_reasons(record, now):
+    """Fail closed on a stale/incomplete fault observer, regardless of utilization."""
+    if not isinstance(record, dict):
+        return ['GPU observer is not an object']
+    reasons = []
+    try:
+        stamp = datetime.fromisoformat(record['observed_at'])
+        if stamp.tzinfo is None or not 0 <= now-stamp.timestamp() <= 120:
+            reasons.append('GPU driver observation is stale or invalid')
+    except (KeyError, TypeError, ValueError, OverflowError):
+        reasons.append('GPU driver observation time is invalid')
+    if record.get('event_query_complete') is not True:
+        reasons.append('GPU driver event coverage is incomplete')
+    if record.get('gpu_reset_latched') is not False:
+        reasons.append('GPU driver fault is latched or unknown')
+    guard = record.get('guard_health')
+    if not isinstance(guard, dict) or guard.get('status') != 'healthy':
+        reasons.append('CPU guard observation is unverified')
+    return reasons
+
+
+def require_gpu_observation():
+    try:
+        record = json.loads(GPU_OBSERVER.read_text(encoding='utf-8-sig'))
+    except (OSError, ValueError) as error:
+        raise RuntimeError('GPU observer unavailable: '+type(error).__name__) from error
+    reasons = gpu_observation_reasons(record, datetime.now(timezone.utc).timestamp())
+    if reasons:
+        raise RuntimeError('; '.join(reasons))
+    return record['observed_at']
 
 
 def mux_narration(video, audio, output, seconds):
@@ -51,8 +85,12 @@ class Partial:
         self.frozen = False
         self.log = None
         self.started = time.perf_counter()
+        self.last_gpu_check = 0.0
 
     def put(self, frame, count):
+        if self.codec == 'h264_nvenc' and (self.process is None or time.monotonic()-self.last_gpu_check >= 1):
+            require_gpu_observation()
+            self.last_gpu_check = time.monotonic()
         if not isinstance(frame, np.ndarray) or frame.dtype != np.uint8:
             raise ValueError('Expected uint8 Cairo RGBA frame')
         if frame.shape != (self.height, self.width, 4) or count < 1 or int(count) != count:

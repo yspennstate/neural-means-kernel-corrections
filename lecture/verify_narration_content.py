@@ -86,6 +86,7 @@ def main():
     parser.add_argument('--device',choices=['cpu','cuda'],default='cpu')
     parser.add_argument('--cuda-library',type=Path)
     parser.add_argument('--limit',type=int)
+    parser.add_argument('--key', action='append', help='Exact recording key to screen; may be repeated for a correction pass')
     parser.add_argument('--resume',action='store_true')
     args=parser.parse_args()
     if args.cpu not in [4,5,6,7,8,9,14,15]:raise ValueError('Outside background partition')
@@ -112,6 +113,14 @@ def main():
                 rows.append(dict(chapter=chapter_id,key=key,script=segment['say'],
                     chapter_sha256=sha(path),audio=str(audio),audio_sha256=sha(audio),
                     synthesis_identity=identity(segment['say']),seconds=seconds))
+    if args.key is not None:
+        if len(args.key) != len(set(args.key)):
+            raise ValueError('Duplicate selected recording key')
+        available = {row['key'] for row in rows}
+        missing = set(args.key) - available
+        if missing:
+            raise ValueError('Selected keys absent from the explicit chapters: '+str(sorted(missing)))
+        rows = [row for row in rows if row['key'] in set(args.key)]
     if args.limit is not None:
         if args.limit<1:raise ValueError('Limit must be positive')
         rows=rows[:args.limit]

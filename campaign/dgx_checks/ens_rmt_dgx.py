@@ -1,5 +1,7 @@
-"""Sixty-predictor per-pixel stacks with regularization chosen by GCV, leave-one-out and the
-Marchenko-Pastur edge: the ensemble-weighting study on the structural-mechanics pool.
+"""Corrected ensemble-weighting study on the structural-mechanics pool.
+
+This candidate has not reproduced the retained real-data results. It repairs
+fold selection and small-calibration PCR scoring and writes a distinct record.
 
 Paper 1 found that a per-pixel affine stack over the SIX ten-seed means (4.556) beats the same stack
 over all SIXTY predictors (4.682): sixty-one weights per pixel from a thousand calibration cases
@@ -12,20 +14,28 @@ per-pixel regression recovers, or beats, the six-mean stack from the sixty:
   sixty_ridge_loo       the same with the exact leave-one-out error
   sixty_ridge_pixgcv    a ridge per pixel by GCV
   sixty_pcr_mp          per-pixel principal-component regression on the member-prediction covariance,
-                        keeping the components above the Marchenko-Pastur edge of the calibration covariance
-  sixty_shrink_global   per-pixel weights shrunk toward the global convex weights, shrinkage chosen by LOO
+                        with the inherited median-eigenvalue threshold heuristic (legacy field name)
+  sixty_shrink_global   per-pixel weights shrunk toward global convex weights, fraction chosen by nested five-fold CV
   sixty_ridge_lw        per-pixel weights from the Ledoit-Wolf shrunk Gram
   sixty_rie             per-pixel weights from the rotationally invariant (nonlinear shrinkage) covariance estimator
   _small_calibration    the same estimators with 120 and 300 calibration rows (q = 0.5, 0.2), five draws each
 
 All weights are fitted on the calibration half of the test block (1000 cases, split seed 20260902 as in
 seedarch.py) and every number is read on the evaluation half (19000). Runs on the DGX over
-~/nmkc2/seeds/sm_s*/runs/*_predte.npy. Writes results/sm_ens_rmt.json.
+~/nmkc2/seeds/sm_s*/runs/*_predte.npy. Writes results/sm_ens_rmt_corrected_v1.json
+using exclusive creation. The historical sm_ens_rmt.json is never overwritten.
 """
-import glob, json, os, time
+import glob, hashlib, json, os, time
 import numpy as np
 
 ROOT = os.path.expanduser("~/nmkc2")
+OUTPUT_PATH = ROOT + "/results/sm_ens_rmt_corrected_v1.json"
+if os.path.exists(OUTPUT_PATH):
+    raise FileExistsError(f"Corrected record already exists: {OUTPUT_PATH}")
+SOURCE_HASHES_AT_START = {}
+for source_name in (os.path.basename(__file__), "fold_selection.py"):
+    with open(os.path.join(os.path.dirname(__file__), source_name), "rb") as source_file:
+        SOURCE_HASHES_AT_START[source_name] = hashlib.sha256(source_file.read()).hexdigest()
 DATA = ROOT + "/data/structmech"
 t0 = time.time()
 stress = np.load(DATA + "/stress.npy"); ite = np.load(DATA + "/idx_test.npy")
@@ -181,8 +191,9 @@ lam_pix = lams[np.argmin(gpix, 0)]
 W = fit_pixel(P60c, Ycal, lam_pix); results["sixty_ridge_pixgcv"] = rel(apply_pixel(P60e, W), ev)
 results["_lam_pix_median"] = float(np.median(lam_pix))
 
-stage('pcr at the mp edge')
-# per-pixel PCR at the MP edge: covariance of the 60 member predictions across calibration cases, per pixel
+stage('pcr with inherited median-eigenvalue threshold heuristic')
+# This retained 2.858 covariance-eigenvalue multiplier is a heuristic, not a
+# claimed Marchenko-Pastur edge or a literal Gavish-Donoho singular-value rule.
 Xc = P60c.astype(np.float64) - P60c.astype(np.float64).mean(1, keepdims=True)   # (60, n, D)
 Xe = P60e.astype(np.float64) - P60c.astype(np.float64).mean(1, keepdims=True)
 kept, pred_ev = [], np.empty((len(ev), D_))
@@ -190,7 +201,7 @@ gamma = m_ / n_
 for dpx in range(D_):
     C = Xc[:, :, dpx] @ Xc[:, :, dpx].T / n_                     # (60, 60)
     w, V = np.linalg.eigh(C)
-    # noise level from the bulk median (Gavish-Donoho square-matrix rule adapted: median-based sigma^2 estimate)
+    # Retain the historical threshold numerically; qualify its interpretation.
     med = np.median(w); edge = 2.858 * med
     k = np.where(w > edge)[0]
     kept.append(len(k))
@@ -201,7 +212,8 @@ for dpx in range(D_):
 results["sixty_pcr_mp"] = rel(pred_ev, ev); results["_pcr_components_median"] = float(np.median(kept))
 
 stage('shrink toward global convex')
-# shrinkage toward the global convex weights (fitted on cal), amount by LOO over a grid
+# Final weights use all calibration rows. Candidate selection below refits both
+# weight systems and selects the ridge inside each training fold.
 from scipy.optimize import minimize
 Rn = (P60c.astype(np.float64) - Ycal[None]) / nte[cal][None, :, None]
 S = np.einsum("mnd,knd->mk", Rn, Rn) / n_
@@ -210,17 +222,9 @@ res = minimize(lambda z: z @ S @ z, np.ones(m_) / m_, jac=lambda z: 2 * S @ z, b
 wg = np.maximum(res.x, 0); wg /= wg.sum()
 Wg = np.concatenate([np.tile(wg, (D_, 1)), np.zeros((D_, 1))], 1)          # (D, 61), no intercept
 Wp = fit_pixel(P60c, Ycal, lam_l)
-best_s, best_e = 0.0, np.inf
-for s_ in np.linspace(0, 1, 21):
-    Wm = (1 - s_) * Wp + s_ * Wg
-    # LOO is not exact for the mixture; use a 5-fold split of cal instead
-    folds = np.array_split(np.random.default_rng(1).permutation(n_), 5); e = 0.0
-    for f_ in folds:
-        tr_ = np.setdiff1d(np.arange(n_), f_)
-        Wf = (1 - s_) * fit_pixel(P60c[:, tr_], Ycal[tr_], lam_l) + s_ * Wg
-        e += rel(apply_pixel(P60c[:, f_], Wf), cal[f_]) / 5
-    if e < best_e:
-        best_e, best_s = e, s_
+from fold_selection import select_shrinkage
+best_s, shrink_selection = select_shrinkage(P60c, Ycal, lams, n_splits=5, seed=1)
+results['_shrinkage_selection'] = shrink_selection
 Wm = (1 - best_s) * Wp + best_s * Wg
 results["sixty_shrink_global"] = rel(apply_pixel(P60e, Wm), ev); results["_shrink_s"] = best_s
 results["sixty_global_convex"] = rel(np.einsum("m,mnd->nd", wg, P60e), ev)
@@ -244,7 +248,8 @@ for ncal in (120, 300):
         out["ridge_pixgcv"] = rel(apply_pixel(P60e, fit_pixel(Pc_, Yc_, lams[np.argmin(gp, 0)])), ev)
         out["ridge_lw"] = rel(apply_pixel(P60e, ledoit_wolf_weights(Pc_, Yc_)[0]), ev)
         Wr_, rr = rie_weights(Pc_, Yc_); out["rie"] = rel(apply_pixel(P60e, Wr_), ev); out["_rie_change"] = rr["median_rel_change"]
-        out["pcr_mp"], out["_pcr_kept"] = pcr_mp_pred(Pc_, Yc_, P60e)
+        pcr_prediction, out["_pcr_kept"] = pcr_mp_pred(Pc_, Yc_, P60e)
+        out["pcr_mp"] = rel(pcr_prediction, ev)
         out["ols"] = rel(apply_pixel(P60e, fit_pixel(Pc_, Yc_, 1e-12)), ev)
         out["six_means_ridge1e-3"] = rel(apply_pixel(P6e, fit_pixel(P6c[:, rows], Yc_, 1e-3)), ev)
         for k, v in out.items():
@@ -253,6 +258,10 @@ for ncal in (120, 300):
     print("small-calibration regime", ncal, small[f"ncal{ncal}"], f"[{(time.time()-t0)/60:.1f} min]", flush=True)
 results["_small_calibration"] = small
 os.makedirs(ROOT + "/results", exist_ok=True)
-json.dump(dict(results=results, lams=[float(x) for x in lams], gcv=[float(x) for x in g], loo=[float(x) for x in l],
-               n_cal=len(cal), n_ev=len(ev), minutes=(time.time() - t0) / 60), open(ROOT + "/results/sm_ens_rmt.json", "w"), indent=1)
-print("wrote results/sm_ens_rmt.json", flush=True)
+with open(OUTPUT_PATH, "x") as result_file:
+    json.dump(dict(results=results, lams=[float(x) for x in lams], gcv=[float(x) for x in g], loo=[float(x) for x in l],
+                   n_cal=len(cal), n_ev=len(ev), minutes=(time.time() - t0) / 60,
+                   protocol="fold-refit-and-PCR-metric-correction-v1",
+                   source_sha256_at_start=SOURCE_HASHES_AT_START,
+                   pcr_threshold="inherited covariance-eigenvalue median multiplier 2.858; heuristic"), result_file, indent=1)
+print("wrote", OUTPUT_PATH, flush=True)

@@ -56,7 +56,7 @@ def flip(word):
                             "commit", "-q", "-m", f"DGX control: {word}"], capture_output=True, text=True)
         if r.returncode == 0 or "nothing to commit" in r.stdout + r.stderr:
             p = subprocess.run(["git", "-C", str(WT), "push", "-q", "origin", "f5/gpu-experiments-20260906"],
-                               capture_output=True, text=True, timeout=120)
+                               capture_output=True, text=True, timeout=600)   # this laptop under load pushes slowly
             log(f"control word {word} pushed" if p.returncode == 0 else f"push failed: {p.stderr.strip()[:200]}")
     except Exception as ex:  # noqa: BLE001
         log(f"flip {word}: git error {ex!r}")

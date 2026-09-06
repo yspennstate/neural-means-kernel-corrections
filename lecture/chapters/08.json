@@ -116,6 +116,7 @@
       "title": "Interpolation reaches the lower bound",
       "visual": {
         "kind": "minimax_interval",
+        "attainment": true,
         "label": "Interpolation attains the center of the indistinguishable zero-data pair",
         "source": "paper/theory.tex:thm:or and thm:minimax"
       },

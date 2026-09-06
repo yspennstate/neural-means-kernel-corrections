@@ -330,8 +330,19 @@ def build_visual(spec):
             parts.add(row); stages.append(row)
         labels=VGroup(small_label("Same seed, epochs and downstream choices",[2.65,-2.2,0],24),
                       formula(r"d_s=E_{s,\rm local}-E_{s,\rm pooled}",30,GOLD).move_to([2.65,-2.78,0]))
-        return VGroup(parts,labels),[lambda:Indicate(stages[0],color=BLUE),
-                lambda:Indicate(stages[1],color=GOLD),lambda:Indicate(labels[1],color=GOLD)]
+        group=VGroup(parts,labels)
+        original=group.copy()
+        fixed=RoundedRectangle(width=5.6,height=.8,corner_radius=.08,color=DIM).move_to([2.65,1.5,0])
+        fixed_text=small_label("Fixed mean, weights and kernel",fixed.get_center(),26,INK)
+        mismatch=VGroup(fixed,fixed_text)
+        for x,label,color in ((1.0,r"R_{\rm tr}",BLUE),(4.3,r"R_{\rm full}",GOLD)):
+            box=RoundedRectangle(width=2.2,height=.8,corner_radius=.08,color=color).move_to([x,-.1,0])
+            mismatch.add(Arrow([2.65,1.05,0],[x,.4,0],buff=.08,color=DIM),box,
+                formula(label,32,color).move_to(box))
+        mismatch.add(small_label("Replace only the correction labels",[2.65,-1.3,0],26),
+            formula(r"\widehat G_{\rm tr}-\widehat G_{\rm full}=c_\lambda^\top\Delta",30,GOLD,6.2).move_to([2.65,-2.3,0]))
+        return group,[lambda:Indicate(stages[0],color=BLUE),
+                lambda:Transform(group,mismatch),lambda:Transform(group,original)]
     if kind == "elastic_domain":
         square = Square(3.0, color=BLUE, fill_color=BLUE, fill_opacity=.09).move_to([2.5, .0, 0])
         fibre = Circle(.72, color=GOLD, fill_color=GOLD, fill_opacity=.22).move_to(square)
@@ -954,6 +965,7 @@ def build_visual(spec):
     if kind == "minimax_interval":
         left, right = np.array([-.05, .7, 0]), np.array([5.15, .7, 0])
         mid = (left+right)/2; prediction = mid+np.array([.9, 0, 0])
+        if spec.get("attainment", False): prediction = mid.copy()
         line = Line(left-np.array([.3, 0, 0]), right+np.array([.3, 0, 0]), color=DIM)
         a, b = Dot(left, radius=.1, color=GREEN), Dot(right, radius=.1, color=GOLD)
         psi = Dot(prediction, radius=.095, color=RED)
@@ -966,6 +978,15 @@ def build_visual(spec):
                         formula(r"2\rho P_0", 28, INK).next_to(total, DOWN, buff=.18),
                         small_label("The larger error is at least half the separation", [2.6, -2.25, 0], 25))
         group = VGroup(line, a, b, psi, dist_left, dist_right, total, labels)
+        if spec.get("attainment", False):
+            labels[2].become(formula(r"\psi=0", 29, RED).next_to(psi, DOWN, buff=.18))
+            return group, [lambda: Indicate(psi, color=RED),
+                lambda: AnimationGroup(Indicate(dist_left), Indicate(dist_right)),
+                lambda: AnimationGroup(a.animate.move_to(mid), b.animate.move_to(mid),
+                    FadeOut(dist_left), FadeOut(dist_right), FadeOut(total),
+                    FadeOut(labels[0]), FadeOut(labels[1]),
+                    Transform(labels[3], formula(r"P_0(u)=0", 29, INK).move_to([2.6, -1.2, 0])),
+                    Transform(labels[4], small_label("No unresolved query component remains", [2.6, -2.25, 0], 25)))]
         return group, [lambda: Indicate(psi, color=RED), lambda: Indicate(total),
                        lambda: AnimationGroup(psi.animate.move_to(mid),
                            labels[2].animate.next_to(mid, DOWN, buff=.25),
@@ -974,18 +995,18 @@ def build_visual(spec):
     if kind == "nugget_factors":
         ax = axes(x=(0, 2, .5), y=(0, 11, 2), width=5.4, height=3.5).move_to([2.6, .3, 0])
         # For phi(x)=(1,0), phi(u)=(3,2), n=1:
-        interpolation = ax.plot(lambda l: 4., x_range=[0, 2], color=BLUE, stroke_width=3)
-        exact = ax.plot(lambda l: 4+9*(l/(1+l))**2, x_range=[0, 2], color=GOLD, stroke_width=3)
-        posterior = ax.plot(lambda l: 13-9/(1+l), x_range=[0, 2], color=GREEN, stroke_width=3)
+        interpolation = ax.plot(lambda l: 4., x_range=[0, 2, .02], use_smoothing=False, color=BLUE, stroke_width=3)
+        exact = ax.plot(lambda l: 4+9*(l/(1+l))**2, x_range=[0, 2, .02], use_smoothing=False, color=GOLD, stroke_width=3)
+        posterior = ax.plot(lambda l: 13-9/(1+l), x_range=[0, 2, .02], use_smoothing=False, color=GREEN, stroke_width=3)
         labels = VGroup(formula(r"\lambda", 27, INK).next_to(ax, DOWN, buff=.32),
                         small_label("Squared geometric factors", [2.6, 2.5, 0], 27),
                         formula(r"P_0^2", 25, BLUE).move_to([.0, -2.35, 0]),
                         formula(r"\widetilde P_\lambda^2", 25, GOLD).move_to([2.3, -2.35, 0]),
                         formula(r"P_\lambda^2", 25, GREEN).move_to([4.8, -2.35, 0]))
         for x in (0, .5, 1, 1.5, 2):
-            labels.add(formula(f"{x:g}", 19, DIM).next_to(ax.c2p(x, 0), DOWN, buff=.1))
+            labels.add(formula(f"{x:g}", 19, DIM).next_to(ax.c2p(x, 0), DOWN, buff=.16))
         for y in (0, 2, 4, 6, 8, 10):
-            labels.add(formula(str(y), 19, DIM).next_to(ax.c2p(0, y), LEFT, buff=.1))
+            labels.add(formula(str(y), 19, DIM).next_to(ax.c2p(0, y), LEFT, buff=.18))
         point = Dot(ax.c2p(.5, 5), color=INK, radius=.065)
         group = VGroup(ax, interpolation, exact, posterior, labels, point)
         return group, [lambda: Indicate(exact, color=GOLD), lambda: Indicate(posterior, color=GREEN),

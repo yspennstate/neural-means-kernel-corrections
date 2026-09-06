@@ -112,10 +112,10 @@
     },
     {
       "key": "c09_paired",
-      "title": "Retrain the downstream stages in matched pairs",
+      "title": "The two paired checks change different parts of prediction",
       "visual": {
         "kind": "paired_protocol",
-        "label": "Two centering arms at each of ten fixed seeds; downstream refitting is repeated in both",
+        "label": "Centering refits downstream stages; the mismatch check changes only correction labels",
         "source": "paper/implementation_sensitivity.tex; campaign/run_centering_campaign.py"
       },
       "visual_argument": "Parallel paths differ at one declared intervention, then pass through the same downstream fitting stages.",

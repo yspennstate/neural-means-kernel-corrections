@@ -1,6 +1,57 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
-## Current checkpoint: September 6, 05:49 Jerusalem
+## Current checkpoint: September 6, 06:22 Jerusalem
+
+Build10 passed and its two PDFs are now copied into paper/main.pdf and
+paper/supplement.pdf. Main34pages SHA
+90964fff9661d445ccfd7853f01ff094dea77f674fe2b17442614f5f7bf7938f;
+supplement51pages SHA
+90bffabb4108eeb679e33dbc0380c39826e7b781072f726bc559bf8919fb3d35.
+Build source-manifest SHA
+69b3b26d4ef54385ca9c49d6250d6cad929498ca3edd61cb4801f89e85ef864c.
+Both final nmkc-*.log files have no overfull/undefined/error match. All85
+pages rendered in pdf-qa-10; main pixels unchanged, supplement only15/25
+changed from09. Root inspected both at full resolution and accepted the
+typography. QA manifest SHA
+9dbc02e137092c68a8926b81790fee6c26ba3ae744126a4287ea8b15032ebeaa.
+The build's no-flash observation is INCONCLUSIVE (max gap668.95ms).
+
+Four driver-routing checks now pass: historical default, explicit paired
+modes with disjoint default paths, invalid mode rejection, and detection of
+an intentionally omitted forwarding argument. These execute actual command
+construction with stages stubbed; they are not another training run. The
+first test harness failed by removing newly imported NumPy modules while
+restoring sys.modules; the corrected harness restores only its fcntl stub.
+
+All21 chapter08 and15 chapter09 native end frames inspected. Their receipts
+are CORRECTIONS_REQUIRED: chapter08 needed a weak-inequality caption, centered
+interpolation and collapsed zero-uncertainty geometry, plus tick spacing;
+chapter09 needed a distinct fixed-predictor diagram at the mismatch step.
+Source repairs made; narration text unchanged. Replacements now02–09 and12.
+
+Chapter10 completed; media verification46944 began06:17. The active finite
+serial renderer controller is24268 (.local-verification/render_remaining_0615.py).
+It verifies10, then renders and mechanically verifies11,02–09,12 one at a
+time, with exact old TeX donors and CPUs14,15. No visual approval or delivery
+is automatic. Current renderer10 was moved from14 to14,15 using held native
+handles at06:12; receipt render10_affinity_1788664364.json records the exact
+four process births and verified masks. Do not duplicate these jobs.
+
+The GPU ASR probe completed all3 passages with transcripts identical to the
+CPU probe. Cold-start timings differ; no general speedup claim. No matching
+System4101/nvlddmkm event was returned in the05:45-to06:03 query. Full252-WAV
+ASR screening is now running under launcher37388 since06:03:52, CPU6/GPU,
+output lecture/out/asr_full_0604; reached chapter02 at06:19. Preserve all raw
+disagreements: many are spelled-number versus digit formatting. Text-bound
+WAV identity is checked; this is not human listening.
+
+Original review count remains8 (6YES,2NO), with05/10 still reviewing and
+temporarily pausing for pressure. All10 must vote on one corrected packet
+after their initial reports return. No author repair is independent closure.
+Latest verified push e296f84f05c7d0910c10c0178a7eae3c42abac42 at05:53.
+Root pulse06:09:24, leases through06:54:24. Continue through12:55 Jerusalem.
+
+## Historical checkpoint: September 6, 05:49 Jerusalem
 
 Original eight votes unchanged (six YES, two NO). Root hash verification of
 the complete 04/09 reports and both 09 findings passed at05:21; all 60 cited

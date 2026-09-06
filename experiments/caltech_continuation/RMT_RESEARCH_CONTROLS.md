@@ -1,0 +1,18 @@
+# RMT estimator controls to prepare before an authorized rerun
+
+This is a research plan and an exact algebraic observation. It does not report new structural-mechanics performance or identify another confirmed bug in the historical RIE result.
+
+The historical `rie_weights` denominator `abs(1 - q + q*z*g)**2` matches the finite-size form in Eq. (6.26) of Bun, Bouchaud and Potters. That review discusses near-zero eigenvalue bias and regularization in Section 8.1. Its illustrative bandwidth uses matrix dimension, whereas the retained code uses the number of calibration rows: after scaling by the mean eigenvalue, those bandwidths differ by a factor of `sqrt(q)`. This makes bandwidth and near-zero behavior useful controls; it does not establish that one value is best for this pool. [Primary review](https://arxiv.org/pdf/1610.08104).
+
+An improved covariance estimate does not by itself guarantee improved prediction when the sample predictor-target covariance is left unchanged. For centered data, let `S = X.T @ X / n` and `c = X.T @ y / n`. The retained regression construction is `w = cleaned_S^{-1} c`. In a noiseless linear relation `y = X beta`, the identity `c = S beta` holds. Replacing only `S` generally changes the exact-fit coefficient to `cleaned_S^{-1} S beta`.
+
+A finite counterexample is exact. Let the population predictor be uniform on `{-3, -1, 1, 3}` and let the target equal the predictor. A possible centered calibration sample is `{-1, 1}`. The sample covariance and cross-covariance are both 1, while the true covariance is 5. The raw fit has weight 1 and zero population squared error. Replacing its covariance by the exact population value while keeping sample cross-covariance 1 gives weight 1/5 and population squared error 16/5. This follows both by averaging the four residual squares and by `5 * (1/5 - 1)^2`. The covariance error improved to zero; the plug-in prediction error increased. This refutes a general implication, not a particular asymptotic RIE theorem or the empirical Caltech estimator. Supplying the true cross-covariance 5 as well restores weight 1.
+
+The useful full-data controls are therefore specific:
+
+- Preserve the original RIE formula and compare its covariance spectrum from float32 arithmetic with a float64 calculation on identical prediction values. Record negative eigenvalues, the scale of the smallest eigenvalues, and how often the lower floor is active.
+- Record the actual bandwidth, aspect ratio, covariance trace and eigenvalue scale; compare predeclared bandwidth conventions through training-only selection.
+- Compare prediction loss directly, with the unchanged empirical cross-covariance explicitly identified. Covariance Frobenius error and prediction error answer different questions. Cross-covariance cleaning is a separate literature and would require its own protocol. [Primary cross-covariance study](https://arxiv.org/abs/1901.05543).
+- Keep every selection choice inside the calibration folds and freeze the choices before evaluation. Repeated reuse of the retained 19,000-case evaluation block does not provide a fresh final confirmation merely because the internal folds are repaired.
+
+Streaming must preserve the whole-case norm and aggregate pixel contributions before selecting a global penalty or convex mixture. For the existing exact linear-smoother LOO convention, deleted-row refits retain the original `n * lambda` penalty mass; they do not silently substitute `(n - 1) * lambda`. The corrected helper already has a deleted-row control for that convention.

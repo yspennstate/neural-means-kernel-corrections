@@ -761,7 +761,10 @@ def build_visual(spec):
                 labels.add(formula(label,30,color).move_to([x,2.35,0]))
             labels.add(small_label("Toy functions of a scalar input", [2.6,-2.3,0],24))
         for x in (-3,0,3):
-            labels.add(formula(str(x),18,DIM).next_to(ax.c2p(x,0),DOWN,buff=.12))
+            label = formula(str(x),18,DIM).next_to(ax.c2p(x,0),DOWN,buff=.12)
+            if x == 0:
+                label.shift(.18*LEFT)
+            labels.add(label)
         group = VGroup(ax,curves,labels)
         return group,[lambda:Indicate(curves[0]),lambda:Indicate(curves[1]),lambda:Indicate(curves[2])]
     if kind == "feature_circle":
@@ -843,7 +846,8 @@ def build_visual(spec):
     if kind == "equicorrelation_curve":
         correlation = .6
         ax = axes(x=(1, 30, 10), y=(0, 1.1, .2), width=5.3, height=3.7).move_to([2.6,.15,0])
-        curve = ax.plot(lambda m: correlation+(1-correlation)/m, x_range=[1,30], color=GOLD, stroke_width=3)
+        ticks_at(ax.x_axis, (1, 10, 20, 30))
+        curve = ax.plot(lambda m: correlation+(1-correlation)/m, x_range=[1,30,.1], use_smoothing=False, color=GOLD, stroke_width=3)
         floor = DashedLine(ax.c2p(1,.6), ax.c2p(30,.6), color=BLUE)
         labels = VGroup(small_label("Member count", [2.6,-2.25,0], 26),
                         small_label("Normalized squared error", [2.6,2.45,0], 26),

@@ -1,6 +1,56 @@
 # Paper 1 and lecture: restart checkpoint, 5 September 2026
 
-## Current checkpoint: September 6, 03:12 Jerusalem
+## Current checkpoint: September 6, 03:47 Jerusalem
+
+Six original-packet votes: 01/02/03/06/07 YES, 08 NO. Reviewer 08's seven
+snapshot hashes match; report SHA
+ed2afc9efd5c2b0efb332989174abfc2b6d0b2bb41a209921aebe47d956e1d1b.
+Its two separate findings require correction: the spectrum producer records
+a 6000-row subsample, but the caption/prose attribute it to the 19000-row
+design; and the Fourier theorem boundary lacks pinned RMS/cross-moment inputs.
+Both reports have been read completely. Original spectral/Fourier arrays are
+missing from the released repository; bounded recovery is in progress. The
+previous lemma-label repair alone does not close the spectrum finding.
+
+Reviewer 04's controller failed on a reused child PID while resuming a paused
+tree. Four exact held-handle identities were safely resumed at 03:34; receipt
+.local-verification/reviewer04_recovery_1788654867.json. Native reviewer 48636
+continues in thread 01a0740a-1867-75d2-8f36-aaa3a5cac218. Its controller is DEAD:
+root must monitor completion and launch 05 once, afterward. Do not duplicate
+04. The other controller 43484 advanced to reviewer 09/native 48388; 10 queued.
+The future controller source skips reused/gone children instead of abandoning
+the live parent. The existing 43484 process still has the older loaded code.
+
+Paper build 07 completed at 03:17:25, 34 + 51 pages, zero unresolved references
+or overfull boxes. Main SHA
+7a24699242a0c966f6cc9bfa12d12730052751cc4b15dce89669309652bbd145.
+Supplement SHA
+af385b30f14cf1c86409c518afb343cfc1f52103cf3c97314051ecebc26ab4ec.
+All 85 pages rendered at 144 dpi; changed pages through supplement 44 inspected.
+Pages 45-51 remain; new R08 corrections will require a new paired build anyway.
+
+Chapter 07 completed in 1220.812 seconds, build 20260906T032001_chapter07_final,
+input manifest 9dfef6bfdd42b9cf2a47ec13cf6f34477b573dceb8ea3fbce1fd7716b0dc0096.
+Media/frame verifier 24772 launched 03:47. Chapter 06 has 17642 frames and
+588.066667 seconds; all 21 audio waveforms pass at zero offset. All 21 native
+end frames were inspected. Its zero label and the coordinate RKHS bridge
+formula are now corrected in source; replacement is required. The chapter-03
+equicorrelation curve also now has manually positioned ticks and unsmoothed
+interpolation. Replacement renders remain 02,03,04,05,06,12.
+
+The native twelve-chapter assembly fixture PASSED at 03:36: exact 384 frames,
+12.8 seconds, 307200 PCM samples, all 12 escaped chapter titles, and every
+chirp at zero sample offset with correlation above .99999. Receipt is
+.local-verification/assembly_native_0254/receipt.json; movie SHA
+ada232a2a58bd16151e83ab56c6967d22479066a1437f9fb165128949891a472.
+This is fixture validation, not final-film approval. Chapter 01's existing
+18-frame visual PASS was normalized to the strict assembler schema, preserving
+original inspection evidence. The full film is not yet assembled or listened to.
+
+Root pulse 03:36:22, claims through 04:21:22. Latest verified push b581301685938129b2f6c7f1e0034a0385a3e442.
+Continue through 12:55; preserve the original review packet unchanged.
+
+## Historical checkpoint: September 6, 03:12 Jerusalem
 
 Five original-packet reviews have returned YES: 01, 02, 03, 06, 07.
 Reviewer 03's 19 snapshot hashes all match; report SHA

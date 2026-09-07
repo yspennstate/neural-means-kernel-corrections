@@ -1,7 +1,7 @@
 The two-member criterion is exact for population second moments. Applying
 it to estimates introduces a separate estimation problem. The following
-bound states explicitly the distributional assumption needed for a margin
-interpretation and assigns ties to the decision not to mix.
+bound assumes conditionally sub-Gaussian estimation error and assigns ties
+to the decision not to mix.
 
 \begin{proposition}[margin law for a threshold rule]\label{prop:margin}
 Let $D=\varrho-e_1/e_2$ be the gap in
@@ -47,13 +47,12 @@ and a sub-Gaussian tail bound, neither of which follows from a small pooled
 mean or standard deviation. The differences across the $840$ dependent
 member pairs describe the observed validation-to-test transfer scale. In particular the OCO-2 validation and test
 blocks have the distribution shift described in Section~\ref{sec:oco2}.
-The margin-bin accuracies and the illustrative exponential calculation of
-Section~\ref{sec:secmom-margin} are therefore empirical diagnostics and a
-conditional reference calculation, respectively.
+The margin-bin accuracies in Section~\ref{sec:secmom-margin} describe
+empirical transfer and do not verify the conditional sub-Gaussian assumption.
 
-A separate observation concerns separable squared output metrics. It
-motivates coordinatewise combinations without implying simultaneous
-optimality for the two reported means of relative norms.
+Minimizing a separable squared output metric reduces to independent
+choices for each coordinate. This separability does not extend to the
+reported means of relative norms.
 
 \begin{proposition}[per-coordinate combination under diagonal metrics]
 \label{prop:percoord}
@@ -100,9 +99,6 @@ measured separately for other predictors and samples.
 \noindent\emph{Proof.} See Supplement~\ref{proof:cor:percoordw}.
 
 
-The experiments run the combination both ways, unweighted and with the
-per-sample weights of the corollary, and report both.
-
 Proposition~\ref{prop:percoord} and its corollary describe the population
 optimum; the pipeline computes an empirical selection, coordinate by
 coordinate, on the validation split. For candidates fixed independently of an i.i.d. validation sample, the
@@ -138,16 +134,13 @@ and consequently, for every diagonal metric $w$ at once,
 The OCO-2 selector uses this coordinatewise empirical operation with
 $M=6$, $q=40$ and $m_v=2000$. Its candidate checkpoints and kernel heads
 were themselves selected on the same validation block, and that block has
-a different distribution from the test block. The proposition therefore does
-not provide a risk guarantee for that deployed selector. Its observed gains
-on both reported metrics, and the comparison of unweighted and
-inverse-norm-weighted selectors, are empirical findings.
+a different distribution from the test block. The independent-validation bound therefore does
+not apply to this fitted selector.
 
 \subsection{A finite-design bound for truncating an input map}
 
-An approximate rank alone does not imply a learning rate. The next result
-instead separates a deterministic approximation error from the kernel error
-on a specified lower-dimensional design.
+The next result separates the error from truncating the input map from the
+kernel error on the resulting lower-dimensional design.
 
 \begin{proposition}[finite-design rank truncation]\label{prop:aniso}
 Let $\mathcal U\subset\{u\in\mathbb R^d:\|u\|_2\le R\}$ and let
@@ -190,12 +183,10 @@ Then, for every $u\in\mathcal U$,
 \noindent\emph{Proof.} See Supplement~\ref{proof:prop:aniso}.
 
 
-The proof is in Supplement~\ref{proof:prop:aniso}. The first term is the
+The first term is the
 native-space bound on the projected design. The second includes both the
 pointwise approximation error from discarding directions and its propagation
 through the regression weights. For $\lambda>0$ and bounded kernel diagonal,
-Lemma~\ref{lem:kappa} also bounds the latter weights uniformly. No sampling
-rate or comparison with the unprojected kernel follows without additional
-control of the power function and the target norm. The empirical OCO-2
-scaling sweep reports those observed error curves without treating the
-measured sensitivity rank as such a control.
+Lemma~\ref{lem:kappa} also bounds the latter weights uniformly. Sampling rates and comparisons with the unprojected kernel require
+additional control of the power function and the target norm. The estimated
+sensitivity ranks in the OCO-2 experiments do not supply that control.

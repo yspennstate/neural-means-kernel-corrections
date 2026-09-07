@@ -1,9 +1,7 @@
 \subsection{Coverage under split-conformal assumptions}
 
-The native-space bound of Theorem~\ref{thm:or} contains an unknown norm,
-and $P_\lambda$ ranks the measured pointwise errors weakly. A separate
-calibration construction rescales this positive score by an empirical
-quantile. Write $\widehat G$ for the fitted predictor,
+Split-conformal calibration rescales the positive function $P_\lambda$
+by a quantile of the normalized residuals. Write $\widehat G$ for the fitted predictor,
 $e(u)=G(u)-\widehat G(u)$, and let
 \begin{equation}\label{eq:conf}
 s_i=\frac{\|e(\tilde u_i)\|_2}{P_\lambda(\tilde u_i)},\qquad
@@ -49,19 +47,17 @@ alone is sufficient for Proposition~\ref{prop:conf}, but does not imply this
 stronger Beta--binomial law.
 \end{remark}
 
-The proposition is the usual split-conformal rank argument
-\citep{vovk2005algorithmic,lei2018distribution}; its proof is in
-Supplement~\ref{proof:prop:conf}. The score is a residual norm divided by a
+The proposition follows from the usual split-conformal rank argument
+\citep{vovk2005algorithmic,lei2018distribution}. The score is a residual norm divided by a
 positive scale, and the resulting set is a Euclidean ball in output space
-with radius $QP_\lambda(u)$. The stored statistic named \texttt{mean\_width}
-in the records is the mean of this radius, not its diameter.
-The guarantee is marginal over a new input and concerns the whole-output ball; it does not give conditional coverage at each input or coordinatewise intervals. Constant-radius and
+with radius $QP_\lambda(u)$. The statistic \texttt{mean\_width} is the mean radius.
+The guarantee is marginal over a new input and concerns the output vector jointly; it does not give conditional coverage at each input or coordinatewise intervals. Constant-radius and
 other positive-scale scores satisfy the same proposition under the same
 independence assumptions, whether or not the scale ranks error well.
 
-The released campaign applies this calculation to a
-$1000/19000$ partition of the public test block after the reported models
-were fitted. Its recorded six-member coverage is
+The experiments apply this calculation to a
+$1000/19000$ partition of the public test block after fitting the models.
+The six-member coverage is
 $\uqPlamSix\pm\uqPlamSixSd\%$ at the nominal $\uqCoverNom\%$ level,
 with $P_\lambda$ rebuilt from each seed's correction kernel
 (\texttt{campaign/uq\_conformal\_plam.py}). Under the i.i.d.-continuous
@@ -69,12 +65,9 @@ reference model, $m=1000$, $\alpha=0.1$ give
 $\mathrm{Beta}(901,100)$ conditional coverage, and the central $95\%$
 reference interval for the fraction on $N=19000$ cases is
 $[88.0\%,91.8\%]$; at the $95\%$ nominal level it is
-$[93.5\%,96.3\%]$. The reported ten seeds fall inside these intervals
+$[93.5\%,96.3\%]$. All ten seeds fall inside these intervals
 at both levels. The seeds share test cases and are not ten independent draws from this law.
 
-The proposition's guarantee refers to a predictor and scale fixed before an
-independent, exchangeable calibration-and-evaluation sample is observed. The
-measured coverage, the constant-radius comparison and the radius ratios are
-empirical results. Under the stated fresh-sample assumptions, the conformal guarantee
-does not require native-space membership, a known residual norm, or a
-positive association between $P_\lambda$ and error.
+Under the proposition's sampling assumptions, coverage requires neither
+native-space membership nor a known residual norm, and remains valid when
+$P_\lambda$ ranks errors poorly.

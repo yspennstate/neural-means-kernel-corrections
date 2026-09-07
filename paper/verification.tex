@@ -1,33 +1,39 @@
-Numerical checks complement the proofs. The public source snapshot contains synthetic checks and matrix-level checks of the experiments. The checks in this section use those recorded experiments; Supplement~\ref{supp:sensitivity} reports the paired reruns and prediction reconstruction. The reported numerical macros agree with the released summary records, and independent matrix calculations reproduce the sixty-member empirical RMS floor $4.813611\%$ and recorded optimum $4.876133\%$.
+Numerical experiments evaluate the identities and inequalities on
+synthetic designs and on the benchmark residual statistics. The sixty-predictor
+second-moment matrix gives an empirical RMS lower bound of $4.813611\%$
+and a convex optimum of $4.876133\%$.
 
-The second-moment identity is checked on the same arrays used to calculate the quadratic form. The validation dispersion factors $\dispFac$ and $\dispFacSix$ compare mean and RMS errors on that same sample. In the original five-member bracket record, the normalized value $0.980\pm0.003$ is the held-out risk of fitted global weights, not a simplex minimum. The six-member value $0.972\pm0.005$ is the validation simplex minimum. 
+The second-moment identity and validation dispersion factors $\dispFac$
+and $\dispFacSix$ use the same samples as their respective quadratic-form
+calculations. The normalized five-member value $0.980\pm0.003$ is the
+held-out risk of fitted global weights. The six-member value
+$0.972\pm0.005$ is the validation simplex minimum.
 
-The independence requirements of the capacity bounds fail for validation-adapted candidates in this pipeline; empirical values of their constants do not repair that. Likewise, the fitted residual norms under mixed training labels do not determine the norm of the query-time residual. The correction-label mismatch bound is proved explicitly in the main text. Proposition~\ref{prop:aniso} is a finite-design Lipschitz truncation bound with a complete proof. The warped-target scaling experiments are illustrative and do not establish an asymptotic rate theorem.
+The central $95\%$ conformal reference intervals at $m=1000,N=19000$ are $[88.0\%,91.8\%]$ and $[93.5\%,96.3\%]$ at nominal 90\% and 95\%. Their Beta--binomial interpretation is stated in Remark~\ref{rem:covlaw}.
 
-The reported conformal reference intervals at $m=1000,N=19000$ are $[88.0\%,91.8\%]$ and $[93.5\%,96.3\%]$ at nominal 90\% and 95\%. Their Beta--binomial interpretation is stated in Remark~\ref{rem:covlaw}.
+\paragraph{Residual-mixture identities.}
+In the exact block-correlated model, the quadratic-form identity in the
+proof of Theorem~\ref{thm:blockfloor} has maximum absolute discrepancy
+$3\times10^{-18}$ over two thousand random convex weight vectors. On a
+perturbed pool and on the sixty-predictor matrix, all twenty thousand
+sampled convex mixtures satisfy the bound obtained from the pool's minima.
+Replacing block minima by block means gives the uniform mixture's value.
+The signed optimum of Corollary~\ref{cor:signed} agrees with its closed
+form and is no larger than any sampled convex-mixture risk.
 
-The floor theorem, the exchange rate, the sharpened weight bound, the
-minimax identity and the signed-stack corollary have their own released
-check, fifteen tests in all, in
+\paragraph{Local sensitivity.}
+The two derivatives in Proposition~\ref{prop:exchange} agree with central
+differences to $4\times10^{-9}$ over two thousand interior points. Both are
+positive at the sampled points away from perfect anticorrelation; along
+the stated direction, the change in optimal risk is second order in the step.
+
+\paragraph{Kernel bounds.}
+The bound in Lemma~\ref{lem:kappa} holds on fifteen hundred random
+Mat\'ern designs and evaluation points, with a largest ratio to the bound
+of $0.87$; the cosine-kernel construction attains equality to
+$7\times10^{-15}$. The maximum discrepancy in the identity of
+Theorem~\ref{thm:minimax} is $4\times10^{-14}$, and
+$P_0\le\widetilde P_\lambda\le P_\lambda$ on every sampled design.
+The extremizing residual in the proof of Theorem~\ref{thm:or} attains its
+bound to $10^{-14}$. The numerical implementation is provided in
 \texttt{campaign/verify\_floor\_and\allowbreak\_certificate.py}.
-The block floor of Theorem~\ref{thm:blockfloor} is an identity in the exact
-block-correlated model, and the identity closes to $3\times10^{-18}$ over
-two thousand random convex weight vectors; on a perturbed pool, and on the
-released sixty-predictor matrix, twenty thousand random convex mixtures never
-pass the bound evaluated with the pool's minima, and the mean-entry form of
-the display returns the uniform mixture's value exactly. The two partial
-derivatives of Proposition~\ref{prop:exchange} agree with central
-differences to $4\times10^{-9}$ over two thousand interior points, both are positive at the sampled points away from perfect anticorrelation, and along the stated direction the change in the optimal
-risk is second order in the step. The sharpened bound of
-Lemma~\ref{lem:kappa} holds on fifteen hundred random Mat\'ern designs and
-evaluation points, the largest ratio to the bound being $0.87$, and the
-cosine-kernel construction attains it to $7\times10^{-15}$. The identity of
-Theorem~\ref{thm:minimax} closes to $4\times10^{-14}$, the ordering
-$P_0\le\widetilde P_\lambda\le P_\lambda$ holds on every draw, the residual
-that the proof of Theorem~\ref{thm:or} exhibits attains the certified bound
-with equality to $10^{-14}$, and the signed optimum of
-Corollary~\ref{cor:signed} matches its closed form and never lies above a
-sampled convex mixture.
-
-
-These checks cover the displayed algebra at their sampled designs and tolerances.

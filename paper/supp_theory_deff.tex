@@ -1,10 +1,8 @@
-\subsection{Effective dimension from the Gram spectrum}
+\subsection{Spectral identities}
 \label{sec:theory-rmt}
 
-The remaining design choice is the nugget $\lambda$, selected by
-cross-validation in the pipeline. The following exact identity connects that
-choice to the spectrum of the Gram matrix and, through it, to random matrix
-descriptions of the design.
+The nugget $\lambda$, selected by cross-validation, determines the
+effective dimension through the spectrum of the Gram matrix.
 
 \begin{lemma}[effective dimension and the empirical Stieltjes transform]
 \label{lem:deff}
@@ -26,9 +24,8 @@ Stieltjes transform of $F$.
 \noindent\emph{Proof.} See Supplement~\ref{proof:lem:deff}.
 
 
-The identity is unconditional; the random-matrix content enters through the
-choice of $F$. For the benchmark's simplest reference model, isotropic linear
-features, the limit can be evaluated in closed form.
+The identity holds for every positive semidefinite Gram matrix. For
+isotropic i.i.d. linear features, the limiting spectral law gives a closed form.
 
 \begin{corollary}[effective dimension under a Mar\v{c}enko--Pastur limit]
 \label{cor:mp}
@@ -58,11 +55,8 @@ $\lambda\in\{10^{-3},10^{-2},10^{-1},1,10\}$.
 The closed form is a reference for the stated i.i.d. linear-feature model.
 The learned neural features and nonlinear kernel matrices in the experiments
 lie outside those assumptions; the finite-matrix trace identity holds
-regardless. Figure~\ref{fig:spectra} applies
-it to a separate $6000$-row subsample of the structural-mechanics training
-design. At the diagnostic's fixed nugget $10^{-5}$, its effective dimension
-is $103.12$. This is the trace of that subsample smoother; the full $19000$-row fit was not measured. The trace neither certifies generalization
-nor reduces the cubic cost of a dense factorization.
+regardless. Supplement~\ref{sec:spectra} reports its application to a
+$6000$-row subsample of the structural-mechanics training design.
 
 The effective dimension also determines the sum of the training-point
 posterior variances. Writing $A=K+n\lambda I$, their sum is
@@ -74,4 +68,3 @@ posterior variances. Writing $A=K+n\lambda I$, their sum is
 \]
 using $KA^{-1}K=K-n\lambda\,KA^{-1}$. This identity concerns the training
 design. The trace alone does not determine the power function at other inputs.
-

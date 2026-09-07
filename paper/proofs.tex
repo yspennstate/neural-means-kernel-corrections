@@ -34,10 +34,11 @@ g(C,i):=\|v_i-I_C(z_i)\|_2^2 .
 Conditionally on $C$, the sum has exactly $b/2$ terms, so
 $e_2(\theta;C)=\tfrac b2\,\mathbb E_{i\sim\mathrm{Unif}(B\setminus C)}[g(C,i)]$,
 and taking the expectation over $C$ proves the identity. The gradient claim
-is immediate: for fixed $(B,C)$ the map $\theta\mapsto e_2(\theta;C)$ is
-differentiable wherever the Cholesky factorization in $I_C$ is (the kernel
-matrix stays positive definite in a neighborhood), and under a local
-integrable Lipschitz bound the derivative passes under the expectation, so
+follows from the differentiability assumptions: for fixed $(B,C)$,
+differentiable feature and kernel maps make
+$\theta\mapsto e_2(\theta;C)$ differentiable wherever the kernel matrix in
+$I_C$ remains positive definite. Under the stated local integrable
+domination, the derivative passes under the expectation, so
 $\mathbb E_{B,C}[\nabla_\theta e_2]=\nabla_\theta\,\mathbb E_{B,C}[e_2]$. \qed
 
 \subsection{Proof of Proposition~\ref{prop:stack}}
@@ -168,8 +169,8 @@ $\widehat R_j(\widehat w_j)+\lambda\|\widehat w_j\|_2^2\le
 $\widehat R_j(\widehat w_j)\le\widehat R_j(w^\ast)+\lambda\|w^\ast\|_2^2
 \le\widehat R_j(w^\ast)+\lambda W^2$. Since by assumption
 $\|\widehat w_j\|_2\le W$, the uniform event of part (i) applies to
-$\widehat w_j$ and $w^\ast$ alike, and the chain above goes through with the
-extra $\lambda W^2$. \qed
+$\widehat w_j$ and $w^\ast$ alike, and the preceding inequalities hold with the
+additional term $\lambda W^2$. \qed
 
 \subsection{Proof of Corollary~\ref{cor:floorpinch}}
 \label{proof:cor:floorpinch}
@@ -212,8 +213,8 @@ $WbD(1+\kappa)+b\kappa+b\le b(1+WD)(1+\kappa)=:\tilde c$, so the squared
 losses lie in $[0,\tilde c^{\,2}]$ and are $2\tilde c$-Lipschitz in the
 prediction.
 
-The argument of Proposition~\ref{prop:affine} now applies verbatim to the
-class indexed by $w$ in the $W$-ball, for this fixed $(j,\gamma)$: the
+By the argument of Proposition~\ref{prop:affine}, for the class
+indexed by $w$ in the $W$-ball and fixed $(j,\gamma)$, the
 Rademacher complexity of the affine part is at most
 $W\,bD(1+\kappa)/\sqrt m$, contraction multiplies it by $2\tilde c$,
 symmetrization doubles it, and McDiarmid at level $\delta/(2q|\Gamma|)$ adds
@@ -332,7 +333,7 @@ Write $W_a=\sum_kw_{a,k}$ for the total weight of architecture $a$, so that
 $\sum_aW_a=1$. Split the quadratic form into its diagonal terms, the terms
 between two seeds of one architecture and the terms between architectures,
 and bound each entry below by its hypothesis; the weights are nonnegative,
-so the inequalities survive the multiplication:
+so multiplying by the weights preserves these inequalities:
 \[
 w^\top Sw\;\ge\;\bar e^{\,2}\Big(\|w\|_2^2
 +\varrho_w\big(\textstyle\sum_aW_a^2-\|w\|_2^2\big)
@@ -395,7 +396,7 @@ The metric is diagonal, so the squared norm splits over coordinates and the
 $j$-th summand $w_j^2\,\mathbb E\big(\sum_m v_{mj}f_m(u)_j-G(u)_j\big)^2$
 depends on the weights only through the column $v_{\cdot j}$. Minimizing the
 sum is therefore $q$ independent minimizations, and the positive factor
-$w_j^2$ does not move any of the $q$ argmins, so the optimizer is the same
+$w_j^2$ leaves every coordinate minimizer unchanged, so the optimizer is the same
 for every positive $w$. A combination with shared weights is the special
 case $v_{mj}=v_m$ for all $j$, a subset of the feasible set of each
 coordinate problem, which gives the domination. \qed

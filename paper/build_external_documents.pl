@@ -25,7 +25,7 @@ sub contents {
 }
 
 sub label_state {
-    return sha256_hex(join("\0", map { contents("$_.aux") } @documents));
+    return sha256_hex(join("\0", map { contents("$_-xr.aux") } @documents));
 }
 
 sub compile_document {
@@ -56,6 +56,8 @@ sub compile_document {
     my $aux = "$build/$document/$job.aux";
     die "The $document build did not produce $aux\n" unless -s $aux;
     # xr searches beside the .tex sources, independently of the editor job name.
+    # Dedicated exports preserve each root's normal LaTeX/BibTeX auxiliary file
+    # when latexmk rebuilds that root incrementally.
     # Each document owns its bibliography.  Older xr versions also import
     # \bibcite, causing duplicate citation labels.  Export only \newlabel
     # records; all sections in these two roots use \input, so their labels
@@ -67,8 +69,8 @@ sub compile_document {
     s/\{\}\}\s*$/{$document.pdf}}/ for @labels;
     my $export = "% Generated cross-reference labels; rebuild instead of editing.\n"
                . join("\n", @labels) . "\n";
-    if (contents("$document.aux") ne $export) {
-        open my $out, '>', "$document.aux" or die "Cannot export $document labels: $!\n";
+    if (contents("$document-xr.aux") ne $export) {
+        open my $out, '>', "$document-xr.aux" or die "Cannot export $document labels: $!\n";
         print {$out} $export;
         close $out;
     }

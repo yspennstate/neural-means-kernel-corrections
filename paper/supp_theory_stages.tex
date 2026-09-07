@@ -7,9 +7,9 @@ model are all symmetric, the input distribution has a reflection-invariant
 covariance, and reflecting the load reflects the stress field. On the discrete
 grid this is expressed by two permutation matrices: $S\in\mathbb R^{p\times p}$
 reverses the load samples and $T\in\mathbb R^{q\times q}$ reverses the rows of
-the stress field. Both are orthogonal involutions. Section~\ref{sec:benchmark}
-describes a direct data-driven check of the equivariance
-$G(Su)=T\,G(u)$; we treat it as an assumption here.
+the stress field. Both are orthogonal involutions. Supplement~\ref{sec:symcheck}
+examines the discrete equivariance relation $G(Su)=T\,G(u)$
+empirically. The following proposition assumes this relation exactly.
 
 \begin{proposition}[symmetrization]\label{prop:sym}
 Assume $G(Su)=TG(u)$ for $\mu$-a.e.\ $u$, that $\mu$ is invariant under $S$,
@@ -35,16 +35,13 @@ invariance. For a finite training sample, Jensen's inequality also shows that
 the reflection-augmented empirical loss upper-bounds the empirical loss of
 the symmetrized predictor. The objectives are generally different, so the
 proposition does not guarantee that training with augmentation improves the
-fitted model. The near-mirror checks support exact symmetry of the distributed solver
-output. In the campaign, the averages improve twenty-nine of thirty members across the two MLP variants
-and the refiner, and worsen one by a thousandth of a point. The refiner's
-operation requires the distinction below. The convexity
+fitted model. The near-reflection comparisons are consistent with symmetry of the
+distributed solver output. In the experiment, the averages improve twenty-nine of thirty members across the two MLP variants
+and the refiner, and worsen one by a thousandth of a point. For the refiner, equivariance of its conditioning field is a sufficient
+additional condition for this guarantee. The convexity
 argument is standard; \citet{lyle2020benefits} give a general account.
 
 \paragraph{A supplied conditioning field is an additional input.}
-The proposition covers the full-map average $f_S$. A sufficient condition
-for the implemented supplied-field average to equal $f_S$ is
-$h(Su)=T h(u)$; the fitted kernel is not constrained to satisfy this condition.
 For a fitted refiner $F(u,h)$ and a fixed kernel predictor $h(u)$, define
 $f(u)=F(u,h(u))$. The proposition concerns
 \[
@@ -58,7 +55,7 @@ kernel predictor, and training the refiner with randomly reflected triples
 does not force exact equivariance; the non-increase guarantee for its
 averaging operation is conditional on that identity.
 
-There is a quantitative way to state the missing requirement. Write
+The effect of this difference can be bounded. Write
 $b(u)=\tfrac12(F(u,h(u))+T F(Su,T h(u)))$ for the implemented average and
 $R(g)=\mathbb E\|g(u)-G(u)\|_2/\|G(u)\|_2$, assuming nonzero targets
 almost surely and finite quantities below. Under the proposition's exact
@@ -80,7 +77,7 @@ $(L_h/2)\mathbb E[\|T h(u)-h(Su)\|_2/\|G(u)\|_2]$.
 This defect and the Lipschitz constant are not measured in the experiments,
 so the inequality is not evaluated numerically.
 
-The distinction can matter even with an exactly symmetric target. Let the
+The two averages can have different risks even for an exactly symmetric target. Let the
 input take the values $+1$ and $-1$ with equal probability, let $S$ exchange
 them, and let $T$ swap two output coordinates. Set $G(u)=(1,1)$,
 $h(+1)=(1,1)$ and $h(-1)=(3,3)$. Define $F(+1,z)=z$ and
@@ -95,19 +92,14 @@ Thus $f(u)=G(u)$ at both inputs, and the full-map average
 also has zero error. Averaging with $T h(u)$ instead gives $(2,2)$ at both
 inputs, with relative error one. This finite example disproves a general
 guarantee for the supplied-field operation and attains equality in
-\eqref{eq:refiner-defect} (here $L_h=1$). It is not a model of the measured
-benchmark. The accompanying \texttt{campaign/refiner\_symmetry\_diagnostic.py}
-checks the construction and independently recomputes the ten recorded
-refiner differences.
+\eqref{eq:refiner-defect} (here $L_h=1$).
 
-\subsection{What the kernel-flow regularizer estimates}
+\subsection{The kernel-flow regularizer and leave-half-out error}
 \label{sec:theory-kf}
 
 The kernel-flow (KF) loss of Owhadi and Yoo \citep{owhadi2019kernel}, in the
 $\ell^2$ variant used by \citet{yoo2021deep} to regularize deep networks,
-motivates the optional regularizer in our ablation study. We first state
-the identity for exact interpolation, then describe the implementation's
-regularization and differentiation choices. Let $z_i=\phi_\theta(u_i)$ be the features of a batch
+defines the optional regularizer in the ablation study. Let $z_i=\phi_\theta(u_i)$ be the features of a batch
 $B=\{1,\dots,b\}$ ($b$ even), let $k$ be a positive definite kernel on feature
 space, and for $C\subset B$, $|C|=b/2$, let $I_C$ denote the $k$-interpolant
 of $\{(z_j,v_j):j\in C\}$. The batch KF loss is
@@ -125,12 +117,14 @@ $e_2(\theta;C)=\sum_{i\in B\setminus C}\|v_i-I_C(z_i)\|_2^2$, and
 \big[\big\|v_i-I_C(z_i)\big\|_2^2\big],
 \]
 i.e.\ $\tfrac2b\,e_2$ is an unbiased estimator, over the split randomness, of
-the expected squared error committed on a held-out point by the kernel
-predictor trained on a random half of the batch. When $(B,C)$ are
-resampled at every step, the stochastic gradient
+the expected squared error of the kernel predictor on a held-out point
+when trained on a random half of the batch. If the parameterized
+feature and kernel maps are differentiable and the derivative of
+$e_2(\theta;C)$ is bounded in a parameter neighborhood by a random variable
+integrable over $(B,C)$, then, when $(B,C)$
+are resampled at every step, the stochastic gradient
 $\nabla_\theta e_2(\theta;C)$ is unbiased for
-$\nabla_\theta\,\mathbb E_{B,C}[e_2(\theta;C)]$ whenever the expectation and
-derivative commute (e.g.\ under local Lipschitz domination).
+$\nabla_\theta\,\mathbb E_{B,C}[e_2(\theta;C)]$.
 \end{proposition}
 \noindent\emph{Proof.} See Supplement~\ref{proof:prop:kf}.
 
@@ -143,9 +137,8 @@ $10^{-3}(K_{CC}+10^{-3}I)^{-1}Y_C$. Consequently the exact leave-half-out
 identity above does not apply to the regularized loss. The learned Gaussian
 bandwidth multiplier is combined with a batch median distance computed
 under \texttt{no\_grad}; the resulting gradient also omits the dependence
-of that median on the features. It is a stop-gradient training rule, not
-the full derivative in Proposition~\ref{prop:kf}. These choices are fixed
-in the reported ablation. Neither the ideal identity nor its regularized
+of that median on the features. This stop-gradient rule differs from
+the full derivative in Proposition~\ref{prop:kf}. Neither the ideal identity nor its regularized
 analogue estimates the population risk of the adaptively trained network.
 
 
@@ -156,8 +149,7 @@ Convexity bounds the loss of a convex combination by the corresponding
 weighted average of member losses. A separate uniform-deviation argument
 bounds the cost of fitting the weights when the candidate members are fixed
 independently of an i.i.d. validation sample and the losses have a population
-bound. These conditions are part of the following result; they are not
-assumed for the pipeline's validation split.
+bound.
 
 \begin{proposition}[validation stacking]\label{prop:stack}
 Let $f_1,\dots,f_M:\mathcal U\to\mathcal V$ be fixed maps, let
@@ -184,17 +176,14 @@ B\sqrt{\frac{2\big((M-1)\log\!\big(m(M-1)+1\big)+\log(2/\delta)\big)}{m}} .
 
 With $M=5$, $m=1000$ and $\delta=0.05$, the excess term is about
 $0.28B$. Substituting $B=0.25$, the largest observed member error, gives
-roughly seven percentage points, conditional on that value being a genuine
-uniform population bound. Even that conditional value is too large to make the selection error
-negligible. The result supplies the scaling $\sqrt{M\log m/m}$;
+roughly seven percentage points, if that value is a uniform population bound. This excess term is much larger than the measured selection effects. The result supplies the scaling $\sqrt{M\log m/m}$;
 the much smaller validation-to-test gaps are empirical measurements.
 
-The stack the pipeline deploys on the structural-mechanics benchmark is finer
+The stack the pipeline deploys on the structural-mechanics benchmark is more general
 than a single convex vector: the weights are affine and vary per grid point,
-fitted by ridge on the validation split, and the choice between this object
-and the global convex stack is itself made on held-out data (fit both on one
-half of the split, keep whichever wins on the other half, refit the winner on
-the full split). Proposition~\ref{prop:stack} does not cover that
+fitted by ridge on the validation split, and selection between the affine and global convex stacks uses a half-split
+comparison: each is fitted on one half, evaluated on the other, and the
+one with lower error is refitted on the full split. Proposition~\ref{prop:stack} does not cover that
 construction. The following two statements give conditional capacity bounds
 for related fixed-candidate selection and affine classes.
 
@@ -213,9 +202,10 @@ B\sqrt{\frac{2\log(2K/\delta)}{m'}} .
 
 
 The half-split comparison uses $K=2$ and $m'=500$. The lemma applies
-only if both candidate stacks were constructed independently of the judging
-half. Refitting a winner changes the fitted map; the next proposition bounds
-affine fitting under its own independence and boundedness assumptions.
+only if both candidate stacks were constructed independently of the evaluation
+half. Refitting the selected stack changes the predictor. The following
+proposition treats affine fitting under independence and boundedness
+assumptions.
 
 \begin{proposition}[per-pixel affine stacking]\label{prop:affine}
 Fix members $f_1,\dots,f_M$, write $D=\sqrt{M+1}$, and for each output
@@ -254,9 +244,7 @@ A fixed grid of residual corrections gives a further composite class. For
 each configuration, correction of training residuals is affine in the stack
 weights, so the same uniform-deviation argument applies with a transformed
 feature map. The following result requires the training arrays, members and
-correction configurations to be fixed independently of validation; it does
-not assert a guarantee for the deployed sequence of checkpoint selection,
-stacking, subsample tuning and refitting.
+correction configurations to be fixed independently of validation.
 
 \begin{corollary}[capacity bound for a fixed composite correction class]
 \label{cor:certificate}
@@ -268,7 +256,9 @@ h_{w,\gamma}(u)_j\;=\;w_j^\top\varphi_j(u)
 +c_\gamma(u)^\top\big(Y_j-\Phi_j w_j\big),
 \]
 where $Y_j\in\mathbb R^{n_{\mathrm{tr}}}$ collects the training targets of
-coordinate $j$ and $\Phi_j$ the members' training predictions; $\gamma=0$
+coordinate $j$, and $\Phi_j\in\mathbb R^{n_{\mathrm{tr}}\times(M+1)}$
+has rows $\varphi_j(u_i)^\top$, including the final column of intercept
+features equal to $b$; $\gamma=0$
 (no correction, $c_0\equiv0$) is included in $\Gamma$. Suppose the correction
 weights are uniformly bounded, $\sup_{u,\gamma}\|c_\gamma(u)\|_1\le\kappa$.
 Assume that $Y_j$, $\Phi_j$, the members and all $c_\gamma$ are fixed
@@ -289,7 +279,7 @@ probability at least $1-\delta$,
 \end{aligned}
 \]
 Since $\gamma=0$ is among the candidates, the oracle on the right is at most
-the fitted stack's own risk, and combining with
+the fitted stack's risk, and combining with
 Proposition~\ref{prop:affine}(ii) bounds the composite risk against the best
 affine stack, provided the hypotheses of both results hold (with failure
 probabilities allocated between them). Here $b$ and $W$ must be population
@@ -300,7 +290,7 @@ kernel ridge weights, $\kappa$ is supplied by the next lemma.
 \noindent\emph{Proof.} See Supplement~\ref{proof:cor:certificate}.
 
 
-The hypothesis on the correction weights is not an empirical assumption. In
+For kernel ridge regression, the correction-weight bound follows analytically. In
 the pipeline each $\gamma=(s,\lambda)$ is a length scale and a nugget, and
 the weights are those of kernel ridge regression,
 $c_\gamma(u)=(K_\gamma+n\lambda I)^{-1}k_\gamma(X,u)$, so that
@@ -331,35 +321,26 @@ design, with
 \noindent\emph{Proof.} See Supplement~\ref{proof:lem:kappa}.
 
 
-The proof is a few lines in Section~\ref{app:proofs}: the Gram matrix of
-the design together with $u$ is positive semidefinite, which confines
+Positive semidefiniteness of the Gram matrix of the design together with
+$u$ confines
 $k(X,u)$ to the range of $K$ with $k(X,u)^\top K^{+}k(X,u)\le k(u,u)$, and
-$\mu/(\mu+n\lambda)^2\le1/(4n\lambda)$ for every eigenvalue $\mu$. The bound
-is the right kind of constant for the corollary: it depends on nothing that
-is estimated. It is also why the corollary is a capacity bound and not a
-certificate. The excess term carries $(1+\kappa)^2$, so at
-$\kappa_{\mathrm{an}}=500$ the corollary's right-hand side is, like that of
-Proposition~\ref{prop:affine} before it, vacuous at the stated constants by
-many orders of magnitude. The realized scale of the weights is far smaller:
+$\mu/(\mu+n\lambda)^2\le1/(4n\lambda)$ for every eigenvalue $\mu$.
+Thus $\kappa_{\mathrm{an}}$ is a uniform bound determined by the kernel
+diagonal and nugget grid. The excess term contains $(1+\kappa)^2$;
+with $\kappa_{\mathrm{an}}=500$, it exceeds the measured errors by many
+orders of magnitude. The realized weights have a smaller scale:
 on a test probe of five hundred points the largest $\ell^1$ norm over the
 grid averages $\kappaTen$ over the ten seeds
 (Section~\ref{app:verification}), about a fifteenth of
-$\kappa_{\mathrm{an}}$, so that evaluating the display at the probe value
-would shrink it by a factor of about two hundred and forty. But a supremum
-over a finite probe is a lower bound on the constant the corollary needs,
-not the constant. What the corollary
-establishes is conditional: for candidates fixed independently of the
-validation sample, in the coordinatewise mean-squared metric, an oracle
-inequality of the ordinary $m^{-1/2}$ form holds with constants that are
-assumed as population bounds or, for $\kappa$, given in closed form. The estimator the pipeline fits differs from this one: it is selected by mean relative $L^2$ error
-rather than by squared coordinate risk, its kernel stages are tuned on an
-$8000$-row subsample and the winner is refit on all $19000$ rows, and the
-same validation split selects checkpoints and members --- none of which the
-statement covers. Every statement in this section assumes candidates fixed independently of the validation sample, whereas in the deployed pipeline the same split selects checkpoints, members and, on OCO-2, coordinates; and the constants $B$, $b$, $L$, $W$ are population bounds,
-for which the text substitutes observed maxima, so the evaluated values are
-conditional capacity calculations and not guarantees for the fitted
-estimator. The split-conformal result of Section~\ref{supp:conf} gives marginal
-coverage when its separate calibration assumptions hold; Theorem~\ref{thm:or} is a
-conditional worst-case bound whose constant is not observed.
+$\kappa_{\mathrm{an}}$. Substituting that value would reduce the excess term
+by about a factor of 240, but a finite-probe maximum does not supply the
+required uniform bound.
 
-
+The corollary bounds coordinatewise mean-squared risk for candidates fixed
+independently of validation. The deployed estimator instead selects by
+mean relative $L^2$ error, tunes its kernel stages on an $8000$-row
+subsample, refits the selected kernel on all $19000$ rows, and reuses the
+validation split for checkpoint and member selection. These operations are
+outside the corollary's assumptions. Likewise, observed maxima do not
+establish the population bounds $B,b,L,W$ required by the preceding
+capacity results.

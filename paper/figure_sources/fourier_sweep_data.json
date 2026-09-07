@@ -1,0 +1,30 @@
+{
+  "reference_reported_error_percent": 16.37,
+  "rows": [
+    {
+      "bandwidth": 0.3,
+      "reported_error_percent": 31.07,
+      "reported_correlation": 0.537
+    },
+    {
+      "bandwidth": 0.6,
+      "reported_error_percent": 116.71,
+      "reported_correlation": 0.166
+    },
+    {
+      "bandwidth": 1.0,
+      "reported_error_percent": 143.95,
+      "reported_correlation": 0.111
+    },
+    {
+      "bandwidth": 1.5,
+      "reported_error_percent": 143.84,
+      "reported_correlation": 0.105
+    },
+    {
+      "bandwidth": 2.0,
+      "reported_error_percent": 144.98,
+      "reported_correlation": 0.114
+    }
+  ]
+}

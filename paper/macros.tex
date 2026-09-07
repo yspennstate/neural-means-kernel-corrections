@@ -1,10 +1,8 @@
-% ---- result macros: single source of truth for all reported numbers ----
-% Every macro below whose name ends in Sd is a standard deviation over the ten
-% campaign seeds; seeded quantities are written mean/sd as a pair. Filled from the
-% campaign artifacts (seeds/sm_s*/runs/*.json, pix4_s*.json, ens_s*.json,
-% conf_s*.json, and collected/dgx/sm_seed_s*.json for the complete-schedule
-% campaign) -- see Appendix~\ref{app:impl}. campaign/audit_reported_macros.py
-% recomputes every value from those files.
+% Numerical constants used in the article and supplement.
+% Sd denotes the seed standard deviation for the experiment specified in the text.
+% Values are drawn from the experiment summaries identified below.
+% Source records include seeds/sm_s*/runs/*.json, pix4_s*.json, ens_s*.json,
+% conf_s*.json, and collected/dgx/sm_seed_s*.json.
 %
 % Replicated pipeline (ten seeds, five members)
 \newcommand{\errPipe}{4.572}         % corrected pipeline, mean over ten seeds (%)
@@ -224,7 +222,7 @@
 \newcommand{\ttaGainMLP}{0.16}       % MLP reflection-averaging gain, ten-seed mean
 \newcommand{\ttaGainRefiner}{0.0422} % supplied-field average, ten-seed mean percentage points
 \newcommand{\ttaGainRefinerSd}{0.0019} % sample standard deviation; refiner_symmetry_diagnostic.py
-% after-campaign checks on the DGX (campaign/collected/dgx/p1_members_eval.json, sm_ens_rmt.json): same calibration/evaluation split as seedarch
+% additional numerical records on the DGX (campaign/collected/dgx/p1_members_eval.json, sm_ens_rmt.json): same calibration/evaluation split as seedarch
 \newcommand{\saPerpixSixtyLoo}{4.547}   % per-pixel affine over all sixty, ridge chosen by leave-one-out on the calibration half (lambda = 10)
 \newcommand{\saPerpixMeansLoo}{4.548}   % the six ten-seed means with the leave-one-out ridge
 \newcommand{\saSixtyLooThreeH}{4.563}   % sixty, leave-one-out ridge, 300 calibration rows (mean of five draws)
@@ -244,7 +242,7 @@
 \newcommand{\saKfMlpOne}{5.05}          % weight 1.0, five seeds
 \newcommand{\saSelAgree}{5.473}         % kernel member at 8,000-row fits: validation, GCV, LOO and KARE choose the same ridge at all ten seeds
 
-% ClimSim kernel budget ladder (added after review): the exact Matern kernel of the campaign's protocol
+% ClimSim kernel budget ladder: the exact Matern kernel of the campaign's protocol
 % (selection on the pool validation block, test block scored once) fitted on more rows of the one-million
 % training slice, seed 0; the campaign's own rows used 6000. Records: collected/dgx/climsim_cap/.
 \newcommand{\csCapSix}{0.389}           % test R^2 at 6000 rows (the campaign's budget; campaign mean 0.390 +- 0.007)
@@ -252,7 +250,7 @@
 \newcommand{\csCapTwentyFour}{0.432}    % 24000 rows
 \newcommand{\csCapTwentyFourB}{0.446}   % 24000 rows at seed 1 (a different test-block draw, per the ClimSim seed protocol)
 
-% OCO-2 alignment diagnostic recomputed after review (campaign/dgx_checks/jpl_alignment_check.py, O2, seed 0,
+% OCO-2 alignment diagnostic (campaign/dgx_checks/jpl_alignment_check.py, O2, seed 0,
 % n = 4000 subsample, nugget 1e-8, median length scale): record collected/dgx/jpl_alignment_o2_s0.json
 \newcommand{\alignDeffRaw}{3995}        % effective dimension, raw-input kernel
 \newcommand{\alignDeffFeat}{3993}       % effective dimension, feature kernel
@@ -275,7 +273,7 @@
 \newcommand{\specEffRank}{8}            % effective rank of the residual covariance, typical member
 % structural-mechanics fitted-norm diagnostic recomputed with the deployed correction kernel of seed 0
 % (campaign/dgx_checks/sm_norm_check.py; six-member stack; smult 2, nugget 1e-3): collected/dgx/sm_norm_check_hpix_s0.json
-\newcommand{\normRatio}{4900}           % raw over residual, fitted squared RKHS norms (was 271 at the original single-seed nugget)
+\newcommand{\normRatio}{4900}           % raw over residual, fitted squared RKHS norms
 \newcommand{\normRatioNorm}{8.8}        % the same ratio per unit energy of what is regressed
 \newcommand{\normEnergyRatio}{560}      % energy of the raw targets over energy of the stack residuals
 % end-to-end cost of the kernel stage at the campaign's shapes (campaign/dgx_checks/cost_check.py, 8 threads,

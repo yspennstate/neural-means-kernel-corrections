@@ -2,6 +2,7 @@
 # when Overleaf renames the selected root's output to output.pdf/output.aux.
 # No shell-escape setting is required: latexmk, rather than TeX, runs the helper.
 # Select pdfLaTeX and either main.tex or supplement.tex in Overleaf's menu.
+# Reciprocal labels use separate main-xr.aux and supplement-xr.aux exports.
 
 $pdf_mode = 1;
 $max_repeat = 8;

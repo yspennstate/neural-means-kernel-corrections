@@ -1,0 +1,61 @@
+{
+  "source_repository": "https://github.com/yspennstate/neural-means-kernel-corrections",
+  "input_records": [
+    {
+      "path": "runs/fourier_wco2.log",
+      "sha256": "9b73705b32dc5fad76c032b4c0fb012112887a7cdeb8b671b8115b4729e53cd1"
+    },
+    {
+      "path": "runs/scaling_reduced.json",
+      "sha256": "a9e7ae16e46a408a54eff8fd17b42371715f66ad53b76ec6eecf3d60ce66d38c"
+    },
+    {
+      "path": "campaign/collected/box4/a3_climsim_train_n1000000_s0.json",
+      "sha256": "ed05a788fcb273d05f3959703a898c95dfcb28d7622db1a60022c94412c695da"
+    },
+    {
+      "path": "campaign/collected/box4/a3_climsim_train_n1000000_s1.json",
+      "sha256": "946ad7760eb83dbe7a68b90dee27fac2d9f050c7876e33b1dd835d8875ce9aa1"
+    },
+    {
+      "path": "campaign/collected/box4/a3_climsim_train_n1000000_s2.json",
+      "sha256": "7da976542ff033b8faa4d2efb0805758a7bb217e9804b20f4e8442ea547f80b4"
+    },
+    {
+      "path": "campaign/collected/box4/a3_climsim_train_n1000000_s3.json",
+      "sha256": "a0015ede797bd74d0f1b5b226e55a26410d29d90e66cd774e382a2e81d55506b"
+    },
+    {
+      "path": "campaign/collected/box4/a3_climsim_train_n1000000_s4.json",
+      "sha256": "d36a2f48ac35cf087c91d0680fd853d2fe69fc2364bfe18e2e506f092444692e"
+    },
+    {
+      "path": "campaign/collected/box4/a3_climsim_train_n2000000_s0.json",
+      "sha256": "f5b12b0979670cf71ce5f5987cb74865e81b6f4f5b7720c74a18a4976548841e"
+    },
+    {
+      "path": "campaign/collected/box4/a3_climsim_train_n2000000_s1.json",
+      "sha256": "7564d55fc92c948b4f44f0b6ead351cb652fdc70c91cbd239bddb8fe3c3893c2"
+    },
+    {
+      "path": "campaign/collected/box4/a3_climsim_train_n2000000_s2.json",
+      "sha256": "2383d4fa9aea79738d57098af9abc272646f8d95b84a069e3591c95c2d0b6d28"
+    },
+    {
+      "path": "campaign/collected/box4/a3_climsim_train_n3500000_s0.json",
+      "sha256": "72ebd25c8a96ab54f0cd796ee14f3461fda660b31c0140f4e565d37b6742ae72"
+    },
+    {
+      "path": "campaign/collected/box4/a3_climsim_train_n3500000_s1.json",
+      "sha256": "322532ec9801c899ab368b1deed24afe4b0cd3b3cf3f32352ff173b773e7428b"
+    },
+    {
+      "path": "campaign/collected/box4/a3_climsim_train_n3500000_s2.json",
+      "sha256": "e25979ac189c0cb101f6a519d3a0d8ac217c6be1fa43de5439efabbe35a6b15d"
+    },
+    {
+      "path": "paper/figs/seedspread_data.json",
+      "sha256": "b48aaa7e0a110278a58e32979ec042444cb5a21851bb53a7609ac87dd8b4ca35"
+    }
+  ]
+}

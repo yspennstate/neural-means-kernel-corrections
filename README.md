@@ -4,18 +4,19 @@ Code and paper for a study of neural predictors combined with exact kernel regre
 
 ## Paper, supplement, and Overleaf sources
 
-- [Main paper](paper/main.pdf): the manuscript, 34 pages.
-- [Supplement](paper/supplement.pdf): complete proofs and additional experiments, 51 pages. Each result with a deferred proof identifies its location here.
-- [Overleaf ZIP](releases/nmkc_overleaf_20260907.zip): complete editable project, figures, and both PDFs.
+- [Main paper](paper/main.pdf): the manuscript in the JMLR submission format, 33 pages.
+- [Supplement](paper/supplement.pdf): complete proofs and additional experiments, 49 pages. Each result with a deferred proof identifies its location here.
+- [Article Overleaf ZIP](releases/nmkc_main_jmlr_overleaf_20260907.zip): the self-contained article project.
+- [Paired Overleaf ZIP](releases/nmkc_overleaf_20260907.zip): the sectioned article sources with the supplement, figures, and both PDFs.
 
-Upload the ZIP to Overleaf, choose **pdfLaTeX**, and select **main.tex**. The supplied build configuration compiles the companion supplement and resolves references in both directions. Locally:
+Upload the paired ZIP to Overleaf, choose **pdfLaTeX**, and select **main.tex**. The supplied build configuration compiles the companion supplement and resolves references in both directions. Locally:
 
 ```sh
 cd paper
-latexmk -pdf -interaction=nonstopmode -halt-on-error -jobname=output main.tex
+latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 ```
 
-Select `supplement.tex` instead to display that document as the selected output. Keep `main.pdf` and `supplement.pdf` together under those filenames for links between PDFs. See [paper/README.md](paper/README.md) for provenance, build details, and verification records.
+Select `supplement.tex` instead to display that document as the selected output. Keep `main.pdf` and `supplement.pdf` together under those filenames for links between PDFs. See [paper/README.md](paper/README.md) for build details and the figure sources.
 
 ## After-campaign checks
 

@@ -9,7 +9,7 @@
 \usepackage{microtype}
 \usepackage{subcaption}
 \usepackage{xr}
-\externaldocument{main}
+\externaldocument{main-xr}
 
 % Sections here are numbered S1, S2, ...; theorem-like environments inherit the
 % prefix through the section counter, so results read Proposition S1.2 and so on.
@@ -41,22 +41,12 @@ operator learning''}
 \maketitle
 
 \begin{abstract}%
-This supplement accompanies the main text and is available with the code at
-\url{https://github.com/yspennstate/neural-means-kernel-corrections}
-(\texttt{paper/supplement.pdf}). Section~S1 states the conditional finite-sample bounds for the
-fitted stages; Section~S2 the margin law and the per-coordinate selection
-results; Section~S3 the split-conformal coverage statement; Section~S4 the
-uncontrolled survey of the remaining suite problems and the mirror-symmetry
-check; Section~S5 the effective-dimension identity and its
-Mar\v{c}enko--Pastur closed form; Section~S6 the additional
-structural-mechanics results (ablation, error localization, spectra,
-uncertainty quantification, cost); Section~S7 the OCO-2 input-metric study
-and the data-scaling and ClimSim results; Sections~S8--S10 all proofs, the
-implementation and compute record, and the numerical checks of every stated
-identity and inequality; and Section~S11 the paired centering, correction-label,
-and kernel-grid sensitivity experiments and reconstruction from saved fields.
-Numbering of the form S$n$ refers to this document; all other references
-point to the main text.
+This supplement gives the conditional finite-sample bounds, decision rules,
+conformal coverage results, and proofs supporting the main article. It also
+describes the additional benchmark analyses, implementation and computational
+costs, numerical evaluations, and sensitivity experiments. Sections and results
+prefixed by S refer to this document; other numbered references refer to
+the main article.
 \end{abstract}
 
 \section{Guarantees for the fitted stages}
@@ -71,7 +61,7 @@ point to the main text.
 \label{supp:conf}
 \input{supp_theory_conf}
 
-\section{The rest of the suite, and the mirror-symmetry check}
+\section{Additional benchmarks and reflection symmetry}
 \label{supp:benchmark}
 \input{supp_benchmark}
 
@@ -83,7 +73,7 @@ point to the main text.
 \label{supp:experiments}
 \input{supp_experiments}
 
-\section{The OCO-2 input metric, and data scaling}
+\section{OCO-2 input metrics and data scaling}
 \label{supp:oco2}
 \input{supp_oco2}
 
@@ -95,7 +85,7 @@ point to the main text.
 \label{app:impl}
 \input{impl}
 
-\section{Numerical verification of the stated results}
+\section{Numerical evaluation of the theoretical identities and bounds}
 \label{app:verification}
 \input{verification}
 

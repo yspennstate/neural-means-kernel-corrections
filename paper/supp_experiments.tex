@@ -26,9 +26,7 @@ $\saKfMlpThree\%$ at weight $0.3$ against $\saKfMlpZero\%$ without it, and
 $\saKfMlpOne\%$ at weight $1.0$ in the smaller campaign.
 
 Replacing the single tuned Mat\'ern correction by a sum at several bandwidths
-leaves validation error unchanged to two decimals. This is a result for the
-searched kernels and tuning budget, not an irreducibility claim about the
-residual. In the five-member campaign, nine seeds select the largest nugget
+leaves validation error unchanged to two decimals. This is a result for the searched kernels and tuning budget. In the five-member campaign, nine seeds select the largest nugget
 on the grid, $\lambda=10^{-3}$, and one selects $10^{-5}$. The length-scale
 multiplier is $2$ at five seeds, $1$ at four and $4$ at one. The four-member
 ablation selects multiplier $2$ at eight seeds. These choices describe the
@@ -75,8 +73,7 @@ reference member against a median of $\medRel\%$, a factor of $2.31$.
 On those same cases the five-member ensemble reaches $\hardEns\%$ and the
 mean over individual members is $\hardAll\%$. The ensemble improves this tail
 only slightly. Because these cases were selected by the reference member's
-errors, the comparison describes that selected subset rather than an
-independent tail-risk experiment.
+errors, the comparison describes that selected subset.
 
 The root-mean-square pointwise error over validation samples is $\rmsBnd$ on
 the perimeter of the $41\times41$ grid and $\rmsInt$ in the interior, a ratio
@@ -330,8 +327,7 @@ training replicates. Their differences from our scores therefore do not
 support a paired significance test or an equivalence conclusion. Combining
 two copies of our sampling term in quadrature gives approximately
 $\seUnpaired$ points, but this imputes an unknown baseline variance and
-covariance structure. It is only a sensitivity calculation, not an estimated
-standard error for the difference. The $0.098$-point difference from PCA-Net
+covariance structure. It is a sensitivity calculation. The $0.098$-point difference from PCA-Net
 and $0.022$-point difference from PARA-Net for the five-member pipeline are
 benchmark-score differences; neither is declared statistically significant,
 equivalent or conservative on that basis.
@@ -376,7 +372,7 @@ $\bar e\sqrt{\bar\varrho}$. Substituting the measured mean RMS error and
 mean centered correlation gives the older descriptive references
 $\ensFloor\pm\ensFloorSd\%$ and
 $\ensFloorSix\pm\ensFloorSixSd\%$. The empirical pools are heterogeneous,
-so these substitutions are heuristic diagnostics, not lower bounds. The
+so these substitutions are heuristic diagnostics. The
 one-sided entrywise bounds below and the sixty-member bound use the actual
 uncentered second-moment matrices instead.
 
@@ -399,7 +395,7 @@ Over the measured range above $8000$, fitted log-log slopes are
 $-\lcSlopeMlp\pm\lcSlopeMlpSd$ for the network and $-\lcSlopeKrr$ for the
 kernel. The last step gains $\lcLastGain\pm\lcLastGainSd$ points, positive
 at nine seeds; the last two steps gain $\lcLastTwoGain\pm\lcLastTwoGainSd$,
-positive at all ten. These are finite-range fits, not asymptotic rates.
+positive at all ten. These are finite-range fits.
 A three-parameter fit $e_\infty+cN^{-\alpha}$ gives different extrapolated
 asymptotes, $4.64\%$ and $4.88\%$, so it does not locate a common floor.
 The observed $0.034$-point seed span of our pipeline is also not an estimate
@@ -409,8 +405,7 @@ explanations for the residual plateau.
 
 The five-member test-set check of Corollary~\ref{cor:floorpinch} reports a
 normalized bracket $[0.949\pm0.005,1.039\pm0.004]$ and fitted-global-stack
-quadratic risk $0.980\pm0.003$. That risk uses the stored deployed global
-weights, not a test-set simplex minimization. The six-member validation-matrix
+quadratic risk $0.980\pm0.003$. That risk uses the stored deployed global weights. The six-member validation-matrix
 calculation reports a bracket $[0.933\pm0.007,1.032\pm0.004]$ and normalized
 simplex optimum $0.972\pm0.005$. The corollary upper-bounds the minimum by
 the uniform-weight risk; an arbitrary fitted ensemble need not lie below
@@ -454,8 +449,7 @@ $4.96\%$ for the normalized-MSE network, $4.97\%$ for the refiner,
 $4.94\%$ for the UNet, $4.90\%$ for the metric-loss MLP and $5.46\%$ for
 the kernel. The corresponding ten-seed equal-weight errors lie close to
 these empirical references. Replacing lower moments by mean moments in the block formula
-returns the uniform sixty-member mixture's value exactly by algebra, not by
-an independent predictive test.
+returns the uniform sixty-member mixture's value exactly, as an algebraic identity.
 
 At the pipeline's fixed ridge, per-pixel affine fitting on all sixty members
 has evaluation error $\saPerpixSixty\%$, versus $\saPerpixMeans\%$ for the

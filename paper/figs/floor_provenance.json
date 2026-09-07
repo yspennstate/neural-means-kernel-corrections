@@ -1,0 +1,37 @@
+{
+  "source": "runs/fourier_wco2.log",
+  "source_sha256": "797b73d1b778e0e9936efe7d80f26e179fb54715a47be437a0299a1389056a24",
+  "producer_sha256": "23c58bf051ecec3244be5fcd056136eaac99ce92e34e579c024feb9d0aff4973",
+  "figure_sha256": "225f3ccbd125864bea8adb3e253be5a2d19acba2986963f46d1951a204f26e8c",
+  "reference_reported_error_percent": 16.37,
+  "rows": [
+    {
+      "bandwidth": 0.3,
+      "reported_error_percent": 31.07,
+      "reported_correlation": 0.537
+    },
+    {
+      "bandwidth": 0.6,
+      "reported_error_percent": 116.71,
+      "reported_correlation": 0.166
+    },
+    {
+      "bandwidth": 1.0,
+      "reported_error_percent": 143.95,
+      "reported_correlation": 0.111
+    },
+    {
+      "bandwidth": 1.5,
+      "reported_error_percent": 143.84,
+      "reported_correlation": 0.105
+    },
+    {
+      "bandwidth": 2.0,
+      "reported_error_percent": 144.98,
+      "reported_correlation": 0.114
+    }
+  ],
+  "metric_provenance": "Rounded historical log; underlying arrays and exact moment convention unavailable",
+  "theorem_admission_overlay": false,
+  "architecture_comparison_bars": false
+}

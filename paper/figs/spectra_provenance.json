@@ -1,0 +1,16 @@
+{
+  "kind": "new_subsample_spectrum_figure",
+  "n_subsample": 6000,
+  "fixed_nugget": 1e-05,
+  "median_multiplier": 4.0,
+  "effective_dimension": 103.11885064181608,
+  "direct_effective_dimension": 103.11885064179933,
+  "result_sha256": "722364feaf2e51214468d037783dee7de3b927339036d7d572002f1f2b2ac38f",
+  "design_sha256": "7aacc87473849e670dc9566e2dda0e48acf900e4bddf49f2e620d1dd1bd6f507",
+  "spectrum_sha256": "c88843fd07bac9ebd32fd23f10dbbc82ef9b6d9e0fbfd044c690430c04f065bf",
+  "figure_sha256": "6d9c341ce48ee0a4e80238891fa0e636f6098c6933ef82b73b6f99f191892ae2",
+  "producer_sha256": "dab13c436fe1023fac29ef7db253893fadc18a244fe821289ba0e994ec781d26",
+  "clipped_eigenvalues_for_log_display": 0,
+  "log_display_floor": 1e-15,
+  "full_deployed_smoother": false
+}

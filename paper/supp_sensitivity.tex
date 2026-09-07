@@ -3,8 +3,7 @@ original campaigns: target centering in out-of-fold kernel fits,
 consistency of correction labels with the query-time mean, and the extent
 of the OCO-2 kernel search. The run lists and grids were fixed before these
 experiments started. The $\pm$ values below
-are sample standard deviations over the stated seeds, not confidence
-intervals for fresh cases.
+are sample standard deviations over the stated seeds.
 
 \subsection{Paired target-centering reruns}
 For each mechanics seed, the four kernel folds contain 14250 fitting rows
@@ -31,8 +30,7 @@ Each arm retrains the refiner for the same 100 epochs, seed, and eight-thread
 CPU setting, then repeats global stacking, the held-out decision about
 per-pixel weights, full-validation refitting, kernel selection, and
 calibration. The other four neural predictors and the full-training kernel
-predictor are held fixed. Thus the contrast includes propagation through the
-downstream fitting steps, rather than merely comparing two kernel fields.
+predictor are held fixed. Thus the contrast includes propagation through the downstream fitting steps.
 
 \begin{table}[t]
 \centering
@@ -49,10 +47,8 @@ the two rerun arms use the same training schedule and CPU-thread setting.}
 \centering
 \caption{Calibration after the centering reruns, ten seeds. The same 1000
 calibration cases and 19000 evaluation cases are used in each paired arm.
-Radii are absolute Euclidean norms on the output grid, not percentages or
-diameters. ``Constant'' uses scale one; ``disagreement'' uses the retained
-ensemble spread. These are measurements on the public test block, subject
-to the independence qualification in Supplement~\ref{supp:conf}.}
+Radii are absolute Euclidean norms on the output grid. ``Constant'' uses scale one; ``disagreement'' uses the retained
+ensemble spread. These are measurements on the public test block; the independence conditions are stated in Supplement~\ref{supp:conf}.}
 \label{tab:centering-uq}
 \begin{adjustbox}{max width=\linewidth}
 \input{table_centering_uq}
@@ -75,8 +71,7 @@ retain the uncorrected mean or use its inference-consistent correction,
 according to validation error. This decision does not retune the kernel
 grid. The separate correction row records the correction whether or not
 that decision would retain it. The largest propagated relative norm over
-all test cases and ten seeds is $\sensMismatchMax\%$; this maximum is a
-finite-sample diagnostic, not an upper bound at unseen inputs.
+all test cases and ten seeds is $\sensMismatchMax\%$; this maximum is a finite-sample diagnostic.
 
 \begin{table}[t]
 \centering

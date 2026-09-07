@@ -96,8 +96,7 @@ Gaussian process on network features. REEF-GP \citep{vendrell2026geometry}
 fits a Gaussian process post hoc to a neural operator's residuals in its
 feature space. Our contribution here is an empirical comparison of raw
 inputs and frozen features under the same kernel family, search grid,
-tuning subsample, and full refit, with a linear readout control. This
-matches the kernel computation, not the extra cost of learning features.
+tuning subsample, and full refit, with a linear readout control. The comparison matches the kernel computation; the cost of learning the features is additional.
 Separating network training from kernel selection also avoids joint
 optimization, whose overfitting behavior is examined by
 \citet{ober2021promises}.

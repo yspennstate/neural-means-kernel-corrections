@@ -4,9 +4,7 @@ training sizes over a sixteenfold range, at ten seeds on each band.
 Each sensitivity map is estimated from the training rows available at its
 own sample size. The singular-value counts retaining $99\%$ of the map's
 squared energy are $12/20$, $14/24$ and $13/24$; the corresponding
-participation ratios are $11.99$, $13.63$ and $13.33$. These are descriptive
-summaries of an estimated linear sensitivity map, not identified dimensions
-of the nonlinear target.
+participation ratios are $11.99$, $13.63$ and $13.33$. These are descriptive summaries of an estimated linear sensitivity map.
 
 Table~\ref{tab:aniso} reports finite-range log--log slopes. On O2 the paired
 slope difference is small relative to its seed variation. The adapted
@@ -28,8 +26,7 @@ band. ``Rank'' counts singular values of the training-only estimated sensitivity
 holding $99\%$ of the squared energy, out of the input dimension. The exponent
 difference is paired within seed; its standard deviation is over seeds. The
 last column is the isotropic-to-adapted error ratio at $n=18000$.
-The slopes are descriptive fits over the finite sizes tested, not asymptotic
-convergence rates.}
+The slopes are descriptive fits over the finite sizes tested.}
 \label{tab:aniso}
 \begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{lccccc}
@@ -46,10 +43,7 @@ strong CO$_2$ & 13/24 & $0.203\pm0.029$ & $0.255\pm0.020$ & $-0.052\pm0.021$ & $
 
 At its largest size the sweep recovers the raw-kernel rows of
 Table~\ref{tab:oco2} to the digit, seed by seed and including the selected
-hyperparameters. We record that as a consistency check on the two code paths
-and nothing more: both call the same tuning routine on the same standardized
-inputs, so the agreement is a re-execution of one deterministic computation
-rather than corroboration by an independent measurement. One
+hyperparameters. This is a consistency check on the two code paths: both call the same tuning routine on the same standardized inputs. One
 protocol note: the table's matched $250$-epoch budget is short of
 convergence for the network rows. A separate single-seed $750$-epoch run of
 the same code --- not a row of Table~\ref{tab:oco2}, all of whose numbers are
@@ -61,9 +55,7 @@ budget.
 The training-loss comparison further distinguishes coordinate
 weighting from per-case weighting. The second network in
 Table~\ref{tab:oco2} is trained on a diagonally weighted loss over the
-reduced coefficients, $\|s_z\odot(\hat z-z)\|/\|s_z\odot z\|$. That is a
-surrogate for the radiance-relative error, not the error itself: the
-reported radiance metric maps predictions through the stored PCA
+reduced coefficients, $\|s_z\odot(\hat z-z)\|/\|s_z\odot z\|$. That is a surrogate for the radiance-relative error: the reported radiance metric maps predictions through the stored PCA
 reconstruction and divides by the reconstructed-radiance norm, and the
 surrogate omits the reconstruction. The third network is trained in the
 exact radiance metric, reconstruction and denominator included, and it does
@@ -94,8 +86,7 @@ and measure the risks of mixtures of that finite pool.
 
 The identity itself holds numerically. At uniform weights $w^\top Sw$ and the
 directly measured risk of the averaged prediction agree to $7\times10^{-18}$,
-$3\times10^{-17}$ and $1\times10^{-17}$ on the three bands --- the
-proposition's content, checked against real predictions rather than assumed.
+$3\times10^{-17}$ and $1\times10^{-17}$ on the three bands --- the proposition's content, checked against real predictions.
 
 Over the $45$ seed pairs per band, the residual alignments are
 $0.787\pm0.010$ (O2), $0.971\pm0.001$ (WCO2) and
@@ -175,13 +166,11 @@ metric by $0.0015$ points.
 
 On O2 the combination's reduced mean is slightly worse than that of the
 flat-feature head ($4.11510\%$ versus $4.11080\%$), while its radiance mean
-improves from $0.07927\%$ to $0.02940\%$. The result is therefore a useful
-trade-off, not dominance over every component. WCO2 has a weaker radiance
+improves from $0.07927\%$ to $0.02940\%$. The result is therefore a trade-off. WCO2 has a weaker radiance
 comparison: one seed is worse than the source emulator by $0.0015$
 percentage points. The stored paired-bootstrap interval for that seed is
 $[-0.0012,0.0042]$ percentage points, while the other nine intervals are
-negative. These are descriptive intervals on the public test cases, without
-a correction for repeated benchmark analysis.
+negative. These are descriptive intervals on the public test cases.
 
 \subsection{Learning curves and training budgets}
 \label{sec:scaling}
@@ -218,7 +207,7 @@ scope of this comparison. The kernel rows of the campaign
 read $0.390\pm0.007$, $0.391\pm0.006$ and $0.387\pm0.007$ at the three
 sizes, but that flatness is by construction and says nothing about the
 kernel: the exact solve was fitted on a $6000$-row subsample of the
-training slice at every size, a budget rather than a data point. What the
+training slice at every size, so the budget was fixed while the data grew. What the
 kernel does with more rows was measured afterwards under the same protocol
 (selection on the pool validation block, separate test evaluation, seed
 $0$, the one-million slice): $\csCapSix$ at $6000$ rows, $\csCapTwelve$ at
@@ -251,7 +240,6 @@ larger sizes, error bars over seeds. No crossover between the two families is ob
 the campaign's, fitted on $6000$ rows at every training size, so their
 flatness across sizes is by construction; the kernel's own budget ladder,
 measured afterwards under the same protocol, is in the text. The neural
-mean has higher $R^2$; the published baseline (dotted) is an
-orientation point rather than a matched-protocol comparison.}
+mean has higher $R^2$; the published baseline (dotted) is shown for orientation; the protocols are not matched.}
 \label{fig:ocoscaling}
 \end{figure}

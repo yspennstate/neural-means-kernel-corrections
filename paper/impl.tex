@@ -24,7 +24,7 @@ coordinates), projection $64\to128\to1$. AdamW, learning rate
 $1.5\times10^{-3}$ ($2\times10^{-3}$ with batch 256), weight decay $10^{-6}$,
 cosine schedule to $10^{-6}$, 200 epochs, batch 256. 6.45M parameters.
 
-\paragraph{Transformer (implemented, not in the reported ensemble).} Encoder:
+\paragraph{Transformer (not in the reported ensemble).} Encoder:
 41 tokens (load value and 10 sine/cosine pairs of the coordinate), 5 pre-norm
 blocks, dimension 192, 4 heads, MLP ratio 4. Decoder: grid queries from
 Fourier features of both coordinates, two cross-attention blocks, pointwise
@@ -82,8 +82,7 @@ six-member campaign, the ablations, the hard-case study, the learning curves,
 the sixty-predictor analysis, the conformal calibration (which draws its
 $1000$ calibration cases from it) and the additional controls. Predictor
 fitting and model-level selection use the fitting and validation splits.
-The test-block analyses additionally fit the explicitly labelled
-hindsight ensemble optimum and choose calibration quantiles on a test subset.
+The test-block analyses additionally fit the hindsight ensemble optimum and choose calibration quantiles on a test subset.
 The $2000$ public OCO-2 test states are in the same
 position across the ten-seed campaign, the readout control and the ensemble
 scoreboard.
@@ -178,8 +177,7 @@ for the two MLPs and the kernel ridge and $6\times10^{-6}$ for the refiner
 100-epoch cosine schedule, each to the end of it: nine of the ten FNO runs
 and all ten UNet runs keep their final checkpoint, the tenth FNO its
 epoch-79 one. The schedule is normalized to its own budget, so it anneals
-fully to $10^{-6}$; it is a complete shorter schedule, not the first
-campaign's schedule cut short. The per-pixel stack, the residual correction,
+fully to $10^{-6}$; it is a complete shorter schedule. The per-pixel stack, the residual correction,
 the global convex stack, the second-moment measurement and the conformal
 calibration were then run on the six members at every seed and, for the
 paired comparisons of Section~\ref{sec:members-seeds}, on the same five
@@ -198,14 +196,13 @@ writes its member predictions and per-sample errors, which is what makes the
 combination rules, the floors and the scoreboard of Section~\ref{sec:oco2}
 recomputable without retraining; those arrays stay with the run and are not
 part of the distributed release. Seven of the thirty band-seeds were run a
-second time on different hardware, which serves as a reproducibility check:
+second time on different hardware, as a reproducibility check:
 six of the ten rows reproduce to the printed precision across the two runs,
 including the kernel rows, the flat-metric network, its feature head and the
 combination that the paper reports, while the three weighted-loss members
 and their heads move by up to $0.39$ points. Seeding fixes the
 initialization and the data order but not every reduction the training
-performs, so a seeded rerun of those members should be expected to land
-nearby rather than exactly; the tables' standard deviations, which are over
+performs, so a seeded rerun of those members lands near, but not exactly on, the original values; the tables' standard deviations, which are over
 seeds, are larger than this in every case.
 
 \paragraph{Reconciling the stored arrays.} Every member's saved prediction
@@ -272,8 +269,7 @@ timer every ten epochs, and prints the device it selected; the kernel stage
 prints the elapsed seconds of every grid cell, one Cholesky factorization and
 solve of the $19000\times19000$ system followed by the validation prediction,
 and the out-of-fold stage the seconds per fold at $n=14250$. Every task ran
-six threads, five tasks to an instance, so the figures are wall clock under
-the campaign's own load rather than the cost of an isolated job, and the
+six threads, five tasks to an instance, so the figures are wall clock under the campaign's own load, and the
 spread across seeds is mostly the spread across hosts: the four seeds the
 larger instance lists as its own in the campaign's task records (2, 4, 8 and
 9) are separated from the other six by the kernel's per-cell time without
@@ -332,17 +328,14 @@ Kernel ridge, grid and refit & --- & 17.0--26.0 min & 6.1--7.4 min \\
 campaign's cost record at all ten seeds, every member trained to the end of
 its schedule on one host. Thread counts differ across members because the
 host was shared with the rest of the campaign. We report thread-minutes,
-elapsed wall time multiplied by the configured thread count. This records
-allocated parallelism, not measured CPU utilization, and remains sensitive
-to contention on the shared host. The FNO uses about $7900$ thread-minutes
+elapsed wall time multiplied by the configured thread count. This is allocated parallelism; CPU utilization was not measured, and the timings include contention on the shared host. The FNO uses about $7900$ thread-minutes
 against $54$ for the MSE MLP while improving single-member error by about
 $0.03$ percentage points. The UNet uses about $115$ times the MSE MLP's
 thread-minutes and has higher single-member error, although it improves the
 ensemble. Parameter counts alone do not explain these differences: the FNO
 has 6.45M parameters, the refiner 6.64M, and the UNet 4.38M. Convolution over
 the full field and dense prediction from the load vector have different
-computational costs; the table measures their implementations at the stated
-schedules, rather than intrinsic costs of the architecture families.
+computational costs; the table measures their implementations at the stated schedules.
 
 \begin{table}[t]
 \centering

@@ -78,7 +78,7 @@ displayed defect exactly; the second inequality is Proposition~\ref{prop:sym}.
 If $F(u,\cdot)$ is uniformly $L_h$-Lipschitz, the additional term is at most
 $(L_h/2)\mathbb E[\|T h(u)-h(Su)\|_2/\|G(u)\|_2]$.
 This defect and the Lipschitz constant are not measured in the experiments,
-so the inequality is a structural statement rather than a numerical bound.
+so the inequality is not evaluated numerically.
 
 The distinction can matter even with an exactly symmetric target. Let the
 input take the values $+1$ and $-1$ with equal probability, let $S$ exchange
@@ -351,16 +351,11 @@ not the constant. What the corollary
 establishes is conditional: for candidates fixed independently of the
 validation sample, in the coordinatewise mean-squared metric, an oracle
 inequality of the ordinary $m^{-1/2}$ form holds with constants that are
-assumed as population bounds or, for $\kappa$, given in closed form. It is not a bound on the estimator
-the pipeline fits: that estimator is selected by mean relative $L^2$ error
+assumed as population bounds or, for $\kappa$, given in closed form. The estimator the pipeline fits differs from this one: it is selected by mean relative $L^2$ error
 rather than by squared coordinate risk, its kernel stages are tuned on an
 $8000$-row subsample and the winner is refit on all $19000$ rows, and the
 same validation split selects checkpoints and members --- none of which the
-statement covers. Two cautions apply to every statement in this section and are
-repeated in the main text: the candidates are assumed fixed independently
-of the validation sample, which the deployed pipeline does not satisfy,
-since the same split selects checkpoints, members and, on OCO-2,
-coordinates; and the constants $B$, $b$, $L$, $W$ are population bounds,
+statement covers. Every statement in this section assumes candidates fixed independently of the validation sample, whereas in the deployed pipeline the same split selects checkpoints, members and, on OCO-2, coordinates; and the constants $B$, $b$, $L$, $W$ are population bounds,
 for which the text substitutes observed maxima, so the evaluated values are
 conditional capacity calculations and not guarantees for the fitted
 estimator. The split-conformal result of Section~\ref{supp:conf} gives marginal

@@ -16,10 +16,8 @@ matched sensitivity experiment.
 The carve is taken from the source study's Sobol training design while the
 public test states are a separate draw, and the two differ: the flat
 network's mean relative error is $6.7\%$ on the carve against $4.4\%$ on the
-test block on O2, so every selection made on the carve is a selection under
-a shift between the two, not a same-distribution choice.
-The comparison is therefore computed on identical test points against the
-published emulator itself rather than against our reimplementation of it.
+test block on O2, so every selection made on the carve is made under a shift between the two.
+The comparison is therefore computed on identical test points against the published emulator's own predictions.
 
 The two error criteria are defined here on the released reduced
 representation. Neither is the source study's instrument-noise or retrieval
@@ -72,9 +70,7 @@ Mat\'ern solve as everywhere else in this paper, and the two raw-input rows
 are fit by that same kernel-tuning routine and budget as the feature heads:
 the same scale grid $\{0.5,1,2,4\}$ times the median distance, the same
 nugget grid $\{10^{-8},10^{-6},10^{-4}\}$, the same $6000$-sample tuning
-subsample, and the winner refit on all $18000$ training points. This matches
-the kernel stage, not total computation: feature heads additionally require
-neural-network training. The
+subsample, and the winner refit on all $18000$ training points. This matches the kernel stage; feature heads additionally require neural-network training. The
 raw-input rows' selected settings vary from seed to seed; every feature head,
 by contrast, selected the largest multiplier ($4$) and the smallest nugget
 ($10^{-8}$) of that grid at all thirty band-seeds, so the feature-head
@@ -136,9 +132,7 @@ emulator is most accurate exactly on the heavily weighted leading
 coefficient ($0.0012$ against the flat network's $0.0054$), while the flat
 network is nearly four times more accurate across the trailing thirty
 coordinates that the radiance barely sees ($0.0276$ against $0.1037$). Both
-weighted losses buy the leading coefficient at the price of the tail, and by
-almost the same amount ($0.0012$ and $0.0016$), which is the measurement
-behind the reading below; the per-coordinate combination takes
+weighted losses buy the leading coefficient at the price of the tail, and by almost the same amount ($0.0012$ and $0.0016$); the per-coordinate combination takes
 each coordinate from whichever model wins it.}
 \label{fig:oco2}
 \end{figure}
@@ -162,8 +156,7 @@ the other bands. Thus the linear-refit control does not reproduce
 the Mat\'ern improvement. Adding the ridge readouts to coordinate selection
 changes the combination by at most $0.002$ percentage points on any band.
 
-Three details of the comparison belong next to these numbers. The combination
-row is produced by the unweighted selector over the three networks and
+The combination row is produced by the unweighted selector over the three networks and
 their three feature-kernel heads. It takes each reduced
 coordinate from the model with the smallest validation root-mean-square
 error on that coordinate; we also ran a selector
@@ -182,15 +175,11 @@ a case-resampling bootstrap of the difference between the combination and
 the emulator excludes zero at ten of ten seeds on both metrics on O2 and
 SCO2, and at ten of ten on WCO2's reduced metric and nine of ten on its
 radiance metric, the exception being the seed that loses by $0.0015$ points;
-the seed standard deviations in Table~\ref{tab:oco2} describe retraining
-variability, not that comparison. The comparison concerns the two criteria defined here on the released
-reduced representation (the coefficients, and the radiance reconstructed
-from the retained forty components) rather than the full-spectrum acceptance
-test of \citet{susiluoto2025radiative}, with the networks at a $250$-epoch
+the seed standard deviations in Table~\ref{tab:oco2} describe retraining variability. The comparison concerns the two criteria defined here on the released
+reduced representation (the coefficients, and the radiance reconstructed from the retained forty components), with the networks at a $250$-epoch
 budget and the emulator fitted on $20000$ states against our $18000$ plus a
 $2000$-state validation carve. Instrument response, Jacobians and the
-retrieval itself are outside its scope. Learning the metric rather than
-setting it by hand does not change this reading. A per-dimension metric fit by
+retrieval itself are outside its scope. Learning the metric instead of setting it by hand does not change this picture. A per-dimension metric fit by
 the kernel-flows cross-validation loss of \citet{owhadi2019kernel} reaches the
 same $30\%$ on the raw state, and a low-rank Mahalanobis metric with a thousand
 more parameters does not improve on it; on the features, where the network has
@@ -244,16 +233,14 @@ quantity here is the root-mean-square relative error and
 the uncentered alignment the proposition is stated in
 (\texttt{oco\_ensemble\_recheck.json} in the release). The $28$ pairs of a band-seed share members and the ten seeds of a band
 share one test block, so the bins describe a trend across margin rather
-than binomial samples. What degrades in the small-margin pairs is the
-transfer of two estimates from one block to another, not the proposition.
+than binomial samples. In the small-margin pairs it is the transfer of the two estimates from one block to another that degrades.
 
 The signed gap $D=\varrho-e_1/e_2$ changes between validation and test
 with empirical standard deviation $0.099$ across these dependent pairs and
 mean change $0.0004$. Its within-pair seed scatter is $0.010$. The
 validation-to-test design shift is therefore material in this diagnostic;
 Proposition~\ref{prop:margin} turns such a shift into a probabilistic bound
-under an estimation-error condition, and the margin bins describe this pool
-rather than an admission threshold.
+under an estimation-error condition, and the margin bins describe this pool.
 
 For the raw-input kernel against the flat network, the ten-seed validation
 means are $\varrho=0.156$ and $e_n/e_k=0.157$. The difference changes sign

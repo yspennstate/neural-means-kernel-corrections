@@ -65,8 +65,7 @@ random hill climb in logit space ($600$ Gaussian proposals of step $0.3$,
 decaying by $0.3\%$ per step) on half of the $1000$ held-out samples (250 in
 the low-data protocol), the other half judging the per-pixel variant against
 them. The simplex minimizer of the measured second-moment matrix of
-Proposition~\ref{prop:secmom} is used in the analyses of
-Section~\ref{sec:seeds-arch}, not in the deployed stack. A per-pixel variant allows the weights (plus an intercept) to
+Proposition~\ref{prop:secmom} is used only in the analyses of Section~\ref{sec:seeds-arch}. A per-pixel variant allows the weights (plus an intercept) to
 vary over the grid, ridge-fitted on half the validation split and accepted
 only when it beats the global weights on the other half; it is the variant
 the final pipeline uses. Validation-selected stacking \citep{wolpert1992stacked} is an additional fitted stage; Proposition~\ref{prop:stack}, proved in Supplement~\ref{app:proofs}, bounds its selection cost for independent candidates.

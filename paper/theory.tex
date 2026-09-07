@@ -158,7 +158,7 @@ $\delta_\varrho$ plus a $1/M$ term: when these entrywise spreads are small, the 
 \noindent\emph{Proof.} See Supplement~\ref{proof:cor:floorpinch}.
 
 
-Applied to a measured matrix $\widehat S$, these are exact empirical bounds on that same design, not confidence bounds on the population matrix. For the six-member validation matrices, the weak RMS floor $\sqrt{\min_{i\ne j}\widehat S_{ij}}$ is $4.820\pm0.062\%$, the stronger finite-six-member lower bound is $4.849\pm0.060\%$, and the simplex optimum is $4.920\pm0.057\%$ (mean and sample standard deviation over ten seeds). The values near $4.91\%$ obtained from mean centered correlations are equicorrelation diagnostics, not these lower bounds.
+Applied to a measured matrix $\widehat S$, these are exact empirical bounds on that same design. For the six-member validation matrices, the weak RMS floor $\sqrt{\min_{i\ne j}\widehat S_{ij}}$ is $4.820\pm0.062\%$, the stronger finite-six-member lower bound is $4.849\pm0.060\%$, and the simplex optimum is $4.920\pm0.057\%$ (mean and sample standard deviation over ten seeds). The values near $4.91\%$ obtained from mean centered correlations are equicorrelation diagnostics, not these lower bounds.
 
 The floor is stated for convex weights, and the deployed stack is not
 convex: its per-pixel weights are affine and unconstrained in sign. For
@@ -252,7 +252,7 @@ with the first.
 
 At perfect anticorrelation $\varrho=-1$, cancellation gives zero optimal risk and the derivative in $t$ is zero, so that boundary is excluded above. At the admission threshold $\varrho=1/t$ with $t>1$, the exchange coefficient $(1-\varrho^2)/(t-\varrho)$ tends to $1/t$; it need not be large. The formula is a local sensitivity calculation at an interior point. Supplement~\ref{supp:experiments} evaluates it at the measured values.
 
-For coordinate-dependent combinations, squared losses with a fixed diagonal metric separate by coordinate (Proposition~\ref{prop:percoord}; proof in Supplement~\ref{app:proofs}). The same holds after a fixed sample weighting (Corollary~\ref{cor:percoordw}; proof in Supplement~\ref{app:proofs}). These statements motivate the selector but do not make it simultaneously optimal for the two reported mean relative norms: the square root couples coordinates, and the two criteria also have different sample denominators. Proposition~\ref{prop:selectcoord} gives an independent-validation selection bound (proof in Supplement~\ref{app:proofs}); the deployed candidates reuse validation, as noted above. The OCO-2 combination improves on the rescored source emulator in both mean criteria, while the flat feature head is slightly better on the O2 reduced criterion.
+For coordinate-dependent combinations, squared losses with a fixed diagonal metric separate by coordinate (Proposition~\ref{prop:percoord}; proof in Supplement~\ref{app:proofs}). The same holds after a fixed sample weighting (Corollary~\ref{cor:percoordw}; proof in Supplement~\ref{app:proofs}). These statements motivate the selector but do not make it simultaneously optimal for the two reported mean relative norms: the square root couples coordinates, and the two criteria also have different sample denominators. Proposition~\ref{prop:selectcoord} gives an independent-validation selection bound (proof in Supplement~\ref{app:proofs}); the deployed candidates share the validation split. The OCO-2 combination improves on the rescored source emulator in both mean criteria, while the flat feature head is slightly better on the O2 reduced criterion.
 
 \subsection{Metric and representation: when a fixed kernel loses to a network}
 \label{sec:theory-aniso}
@@ -322,7 +322,7 @@ campaigns it is applied coordinatewise, with the norm the root sum of squares
 over output coordinates, which is the norm Theorem~\ref{thm:or} uses.
 
 The proof (Supplement~\ref{app:proofs}) is the standard pullback identity for
-reproducing kernels \citep{saitoh1997integral,paulsen2016introduction}. The identity specifies the feature-kernel RKHS and the minimum extension norm. It provides no comparison with the raw-input RKHS without additional assumptions. In particular, a linear feature map is itself an input metric transformation. The measured fitted-norm reduction is evidence about these fitted kernels at the reported scales and nuggets, rather than a theorem about representation learning.
+reproducing kernels \citep{saitoh1997integral,paulsen2016introduction}. The identity specifies the feature-kernel RKHS and the minimum extension norm. It provides no comparison with the raw-input RKHS without additional assumptions. In particular, a linear feature map is itself an input metric transformation. The measured fitted-norm reduction concerns these fitted kernels at the reported scales and nuggets.
 
 \subsection{An error bound for the residual kernel correction}
 \label{sec:theory-or}

@@ -59,8 +59,7 @@ Navier--Stokes & vorticity $\to$ vorticity & 0.12\% (kernel) & 0.28\% $\pm$ 0.00
 The continuous problem is invariant under $x_1\mapsto1-x_1$: the domain and
 boundary partition are symmetric, and the input law has a symmetric
 covariance. On the grid, reflecting the load ($S$) should reflect the stress
-field along the first grid coordinate ($T$), i.e.\ $G(Su)=TG(u)$. Rather than
-assume this, we test it on the data. For each of the first 200 samples we
+field along the first grid coordinate ($T$), i.e.\ $G(Su)=TG(u)$. We test this on the data. For each of the first 200 samples we
 searched all 40000 loads for the nearest neighbor of the reflected load $Su_i$
 and compared the corresponding outputs. For the five best-matching pairs, the
 input mismatch $\|Su_i-u_j\|/\|u_j\|$ ranges over $0.27$--$0.32$, while the
@@ -80,7 +79,6 @@ Proposition~\ref{prop:sym} controls expected loss under its exact assumptions;
 a finite test sample can go the other way.
 The thirty records include ten refiners whose supplied-field averaging
 requires a further channel-equivariance condition, as explained in
-Supplement~\ref{sec:theory-sym}; their improvements are empirical support
-for that implementation, not instances of the proposition's guarantee.
+Supplement~\ref{sec:theory-sym}; their improvements are empirical support for that implementation.
 
 

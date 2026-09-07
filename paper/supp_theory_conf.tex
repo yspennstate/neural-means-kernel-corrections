@@ -55,8 +55,7 @@ Supplement~\ref{proof:prop:conf}. The score is a residual norm divided by a
 positive scale, and the resulting set is a Euclidean ball in output space
 with radius $QP_\lambda(u)$. The stored statistic named \texttt{mean\_width}
 in the records is the mean of this radius, not its diameter.
-The guarantee is marginal over a new input, not conditional coverage at each
-input and not a collection of coordinatewise intervals. Constant-radius and
+The guarantee is marginal over a new input and concerns the whole-output ball; it does not give conditional coverage at each input or coordinatewise intervals. Constant-radius and
 other positive-scale scores satisfy the same proposition under the same
 independence assumptions, whether or not the scale ranks error well.
 
@@ -71,8 +70,7 @@ $\mathrm{Beta}(901,100)$ conditional coverage, and the central $95\%$
 reference interval for the fraction on $N=19000$ cases is
 $[88.0\%,91.8\%]$; at the $95\%$ nominal level it is
 $[93.5\%,96.3\%]$. The reported ten seeds fall inside these intervals
-at both levels. These are conditional reference comparisons.
-The seeds share test cases and are not ten independent draws from this law.
+at both levels. The seeds share test cases and are not ten independent draws from this law.
 
 The proposition's guarantee refers to a predictor and scale fixed before an
 independent, exchangeable calibration-and-evaluation sample is observed. The

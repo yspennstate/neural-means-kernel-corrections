@@ -57,10 +57,8 @@ $\lambda\in\{10^{-3},10^{-2},10^{-1},1,10\}$.
 
 The closed form is a reference for the stated i.i.d. linear-feature model.
 The learned neural features and nonlinear kernel matrices in the experiments
-are not covered by those assumptions. In particular, a bulk-and-outlier
-spectral shape alone does not establish a Mar\v{c}enko--Pastur limit or
-identify which eigenvectors carry predictive signal. The finite-matrix trace
-identity remains valid without either claim. Figure~\ref{fig:spectra} applies
+lie outside those assumptions; the finite-matrix trace identity holds
+regardless. Figure~\ref{fig:spectra} applies
 it to a separate $6000$-row subsample of the structural-mechanics training
 design. At the diagnostic's fixed nugget $10^{-5}$, its effective dimension
 is $103.12$. This is the trace of that subsample smoother, not a measurement

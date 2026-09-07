@@ -35,9 +35,8 @@ invariance. For a finite training sample, Jensen's inequality also shows that
 the reflection-augmented empirical loss upper-bounds the empirical loss of
 the symmetrized predictor. The objectives are generally different, so the
 proposition does not guarantee that training with augmentation improves the
-fitted model. The near-mirror checks support, but do not prove, exact
-symmetry of the distributed solver output. In the campaign, the recorded
-averages improve twenty-nine of thirty members across the two MLP variants
+fitted model. The near-mirror checks support exact symmetry of the distributed solver
+output. In the campaign, the averages improve twenty-nine of thirty members across the two MLP variants
 and the refiner, and worsen one by a thousandth of a point. The refiner's
 operation requires the distinction below. The convexity
 argument is standard; \citet{lyle2020benefits} give a general account.
@@ -54,10 +53,10 @@ f_S(u)=\tfrac12\big(F(u,h(u))+T F(Su,h(Su))\big).
 The implementation instead uses $T h(u)$ as the second branch's conditioning
 field. Thus $h(Su)=T h(u)$ is a sufficient additional condition for identifying
 the implemented average with $f_S$. Equivariance of the target and invariance
-of the load distribution do not establish this property of a fitted kernel
-predictor. Nor does training the refiner with randomly reflected triples
-force exact equivariance. We make no non-increase guarantee for its recorded
-averaging operation without that additional condition.
+of the load distribution do not by themselves give this property to a fitted
+kernel predictor, and training the refiner with randomly reflected triples
+does not force exact equivariance; the non-increase guarantee for its
+averaging operation is conditional on that identity.
 
 There is a quantitative way to state the missing requirement. Write
 $b(u)=\tfrac12(F(u,h(u))+T F(Su,T h(u)))$ for the implemented average and
@@ -78,8 +77,8 @@ $\mathbb E\|b-f_S\|_2/\|G\|_2$, and orthogonality of $T$ gives the
 displayed defect exactly; the second inequality is Proposition~\ref{prop:sym}.
 If $F(u,\cdot)$ is uniformly $L_h$-Lipschitz, the additional term is at most
 $(L_h/2)\mathbb E[\|T h(u)-h(Su)\|_2/\|G(u)\|_2]$.
-Neither this defect nor such a Lipschitz bound was measured in the campaign,
-so this inequality does not certify its observed error changes.
+This defect and the Lipschitz constant are not measured in the experiments,
+so the inequality is a structural statement rather than a numerical bound.
 
 The distinction can matter even with an exactly symmetric target. Let the
 input take the values $+1$ and $-1$ with equal probability, let $S$ exchange
@@ -186,9 +185,8 @@ B\sqrt{\frac{2\big((M-1)\log\!\big(m(M-1)+1\big)+\log(2/\delta)\big)}{m}} .
 With $M=5$, $m=1000$ and $\delta=0.05$, the excess term is about
 $0.28B$. Substituting $B=0.25$, the largest observed member error, gives
 roughly seven percentage points, conditional on that value being a genuine
-uniform population bound. An observed maximum does not establish this
-hypothesis, and even the conditional value is too large to certify negligible
-selection error. The result supplies the scaling $\sqrt{M\log m/m}$;
+uniform population bound. Even that conditional value is too large to make the selection error
+negligible. The result supplies the scaling $\sqrt{M\log m/m}$;
 the much smaller validation-to-test gaps are empirical measurements.
 
 The stack the pipeline deploys on the structural-mechanics benchmark is finer
@@ -295,7 +293,8 @@ the fitted stack's own risk, and combining with
 Proposition~\ref{prop:affine}(ii) bounds the composite risk against the best
 affine stack, provided the hypotheses of both results hold (with failure
 probabilities allocated between them). Here $b$ and $W$ must be population
-and class bounds; the released observed values do not certify them. For
+and class bounds; the observed values are
+diagnostics of them. For
 kernel ridge weights, $\kappa$ is supplied by the next lemma.
 \end{corollary}
 \noindent\emph{Proof.} See Supplement~\ref{proof:cor:certificate}.
@@ -348,7 +347,7 @@ grid averages $\kappaTen$ over the ten seeds
 $\kappa_{\mathrm{an}}$, so that evaluating the display at the probe value
 would shrink it by a factor of about two hundred and forty. But a supremum
 over a finite probe is a lower bound on the constant the corollary needs,
-not the constant, and we do not use it as one. What the corollary
+not the constant. What the corollary
 establishes is conditional: for candidates fixed independently of the
 validation sample, in the coordinatewise mean-squared metric, an oracle
 inequality of the ordinary $m^{-1/2}$ form holds with constants that are

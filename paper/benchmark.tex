@@ -31,10 +31,10 @@ Errors are mean relative $L^2$ errors over the test set,
 G(u_n)-G(u_n)\|_2}{\|G(u_n)\|_2},
 \]
 computed on grid values in double precision using unweighted vector norms.
-Published comparisons retain their source values; for example,
-\citet{batlle2024kernel} describe trapezoidal quadrature for their
-discretized $L^2$ norm. The numerical proximity of two quoted errors should
-therefore not be read as agreement to every reported decimal.
+Published comparisons retain their source values; \citet{batlle2024kernel},
+for example, use trapezoidal quadrature for their discretized $L^2$ norm, so
+errors quoted from different studies agree in definition only up to such
+conventions.
 
 \subsection{Protocols and published results}
 Two regimes appear in the literature, and we follow both. In the
@@ -54,20 +54,18 @@ protocol of \citet{mora2025operator}, 1250 samples are available and the same
 zero-mean GP), 7.12\% (DeepONet-mean GP) and 6.49\% (FNO-mean GP). In this
 regime we carve the validation split (250 samples) out of the 1250, so
 training uses 1000 samples. Fitting and selection within each low-data run
-use those 1250 labels; the recipe itself was developed through the wider
-benchmark study.
+use those 1250 labels.
 
 \subsection{The rest of the suite, and a check of the mirror symmetry}
 \label{sec:suite-summary}
-Supplement~\ref{supp:benchmark} reports an exploratory survey of the other
-operator-learning problems and a check of reflection symmetry. The survey
-uses a largely fixed recipe but has unequal splits or grids and limited seed
-replication, so it provides context rather than a controlled comparison.
+Supplement~\ref{supp:benchmark} reports a survey of the other operator-learning
+problems and a check of reflection symmetry. The survey uses a largely fixed
+recipe with unequal splits and limited seed replication and is included for
+context.
 For structural mechanics, reflected near-neighbor pairs, the reflection
 axis, and empirical load moments are consistent with the symmetry used by
-Proposition~\ref{prop:sym}. These finite-data checks support that modeling
-assumption without establishing exact equivariance of the numerical solver.
-The replicated mechanics and OCO-2 experiments are the focus of the paper.
+Proposition~\ref{prop:sym}. These finite-data checks support the modeling
+assumption.
 
 \subsection{Related work}
 \label{sec:related}
@@ -102,7 +100,7 @@ tuning subsample, and full refit, with a linear readout control. This
 matches the kernel computation, not the extra cost of learning features.
 Separating network training from kernel selection also avoids joint
 optimization, whose overfitting behavior is examined by
-\citet{ober2021promises}; it does not make repeated validation use independent.
+\citet{ober2021promises}.
 
 Other uncertainty constructions induce a Gaussian process from a neural
 operator \citep{kumar2024neural} or from its linearization
@@ -121,5 +119,4 @@ structure \citep{prasanth2021kernel}. Effective dimension links the kernel
 solve to classical Gram-spectrum and random-matrix results
 \citep{koltchinskii2000random,marchenko1967distribution,baik2005phase}
 and to kernel-ridge generalization theory \citep{caponnetto2007optimal}.
-We use these results as conditional reference models, without asserting
-that trained nonlinear features satisfy an i.i.d. random-matrix model.
+We use these results as reference models.

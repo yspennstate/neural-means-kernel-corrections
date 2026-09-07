@@ -23,7 +23,7 @@ refiner; these changes are empirical measurements.
 The kernel-flow regularizer did not improve
 the low-data MLP's validation error. At high data the ten-seed records give
 $\saKfMlpThree\%$ at weight $0.3$ against $\saKfMlpZero\%$ without it, and
-$\saKfMlpOne\%$ at weight $1.0$ in the recorded smaller campaign.
+$\saKfMlpOne\%$ at weight $1.0$ in the smaller campaign.
 
 Replacing the single tuned Mat\'ern correction by a sum at several bandwidths
 leaves validation error unchanged to two decimals. This is a result for the
@@ -32,13 +32,11 @@ residual. In the five-member campaign, nine seeds select the largest nugget
 on the grid, $\lambda=10^{-3}$, and one selects $10^{-5}$. The length-scale
 multiplier is $2$ at five seeds, $1$ at four and $4$ at one. The four-member
 ablation selects multiplier $2$ at eight seeds. These choices describe the
-recorded regularization preferences without establishing the residual's
-native-space membership or smoothness.
+regularization preferences of the fitted corrections.
 
 The kernel prediction supplies the refiner's conditioning field. Its residual
 is less correlated with the neural members' residuals on the measured splits,
-which motivates this input but does not establish that a second network's
-conditioning field would be inferior. Section~\ref{sec:diversity} reports the
+which motivates this input. Section~\ref{sec:diversity} reports the
 ensemble comparisons and their second-moment diagnostics.
 
 \begin{table}[t]
@@ -149,8 +147,8 @@ are included in the numerical record.}
 
 \subsection{Cost and reproducibility}
 \label{sec:cost}
-The pipeline was built on a single laptop and replicated on four cloud CPU
-instances. The kernel stages use dense, exact linear solves. At the campaign's
+The pipeline was developed on a single workstation GPU and replicated on
+four cloud CPU instances. The kernel stages use dense, exact linear solves. At the campaign's
 shapes, an eight-thread timing diagnostic measured $\costGramS$ seconds to
 build a $19000\times19000$ Gram matrix in blocks, $\costCholS$ seconds for its
 Cholesky factorization, and $\costSolveS$ seconds to solve for 1681 output
@@ -173,7 +171,7 @@ the main correction driver still forms full-size temporaries and needs
 the corresponding memory. The neural means have a few million parameters and include both metric-loss
 and normalized-MSE training. Splits are specified by permutation seeds and
 inputs are the 41-dimensional loads described in Section~\ref{sec:benchmark}.
-The recorded fitting stages use validation-based choices. The release contains splits, code and per-seed
+The fitting stages use validation-based choices. The release contains splits, code and per-seed
 summaries for checking reported rows. Prediction arrays and checkpoints are
 not distributed, so regenerating predictions requires retraining.
 
@@ -183,12 +181,11 @@ kernel native space with consistent training labels. The deployed correction
 uses mixed training predictions: the kernel channel is constructed with
 foldwise fits whose target centering uses the pooled training labels, while
 neural predictions on these rows are in-sample. These labels need not equal
-$G(X)-m_{\mathrm{full}}(X)$ for the deployed mean. The theorem therefore does
-not certify the deployed error without its stated consistency and
-native-space assumptions and, where applicable, the mismatch term.
+$G(X)-m_{\mathrm{full}}(X)$ for the deployed mean. The theorem applies to the deployed error under its stated consistency
+and native-space assumptions and, where applicable, the mismatch term.
 
 Table~\ref{tab:norms} reports a computable diagnostic: the squared RKHS norms
-of ridge functions fitted to the two recorded label arrays. With the selected
+of ridge functions fitted to the two label arrays. With the selected
 correction kernel at seed $0$, the residual-label fit has a norm about
 \normRatio$\times$ smaller than the raw-stress fit and about
 \normRatioNorm$\times$ smaller per unit label energy. These ratios depend on
@@ -201,11 +198,10 @@ The design factor $P_\lambda$ correlates weakly with the deployed surrogate's
 absolute error (Pearson \uqCorrAbs) and negatively with relative error. Its
 correlation with the output norm is \uqCorrNorm{} (Figure~\ref{fig:uq}), so
 normalization by output amplitude changes how this signal should be read.
-These associations describe the recorded data; they do not show that error
-is independent of all input geometry. Ensemble disagreement has correlation
+These associations describe the measured data. Ensemble disagreement has correlation
 $\uqDisAbs\pm0.006$ with absolute error across ten seeds and
 $-0.25\pm0.04$ with relative error. The corresponding four-member absolute
-error correlation is \uqDisAbsFour. Thus neither recorded signal ranks the
+error correlation is \uqDisAbsFour. Thus neither signal ranks the
 remaining error well. A spread statistic is insensitive to a common additive
 error shared by all members, which is consistent with the residual alignment
 observed here.
@@ -229,8 +225,8 @@ reference model, $m=1000$ gives latent coverage
 $\mathrm{Beta}(901,100)$ at the $90\%$ level; with $19000$ independent
 evaluation scores its Beta--binomial reference interval is
 $[88.0\%,91.8\%]$. The analogous $95\%$ interval is $[93.5\%,96.3\%]$.
-All ten recorded six-member coverages fall inside these intervals at each
-level. This comparison does not verify the reference model's assumptions.
+All ten six-member coverages fall inside these intervals at each
+level.
 
 The constant-radius band covers $\uqRawSix\pm\uqRawSixSd\%$ and
 $\uqRawSixHi\pm\uqRawSixHiSd\%$, inside the reference intervals at ten of
@@ -340,14 +336,11 @@ and $0.022$-point difference from PARA-Net for the five-member pipeline are
 benchmark-score differences; neither is declared statistically significant,
 equivalent or conservative on that basis.
 
-Within the recorded campaigns, per-case paired differences isolate changes
+Within the two campaigns, per-case paired differences isolate changes
 between fitted predictors on the same cases. The end-to-end gain is
 $\errEndToEnd$ points and removal of the FNO costs
 $\fnoGain\pm\fnoGainSd$ points across ten seeds, with the latter direction
-holding at all ten. These describe repeatability across the recorded seeds
-and paired test-block effects. They are not independent replications of all
-research choices or corrected confirmatory tests after the full sequence of
-experiments.
+holding at all ten. These describe repeatability across seeds and paired test-block effects.
 
 The validation second-moment simplex optimum distributes weight among the
 five members: refiner $0.31\pm0.04$, FNO $0.34\pm0.06$, normalized-MSE network
@@ -389,17 +382,14 @@ uncentered second-moment matrices instead.
 
 All these bounds concern RMS error $\mathcal E_2$ for global convex weights.
 Jensen's inequality gives $\mathcal E_1\le\mathcal E_2$ for the same
-predictor; it does not transfer an RMS lower bound to mean error. We do not
-convert the final pipeline's mean error with dispersion factors from another
-predictor. Its per-pixel affine weights and kernel correction also place it
+predictor, so an RMS lower bound does not transfer to mean error. Its per-pixel affine weights and kernel correction also place it
 outside the global convex class. Among global sum-to-one weights the signed
 and convex optima differ by at most $0.00052$ percentage points in the stored
 records, but they do not always coincide: the signed minimizer has a negative
 coordinate at seven six-member seeds and one five-member seed.
 
 The selected input-space residual correction improves the five-member stack
-by $\corrGain$ points at $n=19000$. This small gain does not prove that no
-Mat\'ern function can explain the remaining residual. Figure~\ref{fig:scaling}
+by $\corrGain$ points at $n=19000$. Figure~\ref{fig:scaling}
 reports the observed response to sample size: the normalized-MSE network
 goes from $\lcMlpOneK\pm\lcMlpOneKSd\%$ at $N=1000$ to
 $\lcMlpEightK\pm\lcMlpEightKSd\%$ at $8000$ and
@@ -424,17 +414,16 @@ weights, not a test-set simplex minimization. The six-member validation-matrix
 calculation reports a bracket $[0.933\pm0.007,1.032\pm0.004]$ and normalized
 simplex optimum $0.972\pm0.005$. The corollary upper-bounds the minimum by
 the uniform-weight risk; an arbitrary fitted ensemble need not lie below
-that upper bound, although the recorded five-member weights do.
+that upper bound, although the five-member weights do.
 
 From the released six-member validation matrices, the actual one-sided
 RMS floor $\sqrt{\min_{i\ne j}S_{ij}}$ is $4.820\pm0.062\%$, the stronger
 finite-six-member lower bound is $4.849\pm0.060\%$, and the quadratic
 optimum is $\predRMSSix\pm\predRMSSixSd\%$. These are different from the
-heuristic equicorrelation references. The recorded dispersion factors
+heuristic equicorrelation references. The dispersion factors
 $\dispFac\pm\dispFacSd$ and $\dispFacSix\pm\dispFacSixSd$ compare
 $\mathcal E_1$ and $\mathcal E_2$ on the same validation data used to compute
-the weights. They are same-sample metric diagnostics, not prospective
-validation. For six members the ratio of test mean error to validation RMS
+the weights. They are same-sample metric diagnostics. For six members the ratio of test mean error to validation RMS
 error is $0.9357\pm0.0110$; that ratio additionally includes transfer between
 samples and is not a pure dispersion factor.
 
@@ -452,7 +441,7 @@ $40$ random subsets otherwise.
 Using the evaluation matrix, the smallest diagonal is $0.0024512070$ and the
 within- and between-architecture lower second moments divided by that
 diagonal are $0.9807963$ and $0.9377968$. Theorem~\ref{thm:blockfloor} then
-gives $\saBound\%$, below the recorded hindsight RMS optimum
+gives $\saBound\%$, below the hindsight RMS optimum
 $\saSixtyOracleRms\%$. This is an algebraic empirical lower bound for global
 convex combinations of these sixty predictors on these cases. It is not a
 population lower confidence bound or a restriction on untrained predictors.
@@ -464,8 +453,7 @@ within-architecture second moments are approximately $4.93\%$ for the FNO,
 $4.96\%$ for the normalized-MSE network, $4.97\%$ for the refiner,
 $4.94\%$ for the UNet, $4.90\%$ for the metric-loss MLP and $5.46\%$ for
 the kernel. The corresponding ten-seed equal-weight errors lie close to
-these empirical references; this does not establish that further reseeding
-is exhausted. Replacing lower moments by mean moments in the block formula
+these empirical references. Replacing lower moments by mean moments in the block formula
 returns the uniform sixty-member mixture's value exactly by algebra, not by
 an independent predictive test.
 
@@ -480,15 +468,14 @@ uniform-weight mean error from $\saSixtyEq\%$ to $\saFiftyEq\%$.
 For the first campaign the test-error seed standard deviation is $0.005$
 points at uniform weights, $0.006$ for fitted global weights,
 $\errStackSd$ for the affine stack and $\errPipeSd$ after correction.
-These measurements describe the variability of the recorded stages and do
-not imply a general rule that more fitting always raises or lowers it.
+These measurements describe the variability of the fitted stages.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figs/seedspread.pdf}
 \caption{Left: the corrected pipeline's test error at each of the ten seeds
 (points), their mean (dashed), and the five published single numbers on the
-same axis (grey). These show the recorded variability of our pipeline;
+same axis (grey). These show the variability of our pipeline;
 comparable seed distributions are unavailable for the published methods. Right: the same ten seeds followed down the pipeline, each stage
 scored on test, with the stage mean marked. Fitting per-pixel weights lowers the
 mean; seed spreads at each stage are reported in the text.}

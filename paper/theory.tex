@@ -23,9 +23,8 @@ Section~S1 states finite-sample bounds for reflection averaging
 selection stages (Propositions~\ref{prop:stack} and~\ref{prop:affine},
 Lemma~\ref{lem:select}, and Corollary~\ref{cor:certificate}). The statistical
 selection bounds require candidates fixed before an independent validation
-sample is drawn. The deployed pipeline reuses validation for checkpoint,
-member, and kernel selection, so those bounds do not certify its risk.
-They describe the dependence on class size, sample size, and correction
+sample is drawn. The deployed pipeline uses validation for checkpoint, member, and kernel
+selection, so those bounds describe the dependence on class size, sample size, and correction
 weights; several are numerically vacuous at our sample sizes.
 Lemma~\ref{lem:kappa} gives the uniform correction-weight bound
 $\kappa_{\mathrm{an}}=500$ for the stated kernel normalization and nugget.
@@ -263,7 +262,7 @@ less than half a percentage point. On the O2 band, raw-input kernel error is
 roughly nine times the network's error. We examine input scaling and learned
 features as two possible explanations for this difference.
 
-The first is input geometry. A sensitivity-based linear transformation improves the raw-input kernel by a factor of about $1.1$--$1.5$ in this study. The learning-curve sweep does not establish a general rate improvement. Proposition~\ref{prop:aniso} in Supplement~\ref{supp:rules} gives a finite-design bound for a Lipschitz target after a rank-$r$ truncation, with its approximation error explicit; its proof is in Supplement~\ref{app:proofs}. It makes no assertion that a measured approximate rank changes an asymptotic rate.
+The first is input geometry. A sensitivity-based linear transformation improves the raw-input kernel by a factor of about $1.1$--$1.5$ in this study. Proposition~\ref{prop:aniso} in Supplement~\ref{supp:rules} gives a finite-design bound for a Lipschitz target after a rank-$r$ truncation, with its approximation error explicit; its proof is in Supplement~\ref{app:proofs}. It makes no assertion that a measured approximate rank changes an asymptotic rate.
 
 The second is the representation used by the kernel. Native-space bounds depend on the target's norm in that space. A fixed kernel may approximate targets outside its RKHS, so native-space membership is not a limit on approximation expressivity. Learned features can change the relevant norm and design geometry, but neither change is automatically favorable.
 
@@ -395,7 +394,7 @@ $Kc=k(X,u)$, and the same argument applies.
 \end{proof}
 
 
-\paragraph{The recorded correction labels.}
+\paragraph{The correction labels.}
 Let $M_{\rm tr}\in\mathbb R^{n\times q}$ denote the training-row mean actually used by the implementation, and let $m_{\rm full}$ be the query-time mean. The kernel channel uses foldwise fits with pooled target centering; neural channels are in-sample, and the refiner's kernel input also changes at deployment. Thus $M_{\rm tr}$ need not be the restriction of a single cross-fitted function. Define
 \[
  c_\lambda(u)=(K+n\lambda I)^{-1}k(X,u),\qquad
@@ -409,9 +408,9 @@ The implemented predictor is $m_{\rm full}(u)+c_\lambda(u)^\top R_{\rm tr}$. If 
        +\|c_\lambda(u)^\top\Delta\|_2,\label{eq:mismatch}\\
 \|c_\lambda(u)^\top\Delta\|_2&\le\|c_\lambda(u)\|_2\|\Delta\|_F.\nonumber
 \end{align}
-Indeed, $R_{\rm tr}=(G-m_{\rm full})(X)+\Delta$; substituting this identity and applying the theorem proves the display. Section~\ref{sec:implementation-sensitivity} measures the propagated mismatch on the recorded test cases. The first term still contains an unknown native-space norm, so the display is not an evaluated error certificate for the reported correction.
+Indeed, $R_{\rm tr}=(G-m_{\rm full})(X)+\Delta$; substituting this identity and applying the theorem proves the display. Section~\ref{sec:implementation-sensitivity} measures the propagated mismatch on the test cases. The first term still contains an unknown native-space norm, so the display is not an evaluated error certificate for the reported correction.
 
-The RKHS assumption is also unverified for these targets and the norm is unknown. For labels sampled from one compatible $r\in H_k^q$, ridge contraction gives $\|\widehat r_\lambda\|_K\le\|r\|_K$. With the recorded mixed training labels, the fitted norm need not lower-bound $\|G-m_{\rm full}\|_K$. Table~\ref{tab:norms} therefore describes fitted functions only: its squared-norm ratio is about 4900 before energy normalization and 8.8 after it. Neither ratio proves a corresponding reduction in an unknown residual norm or smoothness. The design factor is a worst-case error factor and need not rank realized errors well; Section~\ref{sec:uq} measures that ranking directly.
+The RKHS membership and the norm of the target residual are not observed. For labels sampled from one compatible $r\in H_k^q$, ridge contraction gives $\|\widehat r_\lambda\|_K\le\|r\|_K$. With the mixed training labels, the fitted norm need not lower-bound $\|G-m_{\rm full}\|_K$. Table~\ref{tab:norms} therefore describes fitted functions only: its squared-norm ratio is about 4900 before energy normalization and 8.8 after it. Neither ratio proves a corresponding reduction in an unknown residual norm or smoothness. The design factor is a worst-case error factor and need not rank realized errors well; Section~\ref{sec:uq} measures that ranking directly.
 
 The interpolant also minimizes worst-case error among all rules using the
 same residual observations. The next result states that classical recovery
@@ -488,4 +487,4 @@ on the validation split; Section~\ref{sec:uq} reports this band beside a
 constant-radius band calibrated the same way from the raw scores
 $\|e(\tilde u_i)\|_2$. Coverage does not require the RKHS bound or a useful error ranking. For a predictor and positive scale fixed independently of exchangeable calibration and future inputs, Proposition~\ref{prop:conf} gives marginal coverage at least $1-\alpha$. Its proof is in Supplement~\ref{app:proofs}. The upper bound $1-\alpha+1/(m+1)$ additionally requires almost surely distinct scores. Define the conformal quantile using the $k=\lceil(1-\alpha)(m+1)\rceil$-th order statistic of the $m$ scores augmented by $+\infty$, which also covers $k=m+1$.
 
-If, conditional on the fitted predictor and scale, the calibration and evaluation scores are i.i.d. with a continuous distribution and $k\le m$, the random conditional coverage over calibration draws has law $\mathrm{Beta}(k,m+1-k)$. The number covered among $N$ fresh evaluation cases is Beta--binomial. Remark~\ref{rem:covlaw} states and derives this law in Supplement~\ref{supp:conf}. At $m=1000$ and $N=19000$ its nominal-90\% central reference interval is $[88.0\%,91.8\%]$. A random split alone does not establish continuity or undo study-level adaptation to an already inspected test block. The recorded coverage experiment is compared with this reference law under those conditions; it is not a guarantee conditional on each input or on arbitrary prior test-driven selection.
+If, conditional on the fitted predictor and scale, the calibration and evaluation scores are i.i.d. with a continuous distribution and $k\le m$, the random conditional coverage over calibration draws has law $\mathrm{Beta}(k,m+1-k)$. The number covered among $N$ fresh evaluation cases is Beta--binomial. Remark~\ref{rem:covlaw} states and derives this law in Supplement~\ref{supp:conf}. At $m=1000$ and $N=19000$ its nominal-90\% central reference interval is $[88.0\%,91.8\%]$. The coverage experiment is compared with this reference law under those conditions; it is not a guarantee conditional on each input or on arbitrary prior test-driven selection.

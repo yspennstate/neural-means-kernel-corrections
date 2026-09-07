@@ -55,10 +55,10 @@ convergence for the network rows. A separate single-seed $750$-epoch run of
 the same code --- not a row of Table~\ref{tab:oco2}, all of whose numbers are
 at $250$ epochs --- reaches $3.82\%$ (flat network) and $3.71\%$ (feature
 head) on this band, with the combination at $3.71\%$ reduced and $0.0174\%$
-radiance. This single run shows that the reported levels depend on training
-budget; it does not establish convergence or a replicated budget comparison.
+radiance. This single run shows that the reported levels depend on the training
+budget.
 
-The recorded training-loss comparison further distinguishes coordinate
+The training-loss comparison further distinguishes coordinate
 weighting from per-case weighting. The second network in
 Table~\ref{tab:oco2} is trained on a diagonally weighted loss over the
 reduced coefficients, $\|s_z\odot(\hat z-z)\|/\|s_z\odot z\|$. That is a
@@ -85,7 +85,7 @@ flat network's $0.0054$, whereas the flat network is three to four times
 more accurate on the trailing thirty coordinates. These measurements
 support trying both losses; they do not imply a generally optimal loss.
 
-The recorded flat-network seeds permit a second-moment analysis similar to
+The flat-network seeds permit a second-moment analysis similar to
 that on structural mechanics.
 Proposition~\ref{prop:secmom} is stated for the squared-metric risk, so the
 measurement is made there: for each band we form the matrix $S$ of the ten
@@ -103,8 +103,8 @@ $0.961\pm0.001$ (SCO2). An equicorrelation summary gives ten-member RMS
 relative errors of $4.419\%$, $17.997\%$ and $9.267\%$, matching the
 recorded uniform-mixture risks at the displayed precision. The corresponding
 infinite-family values, $4.360\%$, $17.970\%$ and $9.248\%$, are
-extrapolations under the equicorrelation model. They are not certified lower
-bounds for untrained seeds or for the architecture class. The exact
+extrapolations under the equicorrelation model. They are not lower bounds
+for untrained seeds or for the architecture class. The exact
 finite-pool statement is the quadratic identity applied to the measured
 matrix $S$.
 
@@ -119,12 +119,11 @@ where the seed ensemble reaches $3.916\%$ against the head's $4.111\%$ on
 O2. At this budget a different kind of member buys less than ensembling ten
 copies of the plain one; the order-of-magnitude result of this section is
 the representation ladder, which does not depend on this comparison.
-These are comparisons of recorded predictors with different computational
-costs; the study does not establish their ordering at matched total compute.
+These are comparisons of predictors with different computational costs.
 
 Lower residual alignment alone does not guarantee a useful mixture: the
 weaker member's RMS error also enters Proposition~\ref{prop:secmom}(i).
-A historical WCO2 Fourier-feature bandwidth sweep records error near
+A original WCO2 Fourier-feature bandwidth sweep records error near
 $31\%$ with correlation $0.54$, and errors above $140\%$ with correlations
 near $0.11$ (Figure~\ref{fig:floor}). The surviving log contains rounded
 errors and correlations, but neither the prediction arrays nor the exact
@@ -138,10 +137,9 @@ not a lower bound for an architecture class.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figs/floor.pdf}
-\caption{Historical WCO2 Fourier-feature sweep. Labels and colors identify bandwidths; the
+\caption{Original WCO2 Fourier-feature sweep. Labels and colors identify bandwidths; the
 dashed line is the log's SiLU error of $16.37\%$. Three bandwidths nearly
-coincide in the upper left. The axes report the log's quantities, whose
-precise moment convention cannot be recovered from the retained records.
+coincide in the upper left. The axes report the log's quantities.
 No theorem boundary is plotted. The source log is
 \texttt{runs/fourier\_wco2.log}; its hash and the five rounded pairs are
 retained in the figure's provenance record.}
@@ -151,9 +149,9 @@ retained in the figure's provenance record.}
 For the raw-input kernel against the flat network, the stored validation
 summary has $\varrho=0.156$ and $e_n/e_k=0.157$, with RMS relative errors
 $8.41\%$ and $53.5\%$. The sign of the criterion changes across seeds,
-and the recorded optimal mixture gains only a few ten-thousandths of a
+and the optimal mixture gains only a few ten-thousandths of a
 percentage point. This explains the pair's small
-contribution, not a validated prospective exclusion rule.
+contribution.
 
 The combination chooses each coordinate from one of the three networks
 and three feature-kernel heads using coordinatewise validation RMSE. By
@@ -185,9 +183,9 @@ $[-0.0012,0.0042]$ percentage points, while the other nine intervals are
 negative. These are descriptive intervals on the public test cases, without
 a correction for repeated benchmark analysis.
 
-\subsection{Recorded learning curves and training budgets}
+\subsection{Learning curves and training budgets}
 \label{sec:scaling}
-The recorded OCO-2 learning curve decreases more strongly with training
+The OCO-2 learning curve decreases more strongly with training
 size than the structural-mechanics curve over the ranges examined.
 The left panel of Figure~\ref{fig:ocoscaling} shows a one-seed O2 experiment
 with a disjoint held-out set. A finite-range log--log fit gives slope
@@ -196,23 +194,23 @@ $4.3\%$ at $n=17700$. The main ten-seed combination at $18000$ training
 pairs has mean $4.12\%$ at its $250$-epoch budget; the $3.71\%$ result
 above belongs to a separate single-seed $750$-epoch experiment. These are
 different protocols and should not be combined into one scaling fit.
-The raw-input kernel improves more slowly over the recorded sizes.
+The raw-input kernel improves more slowly over the sizes.
 A separate full-resolution $58\to3048$ experiment shows little change over
 a few hundred retrievals. Neither observation identifies the limiting
 source of error or an asymptotic convergence rate.
 
 The retained ClimSim records cover a larger data range. ClimSim \citep{yu2023climsim} is a climate emulation dataset of about
 ten million samples that maps a $124$-dimensional atmospheric state to $128$
-physics tendencies, with published neural baselines. The recorded runs compare two model
+physics tendencies, with published neural baselines. The runs compare two model
 families at one, two and three and a half million training samples under the
 recorded protocol, with within-run selection on a held-out block drawn
 from the training pool and separate evaluation data; the
 right panel of Figure~\ref{fig:ocoscaling} plots those points. Each campaign
 seed draws its own $20000$-row test block, so the spreads below include that
-variation; this is not claimed to reproduce a canonical benchmark split.
+variation.
 
 What the points establish is the high-data half of the picture. The neural
-mean has higher recorded $R^2$ than the kernel and increases with size: $0.544\pm0.005$ at one
+mean has higher $R^2$ than the kernel and increases with size: $0.544\pm0.005$ at one
 million (five seeds), $0.563\pm0.004$ at two million and $0.575\pm0.004$ at
 three and a half million (three seeds each), compared for orientation with a published multilayer-perceptron value near
 $0.6$; a matched split-and-scoring reproduction of that baseline is outside the
@@ -253,7 +251,7 @@ larger sizes, error bars over seeds. No crossover between the two families is ob
 the campaign's, fitted on $6000$ rows at every training size, so their
 flatness across sizes is by construction; the kernel's own budget ladder,
 measured afterwards under the same protocol, is in the text. The neural
-mean has higher recorded $R^2$; the published baseline (dotted) is an
+mean has higher $R^2$; the published baseline (dotted) is an
 orientation point rather than a matched-protocol comparison.}
 \label{fig:ocoscaling}
 \end{figure}

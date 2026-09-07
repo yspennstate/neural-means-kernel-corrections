@@ -1,7 +1,7 @@
 The pipeline has three stages: neural means, stacking, and kernel
 corrections. All components operate on the load vector $u\in\mathbb R^{41}$
 (standardized by training statistics) and produce stress fields in
-$\mathbb R^{41\times41}$. Neural members use either mean relative $L^2$ loss in original units or normalized mean-squared loss, as identified in Table~\ref{tab:members}. The normalized-MSE MLP is the stronger of the two plain MLPs in this campaign.
+$\mathbb R^{41\times41}$. Neural members use either mean relative $L^2$ loss in original units or normalized mean-squared loss, as identified in Table~\ref{tab:members}. The normalized-MSE MLP is the stronger of the two plain MLPs in these experiments.
 
 \subsection{Neural means}
 \emph{Residual MLP.} The primary mean is a residual multilayer perceptron:
@@ -15,7 +15,7 @@ given an extra input channel: the kernel method's predicted stress field for
 the same load, concatenated with the load. The network predicts the full stress
 field from these two inputs; it has no explicit residual-output constraint.
 Its test error is close to that of the normalized-MSE network
-(Table~\ref{tab:members}). During training the refiner reads four-fold kernel predictions. The kernel weights are fitted excluding the held-out fold, but the recorded runs centered targets using the mean over the full fitting pool. Consequently a held-out row can affect its kernel channel through that pooled target mean. This is training-label reuse, not strict cross-fitting. At query time the refiner receives the full-data kernel prediction. The historical tables describe that implementation. Section~\ref{sec:implementation-sensitivity} changes the target centering in a paired rerun and repeats the downstream fitting steps.
+(Table~\ref{tab:members}). During training the refiner reads four-fold kernel predictions: the kernel weights are fitted excluding the held-out fold, with targets centered by the mean over the full fitting pool. At query time the refiner receives the full-data kernel prediction. Section~\ref{sec:implementation-sensitivity} reports a paired experiment with fold-local target centering.
 
 \emph{Other instances.} The mean slot is not tied to a particular
 architecture. We also use a Fourier neural operator \citep{li2021fourier}
@@ -45,8 +45,8 @@ $h(Su)$. This equals reflection averaging of the composite predictor
 $f(u)=F(u,h(u))$ if $h(Su)=T h(u)$; the fitted kernel channel is not
 constrained to satisfy this identity. Proposition~\ref{prop:sym} gives the population-risk
 guarantee for the full-map average under exact target equivariance and
-distribution invariance; it does not supply that guarantee for the recorded
-refiner without the additional channel condition. The kernel-only member
+distribution invariance, with the channel condition as an additional
+hypothesis for the refiner. The kernel-only member
 uses neither neural augmentation nor this prediction average. Training
 augmentation is a separate intervention from prediction averaging.
 Optionally, the training
@@ -69,11 +69,11 @@ Proposition~\ref{prop:secmom} is used in the analyses of
 Section~\ref{sec:seeds-arch}, not in the deployed stack. A per-pixel variant allows the weights (plus an intercept) to
 vary over the grid, ridge-fitted on half the validation split and accepted
 only when it beats the global weights on the other half; it is the variant
-the final pipeline uses. Validation-selected stacking \citep{wolpert1992stacked} is an additional fitted stage. The independent-candidate bound of Proposition~\ref{prop:stack} is proved in Supplement~\ref{app:proofs}; its independence hypothesis is not satisfied by the reused checkpoint-selection split, and its constants do not certify negligible selection cost here.
+the final pipeline uses. Validation-selected stacking \citep{wolpert1992stacked} is an additional fitted stage; Proposition~\ref{prop:stack}, proved in Supplement~\ref{app:proofs}, bounds its selection cost for independent candidates.
 
 \subsection{Kernel corrections}
 \label{sec:method-kernel}
-Let $M_{\rm tr}$ be the training-row mean used by the recorded code. It combines foldwise kernel predictions with in-sample predictions from fitted neural members; the refiner is evaluated using its training kernel channel. Its residual labels are $R=Y-M_{\rm tr}$. At query time the mean is $m_{\rm full}$. These need not agree on training inputs. Equation~\eqref{eq:mismatch} gives the resulting deterministic mismatch term, with its proof immediately following that display.
+Let $M_{\rm tr}$ be the training-row mean. It combines foldwise kernel predictions with in-sample predictions from fitted neural members; the refiner is evaluated using its training kernel channel. Its residual labels are $R=Y-M_{\rm tr}$. At query time the mean is $m_{\rm full}$. These need not agree on training inputs. Equation~\eqref{eq:mismatch} gives the resulting deterministic mismatch term.
 
 The stacked mean is then corrected by kernel ridge regression of its
 residuals. Let $X=(u_1,\dots,u_n)$ be the training loads (standardized
@@ -86,7 +86,7 @@ $k(u,u')=\kappa\big(\|u-u'\|/s\big)$. The correction is
 with $(s,\lambda)$ chosen on the validation split from a small grid ($s$ as a
 multiple of the median pairwise distance, $\lambda\in\{10^{-6},10^{-5},10^{-3}\}$;
 the grid is searched on an 8000-sample subsample and the chosen pair is refit
-on all of $X$). The recorded corrected surrogate is $m_{\rm full}+\widehat r$. A second corrective
+on all of $X$). The corrected surrogate is $m_{\rm full}+\widehat r$. A second corrective
 stage repeats the construction with the kernel evaluated on deep features,
 the concatenated penultimate activations of the ensemble members
 (reflection-averaged, standardized), fitted to the training-row residuals after the first correction; it contributes a smaller improvement and is included when it helps on
@@ -96,7 +96,7 @@ frozen last-layer features, tuned and refit by the same routine, in place of
 a residual correction of the network; the two uses are named separately
 where they appear. At $n=19000$ the exact solve is a single Cholesky factorization
 of a $19000\times19000$ matrix, under half a minute in double precision on a
-campaign CPU host (factorization alone; Section~\ref{sec:cost}). Prediction
+CPU host (factorization alone; Section~\ref{sec:cost}). Prediction
 evaluates the kernel against the training inputs and multiplies by $\alpha$;
 no inducing points, preconditioners, or stochastic solvers are
 involved. The Gaussian process

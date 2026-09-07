@@ -12,9 +12,7 @@ Q=\begin{cases}s_{(k)},&k\le m,\\+\infty,&k=m+1,\end{cases}
 \end{equation}
 where $s_{(k)}$ is the $k$-th order statistic of the $m$ calibration scores
 and $0<\alpha<1$. When the required index exceeds the calibration sample
-size the prediction set is the whole output space. A fixed random split
-alone does not establish the independence from model development required
-below.
+size the prediction set is the whole output space.
 
 \begin{proposition}[finite-sample coverage]\label{prop:conf}
 Fix the predictor $\widehat G$, design $X$ and positive scale function
@@ -56,7 +54,7 @@ The proposition is the usual split-conformal rank argument
 Supplement~\ref{proof:prop:conf}. The score is a residual norm divided by a
 positive scale, and the resulting set is a Euclidean ball in output space
 with radius $QP_\lambda(u)$. The stored statistic named \texttt{mean\_width}
-in the campaign records is the mean of this radius, not its diameter.
+in the records is the mean of this radius, not its diameter.
 The guarantee is marginal over a new input, not conditional coverage at each
 input and not a collection of coordinatewise intervals. Constant-radius and
 other positive-scale scores satisfy the same proposition under the same

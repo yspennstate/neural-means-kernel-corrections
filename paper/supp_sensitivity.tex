@@ -1,5 +1,5 @@
 These experiments address three implementation choices of the
-historical campaigns: target centering in out-of-fold kernel fits,
+original campaigns: target centering in out-of-fold kernel fits,
 consistency of correction labels with the query-time mean, and the extent
 of the OCO-2 kernel search. The run lists and grids were fixed before these
 experiments started. The $\pm$ values below
@@ -23,7 +23,7 @@ fold and pooled target means, their difference on held-out rows is
 \]
 The implementation checks this identity against a separate right-hand-side
 solve at eight prespecified output coordinates. It also checks that the
-pooled predictions reproduce the historical out-of-fold field before
+pooled predictions reproduce the original out-of-fold field before
 allowing downstream training. The complete per-fold discrepancies are
 retained in the evidence package.
 
@@ -31,13 +31,13 @@ Each arm retrains the refiner for the same 100 epochs, seed, and eight-thread
 CPU setting, then repeats global stacking, the held-out decision about
 per-pixel weights, full-validation refitting, kernel selection, and
 calibration. The other four neural predictors and the full-training kernel
-predictor are reused. Thus the contrast includes propagation through the
+predictor are held fixed. Thus the contrast includes propagation through the
 downstream fitting steps, rather than merely comparing two kernel fields.
 
 \begin{table}[t]
 \centering
 \caption{Target-centering comparison on the fixed 20000-case mechanics test
-block, ten paired seeds. The historical pipeline is shown as a reference;
+block, ten paired seeds. The original pipeline is shown as a reference;
 the two rerun arms use the same training schedule and CPU-thread setting.}
 \label{tab:centering-sensitivity}
 \begin{adjustbox}{max width=\linewidth}
@@ -60,10 +60,10 @@ to the independence qualification in Supplement~\ref{supp:conf}.}
 \end{table}
 
 \subsection{Correction-label consistency with a fixed estimator}
-For each historical six-member pipeline, we reconstruct the training-row
+For each original six-member pipeline, we reconstruct the training-row
 mean and evaluate its query-time counterpart on those same rows. The
 selected kernel, its hyperparameters, and the fitted stack weights remain
-fixed. We then solve for two sets of coefficients: one from the historical
+fixed. We then solve for two sets of coefficients: one from the original
 residual labels, the other from $G(X)-m_{\rm full}(X)$. The difference of
 their predictions is exactly the propagated term in \eqref{eq:mismatch}.
 The driver checks this coefficient identity and reproduction of the
@@ -80,9 +80,9 @@ finite-sample diagnostic, not an upper bound at unseen inputs.
 
 \begin{table}[t]
 \centering
-\caption{Correction-label sensitivity, ten historical mechanics pipelines.
+\caption{Correction-label sensitivity, ten original mechanics pipelines.
 No neural training or stack-weight fitting is repeated. The kernel is the
-one selected in the historical run.}
+one selected in the original run.}
 \label{tab:mismatch-sensitivity}
 \begin{adjustbox}{max width=\linewidth}
 \input{table_mismatch_sensitivity}
@@ -97,7 +97,7 @@ Both grids use the same training/validation split, the same 6000-row tuning
 subsample, the same objective for each head, and a refit at the selected
 hyperparameters on all 18000 training rows.
 
-The recorded grid has scale multipliers $\{0.5,1,2,4\}$ and nuggets
+The original grid has scale multipliers $\{0.5,1,2,4\}$ and nuggets
 $\{10^{-8},10^{-6},10^{-4}\}$, for 12 cells per kernel. The expanded grid
 has multipliers $\{0.25,0.5,1,2,4,8,16\}$ and all eight powers
 $10^{-10},\ldots,10^{-3}$, for 56 cells. Scales multiply the median
@@ -118,7 +118,7 @@ retained forty-component representation, as in the main OCO-2 study.
 \centering
 \caption{O2 grid comparison, three paired seeds. The errors are means and
 sample standard deviations over seeds. Of the 15 selected kernels (five
-per seed), $\sensOtwoOldBoundary$ meet a boundary of the recorded grid and
+per seed), $\sensOtwoOldBoundary$ meet a boundary of the original grid and
 $\sensOtwoNewBoundary$ meet a boundary of the expanded grid. The respective
 failed-cell counts are $\sensOtwoOldFailed$ and $\sensOtwoNewFailed$.}
 \label{tab:grid-o2-full}
@@ -168,7 +168,7 @@ The reported mechanics accuracy uses the ordinary Euclidean norm on the
 $41\times41$ output grid. As a separate metric check, we also apply tensor-product
 trapezoidal weights: one in the interior, one half on edges, and one quarter
 at corners. The common grid-spacing factor cancels in the relative error.
-For the ten historical corrected pipelines, the plain-grid error is
+For the ten original corrected pipelines, the plain-grid error is
 $\sensGridPlain\pm\sensGridPlainSd\%$, while the trapezoidal-grid error is
 $\sensGridWeighted\pm\sensGridWeightedSd\%$. Nested one-dimensional
 quadrature independently reproduces the weighted calculation. This check

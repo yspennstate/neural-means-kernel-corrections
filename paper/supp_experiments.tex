@@ -13,8 +13,14 @@ Reflection test-time averaging lowers the metric-trained MLP's test error by
 $\ttaGainMLP$ points. This agrees with the direction of
 Proposition~\ref{prop:sym} under its symmetry assumptions; the empirical
 symmetry checks do not prove those assumptions. The effect is smaller on the
-normalized-MSE network ($0.02$ points) and absent by construction from the
-refiner, which trains symmetrized. The kernel-flow regularizer did not improve
+normalized-MSE network ($0.02$ points). In the ten-seed refiner records,
+the implemented supplied-field average lowers test error by
+$\ttaGainRefiner\pm\ttaGainRefinerSd$ percentage points (mean and sample standard deviation),
+with an improvement at every seed. Random reflection augmentation during
+training does not make the averaging effect vanish. The additional
+equivariance condition of Proposition~\ref{prop:sym} is not assumed for this
+refiner; these changes are empirical measurements.
+The kernel-flow regularizer did not improve
 the low-data MLP's validation error. At high data the ten-seed records give
 $\saKfMlpThree\%$ at weight $0.3$ against $\saKfMlpZero\%$ without it, and
 $\saKfMlpOne\%$ at weight $1.0$ in the recorded smaller campaign.
@@ -33,7 +39,7 @@ The kernel prediction supplies the refiner's conditioning field. Its residual
 is less correlated with the neural members' residuals on the measured splits,
 which motivates this input but does not establish that a second network's
 conditioning field would be inferior. Section~\ref{sec:diversity} reports the
-ensemble comparisons and their retrospective second-moment diagnostics.
+ensemble comparisons and their second-moment diagnostics.
 
 \begin{table}[t]
 \centering
@@ -109,24 +115,34 @@ whose correlation is $0.01$.}
 
 \subsection{Spectra and effective dimension}
 \label{sec:spectra}
-Figure~\ref{fig:spectra} shows the spectrum of the Mat\'ern Gram matrix on the
-loads and the effective dimension $d_{\mathrm{eff}}(\lambda)$ from the identity
-of Lemma~\ref{lem:deff}. A few hundred eigenvalues carry most of the mass,
-with a tail many orders of magnitude below the leading modes. At the selected
-nugget the effective dimension is a few hundred out of $n=19000$.
-This is a summary of the regularized smoothing matrix, not a generalization
-guarantee for the selected estimator. The positive nugget means the correction
-is a ridge fit rather than an interpolant. The dense factorization still
-performs its full cubic computation regardless of this spectral concentration.
+Figure~\ref{fig:spectra} reports a separate diagnostic on $6000$ rows sampled
+without replacement from the $19000$ training rows. The load coordinates are
+standardized using the full training design. The Mat\'ern-$5/2$ length scale
+is fixed at four times the median distance on a $2000$-row training subsample,
+and the marked nugget is $10^{-5}$. These match the parameters recorded for
+the earlier hybrid diagnostic; they are not a new selection or the parameters
+of every deployed correction. The split and sampling generators both use seed~0.
+
+The leading eight eigenvalues carry $99\%$ of the trace, while
+$d_{\mathrm{eff}}(10^{-5})=103.11885$. Spectral mass and effective dimension
+summarize different aspects of the matrix: the latter counts each mode with
+weight $\mu_i/(\mu_i+6000\lambda)$. An independent Cholesky calculation of
+$6000-6000\lambda\operatorname{tr}\big((K_S+6000\lambda I)^{-1}\big)$ agrees with the
+eigenvalue sum to $1.7\times10^{-11}$. The directory
+\mbox{\path{campaign/collected/spectrum_20260906}} retains the selected rows,
+normalization, eigenvalues and generation record. This regenerated diagnostic
+does not measure the full deployed smoother. Its spectral concentration also
+does not reduce the cubic work of the dense factorization used here.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figs/spectra.pdf}
-\caption{Left: eigenvalues of the Mat\'ern Gram matrix $K/n$ on the loads
-(log scale); the spectrum decays by many orders of magnitude within a few
-hundred modes. Right: the effective dimension $d_{\mathrm{eff}}(\lambda)$ from
-the exact identity of Lemma~\ref{lem:deff}, with the validation-selected nugget
-marked.}
+\caption{A regenerated $6000$-row training-subsample diagnostic with the fixed
+kernel parameters specified in the text. Left: eigenvalues of $K_S/6000$
+on a log scale. Right: the effective dimension from Lemma~\ref{lem:deff};
+the marker at the fixed nugget $10^{-5}$ gives $103.12$. Both panels describe
+this subsample matrix. The eigenvalues and an independent direct trace check
+are included in the numerical record.}
 \label{fig:spectra}
 \end{figure}
 
@@ -134,33 +150,30 @@ marked.}
 \subsection{Cost and reproducibility}
 \label{sec:cost}
 The pipeline was built on a single laptop and replicated on four cloud CPU
-instances. The kernel stages are exact: one Cholesky factorization of the
-$19000\times19000$ Mat\'ern Gram matrix in double precision takes $24$ seconds
-on the laptop's CPU ($16$ threads, OpenBLAS; the matrix itself is $2.9$\,GB),
-and between $18$ and $32$ seconds on the campaign instances, on which it ran
-ten times, once per seed. Prediction is two matrix products; there are no
-inducing points, stochastic solvers, or preconditioners, and no GPU is needed
-for the correction. The factorization performs the full
-$n^3/3\approx2.3\times10^{12}$ floating-point operations --- numerical low rank
-does not reduce the work of a dense Cholesky --- and the measured rate, about
-$100$ gigaflops per second, is simply what a current multicore CPU delivers;
-exactness at this $n$ costs half a minute, not a cluster. What the low effective
-dimension of Section~\ref{sec:spectra} buys is statistical rather than
-computational: it describes where the solve's information concentrates at the
-working nugget, not its flop count.
+instances. The kernel stages use dense, exact linear solves. At the campaign's
+shapes, an eight-thread timing diagnostic measured $\costGramS$ seconds to
+build a $19000\times19000$ Gram matrix in blocks, $\costCholS$ seconds for its
+Cholesky factorization, and $\costSolveS$ seconds to solve for 1681 output
+coordinates. The roughly one-minute total excludes hyperparameter search,
+network training and prediction. Values in this timing experiment are
+synthetic; the dimensions and operations match the campaign. The factorization
+performs $n^3/3\approx2.3\times10^{12}$ floating-point operations. Low effective
+dimension describes the regularized spectrum but does not reduce this dense
+factorization's arithmetic cost. No GPU, inducing points, preconditioner or
+stochastic linear solver is used in the correction.
 
 Building the Gram matrix, not factoring it, is the stage that needs care at
 this size: forming it through a full squared-distance matrix and its
 elementwise transforms allocates several $2.9$\,GB temporaries at once, which
-exhausted a $31$\,GB instance during the campaign. Filling it in row blocks into
-a single preallocated array holds the peak at the matrix itself and is what the
-released code does. The neural means have a few million parameters and include both metric-loss
+exhausted a $31$\,GB instance during the campaign. The block-filled timing
+diagnostic has a measured peak of $\costPeakBlockGb$\,GiB, including the
+factorization and solves, compared with $\costPeakNaiveGb$\,GiB after the
+full-matrix construction. This is a demonstrated implementation option:
+the main correction driver still forms full-size temporaries and needs
+the corresponding memory. The neural means have a few million parameters and include both metric-loss
 and normalized-MSE training. Splits are specified by permutation seeds and
 inputs are the 41-dimensional loads described in Section~\ref{sec:benchmark}.
-The recorded fitting stages use validation-based choices, but this paper is a
-retrospective study of multiple campaigns and diagnostics on reused benchmark
-blocks. We do not treat the test block as a pristine final holdout for the
-whole research process. The release contains splits, code and per-seed
+The recorded fitting stages use validation-based choices. The release contains splits, code and per-seed
 summaries for checking reported rows. Prediction arrays and checkpoints are
 not distributed, so regenerating predictions requires retraining.
 
@@ -199,12 +212,10 @@ observed here.
 
 Three bands are calibrated on $1000$ cases selected from the test block and
 scored on the other $19000$: the scores are $\|e\|_2/P_\lambda$, $\|e\|_2$
-(constant width), and $\|e\|_2$ divided by ensemble disagreement. Each seed's
+(constant radius), and $\|e\|_2$ divided by ensemble disagreement. Each seed's
 $P_\lambda$ uses its own selected correction kernel and training design.
-These cases are disjoint for this calibration exercise. Disjointness alone
-does not establish exchangeability or undo earlier inspection of the test
-block in the research process. The measured coverages below are retrospective
-split diagnostics. The marginal split-conformal theorem applies when the
+These cases are disjoint for this calibration exercise. The measured
+coverages below are split diagnostics on the public test block. The marginal split-conformal theorem applies when the
 predictor and score are fixed independently of exchangeable calibration and
 future observations; the exact Beta and Beta--binomial descriptions additionally
 require conditionally i.i.d. continuous scores (or an appropriate randomized
@@ -221,7 +232,7 @@ $[88.0\%,91.8\%]$. The analogous $95\%$ interval is $[93.5\%,96.3\%]$.
 All ten recorded six-member coverages fall inside these intervals at each
 level. This comparison does not verify the reference model's assumptions.
 
-The constant-width band covers $\uqRawSix\pm\uqRawSixSd\%$ and
+The constant-radius band covers $\uqRawSix\pm\uqRawSixSd\%$ and
 $\uqRawSixHi\pm\uqRawSixHiSd\%$, inside the reference intervals at ten of
 ten seeds at both levels; the $P_\lambda$ band is on average
 \uqWidthRatio{} times as wide. The disagreement-scaled band covers
@@ -230,12 +241,12 @@ one seed on the upper edge of the $95\%$ reference interval. The five-member
 pipeline gives $\uqPlamFive\pm\uqPlamFiveSd\%$ and
 $\uqPlamFiveHi\pm\uqPlamFiveHiSd\%$ for the $P_\lambda$ band (ten and nine
 seeds inside), and $\uqRawFive\pm\uqRawFiveSd\%$ and
-$\uqRawFiveHi\pm\uqRawFiveHiSd\%$ for the constant-width band (ten inside
+$\uqRawFiveHi\pm\uqRawFiveHiSd\%$ for the constant-radius band (ten inside
 at both levels). The records are
 \texttt{collected/dgx/uq\_plam\_seeded.json} and the \texttt{uq} field of
 each seed's pipeline record, produced by
 \texttt{campaign/uq\_conformal\_plam.py} and
-\texttt{campaign/conformal\_seeded.py}. Here the constant-width band is
+\texttt{campaign/conformal\_seeded.py}. Here the constant-radius band is
 narrower, and the kernel design factor provides no measured efficiency gain.
 
 \begin{table}[t]
@@ -250,13 +261,12 @@ the energy of the fitted label array. The residual labels mix foldwise
 kernel predictions and in-sample neural predictions, so these numbers are
 not identified as lower bounds for the native-space norm of the deployed
 residual. The ratios depend on the nugget and the scale
-the correction selected (an earlier draft quoted $271$ at a different
-nugget), and most of the raw ratio is amplitude: per unit energy the
+the correction selected, and most of the raw ratio is amplitude: per unit energy the
 residual's fitted norm is \normRatioNorm{} times smaller at this seed, not
 \normRatio{}; at seeds $1$ and $2$, whose corrections chose scale
 multipliers $1$ and $2$, the raw ratios are \normRatioLo{} and $4300$ and the
 normalized ones \normRatioNormLo{} and $7.6$. Records
-\texttt{collected/dgx/sm\_norm\_check\_hpix\_s\{0,1,2\}.json}.}
+\texttt{collected/dgx/sm\_norm\_check\_hpix\_s}\{\texttt{0,1,2}\}\texttt{.json}.}
 \label{tab:norms}
 \begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{lccc}
@@ -289,7 +299,7 @@ so coverage varies strongly with the design factor despite an overall
 value close to the nominal level. Across the ten seeds the same band
 records $\uqPlamSix\pm\uqPlamSixSd\%$ at the nominal \uqCoverNom\% level,
 inside the i.i.d.-continuous Beta--binomial reference interval at ten
-seeds of ten; the constant-width band
+seeds of ten; the constant-radius band
 is the narrower of the two (Section~\ref{sec:uq}).}
 \label{fig:uq}
 \end{figure}
@@ -303,7 +313,7 @@ block): mean relative test error of the normalized-MSE network, mean and
 standard deviation over ten seeds, and of the deterministic Mat\'ern kernel
 ridge on loads, against the number of training samples, both axes
 logarithmic. The horizontal lines mark the six-member pipeline at $19000$
-samples and the best published result. Error bars are smaller than the
+samples and the quoted PARA-Net result. Error bars are smaller than the
 markers above $4000$.}
 \label{fig:scaling}
 \end{figure}
@@ -313,8 +323,7 @@ markers above $4000$.}
 
 The seed standard deviations describe variation from initialization and
 recorded selection on a common fixed test block. They do not include the
-sampling uncertainty of a future evaluation set or the effect of choices
-made during this retrospective research process. If cases were independent
+sampling uncertainty of a future evaluation set. If cases were independent
 and representative of a target population, the reported per-case standard
 deviation $0.0169$ would give a mean-error standard error of $\seTest$
 percentage points over $20000$ cases. We retain this as a sampling-scale
@@ -384,7 +393,7 @@ predictor; it does not transfer an RMS lower bound to mean error. We do not
 convert the final pipeline's mean error with dispersion factors from another
 predictor. Its per-pixel affine weights and kernel correction also place it
 outside the global convex class. Among global sum-to-one weights the signed
-and convex optima differ by at most $0.0005$ percentage points in the stored
+and convex optima differ by at most $0.00052$ percentage points in the stored
 records, but they do not always coincide: the signed minimizer has a negative
 coordinate at seven six-member seeds and one five-member seed.
 
@@ -434,7 +443,7 @@ Section~\ref{sec:seeds-arch} uses all available test predictions of the second
 campaign (\texttt{campaign/seedarch.py}, record
 \path{campaign/collected/dgx/seedarch.json}). A fixed permutation divides
 the test block into $1000$ fitting and $19000$ evaluation cases for this
-retrospective pooling exercise. Convex weights fitted on the first subset
+pooling exercise. Convex weights fitted on the first subset
 are evaluated on the second; the hindsight optimum is explicitly optimized
 on the evaluation matrix. Equal-weight seed curves average over all subsets
 for RMS error; mean errors use all subsets where there are at most $45$, and

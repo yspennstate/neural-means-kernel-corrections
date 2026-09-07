@@ -1,4 +1,4 @@
-\subsection{Symmetry averaging does not increase the risk}
+\subsection{Full-map symmetry averaging does not increase the risk}
 \label{sec:theory-sym}
 
 The elasticity problem behind the benchmark is invariant under the reflection
@@ -36,20 +36,79 @@ the reflection-augmented empirical loss upper-bounds the empirical loss of
 the symmetrized predictor. The objectives are generally different, so the
 proposition does not guarantee that training with augmentation improves the
 fitted model. The near-mirror checks support, but do not prove, exact
-symmetry of the distributed solver output. In the campaign, test-time
-averaging improves twenty-nine of thirty reflected members and worsens one
-by a thousandth of a point (Section~\ref{app:verification}). The convexity
+symmetry of the distributed solver output. In the campaign, the recorded
+averages improve twenty-nine of thirty members across the two MLP variants
+and the refiner, and worsen one by a thousandth of a point. The refiner's
+operation requires the distinction below. The convexity
 argument is standard; \citet{lyle2020benefits} give a general account.
+
+\paragraph{A supplied conditioning field is an additional input.}
+The proposition covers the full-map average $f_S$. A sufficient condition
+for the implemented supplied-field average to equal $f_S$ is
+$h(Su)=T h(u)$; the fitted kernel is not constrained to satisfy this condition.
+For a fitted refiner $F(u,h)$ and a fixed kernel predictor $h(u)$, define
+$f(u)=F(u,h(u))$. The proposition concerns
+\[
+f_S(u)=\tfrac12\big(F(u,h(u))+T F(Su,h(Su))\big).
+\]
+The implementation instead uses $T h(u)$ as the second branch's conditioning
+field. Thus $h(Su)=T h(u)$ is a sufficient additional condition for identifying
+the implemented average with $f_S$. Equivariance of the target and invariance
+of the load distribution do not establish this property of a fitted kernel
+predictor. Nor does training the refiner with randomly reflected triples
+force exact equivariance. We make no non-increase guarantee for its recorded
+averaging operation without that additional condition.
+
+There is a quantitative way to state the missing requirement. Write
+$b(u)=\tfrac12(F(u,h(u))+T F(Su,T h(u)))$ for the implemented average and
+$R(g)=\mathbb E\|g(u)-G(u)\|_2/\|G(u)\|_2$, assuming nonzero targets
+almost surely and finite quantities below. Under the proposition's exact
+symmetry assumptions,
+\begin{equation}\label{eq:refiner-defect}
+\begin{aligned}
+R(b)&\le R(f_S)+\frac12\mathbb E
+\frac{\|F(Su,T h(u))-F(Su,h(Su))\|_2}{\|G(u)\|_2}
+\\
+&\le R(f)+\frac12\mathbb E
+\frac{\|F(Su,T h(u))-F(Su,h(Su))\|_2}{\|G(u)\|_2}.
+\end{aligned}
+\end{equation}
+Indeed, the triangle inequality bounds the risk difference by
+$\mathbb E\|b-f_S\|_2/\|G\|_2$, and orthogonality of $T$ gives the
+displayed defect exactly; the second inequality is Proposition~\ref{prop:sym}.
+If $F(u,\cdot)$ is uniformly $L_h$-Lipschitz, the additional term is at most
+$(L_h/2)\mathbb E[\|T h(u)-h(Su)\|_2/\|G(u)\|_2]$.
+Neither this defect nor such a Lipschitz bound was measured in the campaign,
+so this inequality does not certify its observed error changes.
+
+The distinction can matter even with an exactly symmetric target. Let the
+input take the values $+1$ and $-1$ with equal probability, let $S$ exchange
+them, and let $T$ swap two output coordinates. Set $G(u)=(1,1)$,
+$h(+1)=(1,1)$ and $h(-1)=(3,3)$. Define $F(+1,z)=z$ and
+$F(-1,z)=(4,4)-z$. The four evaluations are
+\[
+\begin{aligned}
+F(+1,h(+1))&=(1,1), & F(-1,T h(+1))&=(3,3),\\
+F(-1,h(-1))&=(1,1), & F(+1,T h(-1))&=(3,3).
+\end{aligned}
+\]
+Thus $f(u)=G(u)$ at both inputs, and the full-map average
+also has zero error. Averaging with $T h(u)$ instead gives $(2,2)$ at both
+inputs, with relative error one. This finite example disproves a general
+guarantee for the supplied-field operation and attains equality in
+\eqref{eq:refiner-defect} (here $L_h=1$). It is not a model of the measured
+benchmark. The accompanying \texttt{campaign/refiner\_symmetry\_diagnostic.py}
+checks the construction and independently recomputes the ten recorded
+refiner differences.
 
 \subsection{What the kernel-flow regularizer estimates}
 \label{sec:theory-kf}
 
 The kernel-flow (KF) loss of Owhadi and Yoo \citep{owhadi2019kernel}, in the
 $\ell^2$ variant used by \citet{yoo2021deep} to regularize deep networks,
-enters our ablation study as an optional term in the training of the neural
-means. Its motivation is often stated informally (``a kernel is good if
-half the data predicts the rest''). The following observation makes the
-statement exact. Let $z_i=\phi_\theta(u_i)$ be the features of a batch
+motivates the optional regularizer in our ablation study. We first state
+the identity for exact interpolation, then describe the implementation's
+regularization and differentiation choices. Let $z_i=\phi_\theta(u_i)$ be the features of a batch
 $B=\{1,\dots,b\}$ ($b$ even), let $k$ be a positive definite kernel on feature
 space, and for $C\subset B$, $|C|=b/2$, let $I_C$ denote the $k$-interpolant
 of $\{(z_j,v_j):j\in C\}$. The batch KF loss is
@@ -77,13 +136,18 @@ derivative commute (e.g.\ under local Lipschitz domination).
 \noindent\emph{Proof.} See Supplement~\ref{proof:prop:kf}.
 
 
-The training loss we minimize for a neural mean is a sum of an empirical risk
-term and, optionally, $\beta\,e_2$: the first term is a linear functional of
-the empirical measure of the batch and measures fit, while
-Proposition~\ref{prop:kf} identifies the second as held-out-within-batch
-interpolation error. This motivates learning features for a later kernel
-stage; it is not an unbiased population-risk estimate for the adaptively
-trained network or its kernel head.
+The implemented ablation uses normalized targets and the mean squared loss
+over all $bq$ batch-output entries, with predictor
+$K_{BC}(K_{CC}+10^{-3}I)^{-1}Y_C$. Its errors on $C$ need not vanish:
+on those rows the residual is
+$10^{-3}(K_{CC}+10^{-3}I)^{-1}Y_C$. Consequently the exact leave-half-out
+identity above does not apply to the regularized loss. The learned Gaussian
+bandwidth multiplier is combined with a batch median distance computed
+under \texttt{no\_grad}; the resulting gradient also omits the dependence
+of that median on the features. It is a stop-gradient training rule, not
+the full derivative in Proposition~\ref{prop:kf}. These choices are fixed
+in the reported ablation. Neither the ideal identity nor its regularized
+analogue estimates the population risk of the adaptively trained network.
 
 
 \subsection{Capacity of stacking with fixed members}
@@ -94,7 +158,7 @@ weighted average of member losses. A separate uniform-deviation argument
 bounds the cost of fitting the weights when the candidate members are fixed
 independently of an i.i.d. validation sample and the losses have a population
 bound. These conditions are part of the following result; they are not
-established for the pipeline's reused validation split.
+assumed for the pipeline's validation split.
 
 \begin{proposition}[validation stacking]\label{prop:stack}
 Let $f_1,\dots,f_M:\mathcal U\to\mathcal V$ be fixed maps, let
@@ -174,7 +238,7 @@ over the class, then with probability at least $1-\delta$,
 \end{aligned}
 \]
 \item[(ii)] If instead $\widehat w_j$ minimizes the ridge objective
-$\widehat R_j(w)+\lambda\|w\|_2^2$ and satisfies $\|\widehat w_j\|_2\le W$,
+$\widehat R_j(w)+\lambda\|w\|_2^2$ with $\lambda\ge0$ and satisfies $\|\widehat w_j\|_2\le W$,
 the same bound holds with an additional $\lambda W^2$ on the right.
 \end{enumerate}
 \end{proposition}
@@ -276,7 +340,7 @@ is the right kind of constant for the corollary: it depends on nothing that
 is estimated. It is also why the corollary is a capacity bound and not a
 certificate. The excess term carries $(1+\kappa)^2$, so at
 $\kappa_{\mathrm{an}}=500$ the corollary's right-hand side is, like that of
-Proposition~\ref{prop:affine} before it, vacuous at the shipped constants by
+Proposition~\ref{prop:affine} before it, vacuous at the stated constants by
 many orders of magnitude. The realized scale of the weights is far smaller:
 on a test probe of five hundred points the largest $\ell^1$ norm over the
 grid averages $\kappaTen$ over the ten seeds
@@ -289,7 +353,7 @@ establishes is conditional: for candidates fixed independently of the
 validation sample, in the coordinatewise mean-squared metric, an oracle
 inequality of the ordinary $m^{-1/2}$ form holds with constants that are
 assumed as population bounds or, for $\kappa$, given in closed form. It is not a bound on the estimator
-the pipeline ships: that estimator is selected by mean relative $L^2$ error
+the pipeline fits: that estimator is selected by mean relative $L^2$ error
 rather than by squared coordinate risk, its kernel stages are tuned on an
 $8000$-row subsample and the winner is refit on all $19000$ rows, and the
 same validation split selects checkpoints and members --- none of which the
@@ -299,7 +363,7 @@ of the validation sample, which the deployed pipeline does not satisfy,
 since the same split selects checkpoints, members and, on OCO-2,
 coordinates; and the constants $B$, $b$, $L$, $W$ are population bounds,
 for which the text substitutes observed maxima, so the evaluated values are
-conditional capacity calculations and not guarantees for the shipped
+conditional capacity calculations and not guarantees for the fitted
 estimator. The split-conformal result of Section~\ref{supp:conf} gives marginal
 coverage when its separate calibration assumptions hold; Theorem~\ref{thm:or} is a
 conditional worst-case bound whose constant is not observed.

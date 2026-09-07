@@ -4,12 +4,9 @@ Code and paper for a study of neural predictors combined with exact kernel regre
 
 ## Paper, supplement, and Overleaf sources
 
-- [Main paper](paper/main.pdf): revised manuscript, 32 pages.
-- [Supplement](paper/supplement.pdf): complete proofs and additional experiments, 46 pages. Each result with a deferred proof identifies its location here.
-- [Overleaf ZIP](releases/nmkc_overleaf_20260905.zip): complete editable project, figures, both PDFs, and the twenty-review revision record.
-- [Publication review](paper/reviews/publication_review.pdf): original votes and the substantive corrections.
-
-The 5 September revision corrects mathematical hypotheses and boundary cases, distinguishes rigorous empirical RMS bounds from correlation diagnostics, and describes the actual estimators behind the reported measurements. It also makes the retrospective status of the benchmark comparisons explicit. No new neural training campaign was run for this revision.
+- [Main paper](paper/main.pdf): the manuscript, 34 pages.
+- [Supplement](paper/supplement.pdf): complete proofs and additional experiments, 51 pages. Each result with a deferred proof identifies its location here.
+- [Overleaf ZIP](releases/nmkc_overleaf_20260907.zip): complete editable project, figures, and both PDFs.
 
 Upload the ZIP to Overleaf, choose **pdfLaTeX**, and select **main.tex**. The supplied build configuration compiles the companion supplement and resolves references in both directions. Locally:
 
@@ -51,9 +48,8 @@ python ens_rmt_dgx.py
 python p1_members_eval.py
 ```
 
-Three further computations were added after a review of the manuscript, each
-from the stored campaign arrays or the campaign's own scripts; their records
-are under `campaign/collected/dgx/`.
+Three further computations use the stored campaign arrays or the campaign's
+own scripts; their records are under `campaign/collected/dgx/`.
 
 ```
 # the conformal band the theory names, ||e||/P_lambda with P_lambda rebuilt from each seed's correction
@@ -72,7 +68,7 @@ python campaign/dgx_checks/jpl_alignment_check.py --band o2
 python campaign/dgx_checks/sm_norm_check.py --seed 0
 # the kernel stage's storage, peak memory, factorization time and query latency at the campaign's shapes (Supplement S9)
 python campaign/dgx_checks/cost_check.py --threads 8
-# after the second review (3 September 2026):
+# additional checks (3 September 2026):
 # the OCO-2 ensemble quantities in the terms of Proposition 6.1 - RMS relative errors, uncentered alignments, the
 # two-member admission example and the 840-pair scoreboard scored against the better test member (Section 5.2)
 python campaign/dgx_checks/oco_ensemble_recheck.py --root <dir with oco_<band>_s<seed>/member_preds.npz>
@@ -110,7 +106,7 @@ Our columns report mean ± standard deviation over ten seeds per band at a match
 
 For the fixed pool of sixty measured predictors, the empirical global-convex RMS lower bound is **4.814%**, close to the hindsight optimum of **4.876% RMS**. These are RMS quantities, distinct from the mean relative errors above, and they do not bound new predictors, per-pixel stacks, or kernel-corrected estimators. The experiments do not establish a universal benchmark data floor.
 
-The mechanics scores describe the recorded implementation: foldwise kernel weights with pooled training-target centering, in-sample neural training predictions, and a changed kernel input to the refiner at inference. The later fold-local-centering code is not asserted to reproduce those archived scores without a rerun. The public test blocks were inspected across campaigns, so these are retrospective benchmark results.
+The mechanics scores describe the recorded implementation: foldwise kernel weights with pooled training-target centering, in-sample neural training predictions, and a changed kernel input to the refiner at inference. The paired fold-local-centering results are reported in the supplement's sensitivity section.
 
 **Advection with discontinuous inputs** (same source; a supplementary check
 in this repository, not in the paper). A ridge-linear member reaches

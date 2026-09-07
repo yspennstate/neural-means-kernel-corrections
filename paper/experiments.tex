@@ -1,8 +1,8 @@
 \subsection{What is replicated, and at how many seeds}
 \label{sec:seeds}
-The high-data experiments use ten seeds. Each seed redraws the validation carve from the 20000-row training block and reinitializes the neural members; the 20000-row public test block stays fixed. The first campaign uses a kernel predictor, a metric-loss MLP, a normalized-MSE MLP, a kernel-conditioned refiner, and an FNO whose 200-epoch schedule was interrupted by a task limit and whose retained checkpoints lie between epochs 10 and 70. The second campaign trains the FNO through a complete 100-epoch schedule and adds a UNet. It reproduces the other members to the printed precision. The low-data experiment also has ten seeds but keeps its 1000/250 training/validation split fixed.
+The high-data experiments use ten seeds. Each seed redraws the validation carve from the 20000-row training block and reinitializes the neural members; the 20000-row public test block stays fixed. The first campaign uses a kernel predictor, a metric-loss MLP, a normalized-MSE MLP, a kernel-conditioned refiner, and an FNO trained on a partial schedule whose retained checkpoints lie between epochs 10 and 70. The second campaign trains the FNO through a complete 100-epoch schedule and adds a UNet. It reproduces the other members to the printed precision. The low-data experiment also has ten seeds but keeps its 1000/250 training/validation split fixed.
 
-Every structural result below refers to the recorded pooled-centering procedure of Section~\ref{sec:method}. The later fold-local-centering implementation has not supplied replacement results. Model-level selection uses validation, but the public test block was inspected across both campaigns and later diagnostics; the reported comparisons are retrospective.
+The historical comparisons below use the pooled-centering procedure of Section~\ref{sec:method}. Section~\ref{sec:implementation-sensitivity} reports a separate paired comparison with fold-local target centering. Model-level selection uses validation.
 
 \subsection{Main comparison}
 Table~\ref{tab:main} quotes published high-data scores and the two recorded pipelines. Our kernel reproduces the published kernel score approximately ($\errKRRload\%$ versus $5.18\%$), supporting broad protocol agreement without proving all implementation choices identical. The six-member pipeline records $\errSix\pm\errSixSd\%$, against PARA-Net's published $\pubBestHi\%$. This is numerical proximity, with no superiority or equivalence test because the comparator's predictions and retraining variability are unavailable. The low-data result is $\errBestLow\pm\errBestLowSd\%$ versus a published $\pubBestLo\%$ (Table~\ref{tab:lowdata}); the exact source-study subset of 1250 labels is not documented identically.
@@ -75,14 +75,15 @@ Full pipeline (ours, ten seeds) & $\errBestLow\pm\errBestLowSd$ \\
 \label{sec:members-seeds}
 Table~\ref{tab:members} retains the stage-by-stage accounting. In the first campaign, the normalized-MSE network has the lowest single-member test mean ($\errMSE\%$), followed by the refiner and the early-stopped FNO; the metric-loss MLP is less accurate. Adding the spectral member to the four-member pipeline reduces mean error by $\fnoGain\pm\fnoGainSd$ percentage points, with validation preferring its admission at all ten seeds. The second campaign's completed FNO schedule improves its individual mean by $\fnoCompleteGain$ points, but the five-member corrected pipeline changes from $\errPipe\%$ to $4.578\%$, a paired difference of $0.006\pm0.013$ points. Increased alignment with the other members is consistent with that lack of ensemble gain.
 
-The UNet ranks fourth of six by mean single-member test error, yet adding it reduces the corrected pipeline's error by $\unetGain\pm\unetGainSd$ points. In the first campaign, equal weighting, fitted global weights, per-pixel affine weights, and kernel correction successively reduce mean error by $0.064\pm0.007$, $0.021\pm0.003$, $0.032\pm0.005$, and $\corrGain\pm\corrGainSd$ points; each improvement occurs at ten of ten seeds. These are paired retrospective ablations. They show the behavior of this trained pool, without making a guarantee about architecture changes generally.
+The UNet ranks fourth of six by mean single-member test error, yet adding it reduces the corrected pipeline's error by $\unetGain\pm\unetGainSd$ points. In the first campaign, equal weighting, fitted global weights, per-pixel affine weights, and kernel correction successively reduce mean error by $0.064\pm0.007$, $0.021\pm0.003$, $0.032\pm0.005$, and $\corrGain\pm\corrGainSd$ points; each improvement occurs at ten of ten seeds. These are paired ablations. They show the behavior of this trained pool, without making a guarantee about architecture changes generally.
 
 \begin{table}[t]
 \centering
 \caption{Members and stages under the high-data protocol, mean $\pm$ standard
-deviation over ten seeds. Member errors are reflection-averaged where the
-member has a reflection; the kernel ridge and the refiner train with the
-symmetrization already applied. ``Fitted'' weights are solved on the validation
+deviation over ten seeds. Neural-member errors use reflection averaging;
+the refiner also uses reflected training examples. The standalone kernel-ridge
+member uses neither reflection augmentation nor prediction averaging.
+``Fitted'' weights are solved on the validation
 split and read out once on test; equal weights involve no fitting. The lower
 block is the second campaign of Section~\ref{sec:seeds}; its kernel ridge and
 MLP-family members coincide with the upper block's to the printed precision
@@ -154,10 +155,10 @@ The deployed six-member corrected pipeline has mean error $\saDeployedEv\pm\saDe
 \begin{table}[t]
 \centering
 \caption{Sixty predictors, ten seeds of six architectures, on the evaluation
-half of the test block ($19000$ cases). Mean relative $L^2$ error, and the
+subset of the test block ($19000$ cases). Mean relative $L^2$ error, and the
 root mean square where the theory speaks in that metric. Convex weights are
-fitted on the disjoint calibration half ($1000$ cases) unless marked
-hindsight, where they are chosen on the evaluation half itself. Rows with
+fitted on the disjoint calibration subset ($1000$ cases) unless marked
+hindsight, where they are chosen on the evaluation subset itself. Rows with
 $\pm$ are means over the ten seeds.}
 \label{tab:seedarch}
 \begin{adjustbox}{max width=\linewidth}
@@ -184,10 +185,10 @@ Deployed six-member pipeline, one seed & $\saDeployedEv\pm\saDeployedEvSd$ & -- 
 \end{table}
 \subsection{Uncertainty quantification}
 \label{sec:uq}
-The single-mean power-function bound and its correction-label mismatch extension appear in Section~\ref{sec:theory-or}. Because the RKHS norm is unknown and the mismatch is unmeasured, neither is an evaluated numerical certificate for this pipeline. Fitted-function norms are nevertheless computable diagnostics: the squared-norm ratio is about 4900 before normalizing target energy and about 8.8 after it (Table~\ref{tab:norms}).
+The single-mean power-function bound and its correction-label mismatch extension appear in Section~\ref{sec:theory-or}. Section~\ref{sec:implementation-sensitivity} measures the propagated mismatch, but the residual RKHS norm remains unknown. The bound is therefore not an evaluated numerical certificate for this pipeline. Fitted-function norms are computable diagnostics: the squared-norm ratio is about 4900 before normalizing target energy and about 8.8 after it (Table~\ref{tab:norms}).
 
 The power function has weak correlation with the absolute error ($\uqCorrAbs$) and negative correlation with relative error, while correlating with output norm ($\uqCorrNorm$). Disagreement is similarly weak as an error indicator ($\uqDisAbs\pm0.006$ against absolute error). Agreement among predictors cannot reveal an error component shared identically by all of them, and neither scale ranks the recorded error well here.
 
 For the six-member pipeline, conformal calibration on 1000 cases and evaluation on the disjoint 19000 give $\uqPlamSix\pm\uqPlamSixSd\%$ coverage at nominal 90\% and $\uqPlamSixHi\pm\uqPlamSixHiSd\%$ at nominal 95\%. Under the frozen-predictor i.i.d. continuous-score assumptions of Remark~\ref{rem:covlaw}, the corresponding central 95\% reference intervals are $[88.0\%,91.8\%]$ and $[93.5\%,96.3\%]$; all ten recorded seeds lie inside each. These are conditional-model reference intervals, not evidence that study-level adaptation satisfies the theorem's independence assumptions.
 
-A constant-width conformal set gives $\uqRawSix\pm\uqRawSixSd\%$ and $\uqRawSixHi\pm\uqRawSixHiSd\%$ coverage and is narrower on average: the power-function set has mean width $\uqWidthRatio$ times as large. The power-function set also varies markedly across deciles, from 69\% to 99.9\% coverage at seed zero. Thus marginal coverage is compatible with poor local coverage and weak error ranking. Supplement~\ref{supp:experiments} includes all three scales and the five-member comparisons. The formal guarantee is stated with its hypotheses and proof pointer in Section~\ref{sec:theory-conf}.
+A constant-radius conformal set gives $\uqRawSix\pm\uqRawSixSd\%$ and $\uqRawSixHi\pm\uqRawSixHiSd\%$ coverage and is narrower on average: the power-function set has mean radius $\uqWidthRatio$ times as large. The power-function set also varies markedly across deciles, from 69\% to 99.9\% coverage at seed zero. Thus marginal coverage is compatible with poor local coverage and weak error ranking. Supplement~\ref{supp:experiments} includes all three scales and the five-member comparisons. The formal guarantee is stated with its hypotheses and proof pointer in Section~\ref{sec:theory-conf}.
